@@ -1,5 +1,5 @@
 import React from "react";
 
-export default function Home({ text }) {
+export default function LandingPage({ text }) {
     return <div className="text-blue-700">Hello {text}</div>;
 }
