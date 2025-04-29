@@ -7,8 +7,14 @@ createInertiaApp({
     resolve: (name) => {
         const pages = import.meta.glob("./Pages/**/*.jsx", { eager: true });
         let page = pages[`./Pages/${name}.jsx`];
-        page.default.layout =
-            page.default.layout || ((page) => <MainLayout children={page} />);
+
+        // Condition to skip wrapping page inside Main layout
+        if (page.default.layout === undefined) {
+            page.default.layout =
+                page.default.layout ||
+                ((page) => <MainLayout children={page} />);
+        }
+
         return page;
     },
     setup({ el, App, props }) {
