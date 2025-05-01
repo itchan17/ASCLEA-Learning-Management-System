@@ -15,6 +15,6 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard/Dashboard');
 });
 
-Route::get('/student-analytics', function () {
-    return Inertia::render('StudentAnalytics/StudentAnalytics');
+Route::get('/programs', function () {
+    return Inertia::render('Programs/Programs');
 });
