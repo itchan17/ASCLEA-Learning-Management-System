@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import Navbar from "./Navbar";
-import Sidebar from "./Sidebar";
+import Navbar from "./Navbar/Navbar";
+import Sidebar from "./Sidebar/Sidebar";
 
 export default function MainLayout({ children }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -43,7 +43,7 @@ export default function MainLayout({ children }) {
                     setIsSidebarOpen={setIsSidebarOpen}
                     isMdScreen={isMdScreen}
                 />
-                <main className="flex-1 px-8 w-full max-w-[1900px] overflow-y-auto">
+                <main className="flex-1 p-8 w-full max-w-[1900px] overflow-y-auto">
                     {children}
                 </main>
             </div>
