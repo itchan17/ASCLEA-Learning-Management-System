@@ -24,7 +24,7 @@ export default function Sidebar({
         { url: "/dashboard", text: "Dashboard", icon: MdSpaceDashboard },
         {
             url: "/student-analytics",
-            text: "Student Anlytics",
+            text: "Student Analytics",
             icon: MdAnalytics,
         },
         { url: "/staff", text: "Staff", icon: MdPeopleAlt },
@@ -61,7 +61,7 @@ export default function Sidebar({
         >
             <div
                 className={`h-20 flex items-center w-full ${
-                    expanded ? "justify-between px-6" : "justify-center"
+                    expanded ? "justify-between pl-6 pr-3" : "justify-center"
                 }`}
             >
                 {/* Display logo */}
@@ -77,13 +77,13 @@ export default function Sidebar({
                 {isSidebarOpen && isMdScreen ? (
                     <div
                         onClick={closeSidebar}
-                        className="text-2xl cursor-pointer hover:bg-ascend-lightblue p-2 transition-hover duration-300"
+                        className="text-2xl cursor-pointer hover:bg-ascend-lightblue p-3 rounded-[50px]  transition-hover duration-300"
                     >
                         <MdClose />
                     </div>
                 ) : (
                     <button
-                        className="cursor-pointer hover:bg-ascend-lightblue p-2 transition-hover duration-300"
+                        className="cursor-pointer hover:bg-ascend-lightblue p-3 rounded-[50px] transition-hover duration-300"
                         onClick={toggleMenu}
                     >
                         <div className="w-6 h-5 hidden space-y-1 lg:flex flex-col items-end justify-center ">
