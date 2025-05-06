@@ -18,3 +18,8 @@ Route::get('/dashboard', function () {
 Route::get('/programs', function () {
     return Inertia::render('Programs/Programs');
 });
+
+Route::get('/registration', function () {
+    return Inertia::render('RegistrationPage/Registration');
+});
+
