@@ -25,21 +25,21 @@ export default function LandingpageNav() {
                 />
             </div>
             <menu className="flex items-center space-x-8 xl:space-x-12">
-                <ul className="hidden lg:flex space-x-8 xl:space-x-12 font-nunito-sans text-ascend-white font-bold">
-                    <li>
-                        <a href="">Home</a>
+                <ul className="hidden lg:flex space-x-8 xl:space-x-12 font-nunito-sans text-ascend-white font-bold \">
+                    <li className="hover:text-ascend-blue transition-all duration-300">
+                        <a href="#home">Home</a>
                     </li>
-                    <li>
-                        <a href="">About Us</a>
+                    <li className="hover:text-ascend-blue transition-all duration-300">
+                        <a href="#about-us">About Us</a>
                     </li>
-                    <li>
-                        <a href="">Programs</a>
+                    <li className="hover:text-ascend-blue transition-all duration-300">
+                        <a href="#programs">Programs</a>
                     </li>
-                    <li>
-                        <a href="">Admissions</a>
+                    <li className="hover:text-ascend-blue transition-all duration-300">
+                        <a href="#admission">Admission</a>
                     </li>
-                    <li>
-                        <a href="">Contact</a>
+                    <li className="hover:text-ascend-blue transition-all duration-300">
+                        <a href="#contact">Contact</a>
                     </li>
                 </ul>
                 <div className="space-x-2 hidden md:flex">
@@ -78,30 +78,32 @@ export default function LandingpageNav() {
 
             {/* Dropdown menu */}
             <menu
-                className={`flex flex-col items-start lg:hidden absolute top-full py-4 px-10 w-full bg-primary-color shadow-xl transition-all duration-300 ease-out transform ${
+                className={`flex flex-col items-start lg:hidden absolute z-10 top-full py-4 w-full bg-primary-color shadow-xl transition-all duration-300 ease-in-out transform ${
                     isOpen
                         ? "opacity-100 translate-y-0 pointer-events-auto"
-                        : "opacity-0 translate-y-4 pointer-events-none"
-                } backdrop-blur-3xl bg-ascend-black/80 space-y-4`}
+                        : "opacity-0 -translate-y-5 pointer-events-none"
+                } backdrop-blur-3xl bg-ascend-black/80 overflow-y-auto max-h-[60vh]`}
             >
                 <ul className="flex flex-col w-full font-nunito-sans text-ascend-white font-bold">
-                    <li className="py-4">
-                        <a href="">Home</a>
-                    </li>
-                    <li className="py-4">
-                        <a href="">About Us</a>
-                    </li>
-                    <li className="py-4">
-                        <a href="">Programs</a>
-                    </li>
-                    <li className="py-4">
-                        <a href="">Admissions</a>
-                    </li>
-                    <li className="py-4">
-                        <a href="">Contact</a>
-                    </li>
+                    {[
+                        { label: "Home", href: "#home" },
+                        { label: "About Us", href: "#about-us" },
+                        { label: "Programs", href: "#programs" },
+                        { label: "Admission", href: "#admission" },
+                        { label: "Contact", href: "#contact" },
+                    ].map((item) => (
+                        <li key={item.href} onClick={toggleMenu}>
+                            <a
+                                href={item.href}
+                                className="block w-full py-4 px-10 hover:bg-ascend-lightblue hover:text-ascend-blue transition-all duration-300"
+                            >
+                                {item.label}
+                            </a>
+                        </li>
+                    ))}
                 </ul>
-                <div className="space-x-2 flex md:hidden ">
+
+                <div className="space-x-2 flex md:hidden py-4 px-10">
                     <PrimaryButton
                         textColor={"text-ascend-black"}
                         btnColor={"bg-ascend-white"}

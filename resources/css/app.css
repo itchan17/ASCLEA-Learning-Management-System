@@ -16,6 +16,10 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+html {
+    scroll-behavior: smooth;
+}
+
 @utility scrollbar-default {
     &::-webkit-scrollbar {
         display: block;
