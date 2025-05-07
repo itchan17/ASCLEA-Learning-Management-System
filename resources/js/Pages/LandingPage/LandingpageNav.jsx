@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Link } from "@inertiajs/react";
+import { Link as ReactScrollLink } from "react-scroll";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
 
 export default function LandingpageNav() {
@@ -26,29 +28,39 @@ export default function LandingpageNav() {
             </div>
             <menu className="flex items-center space-x-8 xl:space-x-12">
                 <ul className="hidden lg:flex space-x-8 xl:space-x-12 font-nunito-sans text-ascend-white font-bold \">
-                    <li className="hover:text-ascend-blue transition-all duration-300">
-                        <a href="#home">Home</a>
-                    </li>
-                    <li className="hover:text-ascend-blue transition-all duration-300">
-                        <a href="#about-us">About Us</a>
-                    </li>
-                    <li className="hover:text-ascend-blue transition-all duration-300">
-                        <a href="#programs">Programs</a>
-                    </li>
-                    <li className="hover:text-ascend-blue transition-all duration-300">
-                        <a href="#admission">Admission</a>
-                    </li>
-                    <li className="hover:text-ascend-blue transition-all duration-300">
-                        <a href="#contact">Contact</a>
-                    </li>
+                    {[
+                        { label: "Home", href: "home" },
+                        { label: "About Us", href: "about-us" },
+                        { label: "Programs", href: "programs" },
+                        { label: "Admission", href: "admission" },
+                        { label: "Contact", href: "contact" },
+                    ].map((item) => (
+                        <li key={item.href}>
+                            <ReactScrollLink
+                                onClick={toggleMenu}
+                                offset={item.href === "contact" && -300}
+                                to={item.href}
+                                smooth={true}
+                                duration={500}
+                                className="hover:text-ascend-blue transition-all duration-300 cursor-pointer"
+                            >
+                                {item.label}
+                            </ReactScrollLink>
+                        </li>
+                    ))}
                 </ul>
                 <div className="space-x-2 hidden md:flex">
-                    <PrimaryButton
-                        textColor={"text-ascend-black"}
-                        btnColor={"bg-ascend-white"}
-                        text={"Login"}
-                    />
-                    <PrimaryButton text={"Enroll"} />
+                    <Link href={"/login"}>
+                        <PrimaryButton
+                            textColor={"text-ascend-black"}
+                            btnColor={"bg-ascend-white"}
+                            text={"Login"}
+                        />
+                    </Link>
+
+                    <Link href={"/registration"}>
+                        <PrimaryButton text={"Enroll"} />
+                    </Link>
                 </div>
                 <button
                     onClick={toggleMenu}
@@ -86,30 +98,39 @@ export default function LandingpageNav() {
             >
                 <ul className="flex flex-col w-full font-nunito-sans text-ascend-white font-bold">
                     {[
-                        { label: "Home", href: "#home" },
-                        { label: "About Us", href: "#about-us" },
-                        { label: "Programs", href: "#programs" },
-                        { label: "Admission", href: "#admission" },
-                        { label: "Contact", href: "#contact" },
+                        { label: "Home", href: "home" },
+                        { label: "About Us", href: "about-us" },
+                        { label: "Programs", href: "programs" },
+                        { label: "Admission", href: "admission" },
+                        { label: "Contact", href: "contact" },
                     ].map((item) => (
-                        <li key={item.href} onClick={toggleMenu}>
-                            <a
-                                href={item.href}
-                                className="block w-full py-4 px-10 hover:bg-ascend-lightblue hover:text-ascend-blue transition-all duration-300"
+                        <li key={item.href}>
+                            <ReactScrollLink
+                                onClick={toggleMenu}
+                                to={item.href}
+                                smooth={true}
+                                duration={500}
+                                offset={item.href === "contact" && -50}
+                                className="block w-full py-4 px-10 hover:bg-ascend-lightblue hover:text-ascend-blue transition-all duration-300 cursor-pointer"
                             >
                                 {item.label}
-                            </a>
+                            </ReactScrollLink>
                         </li>
                     ))}
                 </ul>
 
                 <div className="space-x-2 flex md:hidden py-4 px-10">
-                    <PrimaryButton
-                        textColor={"text-ascend-black"}
-                        btnColor={"bg-ascend-white"}
-                        text={"Login"}
-                    />
-                    <PrimaryButton text={"Enroll"} />
+                    <Link href={"/login"}>
+                        <PrimaryButton
+                            textColor={"text-ascend-black"}
+                            btnColor={"bg-ascend-white"}
+                            text={"Login"}
+                        />
+                    </Link>
+
+                    <Link href={"/registration"}>
+                        <PrimaryButton text={"Enroll"} />
+                    </Link>
                 </div>
             </menu>
         </nav>

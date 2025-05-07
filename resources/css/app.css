@@ -16,10 +16,6 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-html {
-    scroll-behavior: smooth;
-}
-
 @utility scrollbar-default {
     &::-webkit-scrollbar {
         display: block;
@@ -70,4 +66,7 @@ html {
     --color-ascend-lightyellow: #ffeecc;
     --color-ascend-black: #313131;
     --color-ascend-white: #ffffff;
+    --color-ascend-gray1: #8a8989;
+    --color-ascend-gray2: #6c6969;
+    --color-ascend-gray3: #545454;
 }

@@ -9,13 +9,14 @@ import {
     AiOutlineMail,
     AiOutlineFacebook,
 } from "react-icons/ai";
+import { Link as ReactScrollLink } from "react-scroll";
 
 export default function LandingPage({ text }) {
     useEffect(() => {
         AOS.init({ duration: 1000 });
     }, []);
     return (
-        <div className="scroll-smooth">
+        <div className="landing-page">
             <LandingpageNav />
             <header
                 id="home"
@@ -58,7 +59,7 @@ export default function LandingPage({ text }) {
                 id="about-us"
                 className="flex justify-center w-full px-5 lg:px-[100px] py-20 lg:py-40"
             >
-                <div className="relative border w-full lg:ml-40 md:w-170 lg:w-140 bg-ascend-white p-10 space-y-5 shadow-[5px_10px_15px_0px_#0a0a0a]">
+                <div className="relative border border-ascend-gray1 w-full lg:ml-40 md:w-170 lg:w-140 bg-ascend-white p-10 space-y-5 shadow-[5px_10px_15px_0px_#0a0a0a]">
                     <h1 className="text-4xl font-shippori font-semibold">
                         About Us
                     </h1>
@@ -95,7 +96,7 @@ export default function LandingPage({ text }) {
                     ></div>
                 </div>
             </section>
-            <div className="bg-ascend-black h-[0.5px] mx-5 lg:mx-[100px]" />
+            <div className="bg-ascend-gray1 h-[0.5px] mx-5 lg:mx-[100px]" />
 
             {/* Mission & Vision */}
             <section
@@ -140,7 +141,7 @@ export default function LandingPage({ text }) {
                     </ul>
                 </div>
             </section>
-            <div className="bg-ascend-black h-[0.5px] mx-5 lg:mx-[100px]" />
+            <div className="bg-ascend-gray1 h-[0.5px] mx-5 lg:mx-[100px]" />
 
             {/* Offered Services */}
             <section
@@ -207,7 +208,7 @@ export default function LandingPage({ text }) {
                     <div className="relative w-full sm:w-0">
                         <div
                             data-aos="flip-left"
-                            className="absolute w-full sm:-right-70 lg:-left-2 top-95 lg:top-20 sm:w-120 sm:h-100 bg-ascend-white space-y-10 border shadow-[5px_10px_15px_0px_#0a0a0a] p-8 text-ascend-black"
+                            className="absolute w-full sm:-right-70 lg:-left-2 top-95 lg:top-20 sm:w-120 sm:h-100 bg-ascend-white space-y-10 border border-ascend-gray1 shadow-[5px_10px_15px_0px_#0a0a0a] p-8 text-ascend-black"
                         >
                             <h1 className="font-shippori text-center text-size6 font-semibold">
                                 For CTP
@@ -228,7 +229,7 @@ export default function LandingPage({ text }) {
                         </div>
                         <div
                             data-aos="flip-right"
-                            className="absolute w-full sm:-right-50 lg:-right-2 sm:w-120 h-100 bg-ascend-white space-y-10 border shadow-[5px_10px_15px_0px_#0a0a0a] p-8 text-ascend-black"
+                            className="absolute w-full sm:-right-50 lg:-right-2 sm:w-120 h-100 bg-ascend-white space-y-10 border border-ascend-gray1 shadow-[5px_10px_15px_0px_#0a0a0a] p-8 text-ascend-black"
                         >
                             <h1 className="font-shippori text-center text-size6 font-semibold ">
                                 For LET
@@ -244,13 +245,10 @@ export default function LandingPage({ text }) {
             </section>
 
             {/* Contact Us */}
-            <section
-                id="contact"
-                className="relative flex w-full md:h-100 border border-r scroll-mt-40 md:scroll-mt-100"
-            >
+            <section id="contact" className="relative flex w-full md:h-100">
                 <div
                     data-aos="fade-up"
-                    className="px-5 py-10 md:p-10 md:absolute md:left-1/2 md:transform md:-translate-x-1/2 md:-top-[50%] w-full max-w-280 md:border bg-ascend-white space-y-10 md:shadow-[5px_10px_15px_0px_#0a0a0a]"
+                    className="px-5 py-10 md:p-10 md:absolute md:left-1/2 md:transform md:-translate-x-1/2 md:-top-[50%] w-full max-w-280 md:border md:border-ascend-gray1 bg-ascend-white space-y-10 md:shadow-[5px_10px_15px_0px_#0a0a0a]"
                 >
                     <div
                         id="contact"
@@ -276,32 +274,32 @@ export default function LandingPage({ text }) {
                             </div>
                         </div>
                         <div className="w-full md:w-1/2 space-y-6">
-                            <div className="flex flex-col space-y-4">
+                            <form className="flex flex-col space-y-4">
                                 <input
                                     type="text"
                                     placeholder="Your name"
-                                    className="border py-3 px-5 focus:outline-ascend-blue"
+                                    className="border border-ascend-black py-3 px-5 focus:outline-ascend-blue"
                                 />
                                 <input
                                     type="email"
                                     placeholder="Your email"
-                                    className="border py-3 px-5 focus:outline-ascend-blue"
+                                    className="border border-ascend-black py-3 px-5 focus:outline-ascend-blue"
                                 />
                                 <textarea
                                     name=""
                                     id=""
                                     placeholder="Write a message"
-                                    className="border py-3 px-5 focus:outline-ascend-blue"
+                                    className="border border-ascend-black py-3 px-5 focus:outline-ascend-blue"
                                     rows={6}
                                 ></textarea>
-                            </div>
+                            </form>
                             <PrimaryButton text={"Submit"} />
                         </div>
                     </div>
                 </div>
             </section>
 
-            <footer className="px-5 lg:px-[100px] py-10 lg:py-20 w-full bg-ascend-white border-t-[0.5px] space-y-20">
+            <footer className="px-5 lg:px-[100px] py-10 lg:py-20 w-full bg-ascend-white border-t-[0.5px] border-ascend-gray1 space-y-20">
                 <div className="grid lg:grid-cols-[1fr_2fr_2fr] gap-8 lg:gap-4 h-full font-nunito-sans">
                     <div>
                         <img
@@ -313,7 +311,7 @@ export default function LandingPage({ text }) {
                     <div className="space-y-5 lg:space-y-10 ">
                         <p className="text-size4">
                             611 JPRizal Boulevard, Brgy. Labas, City of Santa
-                            Rosa, Laguna (near Archway beside Don Benitos)
+                            Rosa, Laguna
                         </p>
                         <p>0919-914-9515 / 0993-423-9308</p>
                         <p>ascendreview@yahoo.com</p>
@@ -321,36 +319,44 @@ export default function LandingPage({ text }) {
                     <div className="grid grid-cols-2 gap-8 lg:gap-4">
                         <div>
                             <ul className="space-y-4">
-                                <li>
-                                    <a href="#home">Home</a>
-                                </li>
-                                <li>
-                                    <a href="#about-us">About Us</a>
-                                </li>
-                                <li>
-                                    <a href="#programs">Programs</a>
-                                </li>
-                                <li>
-                                    <a href="#admission">Admission</a>
-                                </li>
-                                <li>
-                                    <a href="#contact">Contact</a>
-                                </li>
+                                {[
+                                    { label: "Home", href: "home" },
+                                    { label: "About Us", href: "about-us" },
+                                    { label: "Programs", href: "programs" },
+                                    { label: "Admission", href: "admission" },
+                                    { label: "Contact", href: "contact" },
+                                ].map((item) => (
+                                    <li key={item.href}>
+                                        <ReactScrollLink
+                                            to={item.href}
+                                            smooth={true}
+                                            duration={500}
+                                            offset={
+                                                item.href === "contact" && -300
+                                            }
+                                            className="cursor-pointer hover:underline"
+                                        >
+                                            {item.label}
+                                        </ReactScrollLink>
+                                    </li>
+                                ))}
                             </ul>
                         </div>
                         <div>
                             <ul className="space-y-4">
                                 <li>
-                                    <a href="">Facebook</a>
-                                </li>
-                                <li>
-                                    <a href="">Instagram</a>
+                                    <a
+                                        href="https://www.facebook.com/ascendctp"
+                                        className="cursor-pointer hover:underline"
+                                    >
+                                        Facebook
+                                    </a>
                                 </li>
                             </ul>
                         </div>
                     </div>
                 </div>
-                <div className="text-center text-gray-700">
+                <div className="text-center text-ascend-gray2">
                     <span>© 2025 All rights reserved.</span>
                 </div>
             </footer>
