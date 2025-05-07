@@ -2,11 +2,23 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Shippori+Mincho&display=swap");
 
 @import "tailwindcss";
+@plugin "daisyui" {
+    themes: false;
+    root: ":root";
+    include: ;
+    exclude: ;
+    prefix: ;
+    logs: true;
+}
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
+
+html {
+    scroll-behavior: smooth;
+}
 
 @utility scrollbar-default {
     &::-webkit-scrollbar {
