@@ -16,7 +16,7 @@ export default function LandingPage({ text }) {
         AOS.init({ duration: 1000 });
     }, []);
     return (
-        <div className="landing-page">
+        <div className="landing-page overflow-x-hidden">
             <LandingpageNav />
             <header
                 id="home"
