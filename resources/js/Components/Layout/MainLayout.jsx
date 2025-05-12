@@ -35,7 +35,7 @@ export default function MainLayout({ children }) {
             {isSidebarOpen && (
                 <div
                     onClick={closeSidebar}
-                    className="fixed inset-0 bg-black opacity-25 z-40 lg:hidden transition-opacity duration-300"
+                    className="fixed inset-0 bg-black/25 z-40 lg:hidden transition-opacity duration-300"
                 />
             )}
             <div className="flex flex-col items-center w-full h-screen overflow-x-hidden">

@@ -1,29 +1,34 @@
-import React from "react";
+import { useState } from "react";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
-import { MdNotifications } from "react-icons/md";
+import ProgramEmptyState from "./ProgramComponent/ProgramEmptyState";
+import AddProgramForm from "./ProgramComponent/AddProgramForm";
 
 export default function Programs() {
+    const [isModalOpen, setIsModalOpen] = useState(false);
     console.log("Render Programs");
 
     const doSomething = () => {
         console.log("CLick Button");
     };
 
+    const toggleModal = () => {
+        setIsModalOpen(!isModalOpen);
+    };
+
     return (
-        <div className="flex flex-wrap space-y-40">
-            <PrimaryButton
-                doSomething={doSomething}
-                icon={<MdNotifications />}
-                text={"Button"}
-            />
-            Programs
-            {/* <div className="break-all">
-                asdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfdfsdfdsafdsfds
-            </div> */}
-            <div className="border w-64 h-20"></div>
-            <div className="border w-64 h-20"></div>
-            <div className="border w-64 h-20"></div>
-            <div className="border w-64 h-20"></div>
-        </div>
+        <>
+            <div className="font-nunito-sans">
+                <div className="flex justify-end">
+                    <PrimaryButton
+                        doSomething={toggleModal}
+                        text={"Create Program"}
+                    />
+                </div>
+                <div className="w-full">
+                    <ProgramEmptyState />
+                </div>
+                {isModalOpen && <AddProgramForm toggleModal={toggleModal} />}
+            </div>
+        </>
     );
 }

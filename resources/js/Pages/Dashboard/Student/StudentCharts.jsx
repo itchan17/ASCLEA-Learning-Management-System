@@ -81,7 +81,7 @@ export default function StudentCharts() {
                             </option>
                         </select>
                         <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
-                            <MdKeyboardArrowDown className="text-size6" />
+                            <MdKeyboardArrowDown className="text-size5" />
                         </div>
                     </div>
                     <Bar
