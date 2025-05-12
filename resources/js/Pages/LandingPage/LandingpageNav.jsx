@@ -110,7 +110,7 @@ export default function LandingpageNav() {
                                 to={item.href}
                                 smooth={true}
                                 duration={500}
-                                offset={item.href === "contact" && -50}
+                                offset={item.href === "contact" && -300}
                                 className="block w-full py-4 px-10 hover:bg-ascend-lightblue hover:text-ascend-blue transition-all duration-300 cursor-pointer"
                             >
                                 {item.label}

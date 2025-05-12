@@ -38,12 +38,12 @@ export default function MainLayout({ children }) {
                     className="fixed inset-0 bg-black opacity-25 z-40 lg:hidden transition-opacity duration-300"
                 />
             )}
-            <div className="flex flex-col items-center w-full h-screen">
+            <div className="flex flex-col items-center w-full h-screen overflow-x-hidden">
                 <Navbar
                     setIsSidebarOpen={setIsSidebarOpen}
                     isMdScreen={isMdScreen}
                 />
-                <main className="flex-1 p-8 w-full max-w-[1900px] overflow-y-auto">
+                <main className="flex-1 p-2 sm:p-8 w-full max-w-[1900px] overflow-y-auto">
                     {children}
                 </main>
             </div>
