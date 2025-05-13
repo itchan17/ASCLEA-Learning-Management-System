@@ -6,9 +6,11 @@ export default function PrimaryButton({
     text,
     textColor,
     btnColor,
+    btnType = "button",
 }) {
     return (
         <button
+            type={btnType}
             onClick={doSomething}
             className={`px-5 h-10 space-x-1 ${
                 btnColor || "bg-ascend-blue"

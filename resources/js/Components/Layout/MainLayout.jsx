@@ -43,7 +43,7 @@ export default function MainLayout({ children }) {
                     setIsSidebarOpen={setIsSidebarOpen}
                     isMdScreen={isMdScreen}
                 />
-                <main className="flex-1 p-2 sm:p-8 w-full max-w-[1900px] overflow-y-auto">
+                <main className="flex-1 p-2 sm:px-8 sm:py-5 w-full max-w-[1900px] overflow-y-auto">
                     {children}
                 </main>
             </div>

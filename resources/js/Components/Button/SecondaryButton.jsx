@@ -6,9 +6,11 @@ export default function SecondaryButton({
     text,
     textColor,
     borderColor,
+    btnType = "button",
 }) {
     return (
         <button
+            type={btnType}
             onClick={doSomething}
             className={`px-5 h-10 space-x-1 ${
                 borderColor || "border-ascend-blue"
