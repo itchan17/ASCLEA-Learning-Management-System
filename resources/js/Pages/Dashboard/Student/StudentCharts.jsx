@@ -2,7 +2,8 @@ import React from "react";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Chart as ChartJS } from "chart.js/auto";
 import { Line, Bar } from "react-chartjs-2";
-import { MdKeyboardArrowDown, MdArrowUpward } from "react-icons/md";
+import { MdArrowUpward } from "react-icons/md";
+import CustomSelect from "../../../Components/CustomInputField/CustomSelect";
 
 export default function StudentCharts() {
     return (
@@ -64,26 +65,26 @@ export default function StudentCharts() {
                             <MdArrowUpward className="text-ascend-green text-size3" />
                         </span>
                     </div>
-                    <div className="w-full relative">
-                        <select
-                            className="w-full rounded-none appearance-none border px-2 s text-size1 py-2 focus:outline-ascend-blue"
-                            name="Select Course"
-                            id=""
-                        >
-                            <option className="" value="">
-                                Select a course
-                            </option>
-                            <option value="let">
-                                Licensure Examination for Teachers
-                            </option>
-                            <option value="ctp">
-                                Certificate in Teaching Program
-                            </option>
-                        </select>
-                        <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
-                            <MdKeyboardArrowDown className="text-size6" />
-                        </div>
-                    </div>
+                    <CustomSelect
+                        selectField={
+                            <select
+                                className="w-full rounded-none appearance-none border px-2 s text-size1 py-2 focus:outline-ascend-blue"
+                                name="Select Course"
+                                id=""
+                            >
+                                <option className="" value="">
+                                    Select a course
+                                </option>
+                                <option value="let">
+                                    Licensure Examination for Teachers
+                                </option>
+                                <option value="ctp">
+                                    Certificate in Teaching Program
+                                </option>
+                            </select>
+                        }
+                    />
+
                     <Bar
                         data={{
                             labels: ["Previous Drill", "Current Drill"],
