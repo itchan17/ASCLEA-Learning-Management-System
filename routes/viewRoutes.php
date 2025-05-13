@@ -23,3 +23,5 @@ Route::get('/registration', function () {
     return Inertia::render('RegistrationPage/Registration');
 });
 
+
+

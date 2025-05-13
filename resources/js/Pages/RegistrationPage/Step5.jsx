@@ -2,14 +2,14 @@ import React from 'react'
 
 const Step5 = () => {
   return (
-    <div className="mx-auto max-w-4xl border-[2px] border-[#8A8989] bg-white p-6 shadow-lg">
+    <div className="mx-auto max-w-4xl border-[2px] border-ascend-gray1 bg-white p-10 shadow-lg">
       <h3 className="text-size3 mb-4 font-semibold text-left text-black">Enrollment Policy</h3>
       <div className="text-size1 mb-4 text-left text-black">
         I promise to abide by the rules and regulations of the center.
         I understand that down payment and enrolment fees are NON-REFUNDABLE but are transferable within one (1) year period only.
       </div>
       <div className="flex items-center space-x-3 mb-4">
-        <input type="checkbox" className="w-3 h-3 rounded-full border border-[#8A8989] " />
+        <input type="checkbox" className="w-3 h-3 rounded-full border border-ascend-gray1 " />
         <label className="text-size2">I acknowledge and agree to the enrollment policy</label>
       </div>  
      
@@ -30,7 +30,7 @@ const Step5 = () => {
         13. Mock examination results will be released only upon settlement of remaining balance. Once your balance is paid in full, all holds are released and access to your results returns normal.<br />
       </div>
         <div className="flex items-center space-x-3 mb-4">
-            <input type="checkbox" className="w-3 h-3 rounded-full border border-[#8A8989] " />
+            <input type="checkbox" className="w-3 h-3 rounded-full border border-ascend-gray1 " />
             <label className="text-size2">By enrolling in review class, I certify that I agree to the term and conditions</label>
         </div>
 
