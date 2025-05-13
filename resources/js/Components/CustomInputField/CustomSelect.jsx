@@ -1,12 +1,12 @@
 import React from "react";
 import { MdKeyboardArrowDown } from "react-icons/md";
 
-export default function CustomSelect({ selectField, spaceRight = "2" }) {
+export default function CustomSelect({ selectField, spaceRight = "right-2" }) {
     return (
         <div className="relative">
             {selectField}
             <div
-                className={`pointer-events-none absolute inset-y-0 right-${spaceRight} flex items-center`}
+                className={`pointer-events-none absolute inset-y-0 ${spaceRight} flex items-center`}
             >
                 <MdKeyboardArrowDown className="text-size5" />
             </div>
