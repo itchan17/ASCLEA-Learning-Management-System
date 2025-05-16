@@ -15,10 +15,18 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard/Dashboard');
 });
 
+// Program routes
 Route::get('/programs', function () {
     return Inertia::render('Programs/Programs');
 });
 
+Route::get('/programs/{programId}', function () {
+    return Inertia::render('Programs/ProgramComponent/ProgramContent');
+});
+
+
+
+// Registration route
 Route::get('/registration', function () {
     return Inertia::render('RegistrationPage/Registration');
 });

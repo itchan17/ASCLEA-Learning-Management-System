@@ -1,9 +1,9 @@
 import { useState } from "react";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
-import ProgramEmptyState from "./ProgramComponent/ProgramEmptyState";
 import AddProgramForm from "./ProgramComponent/AddProgramForm";
 import useProgramStore from "../../Stores/Programs/programStore";
 import ProgramCard from "./ProgramComponent/ProgramCard";
+import EmptyState from "../../Components/EmptyState/EmptyState";
 
 export default function Programs() {
     // Program Store
@@ -27,7 +27,21 @@ export default function Programs() {
                     />
                 </div>
 
-                {programList?.length > 0 ? (
+                {/* Program placeholder */}
+                <div className="w-full flex flex-wrap gap-5">
+                    <ProgramCard
+                        programId={1}
+                        programName={"Licensure Examination for Teacher"}
+                    />
+
+                    <ProgramCard
+                        programId={2}
+                        programName={"Certificate in Teaching Program"}
+                    />
+                </div>
+
+                {/* Display created program */}
+                {/* {programList?.length > 0 ? (
                     <div className="w-full flex flex-wrap gap-5">
                         {programList.map((program, index) => {
                             return (
@@ -39,8 +53,12 @@ export default function Programs() {
                         })}
                     </div>
                 ) : (
-                    <ProgramEmptyState />
-                )}
+                    <EmptyState
+                        imgSrc={"/images/illustrations/launch.svg"}
+                        text={`“No programs? Time to fill this space to start learning
+                adventures!”`}
+                    />
+                )} */}
 
                 {isModalOpen && <AddProgramForm toggleModal={toggleModal} />}
             </div>
