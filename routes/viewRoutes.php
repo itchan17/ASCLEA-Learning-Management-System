@@ -20,10 +20,15 @@ Route::get('/programs', function () {
     return Inertia::render('Programs/Programs');
 });
 
+// Route for selected program
 Route::get('/programs/{programId}', function () {
     return Inertia::render('Programs/ProgramComponent/ProgramContent');
 });
 
+// Route for selected course in the program
+Route::get('/programs/{programId}/course/{courseId}', function () {
+    return Inertia::render('Programs/CourseComponent/CourseContent');
+});
 
 
 // Registration route

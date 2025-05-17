@@ -9,7 +9,6 @@ export default function ProgramCard({ programName, programId }) {
 
     const stopPropagation = (e) => {
         e.stopPropagation();
-        e.preventDefault();
     };
 
     return (

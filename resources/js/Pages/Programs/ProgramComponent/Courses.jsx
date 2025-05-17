@@ -1,11 +1,22 @@
-import React from "react";
+import { useState } from "react";
 import { IoImageSharp } from "react-icons/io5";
 import CustomSelect from "../../../Components/CustomInputField/CustomSelect";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
 import EmptyState from "../../../Components/EmptyState/EmptyState";
 import CourseCard from "./CourseCard";
+import AddCourseForm from "./AddCourseForm";
+import useCourseStore from "../../../Stores/Programs/courseStore";
 
 export default function Courses() {
+    // Course Store
+    const courseList = useCourseStore((state) => state.courseList);
+
+    const [isOpen, setIsOpen] = useState(false);
+
+    const toggleModal = () => {
+        setIsOpen(!isOpen);
+    };
+
     return (
         <div className="w-full space-y-5 font-nunito-sans">
             <div className="relative bg-ascend-gray1 w-full h-50 rounded-tl-xl rounded-br-xl">
@@ -35,18 +46,57 @@ export default function Courses() {
                         </select>
                     }
                 />
-                <PrimaryButton text={"Add Course"} />
-            </div>
-            <div className="w-full flex flex-wrap gap-5">
-                <CourseCard />
-                <CourseCard />
-                <CourseCard />
+                <PrimaryButton doSomething={toggleModal} text={"Add Course"} />
             </div>
 
-            {/* <EmptyState
-                imgSrc={"/images/illustrations/blank_canvas.svg"}
-                text={`“Nothing to see here… yet! Add some content to get going.”`}
-            /> */}
+            {/* Display moda form */}
+            {isOpen && <AddCourseForm toggleModal={toggleModal} />}
+
+            {/* Display courses */}
+            <div className="w-full flex flex-wrap gap-5">
+                {/* {courseList?.length > 0 ? (
+                    courseList.map((course, index) => {
+                        return (
+                            <CourseCard
+                                key={index}
+                                courseCode={course.courseCode}
+                                courseName={course.courseName}
+                                courseDescription={course.courseDescription}
+                            />
+                        );
+                    })
+                ) : (
+                    <EmptyState
+                        imgSrc={"/images/illustrations/blank_canvas.svg"}
+                        text={`“Nothing to see here… yet! Add some content to get going.”`}
+                    />
+                )} */}
+
+                <CourseCard
+                    courseId={1}
+                    courseCode={"EDUC 101"}
+                    courseName={"Facilitating Learners"}
+                    courseDescription={
+                        "Lorem ipsum dolor Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea."
+                    }
+                />
+                <CourseCard
+                    courseId={2}
+                    courseCode={"EDUC 101"}
+                    courseName={"Facilitating Learners"}
+                    courseDescription={
+                        "Lorem ipsum dolor Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea."
+                    }
+                />
+                <CourseCard
+                    courseId={3}
+                    courseCode={"EDUC 101"}
+                    courseName={"Facilitating Learners"}
+                    courseDescription={
+                        "Lorem ipsum dolor Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea."
+                    }
+                />
+            </div>
         </div>
     );
 }

@@ -2,7 +2,7 @@ import React from "react";
 
 export default function Tabs({ doSomething, tabList, activeTab }) {
     return (
-        <div className="h-12 -mt-2 sm:-mt-5 border-b border-ascend-gray1 w-full py-1 flex justify-center items-center space-x-1 font-nunito-sans">
+        <div className="h-12 -mt-2 sm:-mt-5 border-b border-ascend-gray1 w-full py-1 flex sm:justify-center items-center overflow-x-auto space-x-1 font-nunito-sans">
             {tabList.map((tab, index) => (
                 <div
                     onClick={() => doSomething(index)}

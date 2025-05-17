@@ -41,24 +41,24 @@ export default function Programs() {
                 </div>
 
                 {/* Display created program */}
-                {/* {programList?.length > 0 ? (
-                    <div className="w-full flex flex-wrap gap-5">
-                        {programList.map((program, index) => {
+                {/* <div className="w-full flex flex-wrap gap-5">
+                    {programList?.length > 0 ? (
+                        programList.map((program, index) => {
                             return (
                                 <ProgramCard
                                     key={index}
                                     programName={program.programName}
                                 />
                             );
-                        })}
-                    </div>
-                ) : (
-                    <EmptyState
-                        imgSrc={"/images/illustrations/launch.svg"}
-                        text={`“No programs? Time to fill this space to start learning
+                        })
+                    ) : (
+                        <EmptyState
+                            imgSrc={"/images/illustrations/launch.svg"}
+                            text={`“No programs? Time to fill this space to start learning
                 adventures!”`}
-                    />
-                )} */}
+                        />
+                    )}
+                </div> */}
 
                 {isModalOpen && <AddProgramForm toggleModal={toggleModal} />}
             </div>

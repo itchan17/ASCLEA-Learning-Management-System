@@ -9,13 +9,6 @@ export default function AddCourse({ toggleAddCourse }) {
     const handleCourseChange = useCourseStore(
         (state) => state.handleCourseChange
     );
-    const addCourse = useCourseStore((state) => state.addCourse);
-
-    const saveCourse = (e) => {
-        e.preventDefault();
-        addCourse();
-        toggleAddCourse();
-    };
 
     return (
         <div className="space-y-5">
@@ -116,7 +109,6 @@ export default function AddCourse({ toggleAddCourse }) {
                     </div>
                 </div>
             </div>
-            <PrimaryButton doSomething={saveCourse} text={"Save"} />
         </div>
     );
 }
