@@ -3,8 +3,8 @@ import { IoImageSharp } from "react-icons/io5";
 import CustomSelect from "../../../Components/CustomInputField/CustomSelect";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
 import EmptyState from "../../../Components/EmptyState/EmptyState";
-import CourseCard from "./CourseCard";
-import AddCourseForm from "./AddCourseForm";
+import CourseCard from "./CourseComponent/CourseCard";
+import AddCourseForm from "./CourseComponent/AddCourseForm";
 import useCourseStore from "../../../Stores/Programs/courseStore";
 
 export default function Courses() {
@@ -17,8 +17,10 @@ export default function Courses() {
         setIsOpen(!isOpen);
     };
 
+    console.log("Render Courses");
+
     return (
-        <div className="w-full space-y-5 font-nunito-sans">
+        <div className="w-full space-y-5 font-nunito-sans text-ascend-black">
             <div className="relative bg-ascend-gray1 w-full h-50 rounded-tl-xl rounded-br-xl">
                 <label htmlFor="inputBg">
                     <IoImageSharp className="text-size4 text-ascend-black absolute top-2 right-2 cursor-pointer" />
@@ -48,9 +50,6 @@ export default function Courses() {
                 />
                 <PrimaryButton doSomething={toggleModal} text={"Add Course"} />
             </div>
-
-            {/* Display moda form */}
-            {isOpen && <AddCourseForm toggleModal={toggleModal} />}
 
             {/* Display courses */}
             <div className="w-full flex flex-wrap gap-5">
@@ -97,6 +96,9 @@ export default function Courses() {
                     }
                 />
             </div>
+
+            {/* Display modal form */}
+            {isOpen && <AddCourseForm toggleModal={toggleModal} />}
         </div>
     );
 }

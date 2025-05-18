@@ -1,8 +1,8 @@
 import React from "react";
 import AddCourse from "./AddCourse";
-import PrimaryButton from "../../../Components/Button/PrimaryButton";
-import SecondaryButton from "../../../Components/Button/SecondaryButton";
-import useCourseStore from "../../../Stores/Programs/courseStore";
+import PrimaryButton from "../../../../Components/Button/PrimaryButton";
+import SecondaryButton from "../../../../Components/Button/SecondaryButton";
+import useCourseStore from "../../../../Stores/Programs/courseStore";
 
 export default function AddCourseForm({ toggleModal }) {
     // Course Store

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
 import SecondaryButton from "../../../Components/Button/SecondaryButton";
-import AddCourse from "./AddCourse";
-import CourseItem from "./CourseItem";
+import AddCourse from "./CourseComponent/AddCourse";
+import CourseItem from "./CourseComponent/CourseItem";
 import useProgramStore from "../../../Stores/Programs/programStore";
 import useCourseStore from "../../../Stores/Programs/courseStore";
 

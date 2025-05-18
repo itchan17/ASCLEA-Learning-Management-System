@@ -27,7 +27,12 @@ Route::get('/programs/{programId}', function () {
 
 // Route for selected course in the program
 Route::get('/programs/{programId}/course/{courseId}', function () {
-    return Inertia::render('Programs/CourseComponent/CourseContent');
+    return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContent');
+});
+
+// Route for selected user in the program
+Route::get('/programs/{programId}/user/{userId}', function () {
+    return Inertia::render('Programs/ProgramComponent/PeopleComponent/ViewUser');
 });
 
 

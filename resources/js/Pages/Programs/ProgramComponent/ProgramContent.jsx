@@ -2,22 +2,21 @@ import { useState } from "react";
 import Courses from "./Courses";
 import People from "./People";
 import Tabs from "../../../Components/Tabs/Tabs";
+import useProgramStore from "../../../Stores/Programs/programStore";
 
 export default function ProgramContent() {
-    const [activeTab, setActiveTab] = useState(0);
+    // Program Store
+    const activeTab = useProgramStore((state) => state.activeTab);
+    const setActiveTab = useProgramStore((state) => state.setActiveTab);
 
     // Tab list
     const tabs = ["Courses", "People"];
-
-    const handleCLickTab = (tab) => {
-        setActiveTab(tab);
-    };
 
     return (
         <div className="space-y-5">
             <Tabs
                 activeTab={activeTab}
-                doSomething={handleCLickTab}
+                doSomething={setActiveTab}
                 tabList={tabs}
             />
 

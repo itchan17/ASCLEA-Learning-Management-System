@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
 import AddProgramForm from "./ProgramComponent/AddProgramForm";
 import useProgramStore from "../../Stores/Programs/programStore";
@@ -8,6 +8,7 @@ import EmptyState from "../../Components/EmptyState/EmptyState";
 export default function Programs() {
     // Program Store
     const programList = useProgramStore((state) => state.programList);
+    const setActiveTab = useProgramStore((state) => state.setActiveTab);
 
     console.log(programList);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,6 +17,10 @@ export default function Programs() {
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
     };
+
+    useEffect(() => {
+        setActiveTab(0);
+    }, []);
 
     return (
         <>

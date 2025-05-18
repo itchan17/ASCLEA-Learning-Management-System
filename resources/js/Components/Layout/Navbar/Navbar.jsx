@@ -72,7 +72,7 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
         <nav
             className={`relative h-20 w-full flex items-center justify-between ${
                 isMdScreen ? "pl-3 pr-6" : "px-6"
-            } font-nunito-sans text-ascend-black`}
+            } font-nunito-sans text-ascend-black border`}
         >
             <div className="flex items-center space-x-1 md:space-x-6">
                 {isMdScreen && (

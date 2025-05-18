@@ -1,7 +1,7 @@
 import React from "react";
-import PrimaryButton from "../../../Components/Button/PrimaryButton";
-import CustomSelect from "../../../Components/CustomInputField/CustomSelect";
-import useCourseStore from "../../../Stores/Programs/courseStore";
+import PrimaryButton from "../../../../Components/Button/PrimaryButton";
+import CustomSelect from "../../../../Components/CustomInputField/CustomSelect";
+import useCourseStore from "../../../../Stores/Programs/courseStore";
 
 export default function AddCourse({ toggleAddCourse }) {
     //Course Store

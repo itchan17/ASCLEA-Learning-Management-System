@@ -3,6 +3,7 @@ import { create } from "zustand";
 const useProgramStore = create((set) => ({
     programList: [],
     program: { programName: "", programDescription: "" },
+    activeTab: 0,
 
     handleProgramChange: (field, value) =>
         set((state) => ({
@@ -31,6 +32,12 @@ const useProgramStore = create((set) => ({
 
         // Clear the form
         clearProgram();
+    },
+
+    setActiveTab: (tab) => {
+        const { activeTab } = useProgramStore.getState();
+
+        set({ activeTab: tab });
     },
 }));
 
