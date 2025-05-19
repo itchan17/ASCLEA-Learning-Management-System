@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { GoArrowLeft } from "react-icons/go";
 import { GoCheck } from "react-icons/go";
+import useRegistrationStore from "../../Stores/Registration/registrationStore";
+import { router } from '@inertiajs/react';
+import validator from 'validator';
 
 
 import Step1 from './Step1';
@@ -9,13 +12,191 @@ import Step3 from './Step3';
 import Step4 from './Step4';
 import Step5 from './Step5';
 import Step6 from './Step6';  
+import Step7 from './Step7';
 import SuccessPage from './SuccessPage';
 
 import PrimaryButton from "../../Components/Button/PrimaryButton";
 
 function Registration() {
-  const [currentStep, setCurrentStep] = useState(1);
 
+  const [currentStep, setCurrentStep] = useState(1);
+  
+  const addRegistration = useRegistrationStore((state) => state.addRegistration);
+  const registrationList = useRegistrationStore((state) => state.registrationList);
+
+    const registration = useRegistrationStore((state) => state.registration);
+    const handleRegistrationChange = useRegistrationStore(
+      (state) => state.handleRegistrationChange
+  );
+
+  const handleAdd = (e) => {
+    addRegistration();
+    const updatedList = useRegistrationStore.getState().registrationList;
+    console.log(updatedList);
+
+   };
+
+  const handleValidation = () => {
+    if (currentStep === 1 || currentStep === 7) {
+      if (validator.isEmpty(registration.lastname, {ignore_whitespace: true})) {
+        alert("Lastname name is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.firstname, {ignore_whitespace: true})) {
+        alert("First name is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.birthday)) {
+        alert("Birthday is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.sex)) {
+        alert("Sex is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.contactnumber, {ignore_whitespace: true})) {
+        alert("Contact number is required");
+        return false;
+      };
+      if (!validator.isNumeric(registration.contactnumber)|| registration.contactnumber.length !== 11 || !registration.contactnumber.startsWith("09") ) {
+        alert("Invalid contact number");
+        return false;   
+      };
+      if (validator.isEmpty(registration.emailaddress, {ignore_whitespace: true})) {
+        alert("Email address is required");
+        return false;
+      };
+      if (!validator.isEmail(registration.emailaddress)) {
+        alert("Invalid email address");
+        return false;
+      };
+      if (validator.isEmpty(registration.address, {ignore_whitespace: true})) {
+        alert("Address is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.region)) {
+        alert("Region is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.province)) {
+        alert("Province is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.city)) {
+        alert("City is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.barangay)) {
+        alert("Barangay is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.zipcode, {ignore_whitespace: true})) {
+        alert("Zip code is required");
+        return false;
+      };
+      if (!validator.isNumeric(registration.zipcode) || registration.zipcode.length !== 4) {
+        alert("Invalid zipcode");
+        return false;   
+      };
+    return true;
+    }
+    else if (currentStep === 2 || currentStep === 7)  {
+      if (validator.isEmpty(registration.school, {ignore_whitespace: true})) {
+        alert("School name is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.course, {ignore_whitespace: true})) {
+        alert("Course is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.yeargrad)) {
+        alert("Year graduate is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.occupation, {ignore_whitespace: true})) {
+        alert("Occupation is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.company, {ignore_whitespace: true})) {
+        alert("Company name is required");
+        return false;
+      };
+      return true;
+    }
+    else if (currentStep === 3 || currentStep === 7)  {
+      if (validator.isEmpty(registration.fgcivilstatus)) {
+        alert("Civil status is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.fgname, {ignore_whitespace: true})) {
+        alert("Spouse's / Guardian's Name is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.fgaddress, {ignore_whitespace: true})) {
+        alert("Address is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.fgregion)) {
+        alert("Region is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.fgprovince)) {
+        alert("Province is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.fgcity)) {
+        alert("City is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.fgbarangay)) {
+        alert("Barangay is required");
+        return false;
+      };
+      if (validator.isEmpty(registration.fgcontactnum, {ignore_whitespace: true})) {
+        alert("Contact number is required");
+        return false;
+      };
+      if (!validator.isNumeric(registration.fgcontactnum)|| registration.fgcontactnum.length !== 11 || !registration.fgcontactnum.startsWith("09") ) { 
+        alert("Invalid contact number");
+        return false;   
+      };
+      if (validator.isEmpty(registration.fgzipcode, {ignore_whitespace: true})) {
+        alert("Zip code is required");
+        return false;
+      };
+      if (!validator.isNumeric(registration.fgzipcode) || registration.fgzipcode.length !== 4) {
+        alert("Invalid contact number");
+        return false;   
+      };
+      return true;
+    }
+    else if (currentStep === 4 || currentStep === 7)  {
+      if (validator.isEmpty(registration.selectedprog)) {
+        alert("Program is required");
+        return false;
+      };
+      return true;
+
+    } else if (currentStep === 5 || currentStep === 7)  {
+      if (registration.attachedfiles.length === 0) {
+        alert("Attached files is required");
+        return false;
+      };
+      return true;
+    }
+    else if (currentStep === 6)  {
+      if (registration.checked1 === false) {
+        alert("Enrollment policy is required");
+        return false;
+      }
+      else if (registration.checked2 === false) {
+        alert("Terms and conditions is required");
+        return false;
+      }
+      return true;
+    }
+  }
+  
   const showStep = () => {
     switch (currentStep) {
       case 1:
@@ -31,6 +212,8 @@ function Registration() {
       case 6:
         return <Step6 />;
       case 7:
+        return <Step7 />;
+      case 8:
         return <SuccessPage />;
       default:
         return null;
@@ -41,21 +224,21 @@ function Registration() {
     <div className="min-h-screen bg-white px-4 py-10 md:px-16">
       <div className="mb-6">
         <img src="/images/ascend_logo.png" alt="Ascend Logo" className="h-14" />
-        {currentStep < 7 && (
+        {currentStep < 8 && (
         <div className="flex mt-2 ml-10 md:ml-20">
           <GoArrowLeft
             className="text-2xl cursor-pointer"
-            onClick={() => setCurrentStep((prev) => Math.max(prev - 1, 1))}
+            onClick={() => router.visit('/')}
           />
         </div>
         )}
       </div>
       
-      {currentStep < 7 && (
+      {currentStep < 8 && (
       <div className="text-center text-size6 font-semibold text-black mb-10">Enrollment Form</div>
       )}
 
-      {currentStep < 7 && (
+      {currentStep < 8 && (
         <div className="text-center">
           <div className="flex justify-center items-center space-x-0 mb-6 sm:mb-0 mb-adjust-below-945">
             
@@ -99,6 +282,13 @@ function Registration() {
               {currentStep > 6 && <GoCheck className="text-white text-size4 font-bold" />}
               </div>
             </div>
+            <div className={`h-1 w-24 ${currentStep > 6 ? 'bg-ascend-blue' : 'bg-ascend-gray2'}`}></div>
+
+            <div className={`w-12 h-12 border-4 ${currentStep >= 7 ? 'border-ascend-blue' : 'border-ascend-gray2'} ${currentStep > 7 ? 'bg-ascend-blue' : 'bg-white'} rounded-full flex items-center justify-center flex-shrink-0`}>
+              <div className={`${currentStep == 7 ? 'w-3 h-3 bg-ascend-blue rounded-full' : ''}`}> 
+              {currentStep > 7 && <GoCheck className="text-white text-size4 font-bold" />}
+              </div>
+            </div>
 
           </div>
 
@@ -107,11 +297,11 @@ function Registration() {
             <div className={`text-size2 font-semibold ml-1 mr-5 ${currentStep >= 2 ? 'text-ascend-blue' : 'text-ascend-gray2'}`}>Education &<br />Employment<br />&nbsp;</div>
             <div className={`text-size2 font-semibold ml-8 mr-10 ${currentStep >= 3 ? 'text-ascend-blue' : 'text-ascend-gray2'}`}>Family/<br />Guardian<br />Information</div>
             <div className={`text-size2 font-semibold ml-7 mr-10 ${currentStep >= 4 ? 'text-ascend-blue' : 'text-ascend-gray2'}`}>Select<br />Program<br />&nbsp;</div>
-            <div className={`text-size2 font-semibold ml-9 mr-10 ${currentStep >= 5 ? 'text-ascend-blue' : 'text-ascend-gray2'}`}>Terms <br />and<br />Conditions</div>
-            <div className={`text-size2 font-semibold ml-9 mr-10 ${currentStep >= 6 ? 'text-ascend-blue' : 'text-ascend-gray2'}`}>Review<br />&nbsp;<br />&nbsp;</div>
+            <div className={`text-size2 font-semibold ml-7 mr-10 ${currentStep >= 5 ? 'text-ascend-blue' : 'text-ascend-gray2'}`}>Additional<br />Requirements<br />&nbsp;</div>
+            <div className={`text-size2 font-semibold ml-3 mr-10 ${currentStep >= 6 ? 'text-ascend-blue' : 'text-ascend-gray2'}`}>Terms <br />and<br />Conditions</div>
+            <div className={`text-size2 font-semibold ml-9 mr-10 ${currentStep >= 7 ? 'text-ascend-blue' : 'text-ascend-gray2'}`}>Review<br />&nbsp;<br />&nbsp;</div>
           </div>
             
-          
         </div>
       )}
 
@@ -122,31 +312,30 @@ function Registration() {
 
     <div className="w-full max-w-4xl mx-auto flex space-x-4 justify-end mt-4">
 
-      {currentStep > 1 && currentStep < 7 && (
+      {currentStep > 1 && currentStep < 8 && (
       <PrimaryButton 
-        doSomething={() => setCurrentStep((prev) => Math.min(prev - 1, 1))}
+        doSomething={() => setCurrentStep((prev) => Math.min(prev - 1, 8))}
         text = "Back"
       />
       )}
-
-      {currentStep < 6 && (  
-      <PrimaryButton
-        type="button"
-        doSomething={() => setCurrentStep((prev) => Math.min(prev + 1, 7))}
-        text = "Next Step"
-      />
+      
+      {currentStep < 7 && (  
+        <PrimaryButton
+          type="button"
+          doSomething={() => {if (handleValidation()) {setCurrentStep((prev) => Math.min(prev + 1, 8)); }}}
+          text="Next Step"  
+        />
       )}
 
-      {currentStep === 6 && (
-        <button
+
+      {currentStep === 7 && (
+        <PrimaryButton
         type="button"
-        onClick={() => setCurrentStep((prev) => Math.min(prev + 1, 7))}
-        className="bg-ascend-blue text-white px-6 py-2 hover:bg-[#2a2aad]"
+        doSomething={() => {if (handleValidation()) {handleAdd(); setCurrentStep((prev) => Math.min(prev + 1, 8))}}}
+        text ="Save"
       >
-        Save
-      </button>
+      </PrimaryButton>
       )}
-
 
 
     </div>

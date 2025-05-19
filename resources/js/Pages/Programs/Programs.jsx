@@ -39,7 +39,7 @@ export default function Programs() {
                         })}
                     </div>
                 ) : (
-                    <ProgramEmptyState />
+                    <ProgramEmptyState />       
                 )}
 
                 {isModalOpen && <AddProgramForm toggleModal={toggleModal} />}

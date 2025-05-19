@@ -89,7 +89,7 @@
     background-position: calc(100% - 16px);
 }
 
-@media (max-width: 944px) {
+@media (max-width: 1036px) {
   .hide-step-below-945 {
     display: none;
   }
