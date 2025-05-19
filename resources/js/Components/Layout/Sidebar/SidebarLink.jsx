@@ -10,12 +10,12 @@ export default function SidebarLink({
     closeSidebar,
 }) {
     const { url } = usePage();
-
+    console.log(url);
     return (
         <Link
             onClick={closeSidebar}
             className={`h-11 flex items-center text-ascend-black ${
-                url === linkUrl &&
+                url.includes(linkUrl) &&
                 "bg-ascend-lightblue border-l-8 text-ascend-blue border-ascend-blue font-bold"
             } hover:bg-ascend-lightblue hover:border-l-8 hover:text-ascend-blue hover:font-bold transition-all duration-100 ${
                 expanded ? "mr-6" : "justify-center"

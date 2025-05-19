@@ -1,8 +1,8 @@
 import { useState } from "react";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
 import SecondaryButton from "../../../Components/Button/SecondaryButton";
-import AddCourse from "./AddCourse";
-import CourseItem from "./CourseItem";
+import AddCourse from "./CourseComponent/AddCourse";
+import CourseItem from "./CourseComponent/CourseItem";
 import useProgramStore from "../../../Stores/Programs/programStore";
 import useCourseStore from "../../../Stores/Programs/courseStore";
 
@@ -18,8 +18,15 @@ export default function AddProgramForm({ toggleModal }) {
 
     // Course Store
     const courseList = useCourseStore((state) => state.courseList);
+    const addCourseFunc = useCourseStore((state) => state.addCourse);
 
     const [addCourse, setAddCourse] = useState(false);
+
+    const saveCourse = (e) => {
+        e.preventDefault();
+        addCourseFunc();
+        toggleAddCourse();
+    };
 
     // Add program
     const handleAdd = (e) => {
@@ -105,7 +112,13 @@ export default function AddProgramForm({ toggleModal }) {
                     </div>
                 )}
 
-                {addCourse && <AddCourse toggleAddCourse={toggleAddCourse} />}
+                {addCourse && (
+                    <>
+                        <AddCourse toggleAddCourse={toggleAddCourse} />
+                        <PrimaryButton doSomething={saveCourse} text={"Save"} />
+                    </>
+                )}
+
                 {!addCourse && (
                     <PrimaryButton
                         text={"Add Course"}

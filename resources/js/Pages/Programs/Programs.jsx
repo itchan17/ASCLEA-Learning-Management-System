@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
-import ProgramEmptyState from "./ProgramComponent/ProgramEmptyState";
 import AddProgramForm from "./ProgramComponent/AddProgramForm";
 import useProgramStore from "../../Stores/Programs/programStore";
 import ProgramCard from "./ProgramComponent/ProgramCard";
+import EmptyState from "../../Components/EmptyState/EmptyState";
 
 export default function Programs() {
     // Program Store
     const programList = useProgramStore((state) => state.programList);
+    const setActiveTab = useProgramStore((state) => state.setActiveTab);
 
     console.log(programList);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,6 +17,10 @@ export default function Programs() {
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
     };
+
+    useEffect(() => {
+        setActiveTab(0);
+    }, []);
 
     return (
         <>
@@ -27,20 +32,38 @@ export default function Programs() {
                     />
                 </div>
 
-                {programList?.length > 0 ? (
-                    <div className="w-full flex flex-wrap gap-5">
-                        {programList.map((program, index) => {
+                {/* Program placeholder */}
+                <div className="w-full flex flex-wrap gap-5">
+                    <ProgramCard
+                        programId={1}
+                        programName={"Licensure Examination for Teacher"}
+                    />
+
+                    <ProgramCard
+                        programId={2}
+                        programName={"Certificate in Teaching Program"}
+                    />
+                </div>
+
+                {/* Display created program */}
+                {/* <div className="w-full flex flex-wrap gap-5">
+                    {programList?.length > 0 ? (
+                        programList.map((program, index) => {
                             return (
                                 <ProgramCard
                                     key={index}
                                     programName={program.programName}
                                 />
                             );
-                        })}
-                    </div>
-                ) : (
-                    <ProgramEmptyState />       
-                )}
+                        })
+                    ) : (
+                        <EmptyState
+                            imgSrc={"/images/illustrations/launch.svg"}
+                            text={`“No programs? Time to fill this space to start learning
+                adventures!”`}
+                        />
+                    )}
+                </div> */}
 
                 {isModalOpen && <AddProgramForm toggleModal={toggleModal} />}
             </div>

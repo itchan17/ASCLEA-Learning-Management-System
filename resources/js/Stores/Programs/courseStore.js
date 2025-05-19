@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 const useCourseStore = create((set) => ({
+    activeTab: 0,
     courseList: [],
     course: {
         courseCode: "",
@@ -9,6 +10,13 @@ const useCourseStore = create((set) => ({
         courseDay: "",
         fromTime: "",
         toTime: "",
+    },
+
+    // Set the active tab inside the course content
+    setActiveTab: (tab) => {
+        const { activeTab } = useCourseStore.getState();
+
+        set({ activeTab: tab });
     },
 
     handleCourseChange: (field, value) => {

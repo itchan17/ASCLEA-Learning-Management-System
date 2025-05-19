@@ -15,10 +15,28 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard/Dashboard');
 });
 
+// Program routes
 Route::get('/programs', function () {
     return Inertia::render('Programs/Programs');
 });
 
+// Route for selected program
+Route::get('/programs/{programId}', function () {
+    return Inertia::render('Programs/ProgramComponent/ProgramContent');
+});
+
+// Route for selected course in the program
+Route::get('/programs/{programId}/course/{courseId}', function () {
+    return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContent');
+});
+
+// Route for selected user in the program
+Route::get('/programs/{programId}/user/{userId}', function () {
+    return Inertia::render('Programs/ProgramComponent/PeopleComponent/ViewUser');
+});
+
+
+// Registration route
 Route::get('/registration', function () {
     return Inertia::render('RegistrationPage/Registration');
 });
