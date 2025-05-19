@@ -6,7 +6,7 @@ const NotifDropdown = forwardRef((props, ref) => {
     return (
         <div
             ref={ref}
-            className="absolute z-40 top-full right-6 left-6 sm:left-auto sm:w-[450px] pt-2 pb-5 bg-white shadow-lg border-gray-400 border max-h-[60vh] overflow-y-auto scrollbar-default hover:scrollbar-hover "
+            className="absolute z-40 top-full right-6 left-6 sm:left-auto sm:w-[450px] pt-2 pb-5 bg-white shadow-lg border-ascend-gray1 border max-h-[60vh] overflow-y-auto scrollbar-default hover:scrollbar-hover "
         >
             <div className="font-nunito-sans w-full text-ascend-black flex flex-col space-y-2 h-full">
                 <div className="px-5 pt-3 pb-2 space-y-2">

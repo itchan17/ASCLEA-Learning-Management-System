@@ -9,6 +9,7 @@ import {
     MdNoteAlt,
     MdCalendarMonth,
     MdClose,
+    MdRateReview,
 } from "react-icons/md";
 import { PiUserListFill } from "react-icons/pi";
 
@@ -30,6 +31,7 @@ export default function Sidebar({
         { url: "/staff", text: "Staff", icon: MdPeopleAlt },
         { url: "/enrollment", text: "Enrollment", icon: PiUserListFill },
         { url: "/programs", text: "Programs", icon: MdNoteAlt },
+        { url: "/grades", text: "Grades", icon: MdRateReview },
         { url: "/calendar", text: "Calendar", icon: MdCalendarMonth },
     ];
 

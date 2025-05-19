@@ -41,7 +41,6 @@
     }
 }
 
-
 @theme {
     --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
@@ -83,19 +82,18 @@
     -webkit-appearance: none;
     appearance: none;
     -moz-appearance: none;
-    background-image: url('https://www.svgrepo.com/show/80156/down-arrow.svg');
+    background-image: url("https://www.svgrepo.com/show/80156/down-arrow.svg");
     background-repeat: no-repeat;
     background-size: 14px 14px;
     background-position: calc(100% - 16px);
 }
 
 @media (max-width: 944px) {
-  .hide-step-below-945 {
-    display: none;
-  }
+    .hide-step-below-945 {
+        display: none;
+    }
 
-  .mb-adjust-below-945 {
-    margin-bottom: 1.5rem; 
-  }
-  
+    .mb-adjust-below-945 {
+        margin-bottom: 1.5rem;
+    }
 }

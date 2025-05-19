@@ -8,7 +8,7 @@ const ProfileDropdown = forwardRef((props, ref) => {
     return (
         <div
             ref={ref}
-            className="absolute z-40 top-full right-6 sm:left-auto w-48 py-2 bg-white shadow-lg border-gray-400 border max-h-[60vh] overflow-y-auto"
+            className="absolute z-40 top-full right-6 sm:left-auto w-48 py-2 bg-white shadow-lg border-ascend-gray1 border max-h-[60vh] overflow-y-auto"
         >
             <div className="font-nunito-sans w-full text-ascend-black font-bold flex flex-col space-y-2">
                 <Link

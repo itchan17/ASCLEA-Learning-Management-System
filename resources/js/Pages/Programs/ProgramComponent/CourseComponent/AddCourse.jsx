@@ -1,7 +1,7 @@
 import React from "react";
-import PrimaryButton from "../../../Components/Button/PrimaryButton";
-import CustomSelect from "../../../Components/CustomInputField/CustomSelect";
-import useCourseStore from "../../../Stores/Programs/courseStore";
+import PrimaryButton from "../../../../Components/Button/PrimaryButton";
+import CustomSelect from "../../../../Components/CustomInputField/CustomSelect";
+import useCourseStore from "../../../../Stores/Programs/courseStore";
 
 export default function AddCourse({ toggleAddCourse }) {
     //Course Store
@@ -9,17 +9,10 @@ export default function AddCourse({ toggleAddCourse }) {
     const handleCourseChange = useCourseStore(
         (state) => state.handleCourseChange
     );
-    const addCourse = useCourseStore((state) => state.addCourse);
-
-    const saveCourse = (e) => {
-        e.preventDefault();
-        addCourse();
-        toggleAddCourse();
-    };
 
     return (
         <div className="space-y-5">
-            <div className="grid grid-cols-[1fr_2fr] gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-[1fr_2fr] gap-5">
                 <div>
                     <label htmlFor="">Course Code</label>
                     <input
@@ -61,7 +54,7 @@ export default function AddCourse({ toggleAddCourse }) {
 
             <div>
                 <h1>Select Schedule:</h1>
-                <div className="grid grid-cols-[2fr_1fr_1fr] gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr_1fr] gap-5">
                     <div>
                         <label htmlFor="">Day</label>
                         <CustomSelect
@@ -116,7 +109,6 @@ export default function AddCourse({ toggleAddCourse }) {
                     </div>
                 </div>
             </div>
-            <PrimaryButton doSomething={saveCourse} text={"Save"} />
         </div>
     );
 }

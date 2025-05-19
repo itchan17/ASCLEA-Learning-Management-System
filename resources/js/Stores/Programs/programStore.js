@@ -3,6 +3,14 @@ import { create } from "zustand";
 const useProgramStore = create((set) => ({
     programList: [],
     program: { programName: "", programDescription: "" },
+    activeTab: 0,
+
+    // Set the active tab inside the program content
+    setActiveTab: (tab) => {
+        const { activeTab } = useProgramStore.getState();
+
+        set({ activeTab: tab });
+    },
 
     handleProgramChange: (field, value) =>
         set((state) => ({

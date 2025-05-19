@@ -1,7 +1,7 @@
 import React from "react";
 import { MdDelete } from "react-icons/md";
-import { formatTime } from "../../../Utils/FormatTime";
-import useCourseStore from "../../../Stores/Programs/courseStore";
+import { formatTime } from "../../../../Utils/FormatTime";
+import useCourseStore from "../../../../Stores/Programs/courseStore";
 
 export default function CourseItem({
     index,
