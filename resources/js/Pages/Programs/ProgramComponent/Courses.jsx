@@ -6,6 +6,7 @@ import EmptyState from "../../../Components/EmptyState/EmptyState";
 import CourseCard from "./CourseComponent/CourseCard";
 import AddCourseForm from "./CourseComponent/AddCourseForm";
 import useCourseStore from "../../../Stores/Programs/courseStore";
+import { BsThreeDotsVertical } from "react-icons/bs";
 
 export default function Courses() {
     // Course Store
@@ -28,10 +29,39 @@ export default function Courses() {
                 <input className="hidden" type="file" id="inputBg" />
             </div>
             <div className="space-y-1 pb-5 border-b border-ascend-gray1">
-                <h1 className="text-size7 break-words font-semibold">
-                    Licensure Examination for Teachers
-                </h1>
-                <p>
+                <div className="flex items-start gap-2 md:gap-20">
+                    <h1 className="flex-1 min-w-0 text-size7 break-words font-semibold">
+                        Licensure Examination for Teachers
+                    </h1>
+
+                    <div className="dropdown dropdown-end cursor-pointer ">
+                        <div
+                            tabIndex={0}
+                            role="button"
+                            className="rounded-4xl p-3 hover:bg-ascend-lightblue transition-all duration-300"
+                        >
+                            <BsThreeDotsVertical className="text-size5 text-ascend-black" />
+                        </div>
+
+                        <ul
+                            tabIndex={0}
+                            className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none"
+                        >
+                            <li>
+                                <a className="w-full text-left hover:bg-ascend-lightblue transition duration-300">
+                                    Edit
+                                </a>
+                            </li>
+                            <li>
+                                <a className="w-full text-left hover:bg-ascend-lightblue transition duration-300">
+                                    Remove
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p className="break-words">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
                     do eiusmod tempor incididunt ut labore et dolore magna
                     aliqua. Ut enim ad minim veniam, quis nostrud exercitation

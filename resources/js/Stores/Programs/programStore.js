@@ -5,6 +5,13 @@ const useProgramStore = create((set) => ({
     program: { programName: "", programDescription: "" },
     activeTab: 0,
 
+    // Set the active tab inside the program content
+    setActiveTab: (tab) => {
+        const { activeTab } = useProgramStore.getState();
+
+        set({ activeTab: tab });
+    },
+
     handleProgramChange: (field, value) =>
         set((state) => ({
             program: {
@@ -32,12 +39,6 @@ const useProgramStore = create((set) => ({
 
         // Clear the form
         clearProgram();
-    },
-
-    setActiveTab: (tab) => {
-        const { activeTab } = useProgramStore.getState();
-
-        set({ activeTab: tab });
     },
 }));
 

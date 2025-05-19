@@ -18,18 +18,20 @@ export default function ProgramCard({ programName, programId }) {
         >
             <div className="bg-ascend-gray1 w-full h-full p-2 flex justify-end font-nunito-sans"></div>
             <div
-                className="absolute top-2 right-2 dropdown dropdown-end"
+                className="absolute top-2 right-[6px] dropdown dropdown-end"
                 onClick={stopPropagation}
             >
-                <BsThreeDotsVertical
+                <div
                     tabIndex={0}
                     role="button"
-                    className="text-size5 text-ascend-white"
-                />
+                    className="p-[2px] rounded-4xl hover:bg-ascend-lightblue/35 transition-all duration-300"
+                >
+                    <BsThreeDotsVertical className="text-size5 text-ascend-white" />
+                </div>
 
                 <ul
                     tabIndex={0}
-                    className="dropdown-content menu mt-2 bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none"
+                    className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none"
                 >
                     <li>
                         <a className="w-full text-left hover:bg-ascend-lightblue transition duration-300">

@@ -5,7 +5,7 @@ export default function BackButton({ doSomething }) {
     return (
         <div
             onClick={doSomething}
-            className="cursor-pointer hover:bg-ascend-lightblue p-2 rounded-[100px]"
+            className="cursor-pointer hover:bg-ascend-lightblue p-3 rounded-[100px] transition-all duration-300"
         >
             <GoArrowLeft className="text-size6" />
         </div>

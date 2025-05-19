@@ -3,14 +3,10 @@ import BackButton from "../../../../Components/Button/BackButton";
 import PrimaryButton from "../../../../Components/Button/PrimaryButton";
 import { IoSearch } from "react-icons/io5";
 import { router } from "@inertiajs/react";
-import useProgramStore from "../../../../Stores/Programs/programStore";
 import AssignCourseForm from "./AssignCourseForm";
 import useUserStore from "../../../../Stores/Programs/userStore";
 
 export default function ViewUser() {
-    // Program Store
-    const handleCLickTab = useProgramStore((state) => state.handleCLickTab);
-
     // User Store
     const courseList = useUserStore((state) => state.courseList);
 
@@ -18,7 +14,6 @@ export default function ViewUser() {
 
     const handleClickBackBtn = () => {
         router.visit(`/programs/${1}`);
-        handleCLickTab(1);
     };
 
     const toggleModal = () => {
