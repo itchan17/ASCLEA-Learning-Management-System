@@ -16,7 +16,9 @@ export default function CourseCard({
     };
 
     const handleCardClick = () => {
-        router.visit(`/programs/${1}/course/${courseId}`);
+        router.visit(`/programs/${1}/course/${courseId}`, {
+            preserveScroll: false,
+        });
     };
 
     return (

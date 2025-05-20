@@ -4,6 +4,7 @@ import BackButton from "../../../../Components/Button/BackButton";
 import useCourseStore from "../../../../Stores/Programs/courseStore";
 import Home from "./CourseContentTab/Home";
 import { router } from "@inertiajs/react";
+import Materials from "./CourseContentTab/Materials";
 
 export default function CourseContent() {
     // Course Store
@@ -26,7 +27,9 @@ export default function CourseContent() {
             <div className="flex">
                 <BackButton doSomething={handleClickBackBtn} />
             </div>
+
             {activeTab === 0 && <Home />}
+            {activeTab === 1 && <Materials />}
         </div>
     );
 }

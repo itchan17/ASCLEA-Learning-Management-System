@@ -9,8 +9,6 @@ const usePostStore = create((set) => ({
     postValue: "",
 
     handlePostValueChange: (value) => {
-        const { postValue } = usePostStore.getState();
-
         set({ postValue: value });
     },
 
@@ -21,7 +19,6 @@ const usePostStore = create((set) => ({
     },
 
     clearPostDetails: () => {
-        const { postValue, postDetails } = usePostStore.getState();
         set({
             postValue: "",
             postDetails: {

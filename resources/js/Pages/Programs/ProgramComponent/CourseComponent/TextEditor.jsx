@@ -16,7 +16,12 @@ export default function TextEditor({ value, setValue }) {
 
         ["clean"],
     ];
-    const module = { toolbar: toolBarOptions };
+    const module = {
+        toolbar: toolBarOptions,
+        uploader: {
+            handler: () => {},
+        },
+    };
     console.log(value);
     return (
         <ReactQuill

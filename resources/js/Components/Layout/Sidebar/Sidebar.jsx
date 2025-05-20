@@ -88,7 +88,7 @@ export default function Sidebar({
                         className="cursor-pointer hover:bg-ascend-lightblue p-3 rounded-[50px] transition-hover duration-300"
                         onClick={toggleMenu}
                     >
-                        <div className="w-6 h-5 hidden space-y-1 lg:flex flex-col items-end justify-center ">
+                        <div className="w-7 h-7 hidden space-y-1 lg:flex flex-col items-end justify-center ">
                             <span
                                 className={`${
                                     expanded
@@ -113,7 +113,7 @@ export default function Sidebar({
             <ul className="flex-1 py-6 space-y-6 font-nunito-sans font-semibold overflow-y-auto">
                 {links.map((link, index) => {
                     return (
-                        <li key={index}>
+                        <li title={!expanded ? link.text : ""} key={index}>
                             <SidebarLink
                                 linkUrl={link.url}
                                 text={link.text}
