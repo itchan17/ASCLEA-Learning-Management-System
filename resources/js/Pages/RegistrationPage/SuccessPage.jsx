@@ -1,5 +1,6 @@
 import React from 'react'
 import PrimaryButton from "../../Components/Button/PrimaryButton";
+import { router } from '@inertiajs/react';
 
 export const SuccessPage = () => {
   return (
@@ -15,7 +16,10 @@ export const SuccessPage = () => {
         <h2 className="text-center text-size4 font-nunito-sans text-black mb-2">We’ve sent you an email containing the payment details and <br /> further instructions to complete your enrollment.</h2>
         
         <div className="flex justify-center">
-            <PrimaryButton text={"Done"}></PrimaryButton>
+        <PrimaryButton 
+          doSomething={() => router.visit('/')}
+          text = "Done"
+        />
         </div>
         
     </div>

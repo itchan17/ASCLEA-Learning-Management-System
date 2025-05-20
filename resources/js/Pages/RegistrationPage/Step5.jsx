@@ -1,51 +1,126 @@
-import React from 'react'
+import React, { useState } from 'react';
+import { FileUploader } from "react-drag-drop-files";
+import { FiUploadCloud } from "react-icons/fi";
+import { AiFillFile, AiFillCloseCircle } from "react-icons/ai";
+import PrimaryButton from "../../Components/Button/PrimaryButton";
+import useRegistrationStore from "../../Stores/Registration/registrationStore";
 
-const Step5 = () => {
+const Step5 = ({noBorder = false, edit = false, showDragDrop = true}) => {
+  const fileTypes = ["png", "jpeg", "jpg", "pdf"];
+  const attachedfiles = useRegistrationStore((state) => state.registration.attachedfiles);
+  const addFiles = useRegistrationStore((state) => state.addFiles);
+  const removeFile = useRegistrationStore((state) => state.removeFile);
+
+
+const handleChange = (newFiles) => {
+  console.log("Render Registration Step 5");
+  let fileArray = [];
+
+  // Flatten FileList if needed
+  if (Array.isArray(newFiles)) {
+    newFiles.forEach((item) => {
+      if (item instanceof FileList) {
+        fileArray.push(...Array.from(item)); // unpack each FileList
+      } else {
+        fileArray.push(item);
+      }
+    });
+  } else if (newFiles instanceof FileList) {
+    fileArray = Array.from(newFiles);
+  } else {
+    fileArray = [newFiles];
+  }
+
+  addFiles(fileArray);
+};
+
+
+  const handleRemoveFile = (index) => {
+    removeFile(index);
+  };
+
+    const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   return (
-    <div className="mx-auto max-w-4xl border-[2px] border-ascend-gray1 bg-white p-10 shadow-lg">
-      <h3 className="text-size3 mb-4 font-semibold text-left text-black">Enrollment Policy</h3>
+    
+    <div className={`${noBorder ? '' : "mx-auto max-w-4xl border-[2px] border-ascend-gray1 bg-white p-10 shadow-lg"}`}>
+      <h3 className="text-size3 mb-4 font-nunito-sans font-bold text-left text-black">Additional Requirements</h3>
       <div className="text-size1 mb-4 text-left text-black">
-        I promise to abide by the rules and regulations of the center.
-        I understand that down payment and enrolment fees are NON-REFUNDABLE but are transferable within one (1) year period only.
+        1. Original TOR <br />
+        2. Photocopy of TOR <br />
+        3. NSO / PSA Birth Certificate <br />
+        4. NSO / PSA Marriage Certificate (If Applicable) <br />
       </div>
-      <div className="flex items-center space-x-3 mb-4">
-        <input type="checkbox" className="w-3 h-3 rounded-full border border-ascend-gray1 " />
-        <label className="text-size2">I acknowledge and agree to the enrollment policy</label>
-      </div>  
-     
-      <h3 className="text-size3 mb-4 font-semibold text-left text-black">Enrollment Terms and Condition</h3>
-      <div className="text-size1 mb-4 text-left text-black leading-relaxed space-y-2">
-        1. This agreement informs you of the impacts and financial obligations that exist after you register for review.<br /> 
-        2. When you register for a review, you enter into a financial obligation with ASCEND Tutorial, Training and Review Center. This Obligation holds regardless of attendance, receipt or financial aid or third- party funding.<br />
-        3. One thousand minimum down payment is required. The remaining balance will be divided in four payment schedules equivalent to two months (every 15th and 30th of the month).<br />
-        4. Tuition includes the review fee and materials fee.<br />
-        5. Total fees vary depending on the program, discounts and promo being availed.<br />
-        6. Once you enroll under the installment scheme, you will receive a monthly statement of account stating your due balance for the month. The SOA will be given a week before your due date.<br />
-        7. You are expected to pay your tuition fee on the date provided in the statement of account.<br />
-        8. NO refund is allowed but the tuition is transferable to other bearer. Transfer is good only for one year which begins from the day of enrollment.<br />
-        9. Not attending the review does not entitle a refund.<br />
-        10. Review materials are completely given only to those who have made full payment. Review materials for those in the installment mode will be given on a weekly basis until such that all have been given. <br />
-        11. Certificate of Enrollment will be issued upon request only. All dues must be paid. Otherwise, no certificate will be issued.<br />
-        12. Specialization is given FREE for areas with 5 and above enrollees. The number of sessions depends on the population of the enrollees. Regardless of whether the specialization is conducted or not, materials will still be given. Tuition remains fixed.<br />
-        13. Mock examination results will be released only upon settlement of remaining balance. Once your balance is paid in full, all holds are released and access to your results returns normal.<br />
+
+      {showDragDrop && (  
+      <div className="flex items-center justify-center space-x-3 mb-10 mt-10">
+        <FileUploader
+          multiple={true} 
+          handleChange={handleChange}
+          name="file"
+          types={fileTypes}
+        >
+          <div className="mx-auto max-w-4xl border-[3px] border-dashed border-ascend-gray1 bg-white cursor-pointer">
+            <div className="flex flex-col items-center justify-center pt-3 pb-3 pl-10 pr-10">
+              <FiUploadCloud className="text-ascend-gray1 text-[50px] mb-1" />
+              <h3 className="text-size3 mb-1 font-nunito-sans font-bold text-ascend-gray1">Drag & Drop Files here</h3>
+              <h3 className="text-size3 mb-1 font-nunito-sans font-bold text-ascend-gray1">or</h3>
+              <h3 className="text-size3 mb-2 font-nunito-sans font-bold text-ascend-gray1">click to upload</h3>
+            </div>
+          </div>
+        </FileUploader>
       </div>
-        <div className="flex items-center space-x-3 mb-4">
-            <input type="checkbox" className="w-3 h-3 rounded-full border border-ascend-gray1 " />
-            <label className="text-size2">By enrolling in review class, I certify that I agree to the term and conditions</label>
-        </div>
+      )}
+
+      <div className="flex flex-col space-y-4 mb-4">
+        <h3 className="text-size3 font-nunito-sans font-bold text-left text-black">Attached Files</h3>
+
+        {attachedfiles.length === 0 ? (
+          <h3 className="text-size1 font-nunito-sans text-left text-gray-500">No files attached</h3>
+        ) : (
+          attachedfiles.map((file, index) => (
+            <div key={index} className="flex items-center space-x-4 p-2 border border-ascend-lightblue rounded-md bg-white">
+              <AiFillFile className={`${edit ? 'text-ascend-gray1' : 'text-ascend-blue  '} text-2xl ml-2`}/>
+              
+              <div className="flex-1">
+                <h4 className="text-base font-semibold font-nunito-sans text-black">{file.name}</h4>
+              </div>
+              <div className="text-right">
+                <h4 className="text-sm font-bold font-nunito-sans text-black">Upload Complete</h4>
+                <p className="text-sm text-black font-nunito-sans">Tap to Undo</p>
+              </div>
+              <button type="button" disabled={edit} onClick={() => handleRemoveFile(index)}>
+                <AiFillCloseCircle className={`${edit ? 'text-ascend-gray1' : 'text-ascend-blue hover:opacity-80 transition-all duration-300 '} text-2xl mr-2`}/>
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+      
+       {!showDragDrop && ( 
+      <div className="flex items-center justify-start space-x-3 mb-10 mt-10">
+        <FileUploader
+          multiple={true} 
+          disabled={edit}
+          handleChange={handleChange}
+          name="file"
+          types={fileTypes}
+        >
+          <div className={`${edit ? 'bg-ascend-gray1' : 'bg-ascend-blue cursor-pointer hover:opacity-80 transition-all duration-300'} mx-auto max-w-md flex items-center justify-center`}>
+            <div className="flex flex-col items-center justify-center pt-2 pb-2 pl-4 pr-4">
+              <h3 className="text-sm font-nunito-sans font-bold text-white">Upload</h3>
+            </div>
+          </div>
+        </FileUploader>
+      </div>
+      )}
 
     </div>
-      
- 
-
-
-
-
-
-
-
-
-  )
-}
+  );
+};
 
 export default Step5;

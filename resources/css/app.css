@@ -88,10 +88,11 @@
     background-position: calc(100% - 16px);
 }
 
-@media (max-width: 944px) {
-    .hide-step-below-945 {
-        display: none;
-    }
+
+@media (max-width: 1036px) {
+  .hide-step-below-945 {
+    display: none;
+  }
 
     .mb-adjust-below-945 {
         margin-bottom: 1.5rem;
