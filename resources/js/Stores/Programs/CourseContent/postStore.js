@@ -6,13 +6,8 @@ const usePostStore = create((set) => ({
         postTitle: "",
         postDescription: "",
     },
-    postValue: "",
 
-    handlePostValueChange: (value) => {
-        set({ postValue: value });
-    },
-
-    handlePostTitleChange: (field, value) => {
+    handlePostChange: (field, value) => {
         const { postDetails } = usePostStore.getState();
 
         set({ postDetails: { ...postDetails, [field]: value } });
@@ -20,7 +15,6 @@ const usePostStore = create((set) => ({
 
     clearPostDetails: () => {
         set({
-            postValue: "",
             postDetails: {
                 postTitle: "",
                 postDescription: "",
@@ -32,11 +26,7 @@ const usePostStore = create((set) => ({
         const { postDetails, postValue, postList, clearPostDetails } =
             usePostStore.getState();
 
-        const updatedPostDetails = {
-            ...postDetails,
-            postDescription: postValue,
-        };
-        set({ postList: [updatedPostDetails, ...postList] });
+        set({ postList: [postDetails, ...postList] });
         clearPostDetails();
     },
 }));

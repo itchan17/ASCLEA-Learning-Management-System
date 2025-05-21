@@ -13,28 +13,56 @@ Route::get('/', function () {
 // View dashboard
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard/Dashboard');
+})->name('dashboard.index');
+
+// -----Start-----
+// Program routes 
+
+Route::prefix('programs')->group(function () {
+
+    // Programs index page
+    Route::get('/', function () {
+        return Inertia::render('Programs/Programs');
+    })->name('programs.index');
+
+    // Route for selected program
+    Route::get('/{programId}', function ($programId) {
+        return Inertia::render('Programs/ProgramComponent/ProgramContent', [
+            'programId' => $programId,
+        ]);
+    })->name('program.view');
+
+    // Route for selected course in the program
+    Route::get('/{programId}/course/{courseId}', function ($programId, $courseId) {
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContent', [
+            'programId' => $programId,
+            'courseId' => $courseId,
+        ]);
+    })->name('program.course.view');
+
+    // Route for selected user in the program
+    Route::get('/{programId}/user/{userId}', function ($programId, $userId) {
+        return Inertia::render('Programs/ProgramComponent/PeopleComponent/ViewUser', [
+            'programId' => $programId,
+            'userId' => $userId,
+        ]);
+    })->name('program.user.view');
+
+    // Route for viewing material
+    Route::get('/{programId}/course/{courseId}/material/{materialId}', function ($programId, $courseId, $materialId) {
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/MaterialsComponents/ViewMaterial', [
+            'programId' => $programId,
+            'courseId' => $courseId,
+            'materialId' => $materialId,
+        ]);
+    })->name('program.course.material.view');
+
 });
 
-// Program routes
-Route::get('/programs', function () {
-    return Inertia::render('Programs/Programs');
-});
 
-// Route for selected program
-Route::get('/programs/{programId}', function () {
-    return Inertia::render('Programs/ProgramComponent/ProgramContent');
-});
 
-// Route for selected course in the program
-Route::get('/programs/{programId}/course/{courseId}', function () {
-    return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContent');
-});
 
-// Route for selected user in the program
-Route::get('/programs/{programId}/user/{userId}', function () {
-    return Inertia::render('Programs/ProgramComponent/PeopleComponent/ViewUser');
-});
-
+// -----End-----
 
 // Registration route
 Route::get('/registration', function () {

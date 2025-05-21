@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TextEditor from "../../TextEditor";
 import SecondaryButton from "../../../../../../Components/Button/SecondaryButton";
 import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
@@ -9,16 +9,9 @@ import DropFiles from "./DropFiles";
 
 export default function MaterialForm({ toggleOpenMaterialForm }) {
     // Materials Store
-    const fileList = useMaterialsStore((state) => state.fileList);
     const materialDetails = useMaterialsStore((state) => state.materialDetails);
-    const handleMaterialTitleChange = useMaterialsStore(
-        (state) => state.handleMaterialTitleChange
-    );
-    const materialTextEditorValue = useMaterialsStore(
-        (state) => state.materialTextEditorValue
-    );
-    const handleMaterialTextEditorValue = useMaterialsStore(
-        (state) => state.handleMaterialTextEditorValue
+    const handleMaterialChange = useMaterialsStore(
+        (state) => state.handleMaterialChange
     );
     const hanndleAddMaterials = useMaterialsStore(
         (state) => state.hanndleAddMaterials
@@ -34,6 +27,9 @@ export default function MaterialForm({ toggleOpenMaterialForm }) {
         hanndleAddMaterials();
         toggleOpenMaterialForm();
     };
+
+    useEffect(() => console.log(materialDetails), [materialDetails]);
+
     return (
         <div className="border border-ascend-gray1 shadow-shadow1 p-5 space-y-5">
             <div>
@@ -43,31 +39,29 @@ export default function MaterialForm({ toggleOpenMaterialForm }) {
                     value={materialDetails.materialTitle}
                     className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
                     onChange={(e) =>
-                        handleMaterialTitleChange(
-                            "materialTitle",
-                            e.target.value
-                        )
+                        handleMaterialChange("materialTitle", e.target.value)
                     }
                 />
             </div>
             <div>
                 <label htmlFor="">Description</label>
                 <TextEditor
-                    value={materialTextEditorValue}
-                    setValue={handleMaterialTextEditorValue}
+                    fieldName={"materialDescription"}
+                    value={materialDetails.materialDescription}
+                    setValue={handleMaterialChange}
                 />
             </div>
 
             {showDropFiles && <DropFiles toggleDropFiles={toggleDropFiles} />}
 
             {/* Attached Files */}
-            {fileList?.length > 0 && (
+            {materialDetails.materialFiles?.length > 0 && (
                 <>
                     <div>
                         <label className="font-bold pb-5">Attached Files</label>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                        {fileList.map((file, index) => {
+                        {materialDetails.materialFiles.map((file, index) => {
                             return (
                                 <div key={index}>
                                     <MaterialFileCard

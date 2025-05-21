@@ -1,10 +1,13 @@
 import React from "react";
 import { router } from "@inertiajs/react";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import "../../../../css/global.css";
+import { useRoute } from "ziggy-js";
 
 export default function ProgramCard({ programName, programId }) {
+    const route = useRoute();
     const handleCardClick = () => {
-        router.visit(`/programs/${programId}`);
+        router.visit(route("program.view", programId));
     };
 
     const stopPropagation = (e) => {
@@ -14,7 +17,7 @@ export default function ProgramCard({ programName, programId }) {
     return (
         <div
             onClick={handleCardClick}
-            className="relative border border-ascend-gray1 shadow-shadow1 w-full max-w-80 h-58 flex flex-col cursor-pointer hover:-translate-y-2 transition-all duration-300 group"
+            className="relative border border-ascend-gray1 shadow-shadow1 w-full max-w-80 h-58 flex flex-col cursor-pointer card-hover group"
         >
             <div className="bg-ascend-gray1 w-full h-full p-2 flex justify-end font-nunito-sans"></div>
             <div

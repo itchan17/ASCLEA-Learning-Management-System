@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+.card-hover {
+    @apply hover:-translate-y-2 transition-all duration-300;
+}

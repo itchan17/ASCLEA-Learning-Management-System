@@ -5,62 +5,62 @@ const useMaterialsStore = create((set) => ({
     materialDetails: {
         materialTitle: "",
         materialDescription: "",
-        materialFiles: null,
+        materialFiles: [],
     },
-    materialTextEditorValue: "",
-    fileList: [],
 
-    handleMaterialTitleChange: (field, value) => {
+    handleMaterialChange: (field, value) => {
         const { materialDetails } = useMaterialsStore.getState();
 
-        set({ materialDetails: { ...materialDetails, [field]: value } });
+        // Check if the field is materialFiles then add the new files in the array
+        if (field === "materialFiles" && Array.isArray(value)) {
+            set({
+                materialDetails: {
+                    ...materialDetails,
+                    [field]: [...materialDetails[field], ...value],
+                },
+            });
+        } else {
+            set({
+                materialDetails: {
+                    ...materialDetails,
+                    [field]: value,
+                },
+            });
+        }
     },
 
-    handleAddFiles: (newFiles) => {
-        const { fileList } = useMaterialsStore.getState();
-
-        set({ fileList: [...fileList, ...newFiles] });
-    },
-
-    handleMaterialTextEditorValue: (value) => {
-        set({ materialTextEditorValue: value });
-    },
-
+    // Add the new material in the material list
     hanndleAddMaterials: () => {
-        const {
-            fileList,
-            materialTextEditorValue,
-            materialDetails,
-            materialList,
-            clearMaterialForm,
-        } = useMaterialsStore.getState();
+        const { materialDetails, materialList, clearMaterialForm } =
+            useMaterialsStore.getState();
 
-        const updatedMaterialDetails = {
-            ...materialDetails,
-            materialDescription: materialTextEditorValue,
-            materialFiles: fileList,
-        };
+        console.log(materialDetails);
 
-        console.log(updatedMaterialDetails);
-
-        set({ materialList: { updatedMaterialDetails, ...materialList } });
+        set({ materialList: [materialDetails, ...materialList] });
         clearMaterialForm();
     },
 
+    // Remove the attached files based on the id
     removeAttachedFile: (fileId) => {
-        const { fileList } = useMaterialsStore.getState();
-        set({ fileList: fileList.filter((file, index) => index !== fileId) });
+        const { materialDetails } = useMaterialsStore.getState();
+        set({
+            materialDetails: {
+                ...materialDetails,
+                materialFiles: materialDetails.materialFiles.filter(
+                    (file, index) => index !== fileId
+                ),
+            },
+        });
     },
 
+    // Clear the form
     clearMaterialForm: () => {
         set({
             materialDetails: {
                 materialTitle: "",
                 materialDescription: "",
-                materialFiles: null,
+                materialFiles: [],
             },
-            materialTextEditorValue: "",
-            fileList: [],
         });
     },
 }));

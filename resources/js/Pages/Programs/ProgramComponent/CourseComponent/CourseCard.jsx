@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { PiNotebookFill } from "react-icons/pi";
 import { router } from "@inertiajs/react";
+import "../../../../../css/global.css";
+import { useRoute } from "ziggy-js";
 
 export default function CourseCard({
     courseId,
@@ -10,13 +12,15 @@ export default function CourseCard({
 }) {
     const [isExpanded, setIsExpanded] = useState(false);
 
+    const route = useRoute();
+
     const toggleExpanded = (e) => {
         e.stopPropagation();
         setIsExpanded(!isExpanded);
     };
 
     const handleCardClick = () => {
-        router.visit(`/programs/${1}/course/${courseId}`, {
+        router.visit(route("program.course.view", { programId: 1, courseId }), {
             preserveScroll: false,
         });
     };
@@ -24,7 +28,7 @@ export default function CourseCard({
     return (
         <div
             onClick={handleCardClick}
-            className="w-full max-w-100 h-full border border-ascend-gray1 shadow-shadow1 p-5 cursor-pointer space-y-4 hover:-translate-y-2  transition-all duration-300"
+            className="w-full max-w-100 h-full border border-ascend-gray1 shadow-shadow1 p-5 cursor-pointer space-y-4 card-hover"
         >
             <div className="flex items-start space-x-5 w-full">
                 <div className="p-2 rounded-[100px] bg-ascend-lightblue">

@@ -1,8 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import PrimaryButton from "../../../../../Components/Button/PrimaryButton";
 import MaterialForm from "./MaterialsComponents/MaterialForm";
+import useMaterialsStore from "../../../../../Stores/Programs/CourseContent/materialsStore";
+import EmptyState from "../../../../../Components/EmptyState/EmptyState";
+import MaterialItem from "./MaterialsComponents/MaterialItem";
 
 export default function Materials() {
+    // Materials Store
+    const materialList = useMaterialsStore((state) => state.materialList);
+
     const [isFormOpen, setIsFormOpen] = useState(false);
     const targetForm = useRef(null);
 
@@ -30,6 +36,7 @@ export default function Materials() {
                 />
             </div>
 
+            {/* Open the material form */}
             {isFormOpen && (
                 <div ref={targetForm}>
                     <MaterialForm
@@ -37,6 +44,17 @@ export default function Materials() {
                     />
                 </div>
             )}
+
+            {/* Condition to display empty state when no material */}
+            <MaterialItem />
+            {/* {materialList?.length > 0 ? (
+                <MaterialItem />
+            ) : (
+                <EmptyState
+                    imgSrc={"/images/illustrations/empty.svg"}
+                    text={`“There’s a whole lot of nothing going on—time to make something happen!”`}
+                />
+            )} */}
         </div>
     );
 }

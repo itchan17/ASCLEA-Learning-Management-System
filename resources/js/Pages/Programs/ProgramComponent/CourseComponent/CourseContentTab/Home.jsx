@@ -85,7 +85,9 @@ export default function Home() {
                 </div>
             )}
             {postList?.length > 0 ? (
-                postList.map((post) => <Post postContent={post} />)
+                postList.map((post, index) => (
+                    <Post key={index} postContent={post} />
+                ))
             ) : (
                 <EmptyState
                     imgSrc={"/images/illustrations/empty.svg"}

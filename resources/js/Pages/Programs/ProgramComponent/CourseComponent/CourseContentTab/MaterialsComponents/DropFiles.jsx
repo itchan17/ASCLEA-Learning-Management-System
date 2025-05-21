@@ -4,16 +4,22 @@ import { FiUploadCloud } from "react-icons/fi";
 import useMaterialsStore from "../../../../../../Stores/Programs/CourseContent/materialsStore";
 export default function DropFiles({ toggleDropFiles }) {
     // Materials Store
-    const handleAddFiles = useMaterialsStore((state) => state.handleAddFiles);
-    const fileList = useMaterialsStore((state) => state.fileList);
+    const handleMaterialChange = useMaterialsStore(
+        (state) => state.handleMaterialChange
+    );
+    const materialDetails = useMaterialsStore((state) => state.materialDetails);
+
     const fileTypes = ["png", "jpeg", "jpg", "pdf", "pptx"];
 
     const handleChange = (file) => {
         const fileArray = Array.from(file);
-        handleAddFiles(fileArray);
+        handleMaterialChange("materialFiles", fileArray);
     };
 
-    useEffect(() => console.log(fileList), [fileList]);
+    useEffect(
+        () => console.log(materialDetails.materialFiles),
+        [materialDetails]
+    );
 
     return (
         <div className="space-y-5">
