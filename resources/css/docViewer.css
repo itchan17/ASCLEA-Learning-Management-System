@@ -1,0 +1,20 @@
+/*Nunito Sans */
+@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap");
+
+#pdf-renderer {
+    background-color: #e4e4ff;
+    overflow: auto;
+    display: flex;
+    height: 100vh;
+}
+
+#pdf-controls {
+    font-family: "Nunito Sans", sans-serif;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.3);
+    z-index: 10;
+}
+
+#pdf-download {
+    display: none;
+}

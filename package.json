@@ -16,6 +16,7 @@
         "vite": "^6.2.4"
     },
     "dependencies": {
+        "@cyntler/react-doc-viewer": "^1.17.0",
         "@inertiajs/react": "^2.0.8",
         "aos": "^2.3.4",
         "chart.js": "^4.4.9",

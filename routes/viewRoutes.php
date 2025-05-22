@@ -57,6 +57,16 @@ Route::prefix('programs')->group(function () {
         ]);
     })->name('program.course.material.view');
 
+    // Route for viewing file
+    Route::get('/{programId}/course/{courseId}/material/{materialId}/file/{fileId}', function ($programId, $courseId, $materialId, $fileId) {
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/MaterialsComponents/ViewFile', [
+            'programId' => $programId,
+            'courseId' => $courseId,
+            'materialId' => $materialId,
+            'fileId' => $fileId,
+        ]);
+    })->name('program.course.material.file.view');
+
 });
 
 

@@ -4,6 +4,7 @@ import BackButton from "../../../../Components/Button/BackButton";
 import useCourseStore from "../../../../Stores/Programs/courseStore";
 import Home from "./CourseContentTab/Home";
 import { router } from "@inertiajs/react";
+import { useRoute } from "ziggy-js";
 import Materials from "./CourseContentTab/Materials";
 
 export default function CourseContent() {
@@ -11,8 +12,9 @@ export default function CourseContent() {
     const activeTab = useCourseStore((state) => state.activeTab);
     const setActiveTab = useCourseStore((state) => state.setActiveTab);
 
+    const route = useRoute();
     const handleClickBackBtn = () => {
-        router.visit(`/programs/${1}`);
+        router.visit(route("program.view", { programId: 1 }));
     };
 
     // Tab list

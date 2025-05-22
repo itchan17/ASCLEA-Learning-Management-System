@@ -74,6 +74,7 @@
 
     /* Shadow */
     --shadow-shadow1: 0px 4px 2px 0px #adadad;
+    --shadow-shadow2: 0px 0px 3px 0px #adadad;
 }
 
 /* Custom styles for registration */

@@ -5,9 +5,20 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.bubble.css";
 import "../../../../../../../css/quillTextEditor.css";
 import DOMPurify from "dompurify";
-import { AiFillFile } from "react-icons/ai";
+import "../../../../../../../css/global.css";
+import { router } from "@inertiajs/react";
+import { useRoute } from "ziggy-js";
+import File from "./File";
 
 export default function ViewMaterial() {
+    const route = useRoute();
+
+    const handleClickBackBtn = () => {
+        router.visit(
+            route("program.course.view", { programId: 1, courseId: 1 })
+        );
+        console.log("Clicked");
+    };
     // const postHtml = DOMPurify.sanitize(postContent.postDescription);
     const materialDesc = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
                     do eiusmod tempor incididunt ut labore et dolore magna
@@ -16,7 +27,7 @@ export default function ViewMaterial() {
     return (
         <div className="text-ascend-black space-y-5 font-nunito-sans">
             <div className="flex">
-                <BackButton />
+                <BackButton doSomething={handleClickBackBtn} />
             </div>
             <div className="space-y-5 pb-5 border-b border-ascend-gray1">
                 <div className="flex items-start gap-2 md:gap-20">
@@ -62,13 +73,8 @@ export default function ViewMaterial() {
                     theme={"bubble"}
                 />
             </div>
-            <div className="flex h-15 items-center space-x-4 p-2 border border-ascend-gray1 bg-ascend-white cursor-pointer">
-                <div className="w-full flex overflow-hidden font-semibold font-nunito-sans text-ascebd-black">
-                    <AiFillFile
-                        className={`shrink-0 text-ascend-blue text-size5`}
-                    />
-                    <h4 className="ml-2 truncate">File 1</h4>
-                </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                <File />
             </div>
         </div>
     );
