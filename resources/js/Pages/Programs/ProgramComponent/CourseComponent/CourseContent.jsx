@@ -6,6 +6,7 @@ import Home from "./CourseContentTab/Home";
 import { router } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import Materials from "./CourseContentTab/Materials";
+import Assessments from "./CourseContentTab/Assessments";
 
 export default function CourseContent() {
     // Course Store
@@ -32,6 +33,7 @@ export default function CourseContent() {
 
             {activeTab === 0 && <Home />}
             {activeTab === 1 && <Materials />}
+            {activeTab === 2 && <Assessments />}
         </div>
     );
 }

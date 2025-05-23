@@ -1,29 +1,31 @@
 import { useState } from "react";
 import BackButton from "../../../../../../Components/Button/BackButton";
-import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-import "@cyntler/react-doc-viewer/dist/index.css";
-import "../../../../../../../css/docViewer.css";
 import { MdOutlineCloseFullscreen, MdOutlineFullscreen } from "react-icons/md";
+import { router } from "@inertiajs/react";
+import { useRoute } from "ziggy-js";
+import DocumentViewer from "./DocumentViewer";
 
 export default function ViewFile() {
-    const [isFullSCreen, setIsFullScreen] = useState(false);
-    const docs = [{ uri: "/sample.pdf" }];
+    const [isFullScreen, setIsFullScreen] = useState(false);
+
+    const route = useRoute();
+    const handleCLickBackBtn = () => {
+        router.visit(
+            route("program.course.material.view", {
+                programId: 1,
+                courseId: 1,
+                materialId: 1,
+            })
+        );
+    };
 
     const handleCLickFullscreen = () => {
-        setIsFullScreen(!isFullSCreen);
+        setIsFullScreen(!isFullScreen);
     };
 
     return (
         <div className="relative space-y-5 font-nunito-sans text-ascend-black">
-            {isFullSCreen && (
-                <div
-                    className="absolute z-50 -bottom-3 right-3 cursor-pointer rounded-4xl p-3 hover-change-bg-color"
-                    onClick={handleCLickFullscreen}
-                >
-                    <MdOutlineCloseFullscreen className="text-size5" />
-                </div>
-            )}
-            {!isFullSCreen && (
+            {!isFullScreen ? (
                 <>
                     <nav className="h-16 lg:h-20 w-full flex items-center justify-between px-5 lg:px-[100px]">
                         <img
@@ -32,44 +34,34 @@ export default function ViewFile() {
                             className="w-30"
                         />
                     </nav>
-                    <div className="relative flex items-center gap-5 px-5 lg:px-[100px]">
-                        <BackButton />
-                        <div className="w-full flex items-center justify-between">
-                            <h1>sample.pdf</h1>
-                            <div
-                                className="cursor-pointer rounded-4xl p-3 -mr-3 hover-change-bg-color"
-                                onClick={handleCLickFullscreen}
-                            >
-                                <MdOutlineFullscreen className="text-size7" />
-                            </div>
+                    <div className="w-full flex gap-5 items-center px-5 lg:px-[100px]">
+                        <BackButton doSomething={handleCLickBackBtn} />
+                    </div>
+                    <div className="w-full flex gap-5 items-center px-5 lg:px-[200px]">
+                        <h1 className="w-full truncate text-size4">
+                            sample.pdf
+                        </h1>
+
+                        <div
+                            title="Fullscreen"
+                            className="cursor-pointer rounded-4xl p-3 -mr-3 hover-change-bg-color"
+                            onClick={handleCLickFullscreen}
+                        >
+                            <MdOutlineFullscreen className="text-size7" />
                         </div>
                     </div>
                 </>
+            ) : (
+                <div
+                    title="Exit Fullscreen"
+                    className="absolute z-50 -bottom-3 right-3 cursor-pointer rounded-4xl p-3 hover-change-bg-color"
+                    onClick={handleCLickFullscreen}
+                >
+                    <MdOutlineCloseFullscreen className="text-size5" />
+                </div>
             )}
-            <div
-                className={`${
-                    isFullSCreen ? "px-0" : "px-5 lg:px-[100px]"
-                }  flex flex-col justify-center items-center`}
-            >
-                <DocViewer
-                    config={{
-                        header: {
-                            disableHeader: true,
-                            disableFileName: false,
-                            retainURLParams: false,
-                        },
-                        csvDelimiter: ",", // "," as default,
-                        pdfZoom: {
-                            defaultZoom: 1, // 1 as default,
-                            zoomJump: 0.2, // 0.1 as default,
-                        },
-                        pdfVerticalScrollByDefault: true,
-                    }}
-                    className=""
-                    documents={docs}
-                    pluginRenderers={DocViewerRenderers}
-                />
-            </div>
+
+            <DocumentViewer isFullScreen={isFullScreen} />
         </div>
     );
 }

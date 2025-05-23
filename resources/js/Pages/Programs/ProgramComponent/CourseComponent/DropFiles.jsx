@@ -1,25 +1,18 @@
-import { useEffect, useState } from "react";
+import React from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { FiUploadCloud } from "react-icons/fi";
-import useMaterialsStore from "../../../../../../Stores/Programs/CourseContent/materialsStore";
-export default function DropFiles({ toggleDropFiles }) {
-    // Materials Store
-    const handleMaterialChange = useMaterialsStore(
-        (state) => state.handleMaterialChange
-    );
-    const materialDetails = useMaterialsStore((state) => state.materialDetails);
 
+export default function DropFiles({
+    toggleDropFiles,
+    handleFileChange,
+    fieldName,
+}) {
     const fileTypes = ["png", "jpeg", "jpg", "pdf", "pptx"];
 
     const handleChange = (file) => {
         const fileArray = Array.from(file);
-        handleMaterialChange("materialFiles", fileArray);
+        handleFileChange(fieldName, fileArray);
     };
-
-    useEffect(
-        () => console.log(materialDetails.materialFiles),
-        [materialDetails]
-    );
 
     return (
         <div className="space-y-5">

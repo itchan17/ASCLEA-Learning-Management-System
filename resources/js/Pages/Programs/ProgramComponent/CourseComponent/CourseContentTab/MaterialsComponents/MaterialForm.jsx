@@ -4,8 +4,8 @@ import SecondaryButton from "../../../../../../Components/Button/SecondaryButton
 import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
 import { AiFillFileAdd } from "react-icons/ai";
 import useMaterialsStore from "../../../../../../Stores/Programs/CourseContent/materialsStore";
-import MaterialFileCard from "./MaterialFileCard";
-import DropFiles from "./DropFiles";
+import FileCard from "../../FileCard";
+import DropFiles from "../../DropFiles";
 
 export default function MaterialForm({ toggleOpenMaterialForm }) {
     // Materials Store
@@ -15,6 +15,9 @@ export default function MaterialForm({ toggleOpenMaterialForm }) {
     );
     const hanndleAddMaterials = useMaterialsStore(
         (state) => state.hanndleAddMaterials
+    );
+    const removeAttachedFile = useMaterialsStore(
+        (state) => state.removeAttachedFile
     );
 
     const [showDropFiles, setShowDropFiles] = useState(false);
@@ -52,7 +55,13 @@ export default function MaterialForm({ toggleOpenMaterialForm }) {
                 />
             </div>
 
-            {showDropFiles && <DropFiles toggleDropFiles={toggleDropFiles} />}
+            {showDropFiles && (
+                <DropFiles
+                    handleFileChange={handleMaterialChange}
+                    fieldName={"materialFiles"}
+                    toggleDropFiles={toggleDropFiles}
+                />
+            )}
 
             {/* Attached Files */}
             {materialDetails.materialFiles?.length > 0 && (
@@ -64,7 +73,8 @@ export default function MaterialForm({ toggleOpenMaterialForm }) {
                         {materialDetails.materialFiles.map((file, index) => {
                             return (
                                 <div key={index}>
-                                    <MaterialFileCard
+                                    <FileCard
+                                        removeAttachedFile={removeAttachedFile}
                                         fileId={index}
                                         fileName={file.name}
                                     />

@@ -67,6 +67,16 @@ Route::prefix('programs')->group(function () {
         ]);
     })->name('program.course.material.file.view');
 
+     // Route for editing quiz form
+    Route::get('/{programId}/course/{courseId}/material/{materialId}/form/{formId}/edit', function ($programId, $courseId, $materialId, $formId) {
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/QuizForm', [
+            'programId' => $programId,
+            'courseId' => $courseId,
+            'materialId' => $materialId,
+            'formId' => $formId,
+        ]);
+    })->name('program.course.material.form.edit');
+
 });
 
 

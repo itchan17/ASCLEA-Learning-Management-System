@@ -1,12 +1,7 @@
 import React from "react";
 import { AiFillFile, AiFillCloseCircle } from "react-icons/ai";
-import useMaterialsStore from "../../../../../../Stores/Programs/CourseContent/materialsStore";
 
-export default function MaterialFileCard({ fileName, fileId }) {
-    const removeAttachedFile = useMaterialsStore(
-        (state) => state.removeAttachedFile
-    );
-
+export default function FileCard({ fileName, fileId, removeAttachedFile }) {
     return (
         <div className="flex h-15 items-center space-x-4 p-2 border border-ascend-gray1 bg-ascend-white">
             <div className="w-full flex overflow-hidden font-semibold font-nunito-sans text-ascebd-black">

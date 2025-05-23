@@ -25,9 +25,7 @@ export default function File() {
                 <AiFillFile
                     className={`shrink-0 text-ascend-blue text-size5`}
                 />
-                <h4 className="ml-2 truncate">
-                    File 1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                </h4>
+                <h4 className="ml-2 truncate">Sample.pdf</h4>
             </div>
         </div>
     );

@@ -30,15 +30,16 @@ export default function MaterialItem({ material }) {
             className="flex flex-col justify-between border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 cursor-pointer card-hover"
         >
             <div className="flex items-center gap-2 md:gap-20">
-                <h1 className="flex-1 min-w-0 text-size4 truncate font-bold">
-                    {/* {material.materialTitle} */}
-                    Materials for EDUC 101 - Facilitating Learners
+                <h1 className="flex-1 min-w-0 text-size2 truncate font-bold">
+                    New material uploaded
                 </h1>
 
                 <div className="h-8 flex items-center">
-                    <div className="dropdown dropdown-end cursor-pointer">
+                    <div
+                        onClick={stopPropagation}
+                        className="dropdown dropdown-end cursor-pointer"
+                    >
                         <div
-                            onClick={stopPropagation}
                             tabIndex={0}
                             role="button"
                             className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue transition-all duration-300"
@@ -64,6 +65,10 @@ export default function MaterialItem({ material }) {
                     </div>
                 </div>
             </div>
+            <h1 className="flex-1 min-w-0 text-size4 truncate font-bold">
+                {/* {material.materialTitle} */}
+                Materials for EDUC 101 - Facilitating Learners
+            </h1>
 
             <div className="flex flex-wrap-reverse justify-between items-baseline font-nunito-sans gap-2">
                 <span className="text-size1">Posted on March 29, 2025</span>
