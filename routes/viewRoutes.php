@@ -41,5 +41,16 @@ Route::get('/registration', function () {
     return Inertia::render('RegistrationPage/Registration');
 });
 
+// Studen Analytics route
+Route::get('/student-analytics', function () {
+    return Inertia::render('StudentAnalytics/ProgramsSA');
+});
 
+// Route for selected program in the student analytics
+Route::get('/student-analytics/{ProgramID}', function () {
+    return Inertia::render('StudentAnalytics/Assessment');
+});
 
+Route::get('/student-analytics/{ProgramID}/Assessment/{AssessmentID}', function () {
+    return Inertia::render('StudentAnalytics/AssessmentComponents/AssessmentView');
+});
