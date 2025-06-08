@@ -41,5 +41,10 @@ Route::get('/registration', function () {
     return Inertia::render('RegistrationPage/Registration');
 });
 
+Route::get('/login', function () {
+    return Inertia::render('LoginPage/Login');
+});
+
+
 
 
