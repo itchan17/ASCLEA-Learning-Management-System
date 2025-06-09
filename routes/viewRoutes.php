@@ -38,7 +38,7 @@ Route::get('/programs/{programId}/user/{userId}', function () {
 
 // Registration route
 Route::get('/registration', function () {
-    return Inertia::render('RegistrationPage/Registration');
+    return Inertia::render('RegistrationPage/RegistrationPage');
 });
 
 Route::get('/login', function () {
