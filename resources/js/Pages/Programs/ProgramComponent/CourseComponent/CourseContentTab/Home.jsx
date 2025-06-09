@@ -46,7 +46,7 @@ export default function Home() {
 
                         <ul
                             tabIndex={0}
-                            className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                            className="dropdown-content menu text-size2 bg-ascend-white min-w-36 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                         >
                             <li>
                                 <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">

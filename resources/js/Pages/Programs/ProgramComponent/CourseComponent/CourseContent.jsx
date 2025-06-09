@@ -19,7 +19,7 @@ export default function CourseContent() {
     };
 
     // Tab list
-    const tabs = ["Home", "Materials", "Assessments", "Grades"];
+    const tabs = ["Home", "Modules", "Assessments", "Grades"];
     return (
         <div className="space-y-5">
             <Tabs

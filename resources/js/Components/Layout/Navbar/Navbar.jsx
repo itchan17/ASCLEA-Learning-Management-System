@@ -27,33 +27,24 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
     };
 
     useEffect(() => {
-        switch (url) {
-            case "/dashboard":
-                setPageTitle("Dashboard");
-                break;
-            case "/administration":
-                setPageTitle("Administration");
-                break;
-            case "/admission":
-                setPageTitle("Admission");
-                break;
-            case "/programs":
-                setPageTitle("Programs");
-                break;
-            case "/accounting":
-                setPageTitle("Accounting");
-                break;
-            case "/archives":
-                setPageTitle("Archives");
-                break;
-            case "/grades":
-                setPageTitle("Grades");
-                break;
-            case "/payment-history":
-                setPageTitle("Payment History");
-                break;
-            default:
-                setPageTitle("");
+        if (url.includes("/dashboard")) {
+            setPageTitle("Dashboard");
+        } else if (url.includes("/administration")) {
+            setPageTitle("Administration");
+        } else if (url.includes("/admission")) {
+            setPageTitle("Admission");
+        } else if (url.includes("/programs")) {
+            setPageTitle("Programs");
+        } else if (url.includes("/accounting")) {
+            setPageTitle("Accounting");
+        } else if (url.includes("/archives")) {
+            setPageTitle("Archives");
+        } else if (url.includes("/grades")) {
+            setPageTitle("Grades");
+        } else if (url.includes("/payment-history")) {
+            setPageTitle("Payment History");
+        } else {
+            setPageTitle("");
         }
     }, [url]);
 

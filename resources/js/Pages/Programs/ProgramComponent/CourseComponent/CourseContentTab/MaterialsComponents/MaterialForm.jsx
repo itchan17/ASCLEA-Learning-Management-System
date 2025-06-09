@@ -34,9 +34,12 @@ export default function MaterialForm({ toggleOpenMaterialForm }) {
     useEffect(() => console.log(materialDetails), [materialDetails]);
 
     return (
-        <div className="border border-ascend-gray1 shadow-shadow1 p-5 space-y-5">
+        <div className="border font-nunito-sans border-ascend-gray1 shadow-shadow1 p-5 space-y-5">
+            <h1 className="text-size4 font-bold">Add Material</h1>
             <div>
-                <label>Title</label>
+                <label>
+                    Material Title <span className="text-ascend-red">*</span>
+                </label>
                 <input
                     type="text"
                     value={materialDetails.materialTitle}
@@ -85,7 +88,7 @@ export default function MaterialForm({ toggleOpenMaterialForm }) {
                 </>
             )}
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap gap-5 items-center justify-between">
                 <SecondaryButton
                     isDisabled={showDropFiles}
                     doSomething={toggleDropFiles}
