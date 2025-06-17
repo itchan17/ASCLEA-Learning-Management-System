@@ -34,7 +34,7 @@ export default function MaterialForm({ toggleOpenMaterialForm }) {
     useEffect(() => console.log(materialDetails), [materialDetails]);
 
     return (
-        <div className="border font-nunito-sans border-ascend-gray1 shadow-shadow1 p-5 space-y-5">
+        <div className="border font-nunito-sans border-ascend-gray1 shadow-shadow1 p-5 space-y-5 bg-ascend-white">
             <h1 className="text-size4 font-bold">Add Material</h1>
             <div>
                 <label>
