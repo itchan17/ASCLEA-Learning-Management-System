@@ -8,10 +8,9 @@ export default function File() {
 
     const handleFileClick = () => {
         router.visit(
-            route("program.course.material.file.view", {
+            route("program.course.file.view", {
                 programId: 1,
                 courseId: 1,
-                materialId: 1,
                 fileId: 1,
             })
         );

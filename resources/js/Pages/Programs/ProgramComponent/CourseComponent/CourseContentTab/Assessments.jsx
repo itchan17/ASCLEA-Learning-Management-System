@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import PrimaryButton from "../../../../../Components/Button/PrimaryButton";
 import EmptyState from "../../../../../Components/EmptyState/EmptyState";
 import AssessmentForm from "./AssessmentsComponents/AssessmentForm";
+import AssessmentItem from "./AssessmentsComponents/AssessmentItem";
 
 export default function Assessments() {
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -35,10 +36,12 @@ export default function Assessments() {
                     <AssessmentForm toggleForm={toggleForm} />
                 </div>
             )}
-            <EmptyState
+
+            <AssessmentItem />
+            {/* <EmptyState
                 imgSrc={"/images/illustrations/empty.svg"}
                 text={`“There’s a whole lot of nothing going on—time to make something happen!”`}
-            />
+            /> */}
         </div>
     );
 }

@@ -47,7 +47,7 @@ export default function AssessmentForm({ toggleForm }) {
     }, [assessmentDetails]);
 
     return (
-        <div className="border border-ascend-gray1 shadow-shadow1 p-5 space-y-5">
+        <div className="border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 bg-ascend-white">
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 <div>
                     <label>Assessment Type</label>

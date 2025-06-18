@@ -58,14 +58,13 @@ Route::prefix('programs')->group(function () {
     })->name('program.course.material.view');
 
     // Route for viewing file
-    Route::get('/{programId}/course/{courseId}/material/{materialId}/file/{fileId}', function ($programId, $courseId, $materialId, $fileId) {
+    Route::get('/{programId}/course/{courseId}/file/{fileId}', function ($programId, $courseId, $fileId) {
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/MaterialsComponents/ViewFile', [
             'programId' => $programId,
             'courseId' => $courseId,
-            'materialId' => $materialId,
             'fileId' => $fileId,
         ]);
-    })->name('program.course.material.file.view');
+    })->name('program.course.file.view');
 
      // Route for editing quiz form
     Route::get('/{programId}/course/{courseId}/material/{materialId}/form/{formId}/edit', function ($programId, $courseId, $materialId, $formId) {
@@ -77,6 +76,14 @@ Route::prefix('programs')->group(function () {
         ]);
     })->name('program.course.material.form.edit');
 
+    // Route for viewing assessment
+    Route::get('/{programId}/course/{courseId}/assessment/{assessmentId}', function ($programId, $courseId, $assessmentId) {
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/ViewAssessment', [
+            'programId' => $programId,
+            'courseId' => $courseId,
+            'assessmentId' => $assessmentId,
+        ]);
+    })->name('program.course.assessment.view');
 });
 
 

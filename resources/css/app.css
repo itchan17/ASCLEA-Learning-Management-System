@@ -3,12 +3,7 @@
 
 @import "tailwindcss";
 @plugin "daisyui" {
-    themes: false;
-    root: ":root";
-    include: ;
-    exclude: ;
-    prefix: ;
-    logs: true;
+    themes: light --default;
 }
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';

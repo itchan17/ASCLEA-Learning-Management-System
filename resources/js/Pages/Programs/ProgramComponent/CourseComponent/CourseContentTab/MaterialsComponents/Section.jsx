@@ -3,6 +3,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
 import SectionContentList from "./SectionContentList";
 import MaterialForm from "./MaterialForm";
+import AssessmentForm from "../AssessmentsComponents/AssessmentForm";
 import {
     closestCorners,
     DndContext,
@@ -20,6 +21,7 @@ import { isEqual, cloneDeep } from "lodash";
 export default function Section({ sectionTitle }) {
     const [isExpanded, setIsExpanded] = useState(true);
     const [isMaterialFormOpen, setIsMaterialFormOpen] = useState(false);
+    const [isAssessmentFormOpen, setIsAssessmentFormOpen] = useState(false);
     const targetForm = useRef(null);
     const [isButtonDisplayed, setIsButtonDisyplayed] = useState(false);
     const [sectionContent, setSectionContent] = useState([
@@ -106,19 +108,44 @@ export default function Section({ sectionTitle }) {
     ]);
     const [origOrder, setOrigOrder] = useState(cloneDeep(sectionContent));
 
+    // Pass to the material form component for cancelling the form
     const toggleOpenMaterialForm = () => {
         setIsMaterialFormOpen(!isMaterialFormOpen);
     };
 
-    const addSectionDropdown = () => {
+    // Pass to the asessment form component for cancelling the form
+    const toggleOpenAssessmentForm = () => {
+        setIsAssessmentFormOpen(!isAssessmentFormOpen);
+    };
+
+    // Open material or assessment form
+    const openForm = (e) => {
         // Open form if close
-        if (!isMaterialFormOpen) {
-            setIsMaterialFormOpen(!isMaterialFormOpen);
+        if (
+            e.currentTarget.getAttribute("name") === "add-material" &&
+            !isMaterialFormOpen
+        ) {
+            if (isAssessmentFormOpen) {
+                setIsAssessmentFormOpen(!isAssessmentFormOpen);
+                setIsMaterialFormOpen(!isMaterialFormOpen);
+            } else {
+                setIsMaterialFormOpen(!isMaterialFormOpen);
+            }
+        } else if (
+            e.currentTarget.getAttribute("name") === "add-assessment" &&
+            !isAssessmentFormOpen
+        ) {
+            if (isMaterialFormOpen) {
+                setIsMaterialFormOpen(!isMaterialFormOpen);
+                setIsAssessmentFormOpen(!isAssessmentFormOpen);
+            } else {
+                setIsAssessmentFormOpen(!isAssessmentFormOpen);
+            }
         }
 
-        // Close the dropdown
+        // Close the dropdown after clicked
         const elem = document.activeElement;
-        console.log(elem);
+        console.log("elem: " + elem);
         if (elem) {
             elem?.blur();
         }
@@ -132,10 +159,10 @@ export default function Section({ sectionTitle }) {
     };
 
     useEffect(() => {
-        if (isMaterialFormOpen) {
+        if (isMaterialFormOpen || isAssessmentFormOpen) {
             targetForm.current?.scrollIntoView({ behavior: "smooth" });
         }
-    }, [isMaterialFormOpen]);
+    }, [isMaterialFormOpen, isAssessmentFormOpen]);
 
     // Helper function for getting the index
     const getSectionContentPos = (id) =>
@@ -228,12 +255,12 @@ export default function Section({ sectionTitle }) {
                                 Publish
                             </a>
                         </li>
-                        <li onClick={addSectionDropdown}>
+                        <li name="add-material" onClick={openForm}>
                             <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                 Add material
                             </a>
                         </li>
-                        <li>
+                        <li name="add-assessment" onClick={openForm}>
                             <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                 Add assessment
                             </a>
@@ -265,6 +292,13 @@ export default function Section({ sectionTitle }) {
                         <div ref={targetForm} className="mb-3">
                             <MaterialForm
                                 toggleOpenMaterialForm={toggleOpenMaterialForm}
+                            />
+                        </div>
+                    )}
+                    {isAssessmentFormOpen && (
+                        <div ref={targetForm} className="mb-3">
+                            <AssessmentForm
+                                toggleForm={toggleOpenAssessmentForm}
                             />
                         </div>
                     )}
