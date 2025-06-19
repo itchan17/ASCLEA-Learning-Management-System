@@ -7,16 +7,18 @@ export default function SecondaryButton({
     textColor,
     borderColor,
     btnType = "button",
+    isDisabled = false,
 }) {
     return (
         <button
             type={btnType}
             onClick={doSomething}
-            className={`px-5 h-10 space-x-1 ${
+            disabled={isDisabled}
+            className={`px-5 h-10 space-x-2 ${
                 borderColor || "border-ascend-blue"
             } bg-ascend-white border-[2px] hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300`}
         >
-            {icon && <div className="text-xl ">{icon}</div>}
+            {icon && <div className="text-size5 text-ascend-blue">{icon}</div>}
             <span
                 className={`font-semibold ${textColor || "text-ascend-blue"}`}
             >

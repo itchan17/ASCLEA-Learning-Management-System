@@ -7,7 +7,7 @@ const RegistrationFields = () => {
     <div className="mx-auto max-w-4xl bg-white">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div class="relative">
-                <input type="text" onChange={(e) => handleRegistrationChange("lastname", e.target.value)} id="LastNameOutlined" class="block px-3 py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer" placeholder=" " />
+                <input type="text" onChange={(e) => handleRegistrationChange("lastname", e.target.value)} id="LastNameOutlined" class="block px-3  py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer" placeholder=" " />
                 <label for="LastNameOutlined" class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">Last Name <span className="text-ascend-red">*</span></label>
             </div>
             <div class="relative">

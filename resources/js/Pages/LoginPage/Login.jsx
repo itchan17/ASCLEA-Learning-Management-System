@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PrimaryButton from "../../Components/Button/PrimaryButton";
+import { Link } from "@inertiajs/react";
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -58,12 +59,14 @@ export default function Login() {
               <div className="z-10 text-center max-w-xs">
                 <h2 className="text-xl font-bold mb-2 mr-0">Not enrolled yet?</h2>
                 <p className="mb-4 text-xl-1">Enroll now to gain access and start your review journey!</p>
+                <Link href={"/registration"}>
                 <PrimaryButton
                   text = "Enroll"
                   btnColor = "bg-ascend-white"
                   textColor= "text-ascend-blue"
                   className = "mx-auto"
                 ></PrimaryButton>
+                </Link>
               </div>
             </div>
           </div>
@@ -99,7 +102,7 @@ export default function Login() {
             <input
               type={showPassword ? "text" : "password"}
               id="passwordfloat"
-              className="block px-4 py-3 w-full text-sm bg-transparent border border-ascend-gray1 appearance-none dark:border-gray-600 dark:focus:border-ascend-blue focus:outline-none focus:ring-0 focus:border-ascend-blue peer"
+              className="block px-4 py-3 w-full text-sm bg-transparent border border-ascend-gray1 appearance-none dark:border-gray-600 dark:focus:border-ascend-blue focus:outline-none focus:ring-0 focus:border-ascend-blue peer password-input"
               placeholder=" "
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -121,7 +124,7 @@ export default function Login() {
                 onChange={() => setShowPassword(!showPassword)}
               /> Show password
             </label>
-            <a href="#" className="text-ascend-blue hover:underline">Forgot password?</a>
+            <a href="/emailverification" className="text-ascend-blue hover:underline">Forgot password?</a>
           </div>
 
           <PrimaryButton doSomething={handleLogin} text="Sign in" className={"w-full"} />
