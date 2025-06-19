@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IoImageSharp } from "react-icons/io5";
 import CustomSelect from "../../../Components/CustomInputField/CustomSelect";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
@@ -11,12 +11,18 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 export default function Courses() {
     // Course Store
     const courseList = useCourseStore((state) => state.courseList);
+    const setActiveTab = useCourseStore((state) => state.setActiveTab);
 
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleModal = () => {
         setIsOpen(!isOpen);
     };
+
+    // Reset active tab
+    useEffect(() => {
+        setActiveTab(0);
+    }, []);
 
     console.log("Render Courses");
 
@@ -45,15 +51,15 @@ export default function Courses() {
 
                         <ul
                             tabIndex={0}
-                            className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none"
+                            className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                         >
                             <li>
-                                <a className="w-full text-left hover:bg-ascend-lightblue transition duration-300">
+                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                     Edit
                                 </a>
                             </li>
                             <li>
-                                <a className="w-full text-left hover:bg-ascend-lightblue transition duration-300">
+                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                     Remove
                                 </a>
                             </li>
@@ -68,7 +74,7 @@ export default function Courses() {
                     ullamco laboris nisi ut aliquip ex ea commodo consequat.
                 </p>
             </div>
-            <div className="flex flex-wrap justify-between items-center">
+            <div className="flex flex-wrap justify-between items-center gap-2">
                 <CustomSelect
                     selectField={
                         <select className="w-35 rounded-none appearance-none border border-ascend-black p-2 h-9 text-size1  focus:outline-ascend-blue">

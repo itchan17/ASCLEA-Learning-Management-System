@@ -4,13 +4,16 @@ import usePeopleStore from "../../../../Stores/Programs/peopleStore";
 import { router } from "@inertiajs/react";
 import CustomSelect from "../../../../Components/CustomInputField/CustomSelect";
 import { IoSearch } from "react-icons/io5";
+import { useRoute } from "ziggy-js";
 
 export default function PeopleTable() {
     // People Store
     const peopleList = usePeopleStore((state) => state.peopleList);
 
+    const route = useRoute();
+
     const handleRowClick = (userId) => {
-        router.visit(`/programs/${1}/user/${userId}`);
+        router.visit(route("program.user.view", { programId: 1, userId }));
     };
 
     return (

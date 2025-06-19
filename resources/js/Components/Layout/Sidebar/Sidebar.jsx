@@ -4,14 +4,14 @@ import SidebarLink from "./SidebarLink";
 // Icon
 import {
     MdSpaceDashboard,
-    MdAnalytics,
     MdPeopleAlt,
     MdNoteAlt,
-    MdCalendarMonth,
+    MdSchool,
     MdClose,
+    MdPayments,
     MdRateReview,
+    MdArchive,
 } from "react-icons/md";
-import { PiUserListFill } from "react-icons/pi";
 
 export default function Sidebar({
     isSidebarOpen,
@@ -21,18 +21,57 @@ export default function Sidebar({
 }) {
     const [expanded, setExpanded] = useState(true);
 
+    const userRole = "admin";
+
     const links = [
-        { url: "/dashboard", text: "Dashboard", icon: MdSpaceDashboard },
         {
-            url: "/student-analytics",
-            text: "Student Analytics",
-            icon: MdAnalytics,
+            url: "/dashboard",
+            text: "Dashboard",
+            icon: MdSpaceDashboard,
+            roles: ["admin", "faculty", "student"],
         },
-        { url: "/staff", text: "Staff", icon: MdPeopleAlt },
-        { url: "/enrollment", text: "Enrollment", icon: PiUserListFill },
-        { url: "/programs", text: "Programs", icon: MdNoteAlt },
-        { url: "/grades", text: "Grades", icon: MdRateReview },
-        { url: "/calendar", text: "Calendar", icon: MdCalendarMonth },
+        {
+            url: "/administration",
+            text: "Administration",
+            icon: MdPeopleAlt,
+            roles: ["admin"],
+        },
+        {
+            url: "/admission",
+            text: "Admission",
+            icon: MdSchool,
+            roles: ["admin", "student"],
+        },
+        {
+            url: "/programs",
+            text: "Programs",
+            icon: MdNoteAlt,
+            roles: ["admin", "faculty", "student"],
+        },
+        {
+            url: "/accounting",
+            text: "Accounting",
+            icon: MdPayments,
+            roles: ["admin"],
+        },
+        {
+            url: "/archives",
+            text: "Archives",
+            icon: MdArchive,
+            roles: ["admin", "faculty"],
+        },
+        {
+            url: "/grades",
+            text: "Grades",
+            icon: MdRateReview,
+            roles: ["student"],
+        },
+        {
+            url: "/payment-history",
+            text: "Payment History",
+            icon: MdPayments,
+            roles: ["student"],
+        },
     ];
 
     // Get the width of window
@@ -88,7 +127,7 @@ export default function Sidebar({
                         className="cursor-pointer hover:bg-ascend-lightblue p-3 rounded-[50px] transition-hover duration-300"
                         onClick={toggleMenu}
                     >
-                        <div className="w-6 h-5 hidden space-y-1 lg:flex flex-col items-end justify-center ">
+                        <div className="w-7 h-7 hidden space-y-1 lg:flex flex-col items-end justify-center ">
                             <span
                                 className={`${
                                     expanded
@@ -111,20 +150,26 @@ export default function Sidebar({
 
             {/* Links */}
             <ul className="flex-1 py-6 space-y-6 font-nunito-sans font-semibold overflow-y-auto">
-                {links.map((link, index) => {
-                    return (
-                        <li key={index}>
-                            <SidebarLink
-                                linkUrl={link.url}
-                                text={link.text}
-                                icon={link.icon}
-                                expanded={expanded}
-                                setIsSidebarOpen={setIsSidebarOpen}
-                                closeSidebar={closeSidebar}
-                            />
-                        </li>
-                    );
-                })}
+                {links
+                    // .filter(
+                    //     (link) =>
+                    //         Array.isArray(link.roles) &&
+                    //         link.roles.includes(userRole)
+                    // )
+                    .map((link, index) => {
+                        return (
+                            <li key={index}>
+                                <SidebarLink
+                                    linkUrl={link.url}
+                                    text={link.text}
+                                    icon={link.icon}
+                                    expanded={expanded}
+                                    setIsSidebarOpen={setIsSidebarOpen}
+                                    closeSidebar={closeSidebar}
+                                />
+                            </li>
+                        );
+                    })}
             </ul>
         </aside>
     );
