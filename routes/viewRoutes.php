@@ -45,6 +45,12 @@ Route::get('/login', function () {
     return Inertia::render('LoginPage/Login');
 });
 
+// routes/web.php
+Route::get('/emailverification', function () {
+    return Inertia::render('LoginPage/Emailverification');
+});
 
-
-
+// routes/web.php
+Route::get('/changepassword', function () {
+    return Inertia::render('LoginPage/Changepassword');
+});

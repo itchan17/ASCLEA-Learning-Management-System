@@ -98,3 +98,7 @@
         margin-bottom: 1.5rem;
     }
 }
+
+.password-input::-ms-reveal {
+  display: none;
+}

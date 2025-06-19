@@ -99,7 +99,7 @@ export default function Login() {
             <input
               type={showPassword ? "text" : "password"}
               id="passwordfloat"
-              className="block px-4 py-3 w-full text-sm bg-transparent border border-ascend-gray1 appearance-none dark:border-gray-600 dark:focus:border-ascend-blue focus:outline-none focus:ring-0 focus:border-ascend-blue peer"
+              className="block px-4 py-3 w-full text-sm bg-transparent border border-ascend-gray1 appearance-none dark:border-gray-600 dark:focus:border-ascend-blue focus:outline-none focus:ring-0 focus:border-ascend-blue peer password-input"
               placeholder=" "
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -121,7 +121,7 @@ export default function Login() {
                 onChange={() => setShowPassword(!showPassword)}
               /> Show password
             </label>
-            <a href="#" className="text-ascend-blue hover:underline">Forgot password?</a>
+            <a href="/emailverification" className="text-ascend-blue hover:underline">Forgot password?</a>
           </div>
 
           <PrimaryButton doSomething={handleLogin} text="Sign in" className={"w-full"} />
