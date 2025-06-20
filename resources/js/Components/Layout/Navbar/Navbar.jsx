@@ -27,27 +27,24 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
     };
 
     useEffect(() => {
-        switch (url) {
-            case "/dashboard":
-                setPageTitle("Dashboard");
-                break;
-            case "/student-analytics":
-                setPageTitle("Student Analytics");
-                break;
-            case "/staff":
-                setPageTitle("Staff");
-                break;
-            case "/enrollment":
-                setPageTitle("Enrollment");
-                break;
-            case "/programs":
-                setPageTitle("Programs");
-                break;
-            case "/calendar":
-                setPageTitle("Calendar");
-                break;
-            default:
-                setPageTitle("");
+        if (url.includes("/dashboard")) {
+            setPageTitle("Dashboard");
+        } else if (url.includes("/administration")) {
+            setPageTitle("Administration");
+        } else if (url.includes("/admission")) {
+            setPageTitle("Admission");
+        } else if (url.includes("/programs")) {
+            setPageTitle("Programs");
+        } else if (url.includes("/accounting")) {
+            setPageTitle("Accounting");
+        } else if (url.includes("/archives")) {
+            setPageTitle("Archives");
+        } else if (url.includes("/grades")) {
+            setPageTitle("Grades");
+        } else if (url.includes("/payment-history")) {
+            setPageTitle("Payment History");
+        } else {
+            setPageTitle("");
         }
     }, [url]);
 
@@ -80,7 +77,7 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
                         onClick={openSidebar}
                         className="cursor-pointer hover:bg-ascend-lightblue p-3 rounded-[50px] transition-hover duration-300"
                     >
-                        <div className="w-6 h-5 space-y-1 flex flex-col justify-center">
+                        <div className="w-7 h-7 space-y-1 flex flex-col justify-center">
                             <span className="block h-[3px] w-full bg-ascend-black rounded"></span>
                             <span className="block h-[3px] w-full bg-ascend-black rounded"></span>
                             <span className="block h-[3px] w-full bg-ascend-black rounded"></span>

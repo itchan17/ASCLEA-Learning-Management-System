@@ -14,19 +14,23 @@
 }
 
 /* Custom styling for the form */
+.ql-snow {
+    border: none !important;
+}
 .ql-snow .ql-editor {
     font-size: 16px;
     font-family: "Nunito Sans", sans-serif;
     border: 1px solid #8a8989 !important;
     min-height: 200px !important;
+    box-shadow: none !important;
 }
 
-.ql-snow .ql-editor {
+.ql-editor {
     padding: 8px !important;
 }
 
 /* Custome styling for the output */
-.ql-bubble .ql-editor {
+.ql-bubble {
     border: none !important;
 }
 

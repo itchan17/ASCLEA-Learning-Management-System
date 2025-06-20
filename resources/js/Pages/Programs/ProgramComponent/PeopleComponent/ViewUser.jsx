@@ -5,6 +5,7 @@ import { IoSearch } from "react-icons/io5";
 import { router } from "@inertiajs/react";
 import AssignCourseForm from "./AssignCourseForm";
 import useUserStore from "../../../../Stores/Programs/userStore";
+import { useRoute } from "ziggy-js";
 
 export default function ViewUser() {
     // User Store
@@ -12,8 +13,9 @@ export default function ViewUser() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const route = useRoute();
     const handleClickBackBtn = () => {
-        router.visit(`/programs/${1}`);
+        router.visit(route("program.view", { programId: 1 }));
     };
 
     const toggleModal = () => {

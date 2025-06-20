@@ -20,22 +20,22 @@ export default function Post({ postContent }) {
                         <div
                             tabIndex={0}
                             role="button"
-                            className="rounded-4xl p-1 hover:bg-ascend-lightblue/35 transition-all duration-300"
+                            className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue/35 transition-all duration-300"
                         >
                             <BsThreeDotsVertical className="text-size3" />
                         </div>
 
                         <ul
                             tabIndex={0}
-                            className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-xl !transition-none text-ascend-black"
+                            className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                         >
                             <li>
-                                <a className="w-full text-left hover:bg-ascend-lightblue transition duration-300">
+                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                     Edit
                                 </a>
                             </li>
                             <li>
-                                <a className="w-full text-left hover:bg-ascend-lightblue transition duration-300">
+                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                     Remove
                                 </a>
                             </li>

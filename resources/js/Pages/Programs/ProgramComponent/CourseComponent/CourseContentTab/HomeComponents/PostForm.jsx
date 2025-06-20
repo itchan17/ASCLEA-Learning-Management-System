@@ -6,14 +6,8 @@ import usePostStore from "../../../../../../Stores/Programs/CourseContent/postSt
 
 export default function PostForm({ toggleForm }) {
     // Post Store
-    const postValue = usePostStore((state) => state.postValue);
-    const handlePostValueChange = usePostStore(
-        (state) => state.handlePostValueChange
-    );
     const handleAddPost = usePostStore((state) => state.handleAddPost);
-    const handlePostTitleChange = usePostStore(
-        (state) => state.handlePostTitleChange
-    );
+    const handlePostChange = usePostStore((state) => state.handlePostChange);
     const postDetails = usePostStore((state) => state.postDetails);
 
     const handleWritePost = () => {
@@ -28,7 +22,7 @@ export default function PostForm({ toggleForm }) {
                     type="text"
                     value={postDetails.postTitle}
                     onChange={(e) =>
-                        handlePostTitleChange("postTitle", e.target.value)
+                        handlePostChange("postTitle", e.target.value)
                     }
                     className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
                 />
@@ -36,8 +30,9 @@ export default function PostForm({ toggleForm }) {
             <div>
                 <label htmlFor="">Description</label>
                 <TextEditor
-                    value={postValue}
-                    setValue={handlePostValueChange}
+                    fieldName={"postDescription"}
+                    value={postDetails.postDescription}
+                    setValue={handlePostChange}
                 />
             </div>
             <div className=" flex flex-wrap justify-end gap-2">

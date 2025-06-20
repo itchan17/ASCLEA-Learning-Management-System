@@ -6,11 +6,10 @@ export default function SidebarLink({
     text,
     icon: Icon,
     expanded,
-    setIsSidebarOpen,
     closeSidebar,
 }) {
     const { url } = usePage();
-    console.log(url);
+
     return (
         <Link
             onClick={closeSidebar}
