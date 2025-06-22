@@ -23,6 +23,17 @@ export default function AssessmentItem() {
             }
         );
     };
+
+    const handleQuizClick = () => {
+        router.visit(
+            route("program.course.material.form.edit", {
+                programId: 1,
+                courseId: 1,
+                materialId: 1,
+                formId: 1,
+            })
+        );
+    };
     return (
         <div
             onClick={handleCardClick}
@@ -48,7 +59,7 @@ export default function AssessmentItem() {
 
                         <ul
                             tabIndex={0}
-                            className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                            className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-45 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                         >
                             <li>
                                 <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
@@ -57,7 +68,7 @@ export default function AssessmentItem() {
                             </li>
                             <li>
                                 <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Remove assessment
+                                    Archive assessment
                                 </a>
                             </li>
                         </ul>
@@ -73,7 +84,13 @@ export default function AssessmentItem() {
                 <span className="text-size1">Due on April 30 at 11:59pm</span>
             </div>
 
-            <div className="flex h-15 items-center space-x-4 p-2 border border-ascend-gray1 bg-ascend-white hover-change-bg-color cursor-pointer">
+            <div
+                onClick={(e) => {
+                    stopPropagation(e);
+                    handleQuizClick();
+                }}
+                className="flex h-15 items-center space-x-4 p-2 border border-ascend-gray1 bg-ascend-white hover-change-bg-color cursor-pointer"
+            >
                 <div className="w-full flex overflow-hidden font-semibold font-nunito-sans text-ascebd-black">
                     <SiGoogleforms className="text-size5 text-ascend-blue" />
                     <h4 className="ml-2 truncate">Quiz form</h4>

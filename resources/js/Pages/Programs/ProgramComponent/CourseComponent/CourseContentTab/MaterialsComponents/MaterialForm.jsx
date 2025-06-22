@@ -7,7 +7,11 @@ import useMaterialsStore from "../../../../../../Stores/Programs/CourseContent/m
 import FileCard from "../../FileCard";
 import DropFiles from "../../DropFiles";
 
-export default function MaterialForm({ toggleOpenMaterialForm }) {
+export default function MaterialForm({
+    toggleOpenMaterialForm,
+    formTitle,
+    formWidth,
+}) {
     // Materials Store
     const materialDetails = useMaterialsStore((state) => state.materialDetails);
     const handleMaterialChange = useMaterialsStore(
@@ -34,8 +38,12 @@ export default function MaterialForm({ toggleOpenMaterialForm }) {
     useEffect(() => console.log(materialDetails), [materialDetails]);
 
     return (
-        <div className="border font-nunito-sans border-ascend-gray1 shadow-shadow1 p-5 space-y-5 bg-ascend-white">
-            <h1 className="text-size4 font-bold">Add Material</h1>
+        <div
+            className={`border ${formWidth} font-nunito-sans border-ascend-gray1 shadow-shadow1 p-5 space-y-5 bg-ascend-white`}
+        >
+            <h1 className="text-size4 font-bold">
+                {formTitle || "Add Material"}
+            </h1>
             <div>
                 <label>
                     Material Title <span className="text-ascend-red">*</span>

@@ -23,8 +23,8 @@ export default function ViewAssessment() {
             </div>
             <div className="space-y-5 pb-5 border-b border-ascend-gray1">
                 <div className="flex items-start gap-2 md:gap-20">
-                    <div className="w-full">
-                        <h1 className="flex-1 min-w-0 text-size6 break-words font-semibold">
+                    <div className="w-full min-w-0">
+                        <h1 className="text-size6 break-words font-semibold">
                             EDUC 101 - Facilitating Learners
                         </h1>
                         <span className="text-size1">

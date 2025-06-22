@@ -3,13 +3,14 @@ import PrimaryButton from "../../../../../Components/Button/PrimaryButton";
 import EmptyState from "../../../../../Components/EmptyState/EmptyState";
 import AssessmentForm from "./AssessmentsComponents/AssessmentForm";
 import AssessmentItem from "./AssessmentsComponents/AssessmentItem";
+import useAssessmentsStore from "../../../../../Stores/Programs/CourseContent/assessmentsStore";
 
 export default function Assessments() {
-    const [isFormOpen, setIsFormOpen] = useState(false);
-
-    const toggleForm = () => {
-        setIsFormOpen(!isFormOpen);
-    };
+    // Assessments Store
+    const isFormOpen = useAssessmentsStore((state) => state.isFormOpen);
+    const toggleAssessmentForm = useAssessmentsStore(
+        (state) => state.toggleAssessmentForm
+    );
 
     const targetForm = useRef(null);
 
@@ -26,14 +27,14 @@ export default function Assessments() {
 
                 <PrimaryButton
                     isDisabled={isFormOpen}
-                    doSomething={toggleForm}
+                    doSomething={toggleAssessmentForm}
                     text="Add Assessment"
                 />
             </div>
 
             {isFormOpen && (
                 <div ref={targetForm}>
-                    <AssessmentForm toggleForm={toggleForm} />
+                    <AssessmentForm toggleForm={toggleAssessmentForm} />
                 </div>
             )}
 

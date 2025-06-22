@@ -22,7 +22,6 @@ export default function Section({ sectionTitle }) {
     const [isExpanded, setIsExpanded] = useState(true);
     const [isMaterialFormOpen, setIsMaterialFormOpen] = useState(false);
     const [isAssessmentFormOpen, setIsAssessmentFormOpen] = useState(false);
-    const targetForm = useRef(null);
     const [isButtonDisplayed, setIsButtonDisyplayed] = useState(false);
     const [sectionContent, setSectionContent] = useState([
         {
@@ -158,12 +157,6 @@ export default function Section({ sectionTitle }) {
         setIsButtonDisyplayed(false);
     };
 
-    useEffect(() => {
-        if (isMaterialFormOpen || isAssessmentFormOpen) {
-            targetForm.current?.scrollIntoView({ behavior: "smooth" });
-        }
-    }, [isMaterialFormOpen, isAssessmentFormOpen]);
-
     // Helper function for getting the index
     const getSectionContentPos = (id) =>
         sectionContent.findIndex((content) => content.id === id);
@@ -193,7 +186,11 @@ export default function Section({ sectionTitle }) {
 
     // This allows drag and drop in mobile device
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
         useSensor(TouchSensor),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
@@ -289,16 +286,20 @@ export default function Section({ sectionTitle }) {
                     }`}
                 >
                     {isMaterialFormOpen && (
-                        <div ref={targetForm} className="mb-3">
+                        <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
                             <MaterialForm
                                 toggleOpenMaterialForm={toggleOpenMaterialForm}
+                                formTitle={"Add Section Material"}
+                                formWidth={"w-200"}
                             />
                         </div>
                     )}
                     {isAssessmentFormOpen && (
-                        <div ref={targetForm} className="mb-3">
+                        <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
                             <AssessmentForm
                                 toggleForm={toggleOpenAssessmentForm}
+                                formTitle={"Add Section Assessment"}
+                                formWidth={"w-200"}
                             />
                         </div>
                     )}

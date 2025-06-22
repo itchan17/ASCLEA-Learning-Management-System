@@ -11,7 +11,7 @@ export default function SinglePage({ children }) {
             <div className="w-full flex gap-5 items-center px-5 lg:px-[100px]">
                 <BackButton doSomething={handleClickBackBtn} />
             </div>
-            <div className="flex justify-center px-5 lg:px-[200px]">
+            <div className="flex justify-center px-5 pb-5 lg:px-[200px]">
                 {children}
             </div>
         </div>

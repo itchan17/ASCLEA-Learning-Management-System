@@ -2,8 +2,12 @@ import React from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { router } from "@inertiajs/react";
+import { useRoute } from "ziggy-js";
 
 export default function SectionContent({ disabled, contentDetails }) {
+    const route = useRoute();
+
     const { attributes, listeners, setNodeRef, transform, transition } =
         useSortable({
             id: contentDetails.id,
@@ -19,8 +23,19 @@ export default function SectionContent({ disabled, contentDetails }) {
         transform: CSS.Transform.toString(transform),
         transition,
     };
+
+    const handleSectionContentClick = () => {
+        console.log("Clicked");
+
+        // Code here for route
+    };
+
+    const stopPropagation = (e) => {
+        e.stopPropagation();
+    };
     return (
         <div
+            onClick={handleSectionContentClick}
             ref={setNodeRef}
             {...attributes}
             {...(!disabled && listeners)}
@@ -32,9 +47,11 @@ export default function SectionContent({ disabled, contentDetails }) {
                 {contentDetails.title}
             </h1>
 
-            <div className="dropdown dropdown-end cursor-pointer">
+            <div
+                onClick={stopPropagation}
+                className="dropdown dropdown-end cursor-pointer"
+            >
                 <div
-                    onPointerDown={(e) => e.stopPropagation()}
                     tabIndex={0}
                     role="button"
                     className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue transition-all duration-300"
