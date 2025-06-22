@@ -86,8 +86,30 @@ Route::prefix('programs')->group(function () {
 
 // Registration route
 Route::get('/registration', function () {
-    return Inertia::render('RegistrationPage/Registration');
+    return Inertia::render('RegistrationPage/RegistrationPage');
 });
+
+// Admission routes
+
+Route::get('/admission', function () {
+    return Inertia::render('Admission/AdmissionPage');
+});
+
+// Route for selected applicant to view their admission details
+Route::get('/admission/pending/{applicantId}', function ($applicantId) {
+    return Inertia::render('Admission/PendingPage/EnrollmentRequest', [
+        'applicantId' => $applicantId,
+    ]);
+})->name('pending.applicant.view');
+
+// Route for selected enrolled student to view their information
+Route::get('/admission/enrolled/{studentid}', function ($studentid) {
+    return Inertia::render('Admission/EnrolledPage/StudentInfo', [
+        'studentid' => $studentid,
+    ]);
+})->name('enrolled.student.view');
+
+// --End--
 
 Route::get('/login', function () {
     return Inertia::render('LoginPage/Login');
