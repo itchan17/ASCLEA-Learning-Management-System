@@ -124,3 +124,8 @@ Route::get('/emailverification', function () {
 Route::get('/changepassword', function () {
     return Inertia::render('LoginPage/Changepassword');
 });
+
+// Route for Student Grades
+Route::get('/grades', function () {
+    return Inertia::render('Student_Grades/StudentGrades');
+});
