@@ -8,11 +8,10 @@ export default function Quiz() {
 
     const handleQuizClick = () => {
         router.visit(
-            route("program.course.material.form.edit", {
+            route("program.course.quiz-form.edit", {
                 programId: 1,
                 courseId: 1,
-                materialId: 1,
-                formId: 1,
+                quizFormId: 1,
             })
         );
     };

@@ -4,7 +4,7 @@ import { AiFillEdit, AiFillDelete, AiOutlineArrowDown } from "react-icons/ai";
 export default function Question({ questionDetails, questionNumber }) {
     return (
         <div className="space-y-5">
-            <div className="flex justify-end gap-2 text-ascend-black text-size4">
+            <div className="flex justify-end gap-2 text-ascend-black">
                 <AiFillEdit title="Edit question" className="cursor-pointer" />
                 <AiFillDelete
                     title="Delete question"
@@ -30,39 +30,61 @@ export default function Question({ questionDetails, questionNumber }) {
                             <span className="text-ascend-red">*</span>
                         </p>
                         <span className="font-bold">
-                            {`${questionDetails.points} ${
-                                questionDetails.points > 1 ? "pts" : "pt"
+                            {`${questionDetails.questionPoints} ${
+                                questionDetails.questionPoints > 1
+                                    ? "pts"
+                                    : "pt"
                             }`}
                         </span>
                     </div>
                     {/* Multiple Choice */}
-                    {questionDetails.type === "multiple_choice" ? (
+                    {questionDetails.questionType === "multiple_choice" ? (
                         <div className="flex flex-col space-y-4">
-                            {questionDetails.choices.map((choice, i) => (
-                                <label key={i} className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="multipleChoiceOption"
-                                        value={choice}
-                                        className="w-5 h-5 accent-ascend-blue cursor-pointer"
-                                    />
-                                    <span className="ml-2">{choice}</span>
-                                </label>
-                            ))}
+                            {questionDetails.questionChoices.length > 0 &&
+                                questionDetails.questionChoices.map(
+                                    (choice, i) => {
+                                        return (
+                                            <label
+                                                key={i}
+                                                className="flex items-center cursor-pointer"
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="multipleChoiceOption"
+                                                    value={choice}
+                                                    className="w-4 h-4 accent-ascend-blue cursor-pointer"
+                                                />
+                                                <span className="ml-2">
+                                                    {choice}
+                                                </span>
+                                            </label>
+                                        );
+                                    }
+                                )}
                         </div>
-                    ) : questionDetails.type === "true_or_false" ? (
+                    ) : questionDetails.questionType === "true_or_false" ? (
                         <div className="flex flex-col space-y-4">
-                            {questionDetails.choices.map((choice, i) => (
-                                <label key={i} className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="trueOrFalseOption"
-                                        value={choice}
-                                        className="w-5 h-5 accent-ascend-blue cursor-pointer"
-                                    />
-                                    <span className="ml-2">{choice}</span>
-                                </label>
-                            ))}
+                            {questionDetails.questionChoices.length > 0 &&
+                                questionDetails.questionChoices.map(
+                                    (choice, i) => {
+                                        return (
+                                            <label
+                                                key={i}
+                                                className="flex items-center cursor-pointer"
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="trueOrFalseOption"
+                                                    value={choice}
+                                                    className="w-4 h-4 accent-ascend-blue cursor-pointer"
+                                                />
+                                                <span className="ml-2">
+                                                    {choice}
+                                                </span>
+                                            </label>
+                                        );
+                                    }
+                                )}
                         </div>
                     ) : (
                         <input

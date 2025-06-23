@@ -7,30 +7,58 @@ const useCreateQuizStore = create((set) => ({
         quizTitle: "",
         quizDescription: "",
     },
+    questionDetails: {
+        questionType: "",
+        question: "",
+        questionChoices: [],
+        questionAnswer: [],
+        questionPoints: 0,
+        required: true,
+    },
+
+    handleQuestionDetailsChange: (field, value) => {
+        const { questionDetails } = useCreateQuizStore.getState();
+
+        if (field === "questionChoices" || field === "questionAnswer") {
+            set({
+                questionDetails: {
+                    ...questionDetails,
+                    [field]: [...questionDetails[field], value],
+                },
+            });
+        } else {
+            set({
+                questionDetails: {
+                    ...questionDetails,
+                    [field]: value,
+                },
+            });
+        }
+    },
 
     questionList: [
         {
-            id: 1,
-            type: "multiple_choice",
+            questionType: "multiple_choice",
             question: "Which of these is programming language?",
-            choices: ["React", "HTML", "CSS", "Java"],
-            answer: ["Python"],
-            points: 2,
+            questionChoices: ["React", "HTML", "CSS", "Java"],
+            questionAnswer: ["Python"],
+            questionPoints: 2,
+            required: true,
         },
         {
-            id: 2,
-            type: "true_or_false",
+            questionType: "true_or_false",
             question: "The Great Wall of China is visible from space.",
-            choices: ["True", "False"],
-            answer: "False",
-            points: 1,
+            questionChoices: ["True", "False"],
+            questionAnswer: "False",
+            questionPoints: 1,
+            required: true,
         },
         {
-            id: 3,
-            type: "identification",
+            questionType: "identification",
             question: "What is the chemical symbol for water?",
-            answer: "H2O",
-            points: 1,
+            questionAnswer: "H2O",
+            questionPoints: 1,
+            required: true,
         },
     ],
 
@@ -42,6 +70,13 @@ const useCreateQuizStore = create((set) => ({
                 ...quizDetails,
                 [field]: value,
             },
+        });
+    },
+
+    handleAddQuestion: () => {
+        const { questionList, questionDetails } = useCreateQuizStore.getState();
+        set({
+            questionList: [...questionList, questionDetails],
         });
     },
 }));

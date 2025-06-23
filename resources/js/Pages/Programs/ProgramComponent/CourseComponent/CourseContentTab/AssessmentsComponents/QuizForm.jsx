@@ -1,10 +1,11 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import SinglePage from "../../../../../../Components/Layout/SInglePage";
 import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
 import TextEditor from "../../TextEditor";
 import useCreateQuizStore from "../../../../../../Stores/Programs/CourseContent/createQuizStore";
 import Question from "./Question";
 import SecondaryButton from "../../../../../../Components/Button/SecondaryButton";
+import MultipleChoiceForm from "./MultipleChoiceForm";
 
 export default function QuizForm() {
     // Create Quiz Store
@@ -13,10 +14,31 @@ export default function QuizForm() {
         (state) => state.handleQuizDetailsChange
     );
     const questionList = useCreateQuizStore((state) => state.questionList);
+    const handleQuestionDetailsChange = useCreateQuizStore(
+        (state) => state.handleQuestionDetailsChange
+    );
 
+    const [openQuestionForm, setOpenQuestionForm] = useState({
+        multipleChoice: false,
+        trueOrFalse: false,
+        indeftification: false,
+    });
+
+    const handleOpenQuestionForm = (questionType) => {
+        console.log("Clicked");
+        handleQuestionDetailsChange("questionType", questionType);
+        if (questionType === "multiple_choice") {
+            setOpenQuestionForm({
+                multipleChoice: !openQuestionForm.multipleChoice,
+                trueOrFalse: false,
+                indeftification: false,
+            });
+        }
+    };
     useEffect(() => {
         console.log(quizDetails);
-    }, [quizDetails]);
+        console.log(`QUESTION LIST: ${questionList}`);
+    }, [quizDetails, questionList]);
     return (
         <SinglePage>
             <div className="w-full max-w-235 space-y-5">
@@ -40,7 +62,9 @@ export default function QuizForm() {
                 <div className="w-full border border-ascend-gray1 shadow-shadow1 p-5 space-y-5">
                     <div className="font-bold text-end">Total points: 10</div>
                     <div>
-                        <label>Title</label>
+                        <label>
+                            Title<span className="text-ascend-red">*</span>
+                        </label>
                         <input
                             type="text"
                             value={quizDetails.quizTitle}
@@ -76,11 +100,18 @@ export default function QuizForm() {
                             ))}
                         </div>
                     )}
-
+                    <div>
+                        {openQuestionForm.multipleChoice && (
+                            <MultipleChoiceForm />
+                        )}
+                    </div>
                     <div className="space-y-5">
                         <h1 className="font-bold">Select Type of Question</h1>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                             <SecondaryButton
+                                doSomething={() =>
+                                    handleOpenQuestionForm("multiple_choice")
+                                }
                                 width={"w-full"}
                                 text={"Multiple Choice"}
                             />
