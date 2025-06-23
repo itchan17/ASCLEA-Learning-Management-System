@@ -28,7 +28,7 @@ function PrimaryButton({ doSomething, icon, text, textColor, btnColor, className
       <img src="/images/ascend_logo.png" alt="Ascend Logo" className="w-40 mb-6 mx-auto" />
 
       {/* Email Verification Field */}
-      <div className="w-full max-w-sm bg-white shadow-md p-6 space-y-4 h-full sm:border border-ascend-gray1 sm:shadow-shadow1 sm:p-4 space-y-5">
+      <div className="w-full max-w-sm bg-white shadow-md p-6 h-full sm:border border-ascend-gray1 sm:shadow-shadow1 sm:p-4 space-y-5">
         <h2 className="text-2xl font-bold text-center mb-5">Email Verification</h2>
         <p className="text-sm text-gray-600 mb-10 text-center">
             To reset your password, please enter your email address below. We’ll verify your account before allowing changes.
@@ -37,14 +37,14 @@ function PrimaryButton({ doSomething, icon, text, textColor, btnColor, className
         <input
             type="text"
             id="emailfloat"
-            className="block px-4 py-3 w-full text-sm bg-transparent border border-ascend-gray1 appearance-none dark:border-gray-600 dark:focus:border-ascend-blue focus:outline-none focus:ring-0 focus:border-ascend-blue peer"
+            class="block px-4 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
             placeholder=" "
             value={email}
             onChange={(e) => setEmail(e.target.value)}
         />
         <label
             htmlFor="emailfloat"
-            className="absolute text-size2 font-nunito-sans dark:text-ascend-gray2 duration-300 transform -translate-y-5 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:px-2 peer-focus:text-ascend-blue peer-focus:dark:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-5 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1 mb-2"
+            class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
         >
             Email
         </label>
