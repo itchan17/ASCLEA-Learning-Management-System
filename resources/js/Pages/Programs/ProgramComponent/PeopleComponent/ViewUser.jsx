@@ -2,21 +2,15 @@ import { useState } from "react";
 import BackButton from "../../../../Components/Button/BackButton";
 import PrimaryButton from "../../../../Components/Button/PrimaryButton";
 import { IoSearch } from "react-icons/io5";
-import { router } from "@inertiajs/react";
 import AssignCourseForm from "./AssignCourseForm";
 import useUserStore from "../../../../Stores/Programs/userStore";
-import { useRoute } from "ziggy-js";
+import { handleClickBackBtn } from "../../../../Utils/handleClickBackBtn";
 
 export default function ViewUser() {
     // User Store
     const courseList = useUserStore((state) => state.courseList);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const route = useRoute();
-    const handleClickBackBtn = () => {
-        router.visit(route("program.view", { programId: 1 }));
-    };
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);

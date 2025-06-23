@@ -1,6 +1,8 @@
 import { create } from "zustand";
 
 const useAssessmentsStore = create((set) => ({
+    isFormOpen: false,
+
     assessmentDetails: {
         assessmentType: "",
         assessmentDueDate: "",
@@ -9,6 +11,13 @@ const useAssessmentsStore = create((set) => ({
         assessmentTitle: "",
         assessmentDescription: "",
         assessmentFiles: [],
+    },
+
+    assessmentList: [],
+
+    toggleAssessmentForm: () => {
+        const { isFormOpen } = useAssessmentsStore.getState();
+        set({ isFormOpen: !isFormOpen });
     },
 
     handleAssessmentChange: (field, value) => {
@@ -57,6 +66,16 @@ const useAssessmentsStore = create((set) => ({
                 assessmentFiles: [],
             },
         });
+    },
+
+    hanndleAddAssessments: () => {
+        const { assessmentDetails, assessmentList, clearAssessmentDetails } =
+            useAssessmentsStore.getState();
+
+        console.log(assessmentDetails);
+
+        set({ assessmentList: [assessmentDetails, ...assessmentList] });
+        clearAssessmentDetails();
     },
 }));
 

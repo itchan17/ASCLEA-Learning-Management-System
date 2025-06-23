@@ -58,14 +58,13 @@ Route::prefix('programs')->group(function () {
     })->name('program.course.material.view');
 
     // Route for viewing file
-    Route::get('/{programId}/course/{courseId}/material/{materialId}/file/{fileId}', function ($programId, $courseId, $materialId, $fileId) {
+    Route::get('/{programId}/course/{courseId}/file/{fileId}', function ($programId, $courseId, $fileId) {
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/MaterialsComponents/ViewFile', [
             'programId' => $programId,
             'courseId' => $courseId,
-            'materialId' => $materialId,
             'fileId' => $fileId,
         ]);
-    })->name('program.course.material.file.view');
+    })->name('program.course.file.view');
 
      // Route for editing quiz form
     Route::get('/{programId}/course/{courseId}/material/{materialId}/form/{formId}/edit', function ($programId, $courseId, $materialId, $formId) {
@@ -77,6 +76,14 @@ Route::prefix('programs')->group(function () {
         ]);
     })->name('program.course.material.form.edit');
 
+    // Route for viewing assessment
+    Route::get('/{programId}/course/{courseId}/assessment/{assessmentId}', function ($programId, $courseId, $assessmentId) {
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/ViewAssessment', [
+            'programId' => $programId,
+            'courseId' => $courseId,
+            'assessmentId' => $assessmentId,
+        ]);
+    })->name('program.course.assessment.view');
 });
 
 
@@ -86,8 +93,30 @@ Route::prefix('programs')->group(function () {
 
 // Registration route
 Route::get('/registration', function () {
-    return Inertia::render('RegistrationPage/Registration');
+    return Inertia::render('RegistrationPage/RegistrationPage');
 });
+
+// Admission routes
+
+Route::get('/admission', function () {
+    return Inertia::render('Admission/AdmissionPage');
+});
+
+// Route for selected applicant to view their admission details
+Route::get('/admission/pending/{applicantId}', function ($applicantId) {
+    return Inertia::render('Admission/PendingPage/EnrollmentRequest', [
+        'applicantId' => $applicantId,
+    ]);
+})->name('pending.applicant.view');
+
+// Route for selected enrolled student to view their information
+Route::get('/admission/enrolled/{studentid}', function ($studentid) {
+    return Inertia::render('Admission/EnrolledPage/StudentInfo', [
+        'studentid' => $studentid,
+    ]);
+})->name('enrolled.student.view');
+
+// --End--
 
 Route::get('/login', function () {
     return Inertia::render('LoginPage/Login');
@@ -101,4 +130,9 @@ Route::get('/emailverification', function () {
 // routes/web.php
 Route::get('/changepassword', function () {
     return Inertia::render('LoginPage/Changepassword');
+});
+
+// Route for Student Grades
+Route::get('/grades', function () {
+    return Inertia::render('Student_Grades/StudentGrades');
 });
