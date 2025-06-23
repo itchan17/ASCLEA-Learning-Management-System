@@ -3,16 +3,12 @@ import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import "@cyntler/react-doc-viewer/dist/index.css";
 import "../../../../../../../css/docViewer.css";
 
-export default function DocumentViewer({ isFullScreen }) {
+export default function DocumentViewer() {
     // Sample pdf in public folder
     const docs = [{ uri: "/sample.pdf" }];
 
     return (
-        <div
-            className={`${
-                isFullScreen ? "px-0" : "px-5 lg:px-[200px]"
-            }  flex flex-col justify-center items-center`}
-        >
+        <div className="flex flex-col justify-center items-center -mx-6 sm:mx-0">
             <DocViewer
                 config={{
                     header: {
@@ -22,12 +18,15 @@ export default function DocumentViewer({ isFullScreen }) {
                     },
                     csvDelimiter: ",",
                     pdfZoom: {
-                        defaultZoom: 0.8,
+                        defaultZoom: 1,
                         zoomJump: 0.2,
                     },
                     pdfVerticalScrollByDefault: true,
                 }}
-                className=""
+                theme={{
+                    textPrimary: "#313131",
+                    disableThemeScrollbar: false,
+                }}
                 documents={docs}
                 pluginRenderers={DocViewerRenderers}
             />

@@ -7,9 +7,10 @@ import "../../../../../../../css/quillTextEditor.css";
 import DOMPurify from "dompurify";
 import "../../../../../../../css/global.css";
 import File from "../File";
+import Quiz from "./Quiz";
 import { handleClickBackBtn } from "../../../../../../Utils/handleClickBackBtn";
 
-export default function ViewMaterial() {
+export default function ViewAssessment() {
     // const postHtml = DOMPurify.sanitize(postContent.postDescription);
     const materialDesc = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
                     do eiusmod tempor incididunt ut labore et dolore magna
@@ -22,8 +23,8 @@ export default function ViewMaterial() {
             </div>
             <div className="space-y-5 pb-5 border-b border-ascend-gray1">
                 <div className="flex items-start gap-2 md:gap-20">
-                    <div className="w-full">
-                        <h1 className="flex-1 min-w-0 text-size6 break-words font-semibold">
+                    <div className="w-full min-w-0">
+                        <h1 className="text-size6 break-words font-semibold">
                             EDUC 101 - Facilitating Learners
                         </h1>
                         <span className="text-size1">
@@ -42,16 +43,26 @@ export default function ViewMaterial() {
 
                         <ul
                             tabIndex={0}
-                            className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                            className="dropdown-content menu bg-ascend-white w-42 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                         >
                             <li>
                                 <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Edit
+                                    View responses
                                 </a>
                             </li>
                             <li>
                                 <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Remove
+                                    Edit assessment
+                                </a>
+                            </li>
+                            <li>
+                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                    Archive assessment
+                                </a>
+                            </li>
+                            <li>
+                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                    Reset assessment
                                 </a>
                             </li>
                         </ul>
@@ -64,8 +75,13 @@ export default function ViewMaterial() {
                     theme={"bubble"}
                 />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="flex flex-wrap justify-between">
+                <h1 className="font-bold">Possible Points: 100</h1>
+                <h1 className="font-bold">Due on April 30 at 11:59pm</h1>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 <File />
+                <Quiz />
             </div>
         </div>
     );

@@ -24,7 +24,7 @@ const handleCLickEditForm = () => {
     );
 };
 
-export default function AssessmentForm({ toggleForm }) {
+export default function AssessmentForm({ toggleForm, formTitle, formWidth }) {
     // Assessments Store
     const assessmentDetails = useAssessmentsStore(
         (state) => state.assessmentDetails
@@ -34,6 +34,9 @@ export default function AssessmentForm({ toggleForm }) {
     );
     const removeAttachedFile = useAssessmentsStore(
         (state) => state.removeAttachedFile
+    );
+    const hanndleAddAssessments = useAssessmentsStore(
+        (state) => state.hanndleAddAssessments
     );
 
     const [isShowDropFiles, setIsShowDropFiles] = useState(false);
@@ -47,7 +50,12 @@ export default function AssessmentForm({ toggleForm }) {
     }, [assessmentDetails]);
 
     return (
-        <div className="border border-ascend-gray1 shadow-shadow1 p-5 space-y-5">
+        <div
+            className={`border ${formWidth} border-ascend-gray1 shadow-shadow1 p-5 space-y-5 bg-ascend-white`}
+        >
+            <h1 className="text-size4 font-bold">
+                {formTitle || "Add Assessment"}
+            </h1>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 <div>
                     <label>Assessment Type</label>
@@ -216,7 +224,10 @@ export default function AssessmentForm({ toggleForm }) {
                 )}
                 <div className="flex gap-2">
                     <SecondaryButton doSomething={toggleForm} text={"Cancel"} />
-                    <PrimaryButton text={"Add"} />
+                    <PrimaryButton
+                        doSomething={hanndleAddAssessments}
+                        text={"Add"}
+                    />
                 </div>
             </div>
         </div>
