@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import SinglePage from "../../../../../../Components/Layout/SInglePage";
 import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
 import TextEditor from "../../TextEditor";
 import useCreateQuizStore from "../../../../../../Stores/Programs/CourseContent/createQuizStore";
 import Question from "./Question";
 import SecondaryButton from "../../../../../../Components/Button/SecondaryButton";
-import MultipleChoiceForm from "./MultipleChoiceForm";
+import QuestionForm from "./QuestionFormComponents/QuestionForm";
 
 export default function QuizForm() {
     // Create Quiz Store
@@ -18,11 +18,20 @@ export default function QuizForm() {
         (state) => state.handleQuestionDetailsChange
     );
 
+    // Local States
     const [openQuestionForm, setOpenQuestionForm] = useState({
         multipleChoice: false,
         trueOrFalse: false,
         indeftification: false,
     });
+    const targetForm = useRef(null);
+
+    // Scroll into the form once opened
+    useEffect(() => {
+        if (openQuestionForm.multipleChoice) {
+            targetForm.current?.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [openQuestionForm]);
 
     const handleOpenQuestionForm = (questionType) => {
         console.log("Clicked");
@@ -42,9 +51,10 @@ export default function QuizForm() {
     return (
         <SinglePage>
             <div className="w-full max-w-235 space-y-5">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap gap-5 items-center justify-between">
                     <h1 className="text-size6 font-bold">Create Quiz</h1>
-                    <div className="flex items-center gap-3">
+
+                    <div className="flex justify-end items-center gap-2 ml-auto w-full sm:w-auto">
                         <div className="flex gap-1">
                             <input
                                 type="checkbox"
@@ -59,6 +69,7 @@ export default function QuizForm() {
                         <PrimaryButton text={"Save Quiz"} />
                     </div>
                 </div>
+
                 <div className="w-full border border-ascend-gray1 shadow-shadow1 p-5 space-y-5">
                     <div className="font-bold text-end">Total points: 10</div>
                     <div>
@@ -102,7 +113,12 @@ export default function QuizForm() {
                     )}
                     <div>
                         {openQuestionForm.multipleChoice && (
-                            <MultipleChoiceForm />
+                            <div ref={targetForm}>
+                                <QuestionForm
+                                    openQuestionForm={openQuestionForm}
+                                    setOpenQuestionForm={setOpenQuestionForm}
+                                />
+                            </div>
                         )}
                     </div>
                     <div className="space-y-5">

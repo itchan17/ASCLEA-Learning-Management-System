@@ -27,7 +27,9 @@ export default function Question({ questionDetails, questionNumber }) {
                     <div className="flex items-start gap-2 md:gap-20">
                         <p className="flex-1 min-w-0 break-words">
                             {questionDetails.question}
-                            <span className="text-ascend-red">*</span>
+                            {questionDetails.required && (
+                                <span className="text-ascend-red ml-1">*</span>
+                            )}
                         </p>
                         <span className="font-bold">
                             {`${questionDetails.questionPoints} ${
@@ -46,15 +48,15 @@ export default function Question({ questionDetails, questionNumber }) {
                                         return (
                                             <label
                                                 key={i}
-                                                className="flex items-center cursor-pointer"
+                                                className="flex items-center cursor-pointer p-2"
                                             >
                                                 <input
                                                     type="radio"
                                                     name="multipleChoiceOption"
                                                     value={choice}
-                                                    className="w-4 h-4 accent-ascend-blue cursor-pointer"
+                                                    className="w-5 h-5 accent-ascend-green cursor-pointer shrink-0"
                                                 />
-                                                <span className="ml-2">
+                                                <span className="ml-3 min-w-0 break-words">
                                                     {choice}
                                                 </span>
                                             </label>
@@ -76,9 +78,9 @@ export default function Question({ questionDetails, questionNumber }) {
                                                     type="radio"
                                                     name="trueOrFalseOption"
                                                     value={choice}
-                                                    className="w-4 h-4 accent-ascend-blue cursor-pointer"
+                                                    className="w-5 h-5 accent-ascend-blue cursor-pointer"
                                                 />
-                                                <span className="ml-2">
+                                                <span className="ml-3">
                                                     {choice}
                                                 </span>
                                             </label>

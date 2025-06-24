@@ -13,27 +13,7 @@ const useCreateQuizStore = create((set) => ({
         questionChoices: [],
         questionAnswer: [],
         questionPoints: 0,
-        required: true,
-    },
-
-    handleQuestionDetailsChange: (field, value) => {
-        const { questionDetails } = useCreateQuizStore.getState();
-
-        if (field === "questionChoices" || field === "questionAnswer") {
-            set({
-                questionDetails: {
-                    ...questionDetails,
-                    [field]: [...questionDetails[field], value],
-                },
-            });
-        } else {
-            set({
-                questionDetails: {
-                    ...questionDetails,
-                    [field]: value,
-                },
-            });
-        }
+        required: false,
     },
 
     questionList: [
@@ -62,6 +42,36 @@ const useCreateQuizStore = create((set) => ({
         },
     ],
 
+    handleQuestionDetailsChange: (field, value) => {
+        const { questionDetails } = useCreateQuizStore.getState();
+
+        if (field === "questionChoices" || field === "questionAnswer") {
+            if (Array.isArray(value)) {
+                console.log(value);
+                set({
+                    questionDetails: {
+                        ...questionDetails,
+                        [field]: [...value],
+                    },
+                });
+            } else {
+                set({
+                    questionDetails: {
+                        ...questionDetails,
+                        [field]: [...questionDetails[field], value],
+                    },
+                });
+            }
+        } else {
+            set({
+                questionDetails: {
+                    ...questionDetails,
+                    [field]: value,
+                },
+            });
+        }
+    },
+
     handleQuizDetailsChange: (field, value) => {
         const { quizDetails } = useCreateQuizStore.getState();
 
@@ -73,11 +83,27 @@ const useCreateQuizStore = create((set) => ({
         });
     },
 
+    clearQuestionDetails: () => {
+        set({
+            questionDetails: {
+                questionType: "",
+                question: "",
+                questionChoices: [],
+                questionAnswer: [],
+                questionPoints: 0,
+                required: false,
+            },
+        });
+    },
+
     handleAddQuestion: () => {
-        const { questionList, questionDetails } = useCreateQuizStore.getState();
+        const { questionList, questionDetails, clearQuestionDetails } =
+            useCreateQuizStore.getState();
         set({
             questionList: [...questionList, questionDetails],
         });
+
+        clearQuestionDetails();
     },
 }));
 
