@@ -136,3 +136,28 @@ Route::get('/changepassword', function () {
 Route::get('/grades', function () {
     return Inertia::render('Student_Grades/StudentGrades');
 });
+
+// Route for Accounting
+Route::get('/accounting', function () {
+    return Inertia::render('Accounting/AccountingPage');
+});
+
+// Route for Viewing Payment History of Student
+Route::get('/accounting/paymenthistory/{studentId}', function ($studentId) {
+    return Inertia::render('Accounting/StaffAccounting/PaymentHistoryPage', [
+        'studentId' => $studentId,
+    ]);
+})->name('accounting.student.view');
+
+// Route for Viewing Payment Information
+Route::get('/accounting/paymentinfo/{paymentId}/{studentId}', function ($paymentId, $studentId) {
+    return Inertia::render('Accounting/StaffAccounting/PaymentInfo', [
+        'paymentId' => $paymentId,
+        'studentId' => $studentId,
+    ]);
+})->name('accounting.payment.view');
+
+
+
+
+
