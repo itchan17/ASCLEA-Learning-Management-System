@@ -38,8 +38,8 @@ const RegistrationPage = () => {
           >
             <div className="text-white flex flex-col justify-center items-center p-10 pr-16 w-full md:w-full">
               <div className="z-10 text-center max-w-xs">
-                <h2 className="text-size5 font-nunito-sans font-bold mb-2 mr-0">Already have an account?</h2>
-                <p className="mb-4 font-nunito-sans text-size3">
+                <h2 className="text-size4 font-nunito-sans font-bold mb-2 mr-0">Already have an account?</h2>
+                <p className="mb-4 font-nunito-sans text-size2">
                   Log in to continue your review journey!
                 </p>
                 <div className="flex justify-center">

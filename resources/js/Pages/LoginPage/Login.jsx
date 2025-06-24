@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import PrimaryButton from "../../Components/Button/PrimaryButton";
 
 export default function Login() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = () => {
-    console.log('Logging in', username, password);
+    console.log('Logging in', email, password);
   };
 
   function PrimaryButton({ doSomething, icon, text, textColor, btnColor, className }) {
@@ -38,39 +38,12 @@ export default function Login() {
     return () => mediaQuery.removeEventListener('change', handleResize);
   }, []);
 
-  const clipPathSmall = 'polygon(0% 0, 100% 0%, 100% 90%, 0% 100%)'; // for small screen
-  const clipPathMedium = 'polygon(0 0, 100% 0, 90% 100%, 0% 100%)'; // for big or medium screen
+  const clipPathSmall = 'polygon(100% 50px, 0% 0%, 0% 100%, 100% 100%)'; // for small screen
+  const clipPathMedium = 'polygon(10px 0px, 100% 0px, 100% 100%, 10% 100%)'; // for big or medium screen
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden flex flex-col md:flex-row">
-      {/* LEFT SIDE - Enroll section */}
-      <div className="w-full h-100 md:h-screen md:w-1/2">
-        <div
-          className="h-full bg-ascend-yellow"
-          style={{ clipPath: screenSize === 'small' ? clipPathSmall : clipPathMedium }}
-        >
-          <div
-            className="h-93 md:h-full bg-ascend-blue md:mr-5 flex items-center p-5"
-            style={{ clipPath: screenSize === 'small' ? clipPathSmall : clipPathMedium }}
-          >
-            
-            <div className=" text-white flex flex-col justify-center items-center p-10 pr-16 w-full md:w-full">
-              <div className="z-10 text-center max-w-xs">
-                <h2 className="text-xl font-bold mb-2 mr-0">Not enrolled yet?</h2>
-                <p className="mb-4 text-xl-1">Enroll now to gain access and start your review journey!</p>
-                <PrimaryButton
-                  text = "Enroll"
-                  btnColor = "bg-ascend-white"
-                  textColor= "text-ascend-blue"
-                  className = "mx-auto"
-                ></PrimaryButton>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* RIGHT SIDE - Login Form */}
+      {/* LEFT SIDE - Login Form */}
       <div className="w-full md:w-1/2 bg-white flex flex-col items-center justify-center p-8">
         <img src="/images/ascend_logo.png" alt="Ascend Logo" className="w-60 mb-6" />
         <h1 className="text-2xl font-bold mb-4">Welcome!</h1>
@@ -81,17 +54,17 @@ export default function Login() {
           <div className="relative mb-4">
             <input
               type="text"
-              id="usernamefloat"
+              id="emailfloat"
               class="block px-4 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
               placeholder=" "
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <label
-              htmlFor="usernamefloat"
+              htmlFor="emailfloat"
               class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
             >
-              Username
+              Email
             </label>
           </div>
 
@@ -126,6 +99,33 @@ export default function Login() {
 
           <PrimaryButton doSomething={handleLogin} text="Sign in" className={"w-full"} />
         </form>
+      </div>
+      
+      {/* RIGHT SIDE - Enroll section */}
+      <div className="w-full h-100 md:h-screen md:w-1/2">
+        <div
+          className="h-full bg-ascend-yellow pt-5 md:pt-0"
+          style={{ clipPath: screenSize === 'small' ? clipPathSmall : clipPathMedium }}
+        >
+          <div
+            className="h-full md:h-full bg-ascend-blue md:ml-5 flex items-center p-5"
+            style={{ clipPath: screenSize === 'small' ? clipPathSmall : clipPathMedium }}
+          >
+            
+            <div className=" text-white flex flex-col justify-center items-center p-10 w-full md:w-full">
+              <div className="z-10 text-center max-w-xs">
+                <h2 className="text-xl font-bold mb-2 mr-0">Not registered yet?</h2>
+                <p className="mb-4 text-xl-1">Register now to gain access and start your review journey!</p>
+                <PrimaryButton
+                  text = "Register"
+                  btnColor = "bg-ascend-white"
+                  textColor= "text-ascend-blue"
+                  className = "mx-auto"
+                ></PrimaryButton>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
