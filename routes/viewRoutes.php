@@ -157,6 +157,19 @@ Route::get('/accounting/paymentinfo/{paymentId}/{studentId}', function ($payment
     ]);
 })->name('accounting.payment.view');
 
+// Route for Payment History Student Page
+Route::get('/payment-history', function () {
+    return Inertia::render('Accounting/PaymentHistoryStudentPage');
+});
+
+// Route for Viewing a Specific Payment Info
+Route::get('/accounting/studentpaymenthistory/{paymentId}', function ($paymentId) {
+    return Inertia::render('Accounting/StudentPaymentHistory/StudentPaymentInfo', [
+        'paymentId' => $paymentId,
+    ]);
+})->name('accounting.paymentInfo.view');
+
+
 
 
 
