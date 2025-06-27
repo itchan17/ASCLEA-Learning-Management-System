@@ -9,7 +9,7 @@ export default function AccountingPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <div className="font-nunito-sans text-size6 font-bold">Paid Students</div>
-        <div className="flex justify-end">
+        <div className="flex items-center justify-end">
           
           {/* Filter Section */}
           <BiFilter className='text-size5' />
