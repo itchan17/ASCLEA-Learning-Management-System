@@ -58,10 +58,10 @@ const RegistrationPage = () => {
       </div>
 
       {/* RIGHT SIDE - Login Form */}
-      <div className="w-full md:w-[60%] bg-white flex flex-col items-center justify-center p-8">
-        <img src="/images/ascend_logo.png" alt="Ascend Logo" className="w-100 mb-4" />
-        <h1 className="text-size6 font-nunito-sans font-bold mb-2">Welcome!</h1>
-        <p className="text-size4 font-nunito-sans mb-4">Create your account to get started!</p>
+      <div className="w-full md:w-[60%] bg-white flex flex-col items-center justify-center">
+        <img src="/images/ascend_logo.png" alt="Ascend Logo" className="w-55 mb-3" />
+        <h1 className="text-size5 font-nunito-sans font-bold mb-1">Welcome!</h1>
+        <p className="text-size3 font-nunito-sans mb-3">Create your account to get started!</p>
         <RegistrationFields />
       </div>
     </div>

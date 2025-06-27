@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import PrimaryButton from "../../Components/Button/PrimaryButton";
+import { Link } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
+import { useRoute } from "ziggy-js";
+
+
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const route = useRoute();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = () => {
-    console.log('Logging in', email, password);
+    router.visit(route("dashboard.index"));
   };
 
   function PrimaryButton({ doSomething, icon, text, textColor, btnColor, className }) {
@@ -17,7 +21,7 @@ export default function Login() {
         className={`${btnColor || "bg-ascend-blue"} hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300 ${className || ''} px-5 h-10 space-x-1`}
       >
         {icon && <div className="text-xl">{icon}</div>}
-        <span className={`font-semibold ${textColor || ''}`}>{text}</span>
+        <span className={`font-nunitosans font-semibold ${textColor || ''}`}>{text}</span>
       </button>
     );
   }
@@ -46,10 +50,10 @@ export default function Login() {
       {/* LEFT SIDE - Login Form */}
       <div className="w-full md:w-1/2 bg-white flex flex-col items-center justify-center p-8">
         <img src="/images/ascend_logo.png" alt="Ascend Logo" className="w-60 mb-6" />
-        <h1 className="text-2xl font-bold mb-4">Welcome!</h1>
-        <p className="text-xl-1 text mb-4">Sign to your account to continue</p>
+        <h1 className="text-2xl font-nunito-sans font-bold mb-2 ">Welcome!</h1>
+        <p className="text-xl-1 font-nunito-sans  text mb-4">Sign to your account to continue</p>
 
-        <form className="w-full max-w-sm">
+        <div className="w-full max-w-sm">
 
           <div className="relative mb-4">
             <input
@@ -57,8 +61,6 @@ export default function Login() {
               id="emailfloat"
               class="block px-4 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
               placeholder=" "
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
             />
             <label
               htmlFor="emailfloat"
@@ -74,8 +76,6 @@ export default function Login() {
               id="passwordfloat"
               class="block px-4 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer password-input"
               placeholder=" "
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
             />
             <label
               htmlFor="passwordfloat"
@@ -89,16 +89,16 @@ export default function Login() {
             <label className="flex items-center">
               <input
                 type="checkbox"
-                className="w-3 h-3 mr-2 text-blue-300 accent-ascend-blue "
+                className="w-3 h-3 mr-2 text-blue-300 accent-ascend-blue font-nunito-sans"
                 checked={showPassword}
                 onChange={() => setShowPassword(!showPassword)}
               /> Show password
             </label>
-            <a href="/emailverification" className="text-ascend-blue hover:underline">Forgot password?</a>
+            <a href="/emailverification" className="text-ascend-blue hover:underline font-nunito-sans">Forgot password?</a>
           </div>
 
           <PrimaryButton doSomething={handleLogin} text="Sign in" className={"w-full"} />
-        </form>
+        </div>
       </div>
       
       {/* RIGHT SIDE - Enroll section */}
@@ -114,14 +114,16 @@ export default function Login() {
             
             <div className=" text-white flex flex-col justify-center items-center p-10 w-full md:w-full">
               <div className="z-10 text-center max-w-xs">
-                <h2 className="text-xl font-bold mb-2 mr-0">Not registered yet?</h2>
-                <p className="mb-4 text-xl-1">Register now to gain access and start your review journey!</p>
-                <PrimaryButton
-                  text = "Register"
-                  btnColor = "bg-ascend-white"
-                  textColor= "text-ascend-blue"
-                  className = "mx-auto"
-                ></PrimaryButton>
+                <h2 className="text-xl font-nunito-sans font-bold mb-2 mr-0">Not registered yet?</h2>
+                <p className="mb-4 text-xl-1 font-nunito-sans">Register now to gain access and start your review journey!</p>
+                <Link href={"/registration"}>
+                  <PrimaryButton
+                    text = "Register"
+                    btnColor = "bg-ascend-white"
+                    textColor= "text-ascend-blue"
+                    className = "mx-auto"
+                  ></PrimaryButton>
+                </Link>
               </div>
             </div>
           </div>
