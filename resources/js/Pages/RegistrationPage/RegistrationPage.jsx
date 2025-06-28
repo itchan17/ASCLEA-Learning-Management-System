@@ -38,8 +38,8 @@ const RegistrationPage = () => {
           >
             <div className="text-white flex flex-col justify-center items-center p-10 pr-16 w-full md:w-full">
               <div className="z-10 text-center max-w-xs">
-                <h2 className="text-size5 font-nunito-sans font-bold mb-2 mr-0">Already have an account?</h2>
-                <p className="mb-4 font-nunito-sans text-size3">
+                <h2 className="text-size4 font-nunito-sans font-bold mb-2 mr-0">Already have an account?</h2>
+                <p className="mb-4 font-nunito-sans text-size2">
                   Log in to continue your review journey!
                 </p>
                 <div className="flex justify-center">
@@ -58,10 +58,10 @@ const RegistrationPage = () => {
       </div>
 
       {/* RIGHT SIDE - Login Form */}
-      <div className="w-full md:w-[60%] bg-white flex flex-col items-center justify-center p-8">
-        <img src="/images/ascend_logo.png" alt="Ascend Logo" className="w-100 mb-4" />
-        <h1 className="text-size6 font-nunito-sans font-bold mb-2">Welcome!</h1>
-        <p className="text-size4 font-nunito-sans mb-4">Create your account to get started!</p>
+      <div className="w-full md:w-[60%] bg-white flex flex-col items-center justify-center">
+        <img src="/images/ascend_logo.png" alt="Ascend Logo" className="w-55 mb-3" />
+        <h1 className="text-size5 font-nunito-sans font-bold mb-1">Welcome!</h1>
+        <p className="text-size3 font-nunito-sans mb-3">Create your account to get started!</p>
         <RegistrationFields />
       </div>
     </div>
