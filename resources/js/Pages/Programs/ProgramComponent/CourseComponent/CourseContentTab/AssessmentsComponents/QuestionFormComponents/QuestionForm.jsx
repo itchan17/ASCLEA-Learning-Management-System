@@ -3,11 +3,10 @@ import SecondaryButton from "../../../../../../../Components/Button/SecondaryBut
 import PrimaryButton from "../../../../../../../Components/Button/PrimaryButton";
 import useCreateQuizStore from "../../../../../../../Stores/Programs/CourseContent/createQuizStore";
 import MultipleChoice from "./MultipleChoice";
+import TrueOrFalse from "./TrueOrFalse";
+import Identification from "./Identification";
 
-export default function MultipleChoiceForm({
-    openQuestionForm,
-    setOpenQuestionForm,
-}) {
+export default function MultipleChoiceForm({ activeForm, setActiveForm }) {
     // Create Quiz Store
     const questionDetails = useCreateQuizStore(
         (state) => state.questionDetails
@@ -26,16 +25,25 @@ export default function MultipleChoiceForm({
     const [isAddOption, setIsAddOption] = useState(false);
     const [option, setOption] = useState("");
 
-    const addMutipleChoiceQuestion = () => {
+    // set the form title depending on the seleced question type
+    const [formTitle, setFormTitle] = useState(
+        activeForm === "multipleChoice"
+            ? "Multiple Choice"
+            : activeForm === "trueOrFalse"
+            ? "True or False"
+            : "Identification"
+    );
+
+    const addQuestion = (key) => {
         handleAddQuestion();
         setOption("");
         setIsAddOption(false);
-        setOpenQuestionForm({ ...openQuestionForm, multipleChoice: false });
+        setActiveForm("");
     };
 
-    const cancelMultipleChoiceQuestion = () => {
+    const cancelAddQuestion = (key) => {
         clearQuestionDetails();
-        setOpenQuestionForm({ ...openQuestionForm, multipleChoice: false });
+        setActiveForm("");
     };
 
     useEffect(() => {
@@ -44,7 +52,7 @@ export default function MultipleChoiceForm({
     return (
         <div className="border border-ascend-gray1 p-5 gap-5 space-y-5 shadow-shadow2">
             <div className="flex justify-between items-center gap-2 text-ascend-black">
-                <h1 className="text-ascend-black font-bold">Multiple Choice</h1>
+                <h1 className="text-ascend-black font-bold">{formTitle}</h1>
                 <div className="flex justify-end items-center gap-2 text-ascend-black">
                     <div className="space-x-2">
                         <input
@@ -66,12 +74,23 @@ export default function MultipleChoiceForm({
             </div>
 
             {/* Multiple Choice */}
-            <MultipleChoice
-                option={option}
-                setOption={setOption}
-                isAddOption={isAddOption}
-                setIsAddOption={setIsAddOption}
-            />
+            {activeForm === "multipleChoice" ? (
+                <MultipleChoice
+                    option={option}
+                    setOption={setOption}
+                    isAddOption={isAddOption}
+                    setIsAddOption={setIsAddOption}
+                />
+            ) : activeForm === "trueOrFalse" ? (
+                <TrueOrFalse />
+            ) : (
+                <Identification
+                    option={option}
+                    setOption={setOption}
+                    isAddOption={isAddOption}
+                    setIsAddOption={setIsAddOption}
+                />
+            )}
             <div className="flex flex-wrap gap-5 justify-between items-center">
                 <div className="flex gap-1">
                     <input
@@ -91,11 +110,11 @@ export default function MultipleChoiceForm({
                 </div>
                 <div className="flex justify-end gap-2 w-full sm:w-auto">
                     <SecondaryButton
-                        doSomething={cancelMultipleChoiceQuestion}
-                        text={"Cance"}
+                        doSomething={() => cancelAddQuestion(activeForm)}
+                        text={"Cancel"}
                     />
                     <PrimaryButton
-                        doSomething={addMutipleChoiceQuestion}
+                        doSomething={() => addQuestion(activeForm)}
                         text={"Save"}
                     />
                 </div>

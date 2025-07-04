@@ -40,7 +40,7 @@ export default function Question({ questionDetails, questionNumber }) {
                         </span>
                     </div>
                     {/* Multiple Choice */}
-                    {questionDetails.questionType === "multiple_choice" ? (
+                    {questionDetails.questionType === "multipleChoice" ? (
                         <div className="flex flex-col space-y-4">
                             {questionDetails.questionChoices.length > 0 &&
                                 questionDetails.questionChoices.map(
@@ -64,7 +64,7 @@ export default function Question({ questionDetails, questionNumber }) {
                                     }
                                 )}
                         </div>
-                    ) : questionDetails.questionType === "true_or_false" ? (
+                    ) : questionDetails.questionType === "trueOrFalse" ? (
                         <div className="flex flex-col space-y-4">
                             {questionDetails.questionChoices.length > 0 &&
                                 questionDetails.questionChoices.map(

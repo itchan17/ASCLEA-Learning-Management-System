@@ -18,7 +18,7 @@ const useCreateQuizStore = create((set) => ({
 
     questionList: [
         {
-            questionType: "multiple_choice",
+            questionType: "multipleChoice",
             question: "Which of these is programming language?",
             questionChoices: ["React", "HTML", "CSS", "Java"],
             questionAnswer: ["Python"],
@@ -26,7 +26,7 @@ const useCreateQuizStore = create((set) => ({
             required: true,
         },
         {
-            questionType: "true_or_false",
+            questionType: "trueOrFalse",
             question: "The Great Wall of China is visible from space.",
             questionChoices: ["True", "False"],
             questionAnswer: "False",
@@ -104,6 +104,75 @@ const useCreateQuizStore = create((set) => ({
         });
 
         clearQuestionDetails();
+    },
+
+    handleEditOption: (
+        optionToEdit,
+        setOptionToEdit,
+        setOption,
+        toggleAddOption,
+        option
+    ) => {
+        const { questionDetails } = useCreateQuizStore.getState();
+
+        if (optionToEdit) {
+            // Find index of correct answer to update
+            const index = questionDetails.questionAnswer.findIndex(
+                (q) => q === optionToEdit.option
+            );
+
+            // Create a shallow copy of choices
+            const updatedChoices = [...questionDetails.questionChoices];
+            updatedChoices[optionToEdit.index] = option;
+
+            // Also update questionAnswer if needed
+            const updatedAnswers = [...questionDetails.questionAnswer];
+            if (index !== -1) {
+                updatedAnswers[index] = option;
+            }
+
+            // Proper Zustand set call with new object
+            set((state) => ({
+                questionDetails: {
+                    ...state.questionDetails,
+                    questionChoices: updatedChoices,
+                    questionAnswer: updatedAnswers,
+                },
+            }));
+
+            // reset the values
+            setOptionToEdit(null);
+            setOption("");
+            toggleAddOption();
+        }
+    },
+
+    handleDeleteOption: (choiceIndex, option) => {
+        const { questionDetails } = useCreateQuizStore.getState();
+
+        // Find index of correct answer
+        const correctAnswerIndex = questionDetails.questionAnswer.findIndex(
+            (q) => q === option
+        );
+
+        // Create a shallow copy of choices
+        const newQuestionchoices = questionDetails.questionChoices.filter(
+            (question, quesIndex) => quesIndex !== choiceIndex
+        );
+
+        // Also update questionAnswer if its the option is set as correct
+        const newCorrectAsnwers = questionDetails.questionAnswer.filter(
+            (question, quesIndex) => quesIndex !== correctAnswerIndex
+        );
+
+        // Proper Zustand set call with new object
+        set((state) => ({
+            questionDetails: {
+                ...state.questionDetails,
+                questionChoices: newQuestionchoices,
+                questionAnswer: newCorrectAsnwers,
+            },
+        }));
     },
 }));
 

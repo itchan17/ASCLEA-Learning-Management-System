@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import useCreateQuizStore from "../../../../../../../Stores/Programs/CourseContent/createQuizStore";
 import SecondaryButton from "../../../../../../../Components/Button/SecondaryButton";
 import PrimaryButton from "../../../../../../../Components/Button/PrimaryButton";
@@ -19,19 +19,34 @@ export default function MultipleChoice({
     const handleQuestionDetailsChange = useCreateQuizStore(
         (state) => state.handleQuestionDetailsChange
     );
+    const handleEditOption = useCreateQuizStore(
+        (state) => state.handleEditOption
+    );
+    const handleDeleteOption = useCreateQuizStore(
+        (state) => state.handleDeleteOption
+    );
 
     // Local State
-    const [isCorrectAnswer, setIsCorrectASnwer] = useState(false);
+    const [optionToEdit, setOptionToEdit] = useState(null);
 
-    // Fucntions
+    // Functions
+    const stopPropagation = (e) => {
+        e.stopPropagation();
+    };
+
     const toggleAddOption = () => {
         console.log("Clicked");
+        // display the input field for option
+        // clear the option state everytime it is toggle
         setIsAddOption(!isAddOption);
         setOption("");
+        setOptionToEdit(null);
     };
 
     const handleAddOption = () => {
         console.log(option);
+
+        // pass the input option tot he function and add it to the questionChoices array
         handleQuestionDetailsChange("questionChoices", option);
         setOption("");
         toggleAddOption();
@@ -40,15 +55,28 @@ export default function MultipleChoice({
     const setCorrectAnswer = (option) => {
         console.log(option);
         console.log(questionDetails.questionAnswer.includes(option));
+        // check first if the selected option is already set as correct if not unset the option as inncorrect
         if (questionDetails.questionAnswer.includes(option)) {
             let newQuestionAnswer = questionDetails.questionAnswer.filter(
                 (ans) => ans !== option
             );
             handleQuestionDetailsChange("questionAnswer", newQuestionAnswer);
         } else {
+            // add the selected option to the array of questionAnswer
             handleQuestionDetailsChange("questionAnswer", option);
         }
     };
+
+    // this will run every time option was clicked to edit
+    useEffect(() => {
+        if (optionToEdit) {
+            // this will display the option input field
+            setIsAddOption(true);
+
+            // this will set the value of the option input field
+            setOption(optionToEdit.option);
+        }
+    }, [optionToEdit]);
 
     return (
         <div className="space-y-5">
@@ -70,7 +98,7 @@ export default function MultipleChoice({
             <div>
                 {/* List Options */}
                 <label>
-                    Options{" "}
+                    Options
                     <span className="text-size1">
                         (Click option/s to set correct asnwer)
                     </span>
@@ -112,53 +140,43 @@ export default function MultipleChoice({
                                         <p className="ml-3 flex-1 min-w-0 break-words">
                                             {option}
                                         </p>
-                                        <div className="flex ml-5 gap-5">
-                                            <AiFillEdit className="shrink-0 text-size3" />
-                                            <AiFillDelete className="shrink-0 text-size3" />
+                                        <div className="flex ml-5 gap-2">
+                                            <div
+                                                onClick={(e) => {
+                                                    stopPropagation(e);
+                                                    setOptionToEdit({
+                                                        index: i,
+                                                        option,
+                                                    });
+                                                }}
+                                                className={`p-1 rounded-3xl ${
+                                                    isCorrect
+                                                        ? "hover:bg-ascend-green/10"
+                                                        : "hover:bg-ascend-lightblue/35"
+                                                }  transition-all duration-300`}
+                                            >
+                                                <AiFillEdit className="shrink-0 text-size4 text-ascend-yellow" />
+                                            </div>
+                                            <div
+                                                className={`group p-1 rounded-3xl ${
+                                                    isCorrect
+                                                        ? "hover:bg-ascend-green/10"
+                                                        : "hover:bg-ascend-lightblue/35"
+                                                }  transition-all duration-300`}
+                                            >
+                                                <AiFillDelete
+                                                    onClick={(e) => {
+                                                        stopPropagation(e);
+                                                        handleDeleteOption(
+                                                            i,
+                                                            option
+                                                        );
+                                                    }}
+                                                    className="shrink-0 text-size4 text-ascend-red"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
-
-                                    {/* Dropdown placed outside of label */}
-                                    {/* <div
-                                        className="dropdown dropdown-end ml-auto"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <div
-                                            tabIndex={0}
-                                            role="button"
-                                            className="rounded-4xl p-1 hover:bg-ascend-green/10 transition-all duration-300"
-                                        >
-                                            <BsThreeDotsVertical className="text-ascend-black" />
-                                        </div>
-
-                                        <ul
-                                            tabIndex={0}
-                                            className="dropdown-content menu bg-ascend-white w-42 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black z-50"
-                                        >
-                                            <li
-                                                onClick={() =>
-                                                    handleQuestionDetailsChange(
-                                                        "questionAnswer",
-                                                        option
-                                                    )
-                                                }
-                                            >
-                                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                    Mark as correct
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                    Edit option
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                    Remove option
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div> */}
                                 </div>
                             );
                         })}
@@ -183,10 +201,25 @@ export default function MultipleChoice({
                                     doSomething={toggleAddOption}
                                     text={"Cancel"}
                                 />
-                                <PrimaryButton
-                                    doSomething={handleAddOption}
-                                    text={"Add"}
-                                />
+                                {optionToEdit ? (
+                                    <PrimaryButton
+                                        doSomething={() =>
+                                            handleEditOption(
+                                                optionToEdit,
+                                                setOptionToEdit,
+                                                setOption,
+                                                toggleAddOption,
+                                                option
+                                            )
+                                        }
+                                        text={"Edit"}
+                                    />
+                                ) : (
+                                    <PrimaryButton
+                                        doSomething={handleAddOption}
+                                        text={"Add"}
+                                    />
+                                )}
                             </div>
                         </>
                     )}

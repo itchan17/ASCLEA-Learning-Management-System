@@ -77,8 +77,7 @@ export default function AssessmentItem() {
             <div>
                 <h1 className="flex-1 min-w-0 text-size4 truncate font-bold">
                     {/* {material.materialTitle} */}
-                    Mock
-                    Examxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxamxam
+                    Mock Exam
                 </h1>
                 <span className="text-size1">Due on April 30 at 11:59pm</span>
             </div>

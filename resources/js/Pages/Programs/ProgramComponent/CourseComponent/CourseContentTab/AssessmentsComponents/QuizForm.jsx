@@ -22,27 +22,24 @@ export default function QuizForm() {
     const [openQuestionForm, setOpenQuestionForm] = useState({
         multipleChoice: false,
         trueOrFalse: false,
-        indeftification: false,
+        identification: false,
     });
+    const [activeForm, setActiveForm] = useState("");
     const targetForm = useRef(null);
 
     // Scroll into the form once opened
     useEffect(() => {
-        if (openQuestionForm.multipleChoice) {
+        if (
+            activeForm === "multipleChoice" ||
+            activeForm === "trueOrFalse" ||
+            activeForm === "identification"
+        ) {
             targetForm.current?.scrollIntoView({ behavior: "smooth" });
         }
-    }, [openQuestionForm]);
+    }, [activeForm]);
 
     const handleOpenQuestionForm = (questionType) => {
-        console.log("Clicked");
-        handleQuestionDetailsChange("questionType", questionType);
-        if (questionType === "multiple_choice") {
-            setOpenQuestionForm({
-                multipleChoice: !openQuestionForm.multipleChoice,
-                trueOrFalse: false,
-                indeftification: false,
-            });
-        }
+        setActiveForm(questionType);
     };
     useEffect(() => {
         console.log(quizDetails);
@@ -51,14 +48,26 @@ export default function QuizForm() {
     return (
         <SinglePage>
             <div className="w-full max-w-235 space-y-5">
-                <div className="flex flex-wrap gap-5 items-center justify-between">
-                    <h1 className="text-size6 font-bold">Create Quiz</h1>
+                <div className="flex gap-5 items-center justify-between">
+                    <h1 className="text-size6 font-bold text-nowrap">
+                        Create Quiz
+                    </h1>
 
-                    <div className="flex justify-end items-center gap-2 ml-auto w-full sm:w-auto">
-                        <div className="flex gap-1">
+                    <div className="flex justify-end items-center gap-2 w-full sm:w-auto">
+                        <div className="hidden md:flex gap-1">
                             <input
                                 type="checkbox"
-                                defaultChecked
+                                defaultChecked={false}
+                                className="toggle toggle-md border-ascend-blue bg-ascend-white checked:border-ascend-blue checked:bg-ascend-blue checked:text-ascend-white"
+                            />
+                            <span className="text-ascend-black font-bold">
+                                Cheating mitigation
+                            </span>
+                        </div>
+                        <div className="hidden md:flex gap-1">
+                            <input
+                                type="checkbox"
+                                defaultChecked={false}
                                 className="toggle toggle-md border-ascend-blue bg-ascend-white checked:border-ascend-blue checked:bg-ascend-blue checked:text-ascend-white"
                             />
                             <span className="text-ascend-black font-bold">
@@ -69,7 +78,28 @@ export default function QuizForm() {
                         <PrimaryButton text={"Save Quiz"} />
                     </div>
                 </div>
-
+                <div className="md:hidden flex flex-col justify-end gap-2 ml-auto w-full sm:w-auto">
+                    <div className="flex gap-1">
+                        <input
+                            type="checkbox"
+                            defaultChecked={false}
+                            className="toggle toggle-md border-ascend-blue bg-ascend-white checked:border-ascend-blue checked:bg-ascend-blue checked:text-ascend-white"
+                        />
+                        <span className="text-ascend-black font-bold">
+                            Cheating mitigation
+                        </span>
+                    </div>
+                    <div className="flex gap-1">
+                        <input
+                            type="checkbox"
+                            defaultChecked={false}
+                            className="toggle toggle-md border-ascend-blue bg-ascend-white checked:border-ascend-blue checked:bg-ascend-blue checked:text-ascend-white"
+                        />
+                        <span className="text-ascend-black font-bold">
+                            Show answers after
+                        </span>
+                    </div>
+                </div>
                 <div className="w-full border border-ascend-gray1 shadow-shadow1 p-5 space-y-5">
                     <div className="font-bold text-end">Total points: 10</div>
                     <div>
@@ -112,11 +142,13 @@ export default function QuizForm() {
                         </div>
                     )}
                     <div>
-                        {openQuestionForm.multipleChoice && (
+                        {(activeForm === "multipleChoice" ||
+                            activeForm === "trueOrFalse" ||
+                            activeForm === "identification") && (
                             <div ref={targetForm}>
                                 <QuestionForm
-                                    openQuestionForm={openQuestionForm}
-                                    setOpenQuestionForm={setOpenQuestionForm}
+                                    activeForm={activeForm}
+                                    setActiveForm={setActiveForm}
                                 />
                             </div>
                         )}
@@ -125,17 +157,35 @@ export default function QuizForm() {
                         <h1 className="font-bold">Select Type of Question</h1>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                             <SecondaryButton
-                                doSomething={() =>
-                                    handleOpenQuestionForm("multiple_choice")
-                                }
+                                doSomething={() => {
+                                    handleOpenQuestionForm("multipleChoice");
+                                    handleQuestionDetailsChange(
+                                        "questionType",
+                                        "multipleChoice"
+                                    );
+                                }}
                                 width={"w-full"}
                                 text={"Multiple Choice"}
                             />
                             <SecondaryButton
+                                doSomething={() => {
+                                    handleOpenQuestionForm("trueOrFalse");
+                                    handleQuestionDetailsChange(
+                                        "questionType",
+                                        "trueOrFalse"
+                                    );
+                                }}
                                 width={"w-full"}
                                 text={"True or False"}
                             />
                             <SecondaryButton
+                                doSomething={() => {
+                                    handleOpenQuestionForm("identification");
+                                    handleQuestionDetailsChange(
+                                        "questionType",
+                                        "identification"
+                                    );
+                                }}
                                 width={"w-full"}
                                 text={"Identification"}
                             />
