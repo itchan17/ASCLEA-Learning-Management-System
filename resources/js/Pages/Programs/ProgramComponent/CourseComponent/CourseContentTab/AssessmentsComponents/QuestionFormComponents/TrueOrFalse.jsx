@@ -26,7 +26,7 @@ export default function TrueOrFalse() {
     return (
         <div className="space-y-5">
             <div>
-                <label>
+                <label className="font-bold">
                     Question<span className="text-ascend-red">*</span>
                 </label>
                 <input
@@ -40,8 +40,7 @@ export default function TrueOrFalse() {
                 />
             </div>
             <div>
-                {" "}
-                <label>
+                <label className="font-bold">
                     Options
                     <span className="text-size1">
                         (Click option/s to set correct asnwer)

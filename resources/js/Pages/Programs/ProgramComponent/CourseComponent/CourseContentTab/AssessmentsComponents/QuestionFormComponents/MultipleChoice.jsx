@@ -81,7 +81,7 @@ export default function MultipleChoice({
     return (
         <div className="space-y-5">
             <div>
-                <label>
+                <label className="font-bold">
                     Question<span className="text-ascend-red">*</span>
                 </label>
                 <input
@@ -97,13 +97,16 @@ export default function MultipleChoice({
 
             <div>
                 {/* List Options */}
-                <label>
-                    Options
-                    <span className="text-size1">
-                        (Click option/s to set correct asnwer)
-                    </span>
-                    <span className="text-ascend-red ml-1">*</span>
-                </label>
+                {questionDetails.questionChoices.length > 0 && (
+                    <label className="font-bold">
+                        Options
+                        <span className="text-size1">
+                            (Click option/s to set correct asnwer)
+                        </span>
+                        <span className="text-ascend-red ml-1">*</span>
+                    </label>
+                )}
+
                 <div className="space-y-5">
                     {questionDetails.questionChoices.length > 0 &&
                         questionDetails.questionChoices.map((option, i) => {
@@ -151,8 +154,8 @@ export default function MultipleChoice({
                                                 }}
                                                 className={`p-1 rounded-3xl ${
                                                     isCorrect
-                                                        ? "hover:bg-ascend-green/10"
-                                                        : "hover:bg-ascend-lightblue/35"
+                                                        ? "hover:bg-ascend-green/15"
+                                                        : "hover:bg-ascend-lightblue"
                                                 }  transition-all duration-300`}
                                             >
                                                 <AiFillEdit className="shrink-0 text-size4 text-ascend-yellow" />
@@ -160,8 +163,8 @@ export default function MultipleChoice({
                                             <div
                                                 className={`group p-1 rounded-3xl ${
                                                     isCorrect
-                                                        ? "hover:bg-ascend-green/10"
-                                                        : "hover:bg-ascend-lightblue/35"
+                                                        ? "hover:bg-ascend-green/15"
+                                                        : "hover:bg-ascend-lightblue"
                                                 }  transition-all duration-300`}
                                             >
                                                 <AiFillDelete

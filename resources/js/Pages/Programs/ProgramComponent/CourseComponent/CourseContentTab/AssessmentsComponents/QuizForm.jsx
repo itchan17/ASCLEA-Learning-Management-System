@@ -6,6 +6,21 @@ import useCreateQuizStore from "../../../../../../Stores/Programs/CourseContent/
 import Question from "./Question";
 import SecondaryButton from "../../../../../../Components/Button/SecondaryButton";
 import QuestionForm from "./QuestionFormComponents/QuestionForm";
+import {
+    SortableContext,
+    verticalListSortingStrategy,
+    arrayMove,
+    sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable";
+import {
+    closestCorners,
+    DndContext,
+    KeyboardSensor,
+    PointerSensor,
+    TouchSensor,
+    useSensors,
+    useSensor,
+} from "@dnd-kit/core";
 
 export default function QuizForm() {
     // Create Quiz Store
@@ -17,6 +32,12 @@ export default function QuizForm() {
     const handleQuestionDetailsChange = useCreateQuizStore(
         (state) => state.handleQuestionDetailsChange
     );
+    const clearQuestionDetails = useCreateQuizStore(
+        (state) => state.clearQuestionDetails
+    );
+    const setQuestionList = useCreateQuizStore(
+        (state) => state.setQuestionList
+    );
 
     // Local States
     const [openQuestionForm, setOpenQuestionForm] = useState({
@@ -26,6 +47,12 @@ export default function QuizForm() {
     });
     const [activeForm, setActiveForm] = useState("");
     const targetForm = useRef(null);
+    const [onEdit, setOnEdit] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(null);
+
+    useEffect(() => {
+        console.log("ON EDIT: " + onEdit);
+    }, [onEdit]);
 
     // Scroll into the form once opened
     useEffect(() => {
@@ -38,12 +65,61 @@ export default function QuizForm() {
         }
     }, [activeForm]);
 
+    // Helper function for getting the index
+    const getQuestionPos = (id) =>
+        questionList.findIndex((question) => question.id === id);
+
+    // Function for sorting the array
+    const handleDragEnd = (event) => {
+        const { active, over } = event;
+        console.log(active);
+        if (active.id === over.id) return;
+        const originalPos = getQuestionPos(active.id);
+        const newPos = getQuestionPos(over.id);
+
+        const updatedOrder = arrayMove(questionList, originalPos, newPos).map(
+            (item, index) => ({
+                ...item,
+                sortOrder: index + 1,
+            })
+        );
+        console.log(updatedOrder);
+        setQuestionList(updatedOrder);
+    };
+
+    // This allows drag and drop in mobile device
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
     const handleOpenQuestionForm = (questionType) => {
+        setOnEdit(false);
         setActiveForm(questionType);
+    };
+
+    const calcTotalPoints = () => {
+        let totalPoints = 0;
+        questionList.forEach(({ questionPoints }) => {
+            totalPoints += questionPoints;
+        });
+
+        return totalPoints;
     };
     useEffect(() => {
         console.log(quizDetails);
-        console.log(`QUESTION LIST: ${questionList}`);
+        console.log("QUESTION LIST:", questionList);
     }, [quizDetails, questionList]);
     return (
         <SinglePage>
@@ -100,10 +176,12 @@ export default function QuizForm() {
                         </span>
                     </div>
                 </div>
-                <div className="w-full border border-ascend-gray1 shadow-shadow1 p-5 space-y-5">
-                    <div className="font-bold text-end">Total points: 10</div>
+                <div className="w-full space-y-5">
+                    <div className="font-bold text-end">
+                        Total points: {calcTotalPoints()}
+                    </div>
                     <div>
-                        <label>
+                        <label className="font-bold">
                             Title<span className="text-ascend-red">*</span>
                         </label>
                         <input
@@ -119,7 +197,7 @@ export default function QuizForm() {
                         />
                     </div>
                     <div>
-                        <label>Description</label>
+                        <label className="font-bold">Description</label>
                         <TextEditor
                             fieldName={"quizDescription"}
                             value={quizDetails.quizDescription}
@@ -132,32 +210,52 @@ export default function QuizForm() {
                     {questionList.length > 0 && (
                         <div className="space-y-5">
                             <h1 className="font-bold">Questions:</h1>
-                            {questionList.map((question, i) => (
-                                <Question
-                                    key={i}
-                                    questionDetails={question}
-                                    questionNumber={i + 1}
-                                />
-                            ))}
+                            <DndContext
+                                sensors={sensors}
+                                onDragEnd={handleDragEnd}
+                                collisionDetection={closestCorners}
+                            >
+                                <SortableContext
+                                    items={questionList}
+                                    strategy={verticalListSortingStrategy}
+                                >
+                                    {questionList.map((question, i) => (
+                                        <Question
+                                            key={i}
+                                            questionDetails={question}
+                                            questionNumber={i + 1}
+                                            questionIndex={i}
+                                            onEdit={onEdit}
+                                            setOnEdit={setOnEdit}
+                                            selectedIndex={selectedIndex}
+                                            setSelectedIndex={setSelectedIndex}
+                                            disabled={false}
+                                        />
+                                    ))}
+                                </SortableContext>
+                            </DndContext>
                         </div>
                     )}
                     <div>
                         {(activeForm === "multipleChoice" ||
                             activeForm === "trueOrFalse" ||
-                            activeForm === "identification") && (
-                            <div ref={targetForm}>
-                                <QuestionForm
-                                    activeForm={activeForm}
-                                    setActiveForm={setActiveForm}
-                                />
-                            </div>
-                        )}
+                            activeForm === "identification") &&
+                            !onEdit && (
+                                <div ref={targetForm}>
+                                    <QuestionForm
+                                        activeForm={activeForm}
+                                        setActiveForm={setActiveForm}
+                                        setSelectedIndex={setSelectedIndex}
+                                    />
+                                </div>
+                            )}
                     </div>
                     <div className="space-y-5">
                         <h1 className="font-bold">Select Type of Question</h1>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                             <SecondaryButton
                                 doSomething={() => {
+                                    clearQuestionDetails();
                                     handleOpenQuestionForm("multipleChoice");
                                     handleQuestionDetailsChange(
                                         "questionType",
@@ -169,6 +267,7 @@ export default function QuizForm() {
                             />
                             <SecondaryButton
                                 doSomething={() => {
+                                    clearQuestionDetails();
                                     handleOpenQuestionForm("trueOrFalse");
                                     handleQuestionDetailsChange(
                                         "questionType",
@@ -180,6 +279,7 @@ export default function QuizForm() {
                             />
                             <SecondaryButton
                                 doSomething={() => {
+                                    clearQuestionDetails();
                                     handleOpenQuestionForm("identification");
                                     handleQuestionDetailsChange(
                                         "questionType",

@@ -2,12 +2,14 @@ import { create } from "zustand";
 
 const useCreateQuizStore = create((set) => ({
     isFormOpen: false,
+    editForm: false,
 
     quizDetails: {
         quizTitle: "",
         quizDescription: "",
     },
     questionDetails: {
+        id: null,
         questionType: "",
         question: "",
         questionChoices: [],
@@ -18,14 +20,16 @@ const useCreateQuizStore = create((set) => ({
 
     questionList: [
         {
+            id: 1,
             questionType: "multipleChoice",
             question: "Which of these is programming language?",
             questionChoices: ["React", "HTML", "CSS", "Java"],
-            questionAnswer: ["Python"],
+            questionAnswer: ["React"],
             questionPoints: 2,
             required: true,
         },
         {
+            id: 2,
             questionType: "trueOrFalse",
             question: "The Great Wall of China is visible from space.",
             questionChoices: ["True", "False"],
@@ -34,13 +38,21 @@ const useCreateQuizStore = create((set) => ({
             required: true,
         },
         {
+            id: 3,
             questionType: "identification",
             question: "What is the chemical symbol for water?",
-            questionAnswer: "H2O",
+            questionChoices: [],
+            questionAnswer: ["H2O"],
             questionPoints: 1,
             required: true,
         },
     ],
+
+    setQuestionList: (newOrder) => {
+        set({
+            questionList: [...newOrder],
+        });
+    },
 
     handleQuestionDetailsChange: (field, value) => {
         const { questionDetails } = useCreateQuizStore.getState();
@@ -99,8 +111,18 @@ const useCreateQuizStore = create((set) => ({
     handleAddQuestion: () => {
         const { questionList, questionDetails, clearQuestionDetails } =
             useCreateQuizStore.getState();
+
+        // temporarily  set the id
+        const newId =
+            questionList.length > 0
+                ? questionList[questionList.length - 1].id + 1
+                : 1;
+
+        // clone the object
+        const updatedQuestionDetails = { ...questionDetails, id: newId };
         set({
-            questionList: [...questionList, questionDetails],
+            // store the updated questionDetails with temporary id
+            questionList: [...questionList, updatedQuestionDetails],
         });
 
         clearQuestionDetails();
@@ -172,6 +194,41 @@ const useCreateQuizStore = create((set) => ({
                 questionChoices: newQuestionchoices,
                 questionAnswer: newCorrectAsnwers,
             },
+        }));
+    },
+    setQuestionDetails: (questionDetails) => {
+        set((state) => ({
+            questionDetails: questionDetails,
+        }));
+    },
+
+    handleEditQuestion: (questionIndex) => {
+        const { questionList, questionDetails, clearQuestionDetails } =
+            useCreateQuizStore.getState();
+
+        // create a copy of the question list
+        const newQuestionList = questionList;
+
+        // change array item based on the index
+        newQuestionList[questionIndex] = questionDetails;
+
+        set(() => ({
+            // update the list by spreading the new array
+            questionList: [...newQuestionList],
+        }));
+
+        clearQuestionDetails();
+    },
+
+    handleDeleteQuestion: (questionIndex) => {
+        const { questionList } = useCreateQuizStore.getState();
+        const newQuestionList = questionList.filter(
+            (question, index) => index !== questionIndex
+        );
+
+        set(() => ({
+            // update the list by spreading the new array
+            questionList: [...newQuestionList],
         }));
     },
 }));

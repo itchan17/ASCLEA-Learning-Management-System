@@ -6,7 +6,13 @@ import MultipleChoice from "./MultipleChoice";
 import TrueOrFalse from "./TrueOrFalse";
 import Identification from "./Identification";
 
-export default function MultipleChoiceForm({ activeForm, setActiveForm }) {
+export default function QuestionForm({
+    activeForm,
+    setActiveForm,
+    questionIndex,
+    onEdit,
+    setSelectedIndex,
+}) {
     // Create Quiz Store
     const questionDetails = useCreateQuizStore(
         (state) => state.questionDetails
@@ -20,21 +26,30 @@ export default function MultipleChoiceForm({ activeForm, setActiveForm }) {
     const clearQuestionDetails = useCreateQuizStore(
         (state) => state.clearQuestionDetails
     );
+    const handleEditQuestion = useCreateQuizStore(
+        (state) => state.handleEditQuestion
+    );
 
     // Local States
     const [isAddOption, setIsAddOption] = useState(false);
     const [option, setOption] = useState("");
 
     // set the form title depending on the seleced question type
-    const [formTitle, setFormTitle] = useState(
-        activeForm === "multipleChoice"
-            ? "Multiple Choice"
-            : activeForm === "trueOrFalse"
-            ? "True or False"
-            : "Identification"
-    );
+    const [formTitle, setFormTitle] = useState("");
+
+    useEffect(() => {
+        // set the form title basec on the currently active form
+        setFormTitle(
+            activeForm === "multipleChoice"
+                ? "Multiple Choice"
+                : activeForm === "trueOrFalse"
+                ? "True or False"
+                : "Identification"
+        );
+    }, [activeForm]);
 
     const addQuestion = (key) => {
+        // function in the createQuiz store that handle adding question
         handleAddQuestion();
         setOption("");
         setIsAddOption(false);
@@ -42,8 +57,10 @@ export default function MultipleChoiceForm({ activeForm, setActiveForm }) {
     };
 
     const cancelAddQuestion = (key) => {
+        // this fucntion reset the questionDetails object in createQuiz store
         clearQuestionDetails();
         setActiveForm("");
+        setSelectedIndex(null);
     };
 
     useEffect(() => {
@@ -68,12 +85,12 @@ export default function MultipleChoiceForm({ activeForm, setActiveForm }) {
                                 )
                             }
                         />
-                        <label htmlFor="">Points</label>
+                        <label className="font-bold">Points</label>
                     </div>
                 </div>
             </div>
 
-            {/* Multiple Choice */}
+            {/* Display the form based on the question type */}
             {activeForm === "multipleChoice" ? (
                 <MultipleChoice
                     option={option}
@@ -113,10 +130,21 @@ export default function MultipleChoiceForm({ activeForm, setActiveForm }) {
                         doSomething={() => cancelAddQuestion(activeForm)}
                         text={"Cancel"}
                     />
-                    <PrimaryButton
-                        doSomething={() => addQuestion(activeForm)}
-                        text={"Save"}
-                    />
+                    {onEdit ? (
+                        <PrimaryButton
+                            doSomething={() => {
+                                handleEditQuestion(questionIndex);
+                                setActiveForm("");
+                                setSelectedIndex(null);
+                            }}
+                            text={"Save changes"}
+                        />
+                    ) : (
+                        <PrimaryButton
+                            doSomething={() => addQuestion(activeForm)}
+                            text={"Save"}
+                        />
+                    )}
                 </div>
             </div>
         </div>

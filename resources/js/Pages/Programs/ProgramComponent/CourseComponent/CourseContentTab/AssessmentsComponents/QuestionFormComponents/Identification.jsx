@@ -45,7 +45,6 @@ export default function Identification({
         console.log(option);
 
         // pass the input option tot he function and add it to the questionChoices array
-        handleQuestionDetailsChange("questionChoices", option);
         handleQuestionDetailsChange("questionAnswer", option);
         setOption("");
         toggleAddOption();
@@ -64,7 +63,7 @@ export default function Identification({
     return (
         <div className="space-y-5">
             <div>
-                <label>
+                <label className="font-bold">
                     Question<span className="text-ascend-red">*</span>
                 </label>
                 <input
@@ -80,12 +79,23 @@ export default function Identification({
             <div>
                 <div>
                     {/* List Options */}
-                    <label>
-                        Options<span className="text-ascend-red">*</span>
-                    </label>
+                    {questionDetails.questionAnswer.length > 0 && (
+                        <label className="font-bold">
+                            {questionDetails.questionAnswer.length > 1 ? (
+                                <span className="text-ascend-green">
+                                    Correct answers:
+                                </span>
+                            ) : (
+                                <span className="text-ascend-green">
+                                    Correct answer:
+                                </span>
+                            )}
+                        </label>
+                    )}
+
                     <div className="space-y-5">
-                        {questionDetails.questionChoices.length > 0 &&
-                            questionDetails.questionChoices.map((option, i) => {
+                        {questionDetails.questionAnswer.length > 0 &&
+                            questionDetails.questionAnswer.map((option, i) => {
                                 return (
                                     <div
                                         key={i}
@@ -104,11 +114,11 @@ export default function Identification({
                                                             option,
                                                         });
                                                     }}
-                                                    className="p-1 rounded-3xl hover:bg-ascend-lightblue/35"
+                                                    className="p-1 rounded-3xl hover:bg-ascend-lightblue"
                                                 >
                                                     <AiFillEdit className="shrink-0 text-size4 text-ascend-yellow" />
                                                 </div>
-                                                <div className="p-1 rounded-3xl hover:bg-ascend-lightblue/35">
+                                                <div className="p-1 rounded-3xl hover:bg-ascend-lightblue">
                                                     <AiFillDelete
                                                         onClick={(e) => {
                                                             stopPropagation(e);
