@@ -5,6 +5,7 @@ import useCourseStore from "../../../../Stores/Programs/courseStore";
 import Home from "./CourseContentTab/Home";
 import Materials from "./CourseContentTab/Materials";
 import Assessments from "./CourseContentTab/Assessments";
+import Grades from "./CourseContentTab/Grades";
 import { handleClickBackBtn } from "../../../../Utils/handleClickBackBtn";
 
 export default function CourseContent() {
@@ -28,6 +29,7 @@ export default function CourseContent() {
             {activeTab === 0 && <Home />}
             {activeTab === 1 && <Materials />}
             {activeTab === 2 && <Assessments />}
+            {activeTab === 3 && <Grades />}
         </div>
     );
 }

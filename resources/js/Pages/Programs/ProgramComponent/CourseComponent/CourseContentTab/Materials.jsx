@@ -99,7 +99,7 @@ export default function Materials() {
                         <button
                             tabIndex={0}
                             role="button"
-                            className="px-5 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
+                            className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
                         >
                             <div className="text-size1 ">
                                 {<IoCaretDownOutline />}
