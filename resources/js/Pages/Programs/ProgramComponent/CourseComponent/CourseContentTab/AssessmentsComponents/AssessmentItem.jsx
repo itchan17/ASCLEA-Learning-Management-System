@@ -1,11 +1,16 @@
 import React from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { SiGoogleforms } from "react-icons/si";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
+import { formatDueDateTime } from "../../../../../../Utils/formatDueDateTime";
+import { formatFullDate } from "../../../../../../Utils/formatFullDate";
 
-export default function AssessmentItem() {
+export default function AssessmentItem({ assessmentDetails }) {
     const route = useRoute();
+
+    // get the id from url
+    const { programId, courseId } = usePage().props;
 
     const stopPropagation = (e) => {
         e.stopPropagation();
@@ -14,9 +19,9 @@ export default function AssessmentItem() {
     const handleCardClick = () => {
         router.visit(
             route("program.course.assessment.view", {
-                programId: 1,
-                courseId: 1,
-                assessmentId: 1,
+                programId,
+                courseId,
+                assessmentId: assessmentDetails.id,
             }),
             {
                 preserveScroll: false,
@@ -27,12 +32,13 @@ export default function AssessmentItem() {
     const handleQuizClick = () => {
         router.visit(
             route("program.course.quiz-form.edit", {
-                programId: 1,
-                courseId: 1,
-                quizFormId: 1,
+                programId,
+                courseId,
+                quizFormId: assessmentDetails.assessmentQuiz.id,
             })
         );
     };
+
     return (
         <div
             onClick={handleCardClick}
@@ -40,7 +46,9 @@ export default function AssessmentItem() {
         >
             <div className="flex items-center gap-2 md:gap-20">
                 <h1 className="flex-1 min-w-0 text-size2 truncate font-bold">
-                    New Quiz
+                    {assessmentDetails.assessmentType === "quiz"
+                        ? "New Quiz"
+                        : "New Activity"}
                 </h1>
 
                 <div className="h-8 flex items-center">
@@ -76,10 +84,15 @@ export default function AssessmentItem() {
             </div>
             <div>
                 <h1 className="flex-1 min-w-0 text-size4 truncate font-bold">
-                    {/* {material.materialTitle} */}
-                    Mock Exam
+                    {assessmentDetails.assessmentTitle}
                 </h1>
-                <span className="text-size1">Due on April 30 at 11:59pm</span>
+                <span className="text-size1">
+                    {assessmentDetails.assessmentDueDateTime
+                        ? `Due on ${formatDueDateTime(
+                              assessmentDetails.assessmentDueDateTime
+                          )}`
+                        : null}
+                </span>
             </div>
 
             <div
@@ -91,13 +104,20 @@ export default function AssessmentItem() {
             >
                 <div className="w-full flex overflow-hidden font-semibold font-nunito-sans text-ascebd-black">
                     <SiGoogleforms className="text-size5 text-ascend-blue" />
-                    <h4 className="ml-2 truncate">Quiz form</h4>
+                    <h4 className="ml-2 truncate">
+                        {assessmentDetails.assessmentQuiz.quizTitle}
+                    </h4>
                 </div>
             </div>
 
             <div className="flex flex-wrap-reverse justify-between items-baseline font-nunito-sans gap-2">
-                <span className="text-size1">Posted on March 29, 2025</span>
-                <span className="font-bold">John Doe</span>
+                <span className="text-size1">
+                    Posted on{" "}
+                    {formatFullDate(assessmentDetails.assessmentPostDate)}
+                </span>
+                <span className="font-bold">
+                    {assessmentDetails.userPosted}
+                </span>
             </div>
         </div>
     );

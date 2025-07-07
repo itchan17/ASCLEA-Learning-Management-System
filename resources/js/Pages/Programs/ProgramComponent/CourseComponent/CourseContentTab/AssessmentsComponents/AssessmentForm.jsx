@@ -9,21 +9,13 @@ import "../../../../../../../css/global.css";
 import DropFiles from "../../DropFiles";
 import FileCard from "../../FileCard";
 import { SiGoogleforms } from "react-icons/si";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
-const route = useRoute();
-
-const handleCLickEditForm = () => {
-    router.visit(
-        route("program.course.quiz-form.edit", {
-            programId: 1,
-            courseId: 1,
-            quizFormId: 1,
-        })
-    );
-};
 
 export default function AssessmentForm({ toggleForm, formTitle, formWidth }) {
+    const { programId, courseId } = usePage().props;
+    const route = useRoute();
+
     // Assessments Store
     const assessmentDetails = useAssessmentsStore(
         (state) => state.assessmentDetails
@@ -37,17 +29,51 @@ export default function AssessmentForm({ toggleForm, formTitle, formWidth }) {
     const hanndleAddAssessments = useAssessmentsStore(
         (state) => state.hanndleAddAssessments
     );
+    const handleCreateIntialQuizForm = useAssessmentsStore(
+        (state) => state.handleCreateIntialQuizForm
+    );
+    const clearAssessmentDetails = useAssessmentsStore(
+        (state) => state.clearAssessmentDetails
+    );
 
     const [isShowDropFiles, setIsShowDropFiles] = useState(false);
+
+    const handleCLickEditForm = (quizFormId) => {
+        router.visit(
+            route("program.course.quiz-form.edit", {
+                programId,
+                courseId,
+                quizFormId,
+            })
+        );
+    };
+    useEffect(() => {
+        console.log(assessmentDetails);
+    }, [assessmentDetails]);
 
     const toggleShowDropFiles = () => {
         setIsShowDropFiles(!isShowDropFiles);
     };
 
-    useEffect(() => {
-        console.log(assessmentDetails);
-    }, [assessmentDetails]);
+    const changeAsssessmentType = (quizType) => {
+        // check if the type is quiz
+        if (quizType === "quiz") {
+            // this will create an empty quiz form
+            handleCreateIntialQuizForm();
+        }
+        handleAssessmentChange("assessmentType", quizType);
+    };
 
+    const cancelAssessmentForm = () => {
+        toggleForm();
+        clearAssessmentDetails();
+    };
+
+    const addAssessment = () => {
+        toggleForm();
+        hanndleAddAssessments();
+        clearAssessmentDetails();
+    };
     return (
         <div
             className={`border ${formWidth} border-ascend-gray1 shadow-shadow1 p-5 space-y-5 bg-ascend-white`}
@@ -63,10 +89,7 @@ export default function AssessmentForm({ toggleForm, formTitle, formWidth }) {
                             <select
                                 value={assessmentDetails.assessmentType}
                                 onChange={(e) =>
-                                    handleAssessmentChange(
-                                        "assessmentType",
-                                        e.target.value
-                                    )
+                                    changeAsssessmentType(e.target.value)
                                 }
                                 className="w-full rounded-none appearance-none border border-ascend-gray1 p-2 h-9  focus:outline-ascend-blue"
                             >
@@ -80,16 +103,16 @@ export default function AssessmentForm({ toggleForm, formTitle, formWidth }) {
                     />
                 </div>
                 <div>
-                    <label>Due Date</label>
+                    <label>Due Date and Time</label>
                     <input
-                        value={assessmentDetails.assessmentDueDate}
+                        value={assessmentDetails.assessmentDueDateTime || ""}
                         onChange={(e) =>
                             handleAssessmentChange(
-                                "assessmentDueDate",
+                                "assessmentDueDateTime",
                                 e.target.value
                             )
                         }
-                        type="date"
+                        type="datetime-local"
                         className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
                     />
                 </div>
@@ -157,12 +180,18 @@ export default function AssessmentForm({ toggleForm, formTitle, formWidth }) {
                         <label className="font-bold pb-5">Quiz Form</label>
                     </div>
                     <div
-                        onClick={handleCLickEditForm}
+                        onClick={() =>
+                            handleCLickEditForm(
+                                assessmentDetails.assessmentQuiz.id
+                            )
+                        }
                         className="flex h-15 items-center space-x-4 p-2 border border-ascend-gray1 bg-ascend-white hover-change-bg-color cursor-pointer"
                     >
                         <div className="w-full flex overflow-hidden font-semibold font-nunito-sans text-ascebd-black">
                             <SiGoogleforms className="text-size5 text-ascend-blue" />
-                            <h4 className="ml-2 truncate">Edit quiz form</h4>
+                            <h4 className="ml-2 truncate">
+                                {assessmentDetails.assessmentQuiz.quizTitle}
+                            </h4>
                         </div>
                     </div>
                 </div>
@@ -222,11 +251,11 @@ export default function AssessmentForm({ toggleForm, formTitle, formWidth }) {
                     />
                 )}
                 <div className="flex gap-2">
-                    <SecondaryButton doSomething={toggleForm} text={"Cancel"} />
-                    <PrimaryButton
-                        doSomething={hanndleAddAssessments}
-                        text={"Add"}
+                    <SecondaryButton
+                        doSomething={cancelAssessmentForm}
+                        text={"Cancel"}
                     />
+                    <PrimaryButton doSomething={addAssessment} text={"Add"} />
                 </div>
             </div>
         </div>

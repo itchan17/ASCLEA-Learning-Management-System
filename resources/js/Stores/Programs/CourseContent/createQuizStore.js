@@ -5,7 +5,8 @@ const useCreateQuizStore = create((set) => ({
     editForm: false,
 
     quizDetails: {
-        quizTitle: "",
+        id: null,
+        quizTitle: "First quiz",
         quizDescription: "",
     },
     questionDetails: {

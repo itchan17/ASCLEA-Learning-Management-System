@@ -11,6 +11,7 @@ export default function Assessments() {
     const toggleAssessmentForm = useAssessmentsStore(
         (state) => state.toggleAssessmentForm
     );
+    const assessmentList = useAssessmentsStore((state) => state.assessmentList);
 
     const targetForm = useRef(null);
 
@@ -37,8 +38,12 @@ export default function Assessments() {
                     <AssessmentForm toggleForm={toggleAssessmentForm} />
                 </div>
             )}
+            {/* <AssessmentItem /> */}
+            {assessmentList.length > 0 &&
+                assessmentList.map((assessment, i) => (
+                    <AssessmentItem key={i} assessmentDetails={assessment} />
+                ))}
 
-            <AssessmentItem />
             {/* <EmptyState
                 imgSrc={"/images/illustrations/empty.svg"}
                 text={`“There’s a whole lot of nothing going on—time to make something happen!”`}
