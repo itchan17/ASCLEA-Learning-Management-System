@@ -11,6 +11,7 @@ import FileCard from "../../FileCard";
 import { SiGoogleforms } from "react-icons/si";
 import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
+import { IoCaretDownOutline } from "react-icons/io5";
 
 export default function AssessmentForm({ toggleForm, formTitle, formWidth }) {
     const { programId, courseId } = usePage().props;
@@ -81,7 +82,13 @@ export default function AssessmentForm({ toggleForm, formTitle, formWidth }) {
             <h1 className="text-size4 font-bold">
                 {formTitle || "Add Assessment"}
             </h1>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div
+                className={`grid sm:grid-cols-2 ${
+                    assessmentDetails.assessmentType === "activity"
+                        ? "lg:grid-cols-3"
+                        : "lg:grid-cols-2"
+                } gap-5`}
+            >
                 <div>
                     <label>Assessment Type</label>
                     <CustomSelect
@@ -117,38 +124,22 @@ export default function AssessmentForm({ toggleForm, formTitle, formWidth }) {
                     />
                 </div>
 
-                <div>
-                    <label>
-                        Duration<span className="text-size1"> (Minutes)</span>
-                    </label>
-                    <input
-                        value={assessmentDetails.assessmentDuration}
-                        onChange={(e) =>
-                            handleAssessmentChange(
-                                "assessmentDuration",
-                                e.target.value
-                            )
-                        }
-                        type="number"
-                        min={1}
-                        className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
-                    />
-                </div>
-
-                <div>
-                    <label>Points</label>
-                    <input
-                        value={assessmentDetails.assessmentPoints}
-                        onChange={(e) =>
-                            handleAssessmentChange(
-                                "assessmentPoints",
-                                e.target.value
-                            )
-                        }
-                        type="number"
-                        className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
-                    />
-                </div>
+                {assessmentDetails.assessmentType === "activity" && (
+                    <div>
+                        <label>Points</label>
+                        <input
+                            value={assessmentDetails.assessmentPoints}
+                            onChange={(e) =>
+                                handleAssessmentChange(
+                                    "assessmentPoints",
+                                    e.target.value
+                                )
+                            }
+                            type="number"
+                            className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
+                        />
+                    </div>
+                )}
             </div>
             <div>
                 <label>Title</label>
@@ -255,7 +246,42 @@ export default function AssessmentForm({ toggleForm, formTitle, formWidth }) {
                         doSomething={cancelAssessmentForm}
                         text={"Cancel"}
                     />
-                    <PrimaryButton doSomething={addAssessment} text={"Add"} />
+
+                    <div className="flex space-x-[0.5px]">
+                        <PrimaryButton
+                            doSomething={addAssessment}
+                            text={"Publish"}
+                        />
+
+                        {/* Dropdown button */}
+                        <div className="dropdown dropdown-end cursor-pointer ">
+                            <button
+                                tabIndex={0}
+                                role="button"
+                                className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
+                            >
+                                <div className="text-size1 ">
+                                    {<IoCaretDownOutline />}
+                                </div>
+                            </button>
+
+                            <ul
+                                tabIndex={0}
+                                className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-30 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                            >
+                                <li>
+                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        Publish
+                                    </a>
+                                </li>
+                                <li>
+                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        Save draft
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -180,21 +180,41 @@ export default function QuizForm() {
                     <div className="font-bold text-end">
                         Total points: {calcTotalPoints()}
                     </div>
-                    <div>
-                        <label className="font-bold">
-                            Title<span className="text-ascend-red">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            value={quizDetails.quizTitle}
-                            onChange={(e) =>
-                                handleQuizDetailsChange(
-                                    "quizTitle",
-                                    e.target.value
-                                )
-                            }
-                            className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
-                        />
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 w-full">
+                        <div className="col-span-1 sm:col-span-3">
+                            <label className="font-bold">
+                                Title<span className="text-ascend-red">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={quizDetails.quizTitle}
+                                onChange={(e) =>
+                                    handleQuizDetailsChange(
+                                        "quizTitle",
+                                        e.target.value
+                                    )
+                                }
+                                className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
+                            />
+                        </div>
+                        <div className="w-full">
+                            <label>
+                                Duration
+                                <span className="text-size1"> (Minutes)</span>
+                            </label>
+                            <input
+                                type="number"
+                                value={quizDetails.quizDuration}
+                                onChange={(e) =>
+                                    handleQuizDetailsChange(
+                                        "quizDuration",
+                                        e.target.value
+                                    )
+                                }
+                                min={1}
+                                className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
+                            />
+                        </div>
                     </div>
                     <div>
                         <label className="font-bold">Description</label>

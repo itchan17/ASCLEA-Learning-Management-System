@@ -87,28 +87,29 @@ export default function AssessmentItem({ assessmentDetails }) {
                     {assessmentDetails.assessmentTitle}
                 </h1>
                 <span className="text-size1">
-                    {assessmentDetails.assessmentDueDateTime
-                        ? `Due on ${formatDueDateTime(
-                              assessmentDetails.assessmentDueDateTime
-                          )}`
-                        : null}
+                    {assessmentDetails.assessmentDueDateTime &&
+                        `Due on ${formatDueDateTime(
+                            assessmentDetails.assessmentDueDateTime
+                        )}`}
                 </span>
             </div>
 
-            <div
-                onClick={(e) => {
-                    stopPropagation(e);
-                    handleQuizClick();
-                }}
-                className="flex h-15 items-center space-x-4 p-2 border border-ascend-gray1 bg-ascend-white hover-change-bg-color cursor-pointer"
-            >
-                <div className="w-full flex overflow-hidden font-semibold font-nunito-sans text-ascebd-black">
-                    <SiGoogleforms className="text-size5 text-ascend-blue" />
-                    <h4 className="ml-2 truncate">
-                        {assessmentDetails.assessmentQuiz.quizTitle}
-                    </h4>
+            {assessmentDetails.assessmentType === "quiz" && (
+                <div
+                    onClick={(e) => {
+                        stopPropagation(e);
+                        handleQuizClick();
+                    }}
+                    className="flex h-15 items-center space-x-4 p-2 border border-ascend-gray1 bg-ascend-white hover-change-bg-color cursor-pointer"
+                >
+                    <div className="w-full flex overflow-hidden font-semibold font-nunito-sans text-ascebd-black">
+                        <SiGoogleforms className="text-size5 text-ascend-blue" />
+                        <h4 className="ml-2 truncate">
+                            {assessmentDetails.assessmentQuiz.quizTitle}
+                        </h4>
+                    </div>
                 </div>
-            </div>
+            )}
 
             <div className="flex flex-wrap-reverse justify-between items-baseline font-nunito-sans gap-2">
                 <span className="text-size1">

@@ -8,6 +8,7 @@ const useCreateQuizStore = create((set) => ({
         id: null,
         quizTitle: "First quiz",
         quizDescription: "",
+        quizDuration: 0,
     },
     questionDetails: {
         id: null,
@@ -109,26 +110,6 @@ const useCreateQuizStore = create((set) => ({
         });
     },
 
-    handleAddQuestion: () => {
-        const { questionList, questionDetails, clearQuestionDetails } =
-            useCreateQuizStore.getState();
-
-        // temporarily  set the id
-        const newId =
-            questionList.length > 0
-                ? questionList[questionList.length - 1].id + 1
-                : 1;
-
-        // clone the object
-        const updatedQuestionDetails = { ...questionDetails, id: newId };
-        set({
-            // store the updated questionDetails with temporary id
-            questionList: [...questionList, updatedQuestionDetails],
-        });
-
-        clearQuestionDetails();
-    },
-
     handleEditOption: (
         optionToEdit,
         setOptionToEdit,
@@ -197,6 +178,27 @@ const useCreateQuizStore = create((set) => ({
             },
         }));
     },
+
+    handleAddQuestion: () => {
+        const { questionList, questionDetails, clearQuestionDetails } =
+            useCreateQuizStore.getState();
+
+        // temporarily  set the id
+        const newId =
+            questionList.length > 0
+                ? questionList[questionList.length - 1].id + 1
+                : 1;
+
+        // clone the object
+        const updatedQuestionDetails = { ...questionDetails, id: newId };
+        set({
+            // store the updated questionDetails with temporary id
+            questionList: [...questionList, updatedQuestionDetails],
+        });
+
+        clearQuestionDetails();
+    },
+
     setQuestionDetails: (questionDetails) => {
         set((state) => ({
             questionDetails: questionDetails,

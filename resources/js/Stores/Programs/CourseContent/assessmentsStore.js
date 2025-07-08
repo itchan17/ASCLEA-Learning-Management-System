@@ -7,9 +7,9 @@ const useAssessmentsStore = create((set) => ({
 
     assessmentDetails: {
         id: null,
+        assessmentStatus: null,
         assessmentType: "",
         assessmentDueDateTime: "",
-        assessmentDuration: 0,
         assessmentPoints: 0,
         assessmentTitle: "",
         assessmentDescription: "",
@@ -17,6 +17,7 @@ const useAssessmentsStore = create((set) => ({
         assessmentQuiz: null,
         assessmentPostDate: "",
         userPosted: "",
+        responseReceived: 0,
     },
 
     assessmentList: [
@@ -24,11 +25,10 @@ const useAssessmentsStore = create((set) => ({
             id: 1,
             assessmentType: "quiz",
             assessmentDueDateTime: "2025-07-15T23:59",
-            assessmentDuration: 30,
             assessmentPoints: 100,
             assessmentTitle: "Chapter 3 Quiz: Photosynthesis",
             assessmentDescription:
-                "This quiz will cover all topics in Chapter 3, including light-dependent and light-independent reactions. Please review all diagrams and key concepts.",
+                "<h2>This quiz will cover all topics in Chapter 3, including light-dependent and light-independent reactions. Please review all diagrams and key concepts.</h2>",
             assessmentFiles: [],
             assessmentQuiz: {
                 id: 1,
@@ -37,6 +37,29 @@ const useAssessmentsStore = create((set) => ({
             },
             assessmentPostDate: "2025-07-07",
             userPosted: "John Doe",
+            responseReceived: 3,
+        },
+        {
+            id: 2,
+            assessmentType: "activity",
+            assessmentDueDateTime: "2025-07-20T23:59",
+            assessmentPoints: 50,
+            assessmentTitle: "Lab Activity: Plant Cell Observation",
+            assessmentDescription: `
+                                        <h2>Instructions:</h2>
+                                        <ol>
+                                            <li>Obtain the prepared slides of plant cells from your instructor.</li>
+                                            <li>Set up the microscope and carefully observe the slides.</li>
+                                            <li>Draw and label the visible parts of the plant cells.</li>
+                                            <li>Complete the observation sheet provided.</li>
+                                            <li>Submit both the labeled diagram and the observation sheet before the deadline.</li>
+                                        </ol>
+                                    `,
+            assessmentFiles: [],
+            assessmentQuiz: null,
+            assessmentPostDate: "2025-07-08",
+            userPosted: "Jane Smith",
+            responseReceived: 5,
         },
     ],
 
@@ -111,9 +134,16 @@ const useAssessmentsStore = create((set) => ({
             useAssessmentsStore.getState();
 
         const today = new Date().toISOString().slice(0, 10);
+
+        // temporarily  set the id
+        const newId =
+            assessmentList.length > 0
+                ? assessmentList[assessmentList.length - 1].id + 1
+                : 1;
+
         const updatedAssessmentDetails = {
             ...assessmentDetails,
-            id: 1, // temporarily set the id
+            id: newId, // temporarily set the id
             assessmentPostDate: today,
             userPosted: `${user.firstName} ${user.lastName}`,
         };

@@ -83,6 +83,15 @@ Route::prefix('programs')->group(function () {
             'assessmentId' => $assessmentId,
         ]);
     })->name('program.course.assessment.view');
+
+     // Route for viewing assessment responses
+    Route::get('/{programId}/course/{courseId}/assessment/{assessmentId}/responses', function ($programId, $courseId, $assessmentId) {
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/ViewResponses', [
+            'programId' => $programId,
+            'courseId' => $courseId,
+            'assessmentId' => $assessmentId,
+        ]);
+    })->name('program.course.assessment.responses');
 });
 
 
