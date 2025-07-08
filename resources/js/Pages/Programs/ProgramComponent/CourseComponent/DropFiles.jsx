@@ -1,18 +1,55 @@
-import React from "react";
-import { FileUploader } from "react-drag-drop-files";
+import React, { useCallback } from "react";
 import { FiUploadCloud } from "react-icons/fi";
+import { useDropzone } from "react-dropzone";
 
 export default function DropFiles({
     toggleDropFiles,
     handleFileChange,
     fieldName,
 }) {
-    const fileTypes = ["png", "jpeg", "jpg", "pdf", "pptx"];
+    // callback function for handling drop files
+    const onDrop = useCallback((acceptedFiles) => {
+        if (acceptedFiles.length > 0) {
+            // save the files in array
+            handleFileChange(fieldName, acceptedFiles);
+        }
+        // acceptedFiles.forEach((file) => {
+        //     const reader = new FileReader();
 
-    const handleChange = (file) => {
-        const fileArray = Array.from(file);
-        handleFileChange(fieldName, fileArray);
-    };
+        //     reader.onabort = () => console.log("file reading was aborted");
+        //     reader.onerror = () => console.log("file reading has failed");
+        //     reader.onload = () => {
+        //         // Do whatever you want with the file contents
+        //         const binaryStr = reader.result;
+        //         console.log(binaryStr);
+        //     };
+        //     reader.readAsArrayBuffer(file);
+        // });
+    }, []);
+
+    const { acceptedFiles, getRootProps, getInputProps, fileRejections } =
+        useDropzone({
+            onDrop,
+            accept: {
+                "image/png": [".png"],
+                "image/jpeg": [".jpeg", ".jpg"],
+                "application/pdf": [".pdf"],
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+                    [".pptx"],
+            },
+        });
+
+    // for file typ valdiation
+    const fileRejectionItems = fileRejections.map(({ file, errors }) => (
+        <li key={file.path}>
+            {file.path} - {file.size} bytes
+            <ul>
+                {errors.map((e) => (
+                    <li key={e.code}>{e.message}</li>
+                ))}
+            </ul>
+        </li>
+    ));
 
     return (
         <div className="space-y-5">
@@ -27,25 +64,21 @@ export default function DropFiles({
             </div>
 
             {/* File Dropzone */}
-
-            <FileUploader
-                handleChange={handleChange}
-                multiple={true}
-                name="file"
-                types={fileTypes}
-            >
-                <div className="flex items-center justify-center border-2 border-dashed border-ascend-gray1 h-15 w-full cursor-pointer hover:bg-ascend-lightblue transition-colors duration-300">
-                    <div className="flex items-center gap-2 text-ascend-black">
-                        <FiUploadCloud className="shrink-0 text-size4" />
-                        <span className=" text-size1 text-center">
-                            Drop files here or{" "}
-                            <span className="text-ascend-blue font-bold">
-                                Browse files
-                            </span>
+            <section className="">
+                <div
+                    {...getRootProps()}
+                    className="flex items-center justify-center border-2 border-dashed border-ascend-gray1 h-15 w-full cursor-pointer hover:bg-ascend-lightblue transition-colors duration-300 gap-2"
+                >
+                    <input {...getInputProps()}></input>
+                    <FiUploadCloud className="shrink-0 text-size4" />
+                    <span className=" text-size1 text-center">
+                        Drop files here or{" "}
+                        <span className="text-ascend-blue font-bold">
+                            Browse files
                         </span>
-                    </div>
+                    </span>
                 </div>
-            </FileUploader>
+            </section>
         </div>
     );
 }

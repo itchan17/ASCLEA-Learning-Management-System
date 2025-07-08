@@ -2,17 +2,19 @@ import React from "react";
 import { SiGoogleforms } from "react-icons/si";
 import { router } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
+import { usePage } from "@inertiajs/react";
 
-export default function Quiz() {
+export default function Quiz({ quizDetails }) {
     const route = useRoute();
+    console.log(quizDetails);
 
+    const { programId, courseId } = usePage().props;
     const handleQuizClick = () => {
         router.visit(
-            route("program.course.material.form.edit", {
-                programId: 1,
-                courseId: 1,
-                materialId: 1,
-                formId: 1,
+            route("program.course.quiz-form.edit", {
+                programId,
+                courseId,
+                quizFormId: quizDetails.id,
             })
         );
     };
@@ -26,7 +28,7 @@ export default function Quiz() {
                 <SiGoogleforms
                     className={`shrink-0 text-ascend-blue text-size5`}
                 />
-                <h4 className="ml-2 truncate">Quiz form</h4>
+                <h4 className="ml-2 truncate">{quizDetails.quizTitle}</h4>
             </div>
         </div>
     );

@@ -191,9 +191,16 @@ export default function Section({ sectionTitle }) {
                 distance: 8,
             },
         }),
-        useSensor(TouchSensor),
+        useSensor(TouchSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
+            activationConstraint: {
+                distance: 8,
+            },
         })
     );
 
