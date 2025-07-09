@@ -17,9 +17,15 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
 import SecondaryButton from "../../../../../../Components/Button/SecondaryButton";
 import { isEqual, cloneDeep } from "lodash";
+import useModulesStore from "../../../../../../Stores/Programs/CourseContent/modulesStore";
 
-export default function Section({ sectionTitle }) {
-    const [isExpanded, setIsExpanded] = useState(true);
+export default function Section({ sectionDetails }) {
+    // Modules store
+    const updateSectionStatus = useModulesStore(
+        (state) => state.updateSectionStatus
+    );
+
+    const [isExpanded, setIsExpanded] = useState(false);
     const [isMaterialFormOpen, setIsMaterialFormOpen] = useState(false);
     const [isAssessmentFormOpen, setIsAssessmentFormOpen] = useState(false);
     const [isButtonDisplayed, setIsButtonDisyplayed] = useState(false);
@@ -150,6 +156,21 @@ export default function Section({ sectionTitle }) {
         }
     };
 
+    const handleUpdateStatus = () => {
+        updateSectionStatus(
+            sectionDetails.id,
+            sectionDetails.sectionStatus === "published"
+                ? "unpublish"
+                : "published"
+        );
+
+        // Close the dropdown after clicked
+        const elem = document.activeElement;
+        if (elem) {
+            elem?.blur();
+        }
+    };
+
     const toggleArrow = () => {
         setIsMaterialFormOpen(false);
         setIsExpanded(!isExpanded);
@@ -227,7 +248,7 @@ export default function Section({ sectionTitle }) {
 
     return (
         <div className="shadow-shadow1">
-            <div className="flex items-center gap-2 md:gap-20 justify-between pl-2 pr-5 py-2 text-ascend-white bg-ascend-blue">
+            <div className="flex items-center gap-2 md:gap-20 justify-between pl-2 pr-5 py-3 text-ascend-white bg-ascend-blue">
                 <div className="flex flex-1 min-w-0 items-center gap-2">
                     <IoIosArrowDown
                         onClick={toggleArrow}
@@ -237,8 +258,23 @@ export default function Section({ sectionTitle }) {
                     />
 
                     <h1 className="text-size4 font-bold break-words min-w-0">
-                        {sectionTitle}
+                        {sectionDetails.sectionTitle}
                     </h1>
+
+                    {/* Set the status label */}
+                    {sectionDetails.sectionStatus === "published" ? (
+                        <div className="px-2 bg-ascend-green ">
+                            <span className="text-size1 font-bold text-ascend-white">
+                                Published
+                            </span>
+                        </div>
+                    ) : (
+                        <div className="px-2 bg-ascend-yellow ">
+                            <span className="text-size1 font-bold text-ascend-white">
+                                Unpublish
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 <div className="dropdown dropdown-end cursor-pointer">
@@ -254,9 +290,11 @@ export default function Section({ sectionTitle }) {
                         tabIndex={0}
                         className="dropdown-content menu font-bold space-y-2 bg-ascend-white min-w-36 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                     >
-                        <li>
+                        <li onClick={handleUpdateStatus}>
                             <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                Publish
+                                {sectionDetails.sectionStatus === "published"
+                                    ? "Unpublish"
+                                    : "Publish"}
                             </a>
                         </li>
                         <li name="add-material" onClick={openForm}>
@@ -282,6 +320,7 @@ export default function Section({ sectionTitle }) {
                     </ul>
                 </div>
             </div>
+
             <div
                 className={`border-r bg-ascend-lightblue border-l border-b border-ascend-gray1  ${
                     isExpanded ? "h-full" : "h-0 px-5 py-0"
@@ -298,6 +337,7 @@ export default function Section({ sectionTitle }) {
                                 toggleOpenMaterialForm={toggleOpenMaterialForm}
                                 formTitle={"Add Section Material"}
                                 formWidth={"w-200"}
+                                sectionId={sectionDetails.id}
                             />
                         </div>
                     )}
@@ -307,6 +347,7 @@ export default function Section({ sectionTitle }) {
                                 toggleForm={toggleOpenAssessmentForm}
                                 formTitle={"Add Section Assessment"}
                                 formWidth={"w-200"}
+                                sectionId={sectionDetails.id}
                             />
                         </div>
                     )}
@@ -317,7 +358,10 @@ export default function Section({ sectionTitle }) {
                             collisionDetection={closestCorners}
                         >
                             <SectionContentList
-                                sectionContent={sectionContent}
+                                sectionContent={
+                                    sectionDetails.sectionContentList
+                                }
+                                sectionStatus={sectionDetails.sectionStatus}
                             />
                         </DndContext>
                     )}

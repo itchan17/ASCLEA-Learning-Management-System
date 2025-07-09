@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import PrimaryButton from "../../../../../Components/Button/PrimaryButton";
 import MaterialForm from "./MaterialsComponents/MaterialForm";
-import useMaterialsStore from "../../../../../Stores/Programs/CourseContent/materialsStore";
+import useModulesStore from "../../../../../Stores/Programs/CourseContent/modulesStore";
 import EmptyState from "../../../../../Components/EmptyState/EmptyState";
 import MaterialItem from "./MaterialsComponents/MaterialItem";
 import { IoCaretDownOutline } from "react-icons/io5";
@@ -11,7 +11,8 @@ import { IoIosArrowDown } from "react-icons/io";
 
 export default function Materials() {
     // Materials Store
-    const materialList = useMaterialsStore((state) => state.materialList);
+    const materialList = useModulesStore((state) => state.materialList);
+    const sectionList = useModulesStore((state) => state.sectionList);
 
     const [isMaterialFormOpen, setIsMaterialFormOpen] = useState(false);
     const [isSectionFormOpen, setIsSectionFormOpen] = useState(false);
@@ -153,11 +154,10 @@ export default function Materials() {
                     <h1 className="text-size4 font-bold">Materials</h1>
                     <div className="w-full h-[0.5px] bg-ascend-gray1"></div>
                 </div>
-                {isMaterialsExpanded && (
-                    <>
-                        <MaterialItem />
-                    </>
-                )}
+                {isMaterialsExpanded &&
+                    materialList.map((material) => (
+                        <MaterialItem materialDetails={material} />
+                    ))}
             </div>
             <div className="flex flex-col space-y-5">
                 <div className="flex items-center space-x-5">
@@ -171,12 +171,13 @@ export default function Materials() {
                     <h1 className="text-size4 font-bold">Sections</h1>
                     <div className="w-full h-[0.5px] bg-ascend-gray1"></div>
                 </div>
-                {isSectionsExpanded && (
-                    <>
-                        <Section sectionTitle={"Week 1"} />
-                        <Section sectionTitle={"Week 2"} />
-                    </>
-                )}
+
+                {/* Display the list of sections */}
+                {isSectionsExpanded &&
+                    sectionList &&
+                    sectionList.map((section, index) => (
+                        <Section key={index} sectionDetails={section} />
+                    ))}
             </div>
 
             {/* {materialList?.length > 0 ? (

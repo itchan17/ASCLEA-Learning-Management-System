@@ -13,7 +13,12 @@ import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import { IoCaretDownOutline } from "react-icons/io5";
 
-export default function AssessmentForm({ toggleForm, formTitle, formWidth }) {
+export default function AssessmentForm({
+    toggleForm,
+    formTitle,
+    formWidth,
+    sectionId,
+}) {
     const { programId, courseId } = usePage().props;
     const route = useRoute();
 
@@ -72,7 +77,7 @@ export default function AssessmentForm({ toggleForm, formTitle, formWidth }) {
 
     const addAssessment = () => {
         toggleForm();
-        hanndleAddAssessments();
+        hanndleAddAssessments(sectionId);
         clearAssessmentDetails();
     };
     return (

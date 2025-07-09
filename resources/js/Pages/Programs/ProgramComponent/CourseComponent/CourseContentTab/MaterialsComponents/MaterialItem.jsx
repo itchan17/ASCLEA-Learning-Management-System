@@ -1,11 +1,14 @@
 import React from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import "../../../../../../../css/global.css";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 
-export default function MaterialItem({ material }) {
+export default function MaterialItem({ materialDetails }) {
     const route = useRoute();
+
+    // get the id from url
+    const { programId, courseId } = usePage().props;
 
     const stopPropagation = (e) => {
         e.stopPropagation();
@@ -14,9 +17,9 @@ export default function MaterialItem({ material }) {
     const handleCardClick = () => {
         router.visit(
             route("program.course.material.view", {
-                programId: 1,
-                courseId: 1,
-                materialId: 1,
+                programId,
+                courseId,
+                materialId: materialDetails.id,
             }),
             {
                 preserveScroll: false,
@@ -66,8 +69,7 @@ export default function MaterialItem({ material }) {
                 </div>
             </div>
             <h1 className="flex-1 min-w-0 text-size4 truncate font-bold">
-                {/* {material.materialTitle} */}
-                Materials for EDUC 101 - Facilitating Learners
+                {materialDetails.materialTitle}
             </h1>
 
             <div className="flex flex-wrap-reverse justify-between items-baseline font-nunito-sans gap-2">

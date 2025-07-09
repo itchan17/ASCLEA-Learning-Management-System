@@ -2,12 +2,14 @@ import React from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import { MdOutlineDragIndicator } from "react-icons/md";
 
 export default function SectionContent({ disabled, contentDetails }) {
     const route = useRoute();
+
+    const { programId, courseId } = usePage().props;
 
     const {
         attributes,
@@ -35,6 +37,35 @@ export default function SectionContent({ disabled, contentDetails }) {
         console.log("Clicked");
 
         // Code here for route
+
+        // To add the route for this it need to have a contentType that will check if its activity or assessment to specify the route
+        // Currently cant make this functionality as data display in view assessment or view materials is coming from materialList or assessmentList
+        // While data here is coming from sectionContentList inside sectionDetails
+        // If coding backend started the data on view assessment or view materials should be directly coming from backend not on lists in the stores
+
+        if (contentDetails.contentType === "assessment") {
+            router.visit(
+                route("program.course.material.view", {
+                    programId,
+                    courseId,
+                    materialId: contentDetails.id,
+                }),
+                {
+                    preserveScroll: false,
+                }
+            );
+        } else {
+            router.visit(
+                route("program.course.assessment.view", {
+                    programId,
+                    courseId,
+                    assessmentId: contentDetails.id,
+                }),
+                {
+                    preserveScroll: false,
+                }
+            );
+        }
     };
 
     const stopPropagation = (e) => {
@@ -48,18 +79,26 @@ export default function SectionContent({ disabled, contentDetails }) {
             style={style}
             className="bg-ascend-white border border-ascend-gray1"
         >
+            {!disabled && (
+                <div
+                    style={{ touchAction: "none" }}
+                    ref={setActivatorNodeRef}
+                    {...(!disabled && listeners)}
+                    className="flex justify-center cursor-grab py-1"
+                >
+                    <MdOutlineDragIndicator className="rotate-90" />
+                </div>
+            )}
             <div
-                style={{ touchAction: "none" }}
-                ref={setActivatorNodeRef}
-                {...(!disabled && listeners)}
-                className="flex justify-center cursor-grab py-1"
+                className={`flex items-center gap-2 md:gap-20 justify-between pr-5 pl-5 pb-5 cursor-pointer ${
+                    disabled ? "pt-5" : null
+                } text-ascend-black`}
             >
-                <MdOutlineDragIndicator className="rotate-90" />
-            </div>
-            <div className="flex items-center gap-2 md:gap-20 justify-between pr-5 pl-5 pb-5 text-ascend-black">
                 <h1 className="text-size2 font-bold break-words flex-1 min-w-0">
                     {`${contentDetails.sortOrder}. `}
-                    {contentDetails.title}
+                    {contentDetails.contentType === "material"
+                        ? contentDetails.materialTitle
+                        : contentDetails.assessmentTitle}
                 </h1>
 
                 <div

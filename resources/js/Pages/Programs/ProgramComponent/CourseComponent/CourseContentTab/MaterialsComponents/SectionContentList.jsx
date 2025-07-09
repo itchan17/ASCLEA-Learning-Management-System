@@ -5,7 +5,7 @@ import {
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
-export default function SectionContentList({ sectionContent }) {
+export default function SectionContentList({ sectionContent, sectionStatus }) {
     return (
         <div className="space-y-3">
             <SortableContext
@@ -15,7 +15,9 @@ export default function SectionContentList({ sectionContent }) {
                 {sectionContent.map((content, index) => {
                     return (
                         <SectionContent
-                            disabled={false}
+                            disabled={
+                                sectionStatus === "published" ? true : false
+                            }
                             key={index}
                             contentDetails={content}
                         />

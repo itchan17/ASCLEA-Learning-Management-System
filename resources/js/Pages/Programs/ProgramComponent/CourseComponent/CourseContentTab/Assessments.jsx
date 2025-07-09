@@ -21,6 +21,10 @@ export default function Assessments() {
             targetForm.current?.scrollIntoView({ behavior: "smooth" });
         }
     }, [isFormOpen]);
+
+    useEffect(() => {
+        console.log(assessmentList);
+    }, [assessmentList]);
     return (
         <div className="font-nunito-sans text-ascend-black space-y-5">
             <div className="flex flex-wrap gap-2 justify-between items-center">
