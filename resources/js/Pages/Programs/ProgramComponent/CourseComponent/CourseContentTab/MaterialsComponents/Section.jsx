@@ -150,7 +150,6 @@ export default function Section({ sectionDetails }) {
 
         // Close the dropdown after clicked
         const elem = document.activeElement;
-        console.log("elem: " + elem);
         if (elem) {
             elem?.blur();
         }

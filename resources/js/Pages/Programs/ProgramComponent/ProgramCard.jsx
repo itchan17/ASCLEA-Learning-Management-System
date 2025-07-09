@@ -3,17 +3,47 @@ import { router } from "@inertiajs/react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import "../../../../css/global.css";
 import { useRoute } from "ziggy-js";
+import useProgramStore from "../../../Stores/Programs/programStore";
 
-export default function ProgramCard({ programName, programId }) {
+export default function ProgramCard({
+    programDetails,
+    setIsModalOpen,
+    setEditProgram,
+}) {
+    // Const Program Store
+    const setProgram = useProgramStore((state) => state.setProgram);
+    const deleteProgram = useProgramStore((state) => state.deleteProgram);
+
     const route = useRoute();
     const handleCardClick = () => {
-        router.visit(route("program.view", programId));
+        router.visit(route("program.view", programDetails.id));
     };
 
     const stopPropagation = (e) => {
         e.stopPropagation();
     };
 
+    const handleEditClick = () => {
+        setIsModalOpen(true);
+        setProgram(programDetails);
+        setEditProgram(true);
+
+        // Close the dropdown after clicked
+        const elem = document.activeElement;
+        if (elem) {
+            elem?.blur();
+        }
+    };
+
+    const handleArchiveClick = () => {
+        deleteProgram(programDetails.id);
+
+        // Close the dropdown after clicked
+        const elem = document.activeElement;
+        if (elem) {
+            elem?.blur();
+        }
+    };
     return (
         <div
             onClick={handleCardClick}
@@ -34,23 +64,23 @@ export default function ProgramCard({ programName, programId }) {
 
                 <ul
                     tabIndex={0}
-                    className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                    className="dropdown-content menu bg-ascend-white w-36 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                 >
-                    <li>
+                    <li onClick={handleEditClick}>
                         <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                            Edit
+                            Edit program
                         </a>
                     </li>
-                    <li>
+                    <li onClick={handleArchiveClick}>
                         <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                            Remove
+                            Archive program
                         </a>
                     </li>
                 </ul>
             </div>
             <div className="h-16 px-5 flex items-center">
                 <h1 className="font-bold overflow-hidden text-ellipsis text-nowrap group-hover:text-ascend-blue transition-all duration-300">
-                    {programName}
+                    {programDetails.programName}
                 </h1>
             </div>
         </div>

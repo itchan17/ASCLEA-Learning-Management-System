@@ -11,8 +11,10 @@ export default function Programs() {
     const setActiveTab = useProgramStore((state) => state.setActiveTab);
 
     console.log(programList);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     console.log("Render Programs");
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editProgram, setEditProgram] = useState(false);
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
@@ -21,6 +23,10 @@ export default function Programs() {
     useEffect(() => {
         setActiveTab(0);
     }, []);
+
+    useEffect(() => {
+        console.log("Edit program: " + editProgram);
+    }, [editProgram]);
 
     return (
         <>
@@ -32,27 +38,16 @@ export default function Programs() {
                     />
                 </div>
 
-                {/* Program placeholder */}
-                <div className="w-full flex flex-wrap gap-5">
-                    <ProgramCard
-                        programId={1}
-                        programName={"Licensure Examination for Teacher"}
-                    />
-
-                    <ProgramCard
-                        programId={2}
-                        programName={"Certificate in Teaching Program"}
-                    />
-                </div>
-
                 {/* Display created program */}
-                {/* <div className="w-full flex flex-wrap gap-5">
+                <div className="w-full flex flex-wrap gap-5">
                     {programList?.length > 0 ? (
                         programList.map((program, index) => {
                             return (
                                 <ProgramCard
                                     key={index}
-                                    programName={program.programName}
+                                    programDetails={program}
+                                    setIsModalOpen={setIsModalOpen}
+                                    setEditProgram={setEditProgram}
                                 />
                             );
                         })
@@ -63,9 +58,15 @@ export default function Programs() {
                 adventures!”`}
                         />
                     )}
-                </div> */}
+                </div>
 
-                {isModalOpen && <AddProgramForm toggleModal={toggleModal} />}
+                {isModalOpen && (
+                    <AddProgramForm
+                        editProgram={editProgram}
+                        setEditProgram={setEditProgram}
+                        toggleModal={toggleModal}
+                    />
+                )}
             </div>
         </>
     );

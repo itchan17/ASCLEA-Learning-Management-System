@@ -1,8 +1,21 @@
 import { create } from "zustand";
 
 const useProgramStore = create((set) => ({
-    programList: [],
-    program: { programName: "", programDescription: "" },
+    programList: [
+        {
+            id: 1,
+            programName: "Licensure Examination for Teacher",
+            programDescription:
+                "The Licensure Examination for Teacher (LET) review program helps future educators prepare for the national licensure exam. It includes comprehensive coverage of General and Professional Education subjects, specialized review for majors, mock exams patterned after the actual LET, and expert coaching in test-taking strategies.",
+        },
+        {
+            id: 2,
+            programName: "Certificate in Teaching Program",
+            programDescription:
+                "The Certificate in Teaching Program is designed for professionals who want to transition into teaching without an education degree. It covers the foundations of education, curriculum and lesson planning, classroom management, assessment techniques, and includes a teaching practicum under supervision.",
+        },
+    ],
+    program: { id: null, programName: "", programDescription: "" },
     activeTab: 0,
 
     // Set the active tab inside the program content
@@ -32,13 +45,60 @@ const useProgramStore = create((set) => ({
         // Log current program
         console.log(program);
 
+        // temporarily  set the id
+        const newId =
+            programList.length > 0
+                ? programList[programList.length - 1].id + 1
+                : 1;
+
+        const updatedProgramDetails = { ...program, id: newId };
+
         // Add to the list
         set({
-            programList: [...programList, program],
+            programList: [...programList, updatedProgramDetails],
         });
 
         // Clear the form
         clearProgram();
+    },
+
+    editProgramDetails: (programId) => {
+        const { programList, program, clearProgram } =
+            useProgramStore.getState();
+
+        const programIndex = programList.findIndex((p) => p.id === programId);
+        // create a copy of the program list
+        const newProgramList = programList;
+
+        // change array item based on the index
+        newProgramList[programIndex] = program;
+
+        set(() => ({
+            // update the list by spreading the new array
+            programList: [...newProgramList],
+        }));
+
+        clearProgram();
+    },
+
+    deleteProgram: (programId) => {
+        const { programList, program, clearProgram } =
+            useProgramStore.getState();
+
+        const newProgramList = programList.filter((p) => p.id !== programId);
+
+        console.log(newProgramList);
+
+        set(() => ({
+            // update the list by spreading the new array
+            programList: [...newProgramList],
+        }));
+    },
+
+    setProgram: (programDetails) => {
+        set({
+            program: programDetails,
+        });
     },
 }));
 

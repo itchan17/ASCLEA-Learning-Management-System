@@ -7,13 +7,52 @@ import CourseCard from "./CourseComponent/CourseCard";
 import AddCourseForm from "./CourseComponent/AddCourseForm";
 import useCourseStore from "../../../Stores/Programs/courseStore";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { router, usePage } from "@inertiajs/react";
+import useProgramStore from "../../../Stores/Programs/programStore";
+import AddProgramForm from "./AddProgramForm";
+import { useRoute } from "ziggy-js";
 
 export default function Courses() {
+    const route = useRoute();
+
+    // Program Store
+    const programList = useProgramStore((state) => state.programList);
+    const setProgram = useProgramStore((state) => state.setProgram);
+    const deleteProgram = useProgramStore((state) => state.deleteProgram);
+
     // Course Store
     const courseList = useCourseStore((state) => state.courseList);
     const setActiveTab = useCourseStore((state) => state.setActiveTab);
 
+    const [isProgramFormOpen, setIsProgramFormOpen] = useState(false);
+    const [editProgram, setEditProgram] = useState(false);
+
+    // get the id from url
+    const { programId } = usePage().props;
+
     const [isOpen, setIsOpen] = useState(false);
+    const [programDetails, setProgramDetails] = useState(null);
+
+    const toggleEditProgram = () => {
+        setIsProgramFormOpen(!isProgramFormOpen);
+    };
+
+    // temporarily get the data of slected assessment
+    useEffect(() => {
+        console.log(programList);
+        // check if id is true
+        if (programId) {
+            // find the assessment details in asssessment list based on the id in url
+            // this in temporary only as there's currently data passed from backend
+            // the data will come from the backend and here's we're it will be set
+            const details = programList.find(
+                (detail) => detail.id === Number(programId)
+            );
+
+            // set the data
+            setProgramDetails(details);
+        }
+    }, [programId, programList]);
 
     const toggleModal = () => {
         setIsOpen(!isOpen);
@@ -26,6 +65,33 @@ export default function Courses() {
 
     console.log("Render Courses");
 
+    const handleEditClick = () => {
+        setIsProgramFormOpen(true);
+        setProgram(programDetails);
+        setEditProgram(true);
+
+        // Close the dropdown after clicked
+        const elem = document.activeElement;
+        if (elem) {
+            elem?.blur();
+        }
+    };
+
+    const handleArchiveClick = () => {
+        // Navigate first, then delete
+        router.visit(route("programs.index"), {
+            onFinish: () => {
+                deleteProgram(Number(programId));
+            },
+        });
+
+        // Close the dropdown after clicked
+        const elem = document.activeElement;
+        if (elem) {
+            elem?.blur();
+        }
+    };
+
     return (
         <div className="w-full space-y-5 font-nunito-sans text-ascend-black">
             <div className="relative bg-ascend-gray1 w-full h-50 rounded-tl-xl rounded-br-xl">
@@ -37,7 +103,7 @@ export default function Courses() {
             <div className="space-y-1 pb-5 border-b border-ascend-gray1">
                 <div className="flex items-start gap-2 md:gap-20">
                     <h1 className="flex-1 min-w-0 text-size7 break-words font-semibold">
-                        Licensure Examination for Teachers
+                        {programDetails?.programName}
                     </h1>
 
                     <div className="dropdown dropdown-end cursor-pointer ">
@@ -51,16 +117,16 @@ export default function Courses() {
 
                         <ul
                             tabIndex={0}
-                            className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                            className="dropdown-content menu bg-ascend-white w-36 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                         >
-                            <li>
+                            <li onClick={handleEditClick}>
                                 <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Edit
+                                    Edit program
                                 </a>
                             </li>
-                            <li>
+                            <li onClick={handleArchiveClick}>
                                 <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Remove
+                                    Archive Program
                                 </a>
                             </li>
                         </ul>
@@ -68,10 +134,7 @@ export default function Courses() {
                 </div>
 
                 <p className="break-words">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    {programDetails?.programDescription}
                 </p>
             </div>
             <div className="flex flex-wrap justify-between items-center gap-2">
@@ -135,6 +198,15 @@ export default function Courses() {
 
             {/* Display modal form */}
             {isOpen && <AddCourseForm toggleModal={toggleModal} />}
+
+            {/* Open Edit program form */}
+            {isProgramFormOpen && (
+                <AddProgramForm
+                    editProgram={editProgram}
+                    setEditProgram={setEditProgram}
+                    toggleModal={toggleEditProgram}
+                />
+            )}
         </div>
     );
 }

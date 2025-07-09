@@ -6,7 +6,11 @@ import CourseItem from "./CourseComponent/CourseItem";
 import useProgramStore from "../../../Stores/Programs/programStore";
 import useCourseStore from "../../../Stores/Programs/courseStore";
 
-export default function AddProgramForm({ toggleModal }) {
+export default function AddProgramForm({
+    toggleModal,
+    editProgram,
+    setEditProgram,
+}) {
     console.log("Render Add Program Form");
 
     // Program Store
@@ -15,6 +19,9 @@ export default function AddProgramForm({ toggleModal }) {
         (state) => state.handleProgramChange
     );
     const addProgram = useProgramStore((state) => state.addProgram);
+    const editProgramDetails = useProgramStore(
+        (state) => state.editProgramDetails
+    );
 
     // Course Store
     const courseList = useCourseStore((state) => state.courseList);
@@ -32,6 +39,14 @@ export default function AddProgramForm({ toggleModal }) {
     const handleAdd = (e) => {
         e.preventDefault();
         addProgram();
+        setEditProgram(false);
+        // Close modal form
+        toggleModal();
+    };
+
+    const handleEditProgram = (e) => {
+        e.preventDefault();
+        editProgramDetails(program.id);
 
         // Close modal form
         toggleModal();
@@ -43,11 +58,10 @@ export default function AddProgramForm({ toggleModal }) {
 
     return (
         <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
-            <form
-                onSubmit={handleAdd}
-                className="bg-ascend-white opacity-100 p-5 w-150 space-y-5  max-h-[calc(100vh-5rem)] overflow-y-auto my-10"
-            >
-                <h1 className="text-size4 font-bold">Add Program</h1>
+            <form className="bg-ascend-white opacity-100 p-5 w-150 space-y-5  max-h-[calc(100vh-5rem)] overflow-y-auto my-10">
+                <h1 className="text-size4 font-bold">
+                    {editProgram ? "Edit" : "Add"} Program
+                </h1>
                 <div>
                     <label htmlFor="">
                         Program Name
@@ -119,7 +133,7 @@ export default function AddProgramForm({ toggleModal }) {
                     </>
                 )}
 
-                {!addCourse && (
+                {!editProgram && !addCourse && (
                     <PrimaryButton
                         text={"Add Course"}
                         doSomething={toggleAddCourse}
@@ -127,8 +141,23 @@ export default function AddProgramForm({ toggleModal }) {
                 )}
 
                 <div className="flex justify-end space-x-2">
-                    <SecondaryButton doSomething={toggleModal} text={"Close"} />
-                    <PrimaryButton btnType={"submit"} text={"Add"} />
+                    <SecondaryButton
+                        doSomething={() => {
+                            toggleModal();
+                            if (editProgram) {
+                                setEditProgram(false);
+                            }
+                        }}
+                        text={"Close"}
+                    />
+                    {editProgram ? (
+                        <PrimaryButton
+                            doSomething={handleEditProgram}
+                            text={"Save"}
+                        />
+                    ) : (
+                        <PrimaryButton doSomething={handleAdd} text={"Add"} />
+                    )}
                 </div>
             </form>
         </div>
