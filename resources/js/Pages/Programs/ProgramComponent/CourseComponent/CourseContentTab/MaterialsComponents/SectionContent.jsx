@@ -10,7 +10,6 @@ export default function SectionContent({ disabled, contentDetails }) {
     const route = useRoute();
 
     const { programId, courseId } = usePage().props;
-
     const {
         attributes,
         listeners,
@@ -19,7 +18,7 @@ export default function SectionContent({ disabled, contentDetails }) {
         transition,
         setActivatorNodeRef,
     } = useSortable({
-        id: contentDetails.id,
+        id: contentDetails.sortOrder,
         transition: {
             duration: 300, // milliseconds
             easing: "cubic-bezier(0.25, 1, 0.5, 1)",
@@ -29,8 +28,8 @@ export default function SectionContent({ disabled, contentDetails }) {
     });
 
     const style = {
-        transform: CSS.Translate.toString(transform),
-        transition,
+        transform: CSS.Transform.toString(transform),
+        transition: transition || undefined,
     };
 
     const handleSectionContentClick = () => {
@@ -43,7 +42,7 @@ export default function SectionContent({ disabled, contentDetails }) {
         // While data here is coming from sectionContentList inside sectionDetails
         // If coding backend started the data on view assessment or view materials should be directly coming from backend not on lists in the stores
 
-        if (contentDetails.contentType === "assessment") {
+        if (contentDetails.contentType === "material") {
             router.visit(
                 route("program.course.material.view", {
                     programId,

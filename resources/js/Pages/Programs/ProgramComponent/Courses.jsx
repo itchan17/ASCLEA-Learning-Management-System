@@ -39,7 +39,6 @@ export default function Courses() {
 
     // temporarily get the data of slected assessment
     useEffect(() => {
-        console.log(programList);
         // check if id is true
         if (programId) {
             // find the assessment details in asssessment list based on the id in url
@@ -52,7 +51,7 @@ export default function Courses() {
             // set the data
             setProgramDetails(details);
         }
-    }, [programId, programList]);
+    }, [programList]);
 
     const toggleModal = () => {
         setIsOpen(!isOpen);
@@ -152,11 +151,12 @@ export default function Courses() {
 
             {/* Display courses */}
             <div className="w-full flex flex-wrap gap-5">
-                {/* {courseList?.length > 0 ? (
-                    courseList.map((course, index) => {
+                {programDetails?.courseList?.length > 0 ? (
+                    programDetails?.courseList.map((course) => {
                         return (
                             <CourseCard
-                                key={index}
+                                key={course.id}
+                                courseId={course.id}
                                 courseCode={course.courseCode}
                                 courseName={course.courseName}
                                 courseDescription={course.courseDescription}
@@ -168,9 +168,9 @@ export default function Courses() {
                         imgSrc={"/images/illustrations/blank_canvas.svg"}
                         text={`“Nothing to see here… yet! Add some content to get going.”`}
                     />
-                )} */}
+                )}
 
-                <CourseCard
+                {/* <CourseCard
                     courseId={1}
                     courseCode={"EDUC 101"}
                     courseName={"Facilitating Learners"}
@@ -193,7 +193,7 @@ export default function Courses() {
                     courseDescription={
                         "Lorem ipsum dolor Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea."
                     }
-                />
+                /> */}
             </div>
 
             {/* Display modal form */}

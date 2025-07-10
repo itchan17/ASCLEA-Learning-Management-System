@@ -155,8 +155,8 @@ export default function Materials() {
                     <div className="w-full h-[0.5px] bg-ascend-gray1"></div>
                 </div>
                 {isMaterialsExpanded &&
-                    materialList.map((material) => (
-                        <MaterialItem materialDetails={material} />
+                    materialList.map((material, index) => (
+                        <MaterialItem key={index} materialDetails={material} />
                     ))}
             </div>
             <div className="flex flex-col space-y-5">

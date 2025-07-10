@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
 import SecondaryButton from "../../../Components/Button/SecondaryButton";
 import AddCourse from "./CourseComponent/AddCourse";
@@ -55,6 +55,10 @@ export default function AddProgramForm({
     const toggleAddCourse = () => {
         setAddCourse(!addCourse);
     };
+
+    useEffect(() => {
+        console.log(courseList);
+    }, [courseList]);
 
     return (
         <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">

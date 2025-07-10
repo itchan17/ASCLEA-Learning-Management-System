@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PiNotebookFill } from "react-icons/pi";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import "../../../../../css/global.css";
 import { useRoute } from "ziggy-js";
 
@@ -13,6 +13,7 @@ export default function CourseCard({
     const [isExpanded, setIsExpanded] = useState(false);
 
     const route = useRoute();
+    const { programId } = usePage().props;
 
     const toggleExpanded = (e) => {
         e.stopPropagation();
@@ -20,7 +21,7 @@ export default function CourseCard({
     };
 
     const handleCardClick = () => {
-        router.visit(route("program.course.view", { programId: 1, courseId }), {
+        router.visit(route("program.course.view", { programId, courseId }), {
             preserveScroll: false,
         });
     };
@@ -44,7 +45,7 @@ export default function CourseCard({
                             {isExpanded
                                 ? courseDescription
                                 : `${courseDescription.slice(0, 80)}${
-                                      courseDescription.length > 80 && "..."
+                                      courseDescription.length > 80 ? "..." : ""
                                   }`}
                         </p>
                     )}
@@ -55,7 +56,7 @@ export default function CourseCard({
                                     onClick={toggleExpanded}
                                     className="text-size1 font-bold"
                                 >
-                                    {isExpanded ? " See less" : "See more"}
+                                    {isExpanded ? "See less" : "See more"}
                                 </span>
                             )}
                         </div>

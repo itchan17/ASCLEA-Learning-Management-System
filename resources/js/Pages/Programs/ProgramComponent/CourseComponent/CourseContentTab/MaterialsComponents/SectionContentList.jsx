@@ -6,10 +6,11 @@ import {
 } from "@dnd-kit/sortable";
 
 export default function SectionContentList({ sectionContent, sectionStatus }) {
+    const itemIds = sectionContent.map((item) => item.sortOrder);
     return (
         <div className="space-y-3">
             <SortableContext
-                items={sectionContent}
+                items={itemIds}
                 strategy={verticalListSortingStrategy}
             >
                 {sectionContent.map((content, index) => {
@@ -18,7 +19,7 @@ export default function SectionContentList({ sectionContent, sectionStatus }) {
                             disabled={
                                 sectionStatus === "published" ? true : false
                             }
-                            key={index}
+                            key={content.sortOrder}
                             contentDetails={content}
                         />
                     );

@@ -29,89 +29,9 @@ export default function Section({ sectionDetails }) {
     const [isMaterialFormOpen, setIsMaterialFormOpen] = useState(false);
     const [isAssessmentFormOpen, setIsAssessmentFormOpen] = useState(false);
     const [isButtonDisplayed, setIsButtonDisyplayed] = useState(false);
-    const [sectionContent, setSectionContent] = useState([
-        {
-            id: 1,
-            title: "Preliminary Assessment",
-            sortOrder: 1,
-        },
-        {
-            id: 2,
-            title: "Chapter 1: Introduction to Physics",
-            sortOrder: 2,
-        },
-        {
-            id: 3,
-            title: "Midterm Exam",
-            sortOrder: 3,
-        },
-        {
-            id: 4,
-            title: "Lesson: Newton's Laws of Motion",
-            sortOrder: 4,
-        },
-        {
-            id: 5,
-            title: "Final Assessment",
-            sortOrder: 5,
-        },
-        {
-            id: 6,
-            title: "Supplementary Material: Problem Solving Strategies",
-            sortOrder: 6,
-        },
-        {
-            id: 7,
-            title: "Chapter 2: Motion in One Dimension",
-            sortOrder: 7,
-        },
-        {
-            id: 8,
-            title: "Lesson: Displacement, Velocity, and Acceleration",
-            sortOrder: 8,
-        },
-        {
-            id: 9,
-            title: "Quiz: Kinematics",
-            sortOrder: 9,
-        },
-        {
-            id: 10,
-            title: "Chapter 3: Forces and Newton’s Laws",
-            sortOrder: 10,
-        },
-        {
-            id: 11,
-            title: "Lesson: Free-Body Diagrams",
-            sortOrder: 11,
-        },
-        {
-            id: 12,
-            title: "Lab Activity: Measuring Acceleration",
-            sortOrder: 12,
-        },
-        {
-            id: 13,
-            title: "Chapter 4: Work and Energy",
-            sortOrder: 13,
-        },
-        {
-            id: 14,
-            title: "Lesson: Kinetic and Potential Energy",
-            sortOrder: 14,
-        },
-        {
-            id: 15,
-            title: "Quiz: Work-Energy Theorem",
-            sortOrder: 15,
-        },
-        {
-            id: 16,
-            title: "Supplementary Material: Physics Formula Sheet",
-            sortOrder: 16,
-        },
-    ]);
-    const [origOrder, setOrigOrder] = useState(cloneDeep(sectionContent));
+    const [sectionContent, setSectionContent] = useState(
+        sectionDetails.sectionContentList
+    );
 
     // Pass to the material form component for cancelling the form
     const toggleOpenMaterialForm = () => {
@@ -173,24 +93,23 @@ export default function Section({ sectionDetails }) {
     const toggleArrow = () => {
         setIsMaterialFormOpen(false);
         setIsExpanded(!isExpanded);
-        setSectionContent(cloneDeep(origOrder));
         setIsButtonDisyplayed(false);
     };
+    console.log(sectionContent);
 
     // Helper function for getting the index
     const getSectionContentPos = (id) =>
-        sectionContent.findIndex((content) => content.id === id);
+        sectionContent.findIndex((content) => content.sortOrder === id);
 
     // Function for sorting the array
     const handleDragEnd = (event) => {
         const { active, over } = event;
 
         if (active.id === over.id) return;
+        const originalPos = getSectionContentPos(active.id);
+        const newPos = getSectionContentPos(over.id);
 
         setSectionContent((sectionContent) => {
-            const originalPos = getSectionContentPos(active.id);
-            const newPos = getSectionContentPos(over.id);
-
             const updatedOrder = arrayMove(
                 sectionContent,
                 originalPos,
@@ -223,27 +142,6 @@ export default function Section({ sectionDetails }) {
             },
         })
     );
-
-    useEffect(() => {
-        // Check if the array changed
-        if (!isEqual(origOrder, sectionContent)) {
-            console.log(sectionContent);
-            setIsButtonDisyplayed(true);
-            console.log("Section content changed!");
-        }
-    }, [sectionContent]);
-
-    const cancelSort = () => {
-        console.log(origOrder);
-        setSectionContent(cloneDeep(origOrder));
-        setIsButtonDisyplayed(false);
-    };
-
-    const saveNewOrder = () => {
-        setIsButtonDisyplayed(false);
-        setOrigOrder(cloneDeep(sectionContent));
-        console.log(origOrder);
-    };
 
     return (
         <div className="shadow-shadow1">
@@ -357,26 +255,12 @@ export default function Section({ sectionDetails }) {
                             collisionDetection={closestCorners}
                         >
                             <SectionContentList
-                                sectionContent={
-                                    sectionDetails.sectionContentList
-                                }
+                                sectionContent={sectionContent}
                                 sectionStatus={sectionDetails.sectionStatus}
                             />
                         </DndContext>
                     )}
                 </div>
-                {isButtonDisplayed && (
-                    <div className="flex justify-end gap-2 mt-2 mb-5 mx-5">
-                        <SecondaryButton
-                            doSomething={cancelSort}
-                            text={"Cancel"}
-                        />
-                        <PrimaryButton
-                            doSomething={saveNewOrder}
-                            text={"Save Order"}
-                        />
-                    </div>
-                )}
             </div>
         </div>
     );
