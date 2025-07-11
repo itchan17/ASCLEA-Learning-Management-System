@@ -1,9 +1,12 @@
 import { useState } from "react";
 import StudentDashboard from "./Student/StudentDashboard";
-import StaffDashboard from "./Staff/StaffDashboard";
+import AdminDashboard from "./Admin/AdminDashboard";
+import FacultyDashboard from "./Faculty/FacultyDashboard";
+import useUserStore from "../../Stores/User/userStore";
 
 export default function Dashboard() {
-    const [isStudent, setIsStudent] = useState(true);
+    const [isStudent, setIsStudent] = useState(false);
+    const user = useUserStore((state) => state.user);
 
     console.log("Render Dashboard");
     return (
@@ -21,7 +24,13 @@ export default function Dashboard() {
                 <h1 className="text-size6 font-bold">Analytics Overview</h1>
             </div>
 
-            {isStudent ? <StudentDashboard /> : <StaffDashboard />}
+            {user && user?.role === "student" ? (
+                <StudentDashboard />
+            ) : user?.role === "admin" ? (
+                <AdminDashboard />
+            ) : (
+                <FacultyDashboard />
+            )}
         </div>
     );
 }

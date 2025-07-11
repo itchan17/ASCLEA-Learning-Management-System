@@ -4,6 +4,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import "../../../../css/global.css";
 import { useRoute } from "ziggy-js";
 import useProgramStore from "../../../Stores/Programs/programStore";
+import { closeDropDown } from "../../../Utils/closeDropdown";
 
 export default function ProgramCard({
     programDetails,
@@ -29,20 +30,14 @@ export default function ProgramCard({
         setEditProgram(true);
 
         // Close the dropdown after clicked
-        const elem = document.activeElement;
-        if (elem) {
-            elem?.blur();
-        }
+        closeDropDown();
     };
 
     const handleArchiveClick = () => {
         deleteProgram(programDetails.id);
 
         // Close the dropdown after clicked
-        const elem = document.activeElement;
-        if (elem) {
-            elem?.blur();
-        }
+        closeDropDown();
     };
     return (
         <div

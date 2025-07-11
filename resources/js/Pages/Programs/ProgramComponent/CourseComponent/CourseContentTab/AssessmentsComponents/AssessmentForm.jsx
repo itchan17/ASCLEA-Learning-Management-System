@@ -6,7 +6,7 @@ import useAssessmentsStore from "../../../../../../Stores/Programs/CourseContent
 import CustomSelect from "../../../../../../Components/CustomInputField/CustomSelect";
 import { AiFillFileAdd } from "react-icons/ai";
 import "../../../../../../../css/global.css";
-import DropFiles from "../../DropFiles";
+import DropFiles from "../../../../../../Components/DragNDropFiles/DropFiles";
 import FileCard from "../../FileCard";
 import { SiGoogleforms } from "react-icons/si";
 import { router, usePage } from "@inertiajs/react";

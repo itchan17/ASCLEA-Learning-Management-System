@@ -1,36 +1,57 @@
-import React from "react";
 import { useState } from "react";
-import PrimaryButton from "../../../Components/Button/PrimaryButton";
-import SecondaryButton from "../../../Components/Button/SecondaryButton";
+import PrimaryButton from "../../Components/Button/PrimaryButton";
+import SecondaryButton from "../../Components/Button/SecondaryButton";
+import BackButton from "../../Components/Button/BackButton";
+import { handleClickBackBtn } from "../../Utils/handleClickBackBtn";
+import CustomSelect from "../../Components/CustomInputField/CustomSelect";
+import { BiSolidEditAlt } from "react-icons/bi";
+import useUserStore from "../../Stores/User/userStore";
 
-const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
+export default function Profile() {
+    const user = useUserStore((state) => state.user);
+    const [isEdit, setIsEdit] = useState(false);
+
+    const toggleEdit = () => setIsEdit(!isEdit);
+
     return (
-        <>
-            <div className="flex justify-end items-center">
-                {isEditDisabled ? (
-                    <PrimaryButton
-                        text="Edit"
-                        btnColor="bg-ascend-blue"
-                        doSomething={() => setIsEditDisabled(false)}
-                    />
-                ) : (
-                    <div className="flex gap-3">
-                        <SecondaryButton
-                            text="Cancel"
-                            btnColor="bg-ascend-red"
-                            doSomething={() => setIsEditDisabled(true)}
-                        />
+        <div className="space-y-5">
+            <div className="flex flex-wrap items-center justify-between">
+                <BackButton doSomething={handleClickBackBtn} />
 
-                        <PrimaryButton
-                            text="Save"
-                            btnColor="bg-ascend-blue"
-                            doSomething={() => setIsEditDisabled(true)}
+                {isEdit ? (
+                    <div className="flex gap-2">
+                        <SecondaryButton
+                            doSomething={toggleEdit}
+                            text={"Cancel"}
                         />
+                        <PrimaryButton doSomething={toggleEdit} text={"Save"} />
                     </div>
+                ) : (
+                    <PrimaryButton doSomething={toggleEdit} text={"Edit"} />
                 )}
             </div>
 
-            <form autoComplete="off">
+            <div className="justify-start flex items-center mt-5">
+                <div className="relative w-18 h-18 bg-ascend-gray1 rounded-full">
+                    <label htmlFor="inputBg">
+                        <BiSolidEditAlt className="text-size4 text-ascend-black absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer" />
+                    </label>
+                    <input className="hidden" type="file" id="inputBg" />
+                </div>
+                <div className="flex flex-col ml-2">
+                    <div className="flex items-center">
+                        <div className="font-nunito-sans text-size4 ml-5 font-bold">
+                            {`${user?.firstName} ${user?.lastName}`}
+                        </div>
+                    </div>
+                    <div className="font-nunito-sans text-size2 ml-5">
+                        {user?.role.charAt(0).toUpperCase() +
+                            user?.role.slice(1)}
+                    </div>
+                </div>
+            </div>
+
+            <form className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                     <div className="flex flex-col">
                         <label className="font-nunito-sans text-size2 text-ascend-black">
@@ -38,10 +59,10 @@ const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
                         </label>
                         <input
                             type="text"
-                            disabled={isEditDisabled}
-                            value={student.last_name}
+                            value={user?.lastName}
+                            disabled={!isEdit}
                             className={`border px-3 py-2 ${
-                                isEditDisabled ? "text-ascend-gray1" : ""
+                                !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
                     </div>
@@ -51,10 +72,10 @@ const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
                         </label>
                         <input
                             type="text"
-                            disabled={isEditDisabled}
-                            value={student.first_name}
+                            value={user?.firstName}
+                            disabled={!isEdit}
                             className={`border px-3 py-2 ${
-                                isEditDisabled ? "text-ascend-gray1" : ""
+                                !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
                     </div>
@@ -64,48 +85,12 @@ const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
                         </label>
                         <input
                             type="text"
-                            disabled={isEditDisabled}
-                            value={student.middle_name}
+                            value={user?.middleName}
+                            disabled={!isEdit}
                             className={`border px-3 py-2 ${
-                                isEditDisabled ? "text-ascend-gray1" : ""
+                                !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5">
-                    <div className="flex flex-col">
-                        <label className="font-nunito-sans text-size2 text-ascend-black">
-                            Program
-                        </label>
-                        <select
-                            className={`textField border px-3 py-2 ${
-                                isEditDisabled ? "text-ascend-gray1" : ""
-                            } border-ascend-gray1 focus:outline-ascend-blue`}
-                            value={student.program}
-                            disabled={isEditDisabled}
-                        >
-                            <option value="">Select Program</option>
-                            <option value="program1">Program 1</option>
-                            <option value="program2">Program 2</option>
-                        </select>
-                    </div>
-                    <div className="flex flex-col">
-                        <label className="font-nunito-sans text-size2 text-ascend-black">
-                            Status
-                        </label>
-                        <select
-                            className={`textField border px-3 py-2 ${
-                                isEditDisabled ? "text-ascend-gray1" : ""
-                            } border-ascend-gray1 focus:outline-ascend-blue`}
-                            value={student.status}
-                            disabled={isEditDisabled}
-                        >
-                            <option value="">Select Status</option>
-                            <option value="enrolled">Enrolled</option>
-                            <option value="dropped">Drop</option>
-                            <option value="withdraw">withdraw</option>
-                        </select>
                     </div>
                 </div>
 
@@ -116,10 +101,10 @@ const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
                         </label>
                         <input
                             type="text"
-                            value={student.phone}
-                            disabled={isEditDisabled}
+                            value={user?.phone}
+                            disabled={!isEdit}
                             className={`border px-3 py-2 ${
-                                isEditDisabled ? "text-ascend-gray1" : ""
+                                !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
                     </div>
@@ -129,10 +114,10 @@ const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
                         </label>
                         <input
                             type="text"
-                            value={student.email}
-                            disabled={isEditDisabled}
+                            value={user?.email}
+                            disabled={!isEdit}
                             className={`border px-3 py-2 ${
-                                isEditDisabled ? "text-ascend-gray1" : ""
+                                !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
                     </div>
@@ -145,10 +130,10 @@ const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
                         </label>
                         <input
                             type="date"
-                            value={student.birthday}
-                            disabled={isEditDisabled}
+                            value={user?.birthday}
+                            disabled={!isEdit}
                             className={`border px-3 py-2 ${
-                                isEditDisabled ? "text-ascend-gray1" : ""
+                                !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
                     </div>
@@ -157,11 +142,11 @@ const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
                             Gender
                         </label>
                         <select
+                            value={user?.gender}
                             className={`textField border px-3 py-2  ${
-                                isEditDisabled ? "text-ascend-gray1" : ""
+                                !isEdit ? "text-ascend-gray1" : ""
                             }  border-ascend-gray1 focus:outline-ascend-blue`}
-                            value={student.gender}
-                            disabled={isEditDisabled}
+                            disabled={!isEdit}
                         >
                             <option value="">Select Gender</option>
                             <option value="male">Male</option>
@@ -178,10 +163,10 @@ const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
                         </label>
                         <input
                             type="text"
-                            value={student.house_no_st}
-                            disabled={isEditDisabled}
+                            value={user?.houseNoSt}
+                            disabled={!isEdit}
                             className={`border px-3 py-2 ${
-                                isEditDisabled ? "text-ascend-gray1" : ""
+                                !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
                     </div>
@@ -193,11 +178,11 @@ const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
                             Province
                         </label>
                         <select
+                            value={user?.province}
                             className={`textField border px-3 py-2 ${
-                                isEditDisabled ? "text-ascend-gray1" : ""
+                                !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
-                            value={student.province}
-                            disabled={isEditDisabled}
+                            disabled={!isEdit}
                         >
                             <option value="">Select Province</option>
                             <option value="metro_manila">Metro Manila</option>
@@ -208,11 +193,11 @@ const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
                             City
                         </label>
                         <select
+                            value={user?.city}
                             className={`textField border px-3 py-2 ${
-                                isEditDisabled ? "text-ascend-gray1" : ""
+                                !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
-                            value={student.city}
-                            disabled={isEditDisabled}
+                            disabled={!isEdit}
                         >
                             <option value="">Select City</option>
                             <option value="quezon_city">Quezon City</option>
@@ -224,11 +209,11 @@ const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
                             Barangay
                         </label>
                         <select
+                            value={user?.barangay}
                             className={`textField border px-3 py-2 ${
-                                isEditDisabled ? "text-ascend-gray1" : ""
+                                !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
-                            value={student.barangay}
-                            disabled={isEditDisabled}
+                            disabled={!isEdit}
                         >
                             <option value="">Select Barangay</option>
                             <option value="barangay_1">Barangay 1</option>
@@ -236,8 +221,6 @@ const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
                     </div>
                 </div>
             </form>
-        </>
+        </div>
     );
-};
-
-export default DataFormFields;
+}

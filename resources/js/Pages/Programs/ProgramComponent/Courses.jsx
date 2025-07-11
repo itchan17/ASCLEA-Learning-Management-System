@@ -169,31 +169,6 @@ export default function Courses() {
                         text={`“Nothing to see here… yet! Add some content to get going.”`}
                     />
                 )}
-
-                {/* <CourseCard
-                    courseId={1}
-                    courseCode={"EDUC 101"}
-                    courseName={"Facilitating Learners"}
-                    courseDescription={
-                        "Lorem ipsum dolor Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea."
-                    }
-                />
-                <CourseCard
-                    courseId={2}
-                    courseCode={"EDUC 101"}
-                    courseName={"Facilitating Learners"}
-                    courseDescription={
-                        "Lorem ipsum dolor Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea."
-                    }
-                />
-                <CourseCard
-                    courseId={3}
-                    courseCode={"EDUC 101"}
-                    courseName={"Facilitating Learners"}
-                    courseDescription={
-                        "Lorem ipsum dolor Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea."
-                    }
-                /> */}
             </div>
 
             {/* Display modal form */}

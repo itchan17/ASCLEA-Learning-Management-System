@@ -4,6 +4,7 @@ import AddProgramForm from "./ProgramComponent/AddProgramForm";
 import useProgramStore from "../../Stores/Programs/programStore";
 import ProgramCard from "./ProgramComponent/ProgramCard";
 import EmptyState from "../../Components/EmptyState/EmptyState";
+import RoleGuard from "../../Components/Auth/RoleGuard";
 
 export default function Programs() {
     // Program Store
@@ -29,7 +30,7 @@ export default function Programs() {
     }, [editProgram]);
 
     return (
-        <>
+        <RoleGuard allowedRoles={["admin", "faculty", "student"]}>
             <div className="font-nunito-sans space-y-5">
                 <div className="flex justify-end">
                     <PrimaryButton
@@ -68,6 +69,6 @@ export default function Programs() {
                     />
                 )}
             </div>
-        </>
+        </RoleGuard>
     );
 }

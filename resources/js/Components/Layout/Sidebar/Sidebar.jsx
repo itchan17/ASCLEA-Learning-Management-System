@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import SidebarLink from "./SidebarLink";
+import useUserStore from "../../../Stores/User/userStore";
 
 // Icon
 import {
@@ -19,9 +20,8 @@ export default function Sidebar({
     isMdScreen,
     closeSidebar,
 }) {
+    const user = useUserStore((state) => state.user);
     const [expanded, setExpanded] = useState(true);
-
-    const userRole = "admin";
 
     const links = [
         {
@@ -147,15 +147,24 @@ export default function Sidebar({
                     </button>
                 )}
             </div>
-
+            {/* link.roles.includes(user?.role) */}
             {/* Links */}
             <ul className="flex-1 py-6 space-y-6 font-nunito-sans font-semibold overflow-y-auto">
                 {links
-                    // .filter(
-                    //     (link) =>
-                    //         Array.isArray(link.roles) &&
-                    //         link.roles.includes(userRole)
-                    // )
+                    .filter((link) => {
+                        if (
+                            Array.isArray(link.roles) &&
+                            link.roles.includes(user?.role)
+                        ) {
+                            if (user?.role === "student") {
+                                return user?.verified ||
+                                    link.url === "/admission"
+                                    ? link
+                                    : null;
+                            }
+                            return link;
+                        }
+                    })
                     .map((link, index) => {
                         return (
                             <li key={index}>
