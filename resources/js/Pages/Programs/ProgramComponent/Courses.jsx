@@ -11,6 +11,7 @@ import { router, usePage } from "@inertiajs/react";
 import useProgramStore from "../../../Stores/Programs/programStore";
 import AddProgramForm from "./AddProgramForm";
 import { useRoute } from "ziggy-js";
+import RoleGuard from "../../../Components/Auth/RoleGuard";
 
 export default function Courses() {
     const route = useRoute();
@@ -94,42 +95,45 @@ export default function Courses() {
     return (
         <div className="w-full space-y-5 font-nunito-sans text-ascend-black">
             <div className="relative bg-ascend-gray1 w-full h-50 rounded-tl-xl rounded-br-xl">
-                <label htmlFor="inputBg">
-                    <IoImageSharp className="text-size4 text-ascend-black absolute top-2 right-2 cursor-pointer" />
-                </label>
-                <input className="hidden" type="file" id="inputBg" />
+                <RoleGuard allowedRoles={["admin"]}>
+                    <label htmlFor="inputBg">
+                        <IoImageSharp className="text-size4 text-ascend-black absolute top-2 right-2 cursor-pointer" />
+                    </label>
+                    <input className="hidden" type="file" id="inputBg" />
+                </RoleGuard>
             </div>
             <div className="space-y-1 pb-5 border-b border-ascend-gray1">
                 <div className="flex items-start gap-2 md:gap-20">
                     <h1 className="flex-1 min-w-0 text-size7 break-words font-semibold">
                         {programDetails?.programName}
                     </h1>
+                    <RoleGuard allowedRoles={["admin"]}>
+                        <div className="dropdown dropdown-end cursor-pointer ">
+                            <div
+                                tabIndex={0}
+                                role="button"
+                                className="rounded-4xl p-3 hover:bg-ascend-lightblue transition-all duration-300"
+                            >
+                                <BsThreeDotsVertical className="text-size5 text-ascend-black" />
+                            </div>
 
-                    <div className="dropdown dropdown-end cursor-pointer ">
-                        <div
-                            tabIndex={0}
-                            role="button"
-                            className="rounded-4xl p-3 hover:bg-ascend-lightblue transition-all duration-300"
-                        >
-                            <BsThreeDotsVertical className="text-size5 text-ascend-black" />
+                            <ul
+                                tabIndex={0}
+                                className="dropdown-content menu bg-ascend-white w-36 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                            >
+                                <li onClick={handleEditClick}>
+                                    <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        Edit program
+                                    </a>
+                                </li>
+                                <li onClick={handleArchiveClick}>
+                                    <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        Archive Program
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
-
-                        <ul
-                            tabIndex={0}
-                            className="dropdown-content menu bg-ascend-white w-36 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-                        >
-                            <li onClick={handleEditClick}>
-                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Edit program
-                                </a>
-                            </li>
-                            <li onClick={handleArchiveClick}>
-                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Archive Program
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                    </RoleGuard>
                 </div>
 
                 <p className="break-words">
@@ -146,7 +150,12 @@ export default function Courses() {
                         </select>
                     }
                 />
-                <PrimaryButton doSomething={toggleModal} text={"Add Course"} />
+                <RoleGuard allowedRoles={["admin"]}>
+                    <PrimaryButton
+                        doSomething={toggleModal}
+                        text={"Add Course"}
+                    />
+                </RoleGuard>
             </div>
 
             {/* Display courses */}

@@ -18,6 +18,7 @@ import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
 import SecondaryButton from "../../../../../../Components/Button/SecondaryButton";
 import { isEqual, cloneDeep } from "lodash";
 import useModulesStore from "../../../../../../Stores/Programs/CourseContent/modulesStore";
+import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
 
 export default function Section({ sectionDetails }) {
     // Modules store
@@ -173,49 +174,51 @@ export default function Section({ sectionDetails }) {
                         </div>
                     )}
                 </div>
+                <RoleGuard allowedRoles={["admin", "faculty"]}>
+                    <div className="dropdown dropdown-end cursor-pointer">
+                        <div
+                            tabIndex={0}
+                            role="button"
+                            className="rounded-4xl p-1 -mr-1 transition-all duration-300 hover:bg-ascend-lightblue/10"
+                        >
+                            <BsThreeDotsVertical className="text-size3" />
+                        </div>
 
-                <div className="dropdown dropdown-end cursor-pointer">
-                    <div
-                        tabIndex={0}
-                        role="button"
-                        className="rounded-4xl p-1 -mr-1 transition-all duration-300 hover:bg-ascend-lightblue/10"
-                    >
-                        <BsThreeDotsVertical className="text-size3" />
+                        <ul
+                            tabIndex={0}
+                            className="dropdown-content menu font-bold space-y-2 bg-ascend-white min-w-36 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                        >
+                            <li onClick={handleUpdateStatus}>
+                                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                    {sectionDetails.sectionStatus ===
+                                    "published"
+                                        ? "Unpublish"
+                                        : "Publish"}
+                                </a>
+                            </li>
+                            <li name="add-material" onClick={openForm}>
+                                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                    Add material
+                                </a>
+                            </li>
+                            <li name="add-assessment" onClick={openForm}>
+                                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                    Add assessment
+                                </a>
+                            </li>
+                            <li>
+                                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                    Edit section title
+                                </a>
+                            </li>
+                            <li>
+                                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                    Delete section
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-
-                    <ul
-                        tabIndex={0}
-                        className="dropdown-content menu font-bold space-y-2 bg-ascend-white min-w-36 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-                    >
-                        <li onClick={handleUpdateStatus}>
-                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                {sectionDetails.sectionStatus === "published"
-                                    ? "Unpublish"
-                                    : "Publish"}
-                            </a>
-                        </li>
-                        <li name="add-material" onClick={openForm}>
-                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                Add material
-                            </a>
-                        </li>
-                        <li name="add-assessment" onClick={openForm}>
-                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                Add assessment
-                            </a>
-                        </li>
-                        <li>
-                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                Edit section title
-                            </a>
-                        </li>
-                        <li>
-                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                Delete section
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                </RoleGuard>
             </div>
 
             <div

@@ -5,6 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import { MdOutlineDragIndicator } from "react-icons/md";
+import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
 
 export default function SectionContent({ disabled, contentDetails }) {
     const route = useRoute();
@@ -100,34 +101,36 @@ export default function SectionContent({ disabled, contentDetails }) {
                         : contentDetails.assessmentTitle}
                 </h1>
 
-                <div
-                    onClick={stopPropagation}
-                    className="dropdown dropdown-end cursor-pointer"
-                >
+                <RoleGuard allowedRoles={["admin", "faculty"]}>
                     <div
-                        tabIndex={0}
-                        role="button"
-                        className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue transition-all duration-300"
+                        onClick={stopPropagation}
+                        className="dropdown dropdown-end cursor-pointer"
                     >
-                        <BsThreeDotsVertical className="text-size3" />
-                    </div>
+                        <div
+                            tabIndex={0}
+                            role="button"
+                            className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue transition-all duration-300"
+                        >
+                            <BsThreeDotsVertical className="text-size3" />
+                        </div>
 
-                    <ul
-                        tabIndex={0}
-                        className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-                    >
-                        <li>
-                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                Edit
-                            </a>
-                        </li>
-                        <li>
-                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                Delete
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                        <ul
+                            tabIndex={0}
+                            className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                        >
+                            <li>
+                                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                    Edit
+                                </a>
+                            </li>
+                            <li>
+                                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                    Delete
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </RoleGuard>
             </div>
         </div>
     );

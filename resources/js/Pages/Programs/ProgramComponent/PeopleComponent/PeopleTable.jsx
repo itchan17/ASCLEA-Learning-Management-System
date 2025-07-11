@@ -5,6 +5,7 @@ import { router } from "@inertiajs/react";
 import CustomSelect from "../../../../Components/CustomInputField/CustomSelect";
 import { IoSearch } from "react-icons/io5";
 import { useRoute } from "ziggy-js";
+import RoleGuard from "../../../../Components/Auth/RoleGuard";
 
 export default function PeopleTable() {
     // People Store
@@ -67,11 +68,13 @@ export default function PeopleTable() {
                                     </td>
                                     <td>{p.role}</td>
                                     <td>{p.email}</td>
-                                    <td>
-                                        <span className="text-ascend-red underline">
-                                            Remove
-                                        </span>
-                                    </td>
+                                    <RoleGuard allowedRoles={["admin"]}>
+                                        <td>
+                                            <span className="text-ascend-red underline">
+                                                Remove
+                                            </span>
+                                        </td>
+                                    </RoleGuard>
                                 </tr>
                             ))}
                         </tbody>

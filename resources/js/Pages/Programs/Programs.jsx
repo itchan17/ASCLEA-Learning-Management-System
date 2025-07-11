@@ -30,45 +30,45 @@ export default function Programs() {
     }, [editProgram]);
 
     return (
-        <RoleGuard allowedRoles={["admin", "faculty", "student"]}>
-            <div className="font-nunito-sans space-y-5">
+        <div className="font-nunito-sans space-y-5">
+            <RoleGuard allowedRoles={["admin", "faculty"]}>
                 <div className="flex justify-end">
                     <PrimaryButton
                         doSomething={toggleModal}
                         text={"Add Program"}
                     />
                 </div>
+            </RoleGuard>
 
-                {/* Display created program */}
-                <div className="w-full flex flex-wrap gap-5">
-                    {programList?.length > 0 ? (
-                        programList.map((program, index) => {
-                            return (
-                                <ProgramCard
-                                    key={index}
-                                    programDetails={program}
-                                    setIsModalOpen={setIsModalOpen}
-                                    setEditProgram={setEditProgram}
-                                />
-                            );
-                        })
-                    ) : (
-                        <EmptyState
-                            imgSrc={"/images/illustrations/launch.svg"}
-                            text={`“No programs? Time to fill this space to start learning
+            {/* Display created program */}
+            <div className="w-full flex flex-wrap gap-5">
+                {programList?.length > 0 ? (
+                    programList.map((program, index) => {
+                        return (
+                            <ProgramCard
+                                key={index}
+                                programDetails={program}
+                                setIsModalOpen={setIsModalOpen}
+                                setEditProgram={setEditProgram}
+                            />
+                        );
+                    })
+                ) : (
+                    <EmptyState
+                        imgSrc={"/images/illustrations/launch.svg"}
+                        text={`“No programs? Time to fill this space to start learning
                 adventures!”`}
-                        />
-                    )}
-                </div>
-
-                {isModalOpen && (
-                    <AddProgramForm
-                        editProgram={editProgram}
-                        setEditProgram={setEditProgram}
-                        toggleModal={toggleModal}
                     />
                 )}
             </div>
-        </RoleGuard>
+
+            {isModalOpen && (
+                <AddProgramForm
+                    editProgram={editProgram}
+                    setEditProgram={setEditProgram}
+                    toggleModal={toggleModal}
+                />
+            )}
+        </div>
     );
 }

@@ -10,6 +10,7 @@ import { useRoute } from "ziggy-js";
 import useProgramStore from "../../../../../Stores/Programs/programStore";
 import useCourseStore from "../../../../../Stores/Programs/courseStore";
 import AddCourseForm from "../AddCourseForm";
+import RoleGuard from "../../../../../Components/Auth/RoleGuard";
 
 export default function Home() {
     const route = useRoute();
@@ -102,31 +103,33 @@ export default function Home() {
                         }${courseDetails?.courseName}`}
                     </h1>
 
-                    <div className="dropdown dropdown-end cursor-pointer ">
-                        <div
-                            tabIndex={0}
-                            role="button"
-                            className="rounded-4xl p-3 hover:bg-ascend-lightblue transition-all duration-300"
-                        >
-                            <BsThreeDotsVertical className="text-size5 text-ascend-black" />
-                        </div>
+                    <RoleGuard allowedRoles={["admin"]}>
+                        <div className="dropdown dropdown-end cursor-pointer ">
+                            <div
+                                tabIndex={0}
+                                role="button"
+                                className="rounded-4xl p-3 hover:bg-ascend-lightblue transition-all duration-300"
+                            >
+                                <BsThreeDotsVertical className="text-size5 text-ascend-black" />
+                            </div>
 
-                        <ul
-                            tabIndex={0}
-                            className="dropdown-content menu text-size2 bg-ascend-white min-w-36 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-                        >
-                            <li onClick={handleEditClick}>
-                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Edit course
-                                </a>
-                            </li>
-                            <li onClick={handleArchiveCourse}>
-                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Archive course
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                            <ul
+                                tabIndex={0}
+                                className="dropdown-content menu text-size2 bg-ascend-white min-w-36 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                            >
+                                <li onClick={handleEditClick}>
+                                    <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        Edit course
+                                    </a>
+                                </li>
+                                <li onClick={handleArchiveCourse}>
+                                    <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        Archive course
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </RoleGuard>
                 </div>
 
                 <p className="break-words">
@@ -136,11 +139,13 @@ export default function Home() {
             <div className="flex flex-wrap gap-2 justify-between items-center">
                 <h1 className="text-size6 font-bold">Home</h1>
 
-                <PrimaryButton
-                    isDisabled={isFormOpen}
-                    doSomething={toggleForm}
-                    text="Write a Post"
-                />
+                <RoleGuard allowedRoles={["admin", "faculty"]}>
+                    <PrimaryButton
+                        isDisabled={isFormOpen}
+                        doSomething={toggleForm}
+                        text="Write a Post"
+                    />
+                </RoleGuard>
             </div>
 
             {isFormOpen && (
