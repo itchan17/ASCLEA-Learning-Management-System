@@ -22,3 +22,17 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+
+# Ignore Python virtual environments
+cvpython/
+venv/
+
+# Byte-compiled / cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS-specific
+.DS_Store

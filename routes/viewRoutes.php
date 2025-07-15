@@ -177,7 +177,10 @@ Route::get('/accounting/studentpaymenthistory/{paymentId}', function ($paymentId
     ]);
 })->name('accounting.paymentInfo.view');
 
-
+// Route for CV Testing
+Route::get('/CV_Test', function () {
+    return Inertia::render('TrialCV/CV_Testing');
+})->name('CV_Test.view');
 
 
 
