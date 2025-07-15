@@ -32,7 +32,7 @@ export default function LandingpageNav() {
                         { label: "Home", href: "home" },
                         { label: "About Us", href: "about-us" },
                         { label: "Programs", href: "programs" },
-                        { label: "Admission", href: "admission" },
+                        { label: "FAQ", href: "frequently-asked-questions" },
                         { label: "Contact", href: "contact" },
                     ].map((item) => (
                         <li key={item.href}>
@@ -59,7 +59,7 @@ export default function LandingpageNav() {
                     </Link>
 
                     <Link href={"/registration"}>
-                        <PrimaryButton text={"Enroll"} />
+                        <PrimaryButton text={"Register"} />
                     </Link>
                 </div>
                 <button
@@ -101,7 +101,7 @@ export default function LandingpageNav() {
                         { label: "Home", href: "home" },
                         { label: "About Us", href: "about-us" },
                         { label: "Programs", href: "programs" },
-                        { label: "Admission", href: "admission" },
+                        { label: "FAQ", href: "frequently-asked-questions" },
                         { label: "Contact", href: "contact" },
                     ].map((item) => (
                         <li key={item.href}>
@@ -129,7 +129,7 @@ export default function LandingpageNav() {
                     </Link>
 
                     <Link href={"/registration"}>
-                        <PrimaryButton text={"Enroll"} />
+                        <PrimaryButton text={"Register"} />
                     </Link>
                 </div>
             </menu>
