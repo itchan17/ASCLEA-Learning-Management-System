@@ -182,6 +182,10 @@ Route::get('/administration', function () {
     return Inertia::render('Administration/Administration');
 })->name('administration.index');
 
+Route::get('/administration/{userId}', function ($userId) {
+    return Inertia::render('Administration/AdministrationComponents/ViewStaff', ['userId' => $userId,]);
+})->name('administration.view');
+
 // Route for Viewing Administration Page
 Route::get('/archives', function () {
     return Inertia::render('Archives/Archives');

@@ -3,13 +3,14 @@ import BackButton from "../../../../Components/Button/BackButton";
 import PrimaryButton from "../../../../Components/Button/PrimaryButton";
 import { IoSearch } from "react-icons/io5";
 import AssignCourseForm from "./AssignCourseForm";
-import useUserStore from "../../../../Stores/Programs/userStore";
+import useCourseList from "../../../../Stores/Programs/courseLIstStore";
 import { handleClickBackBtn } from "../../../../Utils/handleClickBackBtn";
 import RoleGuard from "../../../../Components/Auth/RoleGuard";
+import EmptyState from "../../../../Components/EmptyState/EmptyState";
 
 export default function ViewUser() {
     // User Store
-    const courseList = useUserStore((state) => state.courseList);
+    const courseList = useCourseList((state) => state.courseList);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -77,6 +78,12 @@ export default function ViewUser() {
                             ))}
                     </tbody>
                 </table>
+                {courseList?.length === 0 && (
+                    <EmptyState
+                        imgSrc={"/images/illustrations/not_assigned.svg"}
+                        text={`No assigned courses found. Click Assign Course to get your students started.`}
+                    />
+                )}
             </div>
 
             {isModalOpen && <AssignCourseForm toggleModal={toggleModal} />}

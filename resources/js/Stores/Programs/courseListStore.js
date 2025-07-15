@@ -1,18 +1,13 @@
 import { create } from "zustand";
 
-const useUserStore = create((set) => ({
-    courseList: [
-        {
-            id: 1,
-            courseCode: "Educ 101",
-            courseName: "Facilitating Learners",
-            courseStatus: "Ongoing",
-        },
-    ],
+// This is a temporrary store for listing the assigned courses to the student or faculty
+
+const useCourseList = create((set) => ({
+    courseList: [],
     addedCourseList: [],
 
     handleAddCourseChange: (newCourse) => {
-        const { addedCourseList } = useUserStore.getState();
+        const { addedCourseList } = useCourseList.getState();
 
         const updatedAddedCourses = addedCourseList.some(
             (p) => p.id === newCourse.id
@@ -27,7 +22,7 @@ const useUserStore = create((set) => ({
     },
 
     clearAddedCourseList: () => {
-        const { addedCourseList } = useUserStore.getState();
+        const { addedCourseList } = useCourseList.getState();
 
         set({
             addedCourseList: [],
@@ -36,7 +31,7 @@ const useUserStore = create((set) => ({
 
     handleAddCourse: () => {
         const { addedCourseList, courseList, clearAddedCourseList } =
-            useUserStore.getState();
+            useCourseList.getState();
         set({
             courseList: [...courseList, ...addedCourseList],
         });
@@ -45,4 +40,4 @@ const useUserStore = create((set) => ({
     },
 }));
 
-export default useUserStore;
+export default useCourseList;

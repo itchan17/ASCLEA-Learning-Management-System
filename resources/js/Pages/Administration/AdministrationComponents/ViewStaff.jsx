@@ -1,22 +1,71 @@
-import { useState } from "react";
-import PrimaryButton from "../../Components/Button/PrimaryButton";
-import SecondaryButton from "../../Components/Button/SecondaryButton";
-import BackButton from "../../Components/Button/BackButton";
-import { handleClickBackBtn } from "../../Utils/handleClickBackBtn";
+import { useState, useEffect } from "react";
+import PrimaryButton from "../../../Components/Button/PrimaryButton";
+import SecondaryButton from "../../../Components/Button/SecondaryButton";
+import BackButton from "../../../Components/Button/BackButton";
+import { handleClickBackBtn } from "../../../Utils/handleClickBackBtn";
 import { BiSolidEditAlt } from "react-icons/bi";
-import useUserStore from "../../Stores/User/userStore";
+import useAdministrationStore from "../../../Stores/Administration/administrationStore";
+import { usePage } from "@inertiajs/react";
+import AssignedCourses from "./AssignedCourses";
 
-export default function Profile() {
-    const user = useUserStore((state) => state.user);
+export default function ViewStaff() {
+    const staffList = useAdministrationStore((state) => state.staffList);
     const [isEdit, setIsEdit] = useState(false);
+    const [staffDetails, setStaffDetails] = useState(null);
+
+    // get the id from url
+    const { userId } = usePage().props;
 
     const toggleEdit = () => setIsEdit(!isEdit);
 
+    // temporarily get the data of selected staff
+    useEffect(() => {
+        // check if id is true
+        if (userId) {
+            // find the assessment details in asssessment list based on the id in url
+            // this in temporary only as there's currently data passed from backend
+            // the data will come from the backend and here's we're it will be set
+            const details = staffList.find(
+                (detail) => detail.id === Number(userId)
+            );
+            console.log(details);
+            // set the data
+            setStaffDetails(details);
+        }
+    }, []);
+
     return (
-        <div className="space-y-5">
+        <div className="space-y-5 font-nunito-sans">
             <div className="flex flex-wrap items-center justify-between">
                 <BackButton doSomething={handleClickBackBtn} />
+                <PrimaryButton btnColor={"bg-ascend-red"} text={"Archive"} />
+            </div>
 
+            <div className="flex flex-wrap gap-5 items-center justify-between">
+                <div className="justify-start flex items-center">
+                    <div className="relative w-18 h-18 bg-ascend-gray1 rounded-full shrink-0">
+                        <label htmlFor="inputBg">
+                            <BiSolidEditAlt className="text-size4 text-ascend-black absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer" />
+                        </label>
+                        <input className="hidden" type="file" id="inputBg" />
+                    </div>
+                    <div className="flex flex-col ml-2">
+                        <div className="flex items-center gap-2">
+                            <div className="font-nunito-sans text-size4 ml-5 font-bold">
+                                {`${staffDetails?.firstName} ${staffDetails?.lastName}`}
+                            </div>
+                            <div className="bg-ascend-blue text-ascend-white px-5 text-center">
+                                Active
+                            </div>
+                        </div>
+                        <div className="font-nunito-sans text-size2 ml-5">
+                            {staffDetails?.role
+                                ? staffDetails.role.charAt(0).toUpperCase() +
+                                  staffDetails.role.slice(1)
+                                : ""}
+                        </div>
+                    </div>
+                </div>
                 {isEdit ? (
                     <div className="flex gap-2">
                         <SecondaryButton
@@ -29,25 +78,14 @@ export default function Profile() {
                     <PrimaryButton doSomething={toggleEdit} text={"Edit"} />
                 )}
             </div>
-
-            <div className="justify-start flex items-center mt-5">
-                <div className="relative w-18 h-18 bg-ascend-gray1 rounded-full">
-                    <label htmlFor="inputBg">
-                        <BiSolidEditAlt className="text-size4 text-ascend-black absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer" />
-                    </label>
-                    <input className="hidden" type="file" id="inputBg" />
-                </div>
-                <div className="flex flex-col ml-2">
-                    <div className="flex items-center">
-                        <div className="font-nunito-sans text-size4 ml-5 font-bold">
-                            {`${user?.firstName} ${user?.lastName}`}
-                        </div>
-                    </div>
-                    <div className="font-nunito-sans text-size2 ml-5">
-                        {user?.role.charAt(0).toUpperCase() +
-                            user?.role.slice(1)}
-                    </div>
-                </div>
+            <div className="flex gap-5">
+                <h1 className="font-bold">
+                    Created on:{" "}
+                    <span className="font-normal">April 16, 2025</span>
+                </h1>
+                <h1 className="font-bold">
+                    Created by: <span className="font-normal">Jonh Doe</span>
+                </h1>
             </div>
 
             <form className="space-y-5">
@@ -58,7 +96,7 @@ export default function Profile() {
                         </label>
                         <input
                             type="text"
-                            value={user?.lastName}
+                            value={staffDetails?.lastName || ""}
                             disabled={!isEdit}
                             className={`border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
@@ -71,7 +109,7 @@ export default function Profile() {
                         </label>
                         <input
                             type="text"
-                            value={user?.firstName}
+                            value={staffDetails?.firstName || ""}
                             disabled={!isEdit}
                             className={`border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
@@ -84,7 +122,7 @@ export default function Profile() {
                         </label>
                         <input
                             type="text"
-                            value={user?.middleName}
+                            value={staffDetails?.middleName || ""}
                             disabled={!isEdit}
                             className={`border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
@@ -100,7 +138,7 @@ export default function Profile() {
                         </label>
                         <input
                             type="text"
-                            value={user?.phone}
+                            value={staffDetails?.phone}
                             disabled={!isEdit}
                             className={`border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
@@ -113,7 +151,7 @@ export default function Profile() {
                         </label>
                         <input
                             type="text"
-                            value={user?.email}
+                            value={staffDetails?.email || ""}
                             disabled={!isEdit}
                             className={`border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
@@ -129,7 +167,7 @@ export default function Profile() {
                         </label>
                         <input
                             type="date"
-                            value={user?.birthday}
+                            value={staffDetails?.birthday}
                             disabled={!isEdit}
                             className={`border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
@@ -141,7 +179,7 @@ export default function Profile() {
                             Gender
                         </label>
                         <select
-                            value={user?.gender}
+                            value={staffDetails?.gender}
                             className={`textField border px-3 py-2  ${
                                 !isEdit ? "text-ascend-gray1" : ""
                             }  border-ascend-gray1 focus:outline-ascend-blue`}
@@ -162,7 +200,7 @@ export default function Profile() {
                         </label>
                         <input
                             type="text"
-                            value={user?.houseNoSt}
+                            value={staffDetails?.houseNoSt}
                             disabled={!isEdit}
                             className={`border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
@@ -177,7 +215,7 @@ export default function Profile() {
                             Province
                         </label>
                         <select
-                            value={user?.province}
+                            value={staffDetails?.province}
                             className={`textField border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
@@ -192,7 +230,7 @@ export default function Profile() {
                             City
                         </label>
                         <select
-                            value={user?.city}
+                            value={staffDetails?.city}
                             className={`textField border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
@@ -208,7 +246,7 @@ export default function Profile() {
                             Barangay
                         </label>
                         <select
-                            value={user?.barangay}
+                            value={staffDetails?.barangay}
                             className={`textField border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
@@ -220,6 +258,10 @@ export default function Profile() {
                     </div>
                 </div>
             </form>
+
+            {staffDetails && staffDetails?.role === "faculty" && (
+                <AssignedCourses />
+            )}
         </div>
     );
 }
