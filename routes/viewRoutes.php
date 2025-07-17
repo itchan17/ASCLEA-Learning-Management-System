@@ -13,7 +13,7 @@ Route::get('/', function () {
 // View dashboard
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard/Dashboard');
-})->name('dashboard.index');
+})->middleware(['auth', 'verified'])->name('dashboard.index');
 
 // -----Start-----
 // Program routes 
@@ -99,11 +99,6 @@ Route::prefix('programs')->group(function () {
 
 // -----End-----
 
-// Registration route
-Route::get('/registration', function () {
-    return Inertia::render('RegistrationPage/RegistrationPage');
-});
-
 // Admission routes
 
 Route::get('/admission', function () {
@@ -128,7 +123,7 @@ Route::get('/admission/enrolled/{studentid}', function ($studentid) {
 
 Route::get('/login', function () {
     return Inertia::render('LoginPage/Login');
-});
+})->name('login');
 
 // routes/web.php
 Route::get('/emailverification', function () {

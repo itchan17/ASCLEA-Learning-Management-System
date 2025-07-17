@@ -72,11 +72,6 @@ const RegistrationPage = () => {
 
             {/* RIGHT SIDE - Login Form */}
             <div className="w-full md:w-[60%] bg-white flex flex-col items-center justify-center">
-                <img
-                    src="/images/ascend_logo.png"
-                    alt="Ascend Logo"
-                    className="w-55 mb-3"
-                />
                 <h1 className="text-size5 font-nunito-sans font-bold mb-1">
                     Welcome!
                 </h1>

@@ -1,12 +1,31 @@
 import React, { useState, useEffect } from "react";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
 import { Link } from "@inertiajs/react";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
+import { ToastContainer, toast } from "react-toastify";
 
 export default function Login() {
     const route = useRoute();
     const [showPassword, setShowPassword] = useState(false);
+
+    const { success } = usePage().props.flash;
+
+    useEffect(() => {
+        // Set the text of toast if registration is success
+        if (success) {
+            toast.success(success, {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+            });
+        }
+    }, [success]);
 
     const handleLogin = () => {
         router.visit(route("dashboard.index"));
@@ -64,6 +83,19 @@ export default function Login() {
 
     return (
         <div className="relative min-h-screen w-full overflow-hidden flex flex-col md:flex-row">
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick={false}
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
+
             {/* LEFT SIDE - Login Form */}
             <div className="w-full md:w-1/2 bg-white flex flex-col items-center justify-center p-8">
                 <img
