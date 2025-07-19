@@ -45,46 +45,6 @@ const useRegistrationStore = create((set) => ({
                 password_confirmation: "",
             },
         })),
-
-    addRegistration: () => {
-        const { registration, registrationList, clearRegistration } =
-            useRegistrationStore.getState();
-
-        set({ registrationList: [...registrationList, registration] });
-
-        clearRegistration();
-    },
-
-    removeRegistration: (registrationIndex) => {
-        const { registrationList } = useRegistrationStore.getState();
-
-        set({
-            registrationList: registrationList.filter(
-                (registration, index) => index !== registrationIndex
-            ),
-        });
-    },
-
-    addFiles: (newFiles) =>
-        set((state) => ({
-            registration: {
-                ...state.registration,
-                attachedfiles: [
-                    ...state.registration.attachedfiles,
-                    ...newFiles,
-                ],
-            },
-        })),
-
-    removeFile: (index) =>
-        set((state) => ({
-            registration: {
-                ...state.registration,
-                attachedfiles: state.registration.attachedfiles.filter(
-                    (_, i) => i !== index
-                ),
-            },
-        })),
 }));
 
 export default useRegistrationStore;

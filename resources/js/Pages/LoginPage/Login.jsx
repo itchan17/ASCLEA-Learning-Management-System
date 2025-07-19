@@ -1,63 +1,25 @@
 import React, { useState, useEffect } from "react";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
 import { Link } from "@inertiajs/react";
-import { router, usePage } from "@inertiajs/react";
+import { useForm } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
-import { ToastContainer, toast } from "react-toastify";
 
 export default function Login() {
-    const route = useRoute();
     const [showPassword, setShowPassword] = useState(false);
 
-    const { success } = usePage().props.flash;
+    const { data, setData, post, processing, errors, reset, clearErrors } =
+        useForm({
+            email: "",
+            password: "",
+        });
 
-    useEffect(() => {
-        // Set the text of toast if registration is success
-        if (success) {
-            toast.success(success, {
-                position: "top-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-            });
-        }
-    }, [success]);
-
-    const handleLogin = () => {
-        router.visit(route("dashboard.index"));
-    };
-
-    function PrimaryButton({
-        doSomething,
-        icon,
-        text,
-        textColor,
-        btnColor,
-        className,
-    }) {
-        return (
-            <button
-                onClick={doSomething}
-                className={`${
-                    btnColor || "bg-ascend-blue"
-                } hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300 ${
-                    className || ""
-                } px-5 h-10 space-x-1`}
-            >
-                {icon && <div className="text-xl">{icon}</div>}
-                <span
-                    className={`font-nunitosans font-semibold ${
-                        textColor || ""
-                    }`}
-                >
-                    {text}
-                </span>
-            </button>
-        );
+    function login(e) {
+        clearErrors();
+        e.preventDefault();
+        post("/login", {
+            replace: true,
+            onSuccess: () => reset("password", "email"),
+        });
     }
 
     const [screenSize, setScreenSize] = useState(() =>
@@ -83,19 +45,6 @@ export default function Login() {
 
     return (
         <div className="relative min-h-screen w-full overflow-hidden flex flex-col md:flex-row">
-            <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick={false}
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-            />
-
             {/* LEFT SIDE - Login Form */}
             <div className="w-full md:w-1/2 bg-white flex flex-col items-center justify-center p-8">
                 <img
@@ -110,13 +59,15 @@ export default function Login() {
                     Sign to your account to continue
                 </p>
 
-                <div className="w-full max-w-sm">
+                <form onSubmit={login} className="w-full max-w-sm space-y-5">
                     <div className="relative mb-4">
                         <input
                             type="text"
                             id="emailfloat"
                             class="block px-4 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
                             placeholder=" "
+                            value={data.email}
+                            onChange={(e) => setData("email", e.target.value)}
                         />
                         <label
                             htmlFor="emailfloat"
@@ -126,12 +77,16 @@ export default function Login() {
                         </label>
                     </div>
 
-                    <div className="relative mb-4">
+                    <div className="relative">
                         <input
                             type={showPassword ? "text" : "password"}
                             id="passwordfloat"
                             class="block px-4 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer password-input"
                             placeholder=" "
+                            value={data.password}
+                            onChange={(e) =>
+                                setData("password", e.target.value)
+                            }
                         />
                         <label
                             htmlFor="passwordfloat"
@@ -141,7 +96,7 @@ export default function Login() {
                         </label>
                     </div>
 
-                    <div className="flex justify-between items-center text-sm mb-4">
+                    <div className="flex justify-between items-center text-sm">
                         <label className="flex items-center">
                             <input
                                 type="checkbox"
@@ -158,13 +113,35 @@ export default function Login() {
                             Forgot password?
                         </a>
                     </div>
-
-                    <PrimaryButton
-                        doSomething={handleLogin}
-                        text="Login"
-                        className={"w-full"}
-                    />
-                </div>
+                    {errors.message && (
+                        <div
+                            role="alert"
+                            className="alert alert-error rounded-none font-nunito-sans mt-4"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-6 w-6 shrink-0 stroke-current"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                            </svg>
+                            <span>{errors.message}</span>
+                        </div>
+                    )}
+                    <div className="grid">
+                        <PrimaryButton
+                            btnType="submit"
+                            text="Login"
+                            isDisabled={processing}
+                        />
+                    </div>
+                </form>
             </div>
 
             {/* RIGHT SIDE - Enroll section */}
@@ -196,13 +173,15 @@ export default function Login() {
                                     Register now to gain access and start your
                                     review journey!
                                 </p>
-                                <Link href={"/registration"}>
-                                    <PrimaryButton
-                                        text="Register"
-                                        btnColor="bg-ascend-white"
-                                        textColor="text-ascend-blue"
-                                        className="mx-auto"
-                                    ></PrimaryButton>
+                                <Link href={"/register"}>
+                                    <div className="flex justify-center">
+                                        <PrimaryButton
+                                            text="Register"
+                                            btnColor="bg-ascend-white"
+                                            textColor="text-ascend-blue"
+                                            className="mx-auto"
+                                        ></PrimaryButton>
+                                    </div>
                                 </Link>
                             </div>
                         </div>

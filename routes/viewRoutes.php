@@ -10,10 +10,11 @@ Route::get('/', function () {
     return Inertia::render('LandingPage/LandingPage', ['text' => "Students"]);
 });
 
+
 // View dashboard
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard/Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard.index');
+})->middleware(['auth', 'verified', 'preventBack'])->name('dashboard.index');
 
 // -----Start-----
 // Program routes 
@@ -120,10 +121,6 @@ Route::get('/admission/enrolled/{studentid}', function ($studentid) {
 })->name('enrolled.student.view');
 
 // --End--
-
-Route::get('/login', function () {
-    return Inertia::render('LoginPage/Login');
-})->name('login');
 
 // routes/web.php
 Route::get('/emailverification', function () {

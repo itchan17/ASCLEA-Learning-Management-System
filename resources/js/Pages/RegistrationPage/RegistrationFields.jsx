@@ -18,12 +18,6 @@ const RegistrationFields = () => {
 
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(false);
-    const { flash } = usePage().props;
-
-    useEffect(() => {
-        console.log(flash.success);
-        // setErrorMessage(errors);
-    }, [flash]);
 
     const register = () => {
         setErrorMessage("");
@@ -345,6 +339,7 @@ const RegistrationFields = () => {
                         <span>{errorMessage.message}</span>
                     </div>
                 )}
+
                 <div className="grid grid-cols-1 gap-4 pt-4">
                     <PrimaryButton
                         isDisabled={loading}
