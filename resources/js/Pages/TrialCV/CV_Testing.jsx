@@ -5,6 +5,9 @@ const CV_Testing = () => {
     const [faceDetected, setFaceDetected] = React.useState(false);
     const [objectDetected, setObjectDetected] = React.useState(false);
     const [missingFace, setMissingFace] = React.useState(false);
+
+    const detectionIntervalRef = React.useRef(null);
+
     
   const handleStart = async () => {
   try {
@@ -31,6 +34,8 @@ const CV_Testing = () => {
       }
     }, 1000);
 
+    detectionIntervalRef.current = interval;
+
   } catch (error) {
     console.error("Failed to start camera or detect face:", error);
   }
@@ -41,6 +46,12 @@ const handleStop = async () => {
       await fetch("http://127.0.0.1:5000/close-camera", {
       method: "POST",
     });
+
+    if (detectionIntervalRef.current) {
+      clearInterval(detectionIntervalRef.current);
+      detectionIntervalRef.current = null;
+    }
+    
     setCameraStarted(false);
   } catch (error) {
     console.error("Failed to stop camera:", error);
@@ -48,13 +59,20 @@ const handleStop = async () => {
 };
 
   return (
-    <div>
-      <div className="flex flex-col-2 items-center justify-center h-screen bg-gray-100">
-        <div className ="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-          <h1 className="text-2xl font-bold mb-4 text-center">
-            Camera Testing
-          </h1>
-          <div className="flex items-center justify-center mb-4">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center space-y-6 p-6">
+        <div className="w-80 h-80 border-4 border-gray-400 rounded-md flex items-center justify-center">
+          {cameraStarted ? (
+            //Webcam view CV
+            <></>
+          ): (
+              <p className="text-gray-500">Camera View</p>
+          )}
+        </div>
+          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
+              <h1 className="text-2xl font-bold mb-4 text-center">
+                Camera Testing
+              </h1>
+              <div className="flex items-center justify-center mb-4">
             {!cameraStarted ? (
               <button
                 onClick={handleStart}
@@ -100,7 +118,6 @@ const handleStop = async () => {
             </div>
           </div>
       </div>
-    </div>
   )
 }
 

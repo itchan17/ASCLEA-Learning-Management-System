@@ -27,7 +27,6 @@ def start_camera():
     # Start the monitoring thread only if it's not already running
     if not cv_state["running"]:
         cv_state["open_camera"] = True
-        import threading
         threading.Thread(target=cv_monitor, daemon=True).start()
 
     return jsonify({"status": "Camera started"})
