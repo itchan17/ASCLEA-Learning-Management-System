@@ -108,7 +108,9 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
 
             {/* Dropdown */}
             {dropDown === "notif" && <NotifDropdown ref={dropdownRef} />}
-            {dropDown === "profile" && <ProfileDropdown ref={dropdownRef} />}
+            {dropDown === "profile" && (
+                <ProfileDropdown setDropdown={setDropdown} ref={dropdownRef} />
+            )}
         </nav>
     );
 }

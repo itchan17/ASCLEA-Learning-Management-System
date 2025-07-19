@@ -177,8 +177,29 @@ Route::get('/accounting/studentpaymenthistory/{paymentId}', function ($paymentId
     ]);
 })->name('accounting.paymentInfo.view');
 
+// Route for Viewing Administration Page
+Route::get('/administration', function () {
+    return Inertia::render('Administration/Administration');
+})->name('administration.index');
 
+Route::get('/administration/{userId}', function ($userId) {
+    return Inertia::render('Administration/AdministrationComponents/ViewStaff', ['userId' => $userId,]);
+})->name('administration.view');
 
+// Route for Viewing Administration Page
+Route::get('/archives', function () {
+    return Inertia::render('Archives/Archives');
+})->name('archives.index');
 
+// Route for viewing profile page
+Route::get('/profile', function () {
+    return Inertia::render('Profile/Profile');
+})->name('profile');
 
+// For handling undefined routes
+Route::fallback(function () {
+    return Inertia::render('Errors/NotFound')
+        ->toResponse(request())
+        ->setStatusCode(404);
+});
 

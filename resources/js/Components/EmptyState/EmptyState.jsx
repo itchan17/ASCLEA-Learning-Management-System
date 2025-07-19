@@ -1,9 +1,9 @@
 import React from "react";
 
-export default function EmptyState({ imgSrc, text, paddingY = "py-20" }) {
+export default function EmptyState({ imgSrc, text }) {
     return (
         <div
-            className={`w-full flex flex-col justify-center items-center h-full ${paddingY}`}
+            className={`w-full flex flex-col justify-center items-center h-full `}
         >
             <img src={imgSrc} alt="" className="w-[300px] md:w-[375px]" />
             <p className="text-size3 md:text-size5 sm:w-100 text-wrap text-center italic">

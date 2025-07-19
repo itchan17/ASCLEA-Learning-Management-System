@@ -7,14 +7,25 @@ import Materials from "./CourseContentTab/Materials";
 import Assessments from "./CourseContentTab/Assessments";
 import Grades from "./CourseContentTab/Grades";
 import { handleClickBackBtn } from "../../../../Utils/handleClickBackBtn";
+import useUserStore from "../../../../Stores/User/userStore";
 
 export default function CourseContent() {
+    // User store
+    const user = useUserStore((state) => state.user);
+
     // Course Store
     const activeTab = useCourseStore((state) => state.activeTab);
     const setActiveTab = useCourseStore((state) => state.setActiveTab);
 
     // Tab list
-    const tabs = ["Home", "Modules", "Assessments", "Grades"];
+    const tabs = [
+        "Home",
+        "Modules",
+        "Assessments",
+        user?.role === "admin" || user?.role === "faculty" ? "Grades" : null,
+    ];
+
+    console.log(tabs);
     return (
         <div className="space-y-5">
             <Tabs

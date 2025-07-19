@@ -6,14 +6,19 @@ import useAssessmentsStore from "../../../../../../Stores/Programs/CourseContent
 import CustomSelect from "../../../../../../Components/CustomInputField/CustomSelect";
 import { AiFillFileAdd } from "react-icons/ai";
 import "../../../../../../../css/global.css";
-import DropFiles from "../../DropFiles";
+import DropFiles from "../../../../../../Components/DragNDropFiles/DropFiles";
 import FileCard from "../../FileCard";
 import { SiGoogleforms } from "react-icons/si";
 import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import { IoCaretDownOutline } from "react-icons/io5";
 
-export default function AssessmentForm({ toggleForm, formTitle, formWidth }) {
+export default function AssessmentForm({
+    toggleForm,
+    formTitle,
+    formWidth,
+    sectionId,
+}) {
     const { programId, courseId } = usePage().props;
     const route = useRoute();
 
@@ -72,7 +77,7 @@ export default function AssessmentForm({ toggleForm, formTitle, formWidth }) {
 
     const addAssessment = () => {
         toggleForm();
-        hanndleAddAssessments();
+        hanndleAddAssessments(sectionId);
         clearAssessmentDetails();
     };
     return (

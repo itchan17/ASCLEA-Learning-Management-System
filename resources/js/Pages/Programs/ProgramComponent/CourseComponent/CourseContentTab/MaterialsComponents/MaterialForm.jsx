@@ -3,24 +3,25 @@ import TextEditor from "../../TextEditor";
 import SecondaryButton from "../../../../../../Components/Button/SecondaryButton";
 import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
 import { AiFillFileAdd } from "react-icons/ai";
-import useMaterialsStore from "../../../../../../Stores/Programs/CourseContent/materialsStore";
+import useModulesStore from "../../../../../../Stores/Programs/CourseContent/modulesStore";
 import FileCard from "../../FileCard";
-import DropFiles from "../../DropFiles";
+import DropFiles from "../../../../../../Components/DragNDropFiles/DropFiles";
 
 export default function MaterialForm({
     toggleOpenMaterialForm,
     formTitle,
     formWidth,
+    sectionId,
 }) {
     // Materials Store
-    const materialDetails = useMaterialsStore((state) => state.materialDetails);
-    const handleMaterialChange = useMaterialsStore(
+    const materialDetails = useModulesStore((state) => state.materialDetails);
+    const handleMaterialChange = useModulesStore(
         (state) => state.handleMaterialChange
     );
-    const hanndleAddMaterials = useMaterialsStore(
-        (state) => state.hanndleAddMaterials
+    const handleAddMaterials = useModulesStore(
+        (state) => state.handleAddMaterials
     );
-    const removeAttachedFile = useMaterialsStore(
+    const removeAttachedFile = useModulesStore(
         (state) => state.removeAttachedFile
     );
 
@@ -31,7 +32,7 @@ export default function MaterialForm({
     };
 
     const handleAddMaterial = () => {
-        hanndleAddMaterials();
+        handleAddMaterials(sectionId);
         toggleOpenMaterialForm();
     };
 

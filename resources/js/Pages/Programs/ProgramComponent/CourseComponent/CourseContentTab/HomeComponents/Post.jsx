@@ -4,6 +4,7 @@ import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.bubble.css";
 import "../../../../../../../css/quillTextEditor.css";
 import DOMPurify from "dompurify";
+import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
 
 export default function Post({ postContent }) {
     const postHtml = DOMPurify.sanitize(postContent.postDescription);
@@ -14,34 +15,35 @@ export default function Post({ postContent }) {
                 <h1 className="flex-1 min-w-0 text-size4 break-words font-semibold">
                     {postContent.postTitle}
                 </h1>
+                <RoleGuard allowedRoles={["admin", "faculty"]}>
+                    <div className="h-8 flex items-center">
+                        <div className="dropdown dropdown-end cursor-pointer">
+                            <div
+                                tabIndex={0}
+                                role="button"
+                                className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue/35 transition-all duration-300"
+                            >
+                                <BsThreeDotsVertical className="text-size3" />
+                            </div>
 
-                <div className="h-8 flex items-center">
-                    <div className="dropdown dropdown-end cursor-pointer">
-                        <div
-                            tabIndex={0}
-                            role="button"
-                            className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue/35 transition-all duration-300"
-                        >
-                            <BsThreeDotsVertical className="text-size3" />
+                            <ul
+                                tabIndex={0}
+                                className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                            >
+                                <li>
+                                    <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        Remove
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
-
-                        <ul
-                            tabIndex={0}
-                            className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-                        >
-                            <li>
-                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Edit
-                                </a>
-                            </li>
-                            <li>
-                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Remove
-                                </a>
-                            </li>
-                        </ul>
                     </div>
-                </div>
+                </RoleGuard>
             </div>
             <div className="flex flex-col justify-between border-b border-r border-l border-ascend-gray1 shadow-shadow1 p-5 space-y-5">
                 <ReactQuill value={postHtml} readOnly={true} theme={"bubble"} />
