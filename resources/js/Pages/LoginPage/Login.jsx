@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
-import { Link } from "@inertiajs/react";
-import { useForm } from "@inertiajs/react";
+import { useForm, Link, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 
 export default function Login() {
+    const route = useRoute();
+    const [successMsg, setSuccessMsg] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
-
+    const { flash } = usePage().props;
     const { data, setData, post, processing, errors, reset, clearErrors } =
         useForm({
             email: "",
@@ -16,7 +17,7 @@ export default function Login() {
     function login(e) {
         clearErrors();
         e.preventDefault();
-        post("/login", {
+        post(route("login.user"), {
             replace: true,
             onSuccess: () => reset("password", "email"),
         });
@@ -27,6 +28,10 @@ export default function Login() {
             ? "medium"
             : "small"
     );
+
+    useEffect(() => {
+        setSuccessMsg(flash.success ? flash.success : null);
+    }, []);
 
     useEffect(() => {
         const mediaQuery = window.matchMedia("(min-width: 768px)");
@@ -60,6 +65,27 @@ export default function Login() {
                 </p>
 
                 <form onSubmit={login} className="w-full max-w-sm space-y-5">
+                    {successMsg && (
+                        <div
+                            role="alert"
+                            className="alert alert-success rounded-none font-nunito-sans"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-6 w-6 shrink-0 stroke-current"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                            </svg>
+                            <span>{successMsg}</span>
+                        </div>
+                    )}
                     <div className="relative mb-4">
                         <input
                             type="text"
@@ -106,12 +132,12 @@ export default function Login() {
                             />{" "}
                             Show password
                         </label>
-                        <a
-                            href="/emailverification"
+                        <Link
+                            href="/forget-password"
                             className="text-ascend-blue hover:underline font-nunito-sans"
                         >
                             Forgot password?
-                        </a>
+                        </Link>
                     </div>
                     {errors.message && (
                         <div

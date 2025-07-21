@@ -19,9 +19,7 @@ class RegistrationController extends Controller
 
     // Render the registrion page
     public function show() {
-    
         return Inertia::render('RegistrationPage/RegistrationPage');
-
     }
 
     // Create and authenticate user

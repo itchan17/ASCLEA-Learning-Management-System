@@ -122,15 +122,7 @@ Route::get('/admission/enrolled/{studentid}', function ($studentid) {
 
 // --End--
 
-// routes/web.php
-Route::get('/emailverification', function () {
-    return Inertia::render('LoginPage/Emailverification');
-});
 
-// routes/web.php
-Route::get('/changepassword', function () {
-    return Inertia::render('LoginPage/Changepassword');
-});
 
 // Route for Student Grades
 Route::get('/grades', function () {
