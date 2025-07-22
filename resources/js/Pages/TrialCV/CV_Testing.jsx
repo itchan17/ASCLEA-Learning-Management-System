@@ -5,15 +5,16 @@ const CV_Testing = () => {
     const [faceDetected, setFaceDetected] = React.useState(false);
     const [objectDetected, setObjectDetected] = React.useState(false);
     const [missingFace, setMissingFace] = React.useState(false);
+    const [lookingAway, setLookingAway] = React.useState(false);
 
     const detectionIntervalRef = React.useRef(null);
 
-    
   const handleStart = async () => {
   try {
     setFaceDetected(false);
     setObjectDetected(false);
     setMissingFace(false);
+    setLookingAway(false);
 
     await fetch("http://127.0.0.1:5000/start-camera", {
       method: "POST",
@@ -28,6 +29,7 @@ const CV_Testing = () => {
         setFaceDetected(data.detected_face);
         setObjectDetected(data.detected_object);
         setMissingFace(data.missing_face);
+        setLookingAway(data.looking_away);
 
       } catch (err) {
         console.error("Error fetching detection data:", err);
@@ -109,6 +111,11 @@ const handleStop = async () => {
                     {objectDetected && (
                       <p className="text-red-600 mb-4 text-center">
                         Object detected. Screenshot has been taken.
+                      </p>
+                    )}
+                    {lookingAway && (
+                      <p className="text-red-600 mb-4 text-center">
+                        Looking away. Screenshot has been taken.
                       </p>
                     )}
                   </>

@@ -4,6 +4,8 @@ import cv2
 import time
 from ultralytics import YOLO
 from monitor_state import cv_state
+import mediapipe as mp
+import numpy as np
 
 #Screenshot functionality
 from screenshot import save_screenshot
@@ -20,6 +22,14 @@ def cv_monitor():
 
     # Load Haar Cascade for face detection
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+
+    # Mediapipe Face Mesh
+    mp_face_mesh = mp.solutions.face_mesh
+    face_mesh = mp_face_mesh.FaceMesh(static_image_mode=False, max_num_faces=1, refine_landmarks=True)
+
+    # Drawing utils
+    mp_drawing = mp.solutions.drawing_utils
+    drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
     while not cv_state["open_camera"]:
         time.sleep(0.1)  # Wait until open_camera is set to True
@@ -47,6 +57,26 @@ def cv_monitor():
     flag_duration = 5  # seconds for violations (OBJECT DETECTED)
     face_screenshot_taken = False  # Initial face detection screenshot flag
 
+    # Mediapipe Drawing utils and specs
+    mp_drawing = mp.solutions.drawing_utils
+    drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
+
+    # Pose estimation variables
+    pose_timer = {
+        "Looking Left": None,
+        "Looking Right": None,
+        "Looking Up": None,
+        "Looking Down": None
+    }
+    pose_flagged = {
+        "Looking Left": False,
+        "Looking Right": False,
+        "Looking Up": False,
+        "Looking Down": False
+    }
+    pose_duration_threshold = 5  # seconds
+
+
     while True:
         ret, frame = cap.read()
         if not ret:
@@ -54,7 +84,6 @@ def cv_monitor():
             break
 
         face_found = False
-
         current_time = time.time()
 
         # Run YOLO detection
@@ -98,6 +127,78 @@ def cv_monitor():
                 save_screenshot(frame, "FACE_MISSING")
                 face_missing_flagged = True
                 cv_state["missing_face"] = face_missing_flagged
+
+        # Head Pose Estimation
+        image_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        image_rgb.flags.writeable = False
+        results_mesh = face_mesh.process(image_rgb)
+        image_rgb.flags.writeable = True
+
+        img_h, img_w, _ = frame.shape
+        face_2d = []
+        face_3d = []
+        pose_text = "Forward"
+
+        if results_mesh.multi_face_landmarks:
+            for face_landmarks in results_mesh.multi_face_landmarks:
+                for idx, lm in enumerate(face_landmarks.landmark):
+                    if idx in [33, 263, 1, 61, 291, 199]:
+                        if idx == 1:
+                            nose_2d = (lm.x * img_w, lm.y * img_h)
+                            nose_3d = (lm.x * img_w, lm.y * img_h, lm.z * 3000)
+                        x, y = int(lm.x * img_w), int(lm.y * img_h)
+                        face_2d.append([x, y])
+                        face_3d.append([x, y, lm.z])
+
+                face_2d = np.array(face_2d, dtype=np.float64)
+                face_3d = np.array(face_3d, dtype=np.float64)
+
+                focal_length = 1 * img_w
+                cam_matrix = np.array([[focal_length, 0, img_h / 2],
+                                       [0, focal_length, img_w / 2],
+                                       [0, 0, 1]])
+                dist_matrix = np.zeros((4, 1), dtype=np.float64)
+
+                success_pnp, rot_vec, trans_vec = cv2.solvePnP(face_3d, face_2d, cam_matrix, dist_matrix)
+                rmat, _ = cv2.Rodrigues(rot_vec)
+                angles, *_ = cv2.RQDecomp3x3(rmat)
+
+                x_angle = angles[0] * 360
+                y_angle = angles[1] * 360
+                z_angle = angles[2] * 360
+
+                if y_angle < -10:
+                    pose_text = "Looking Left"
+                elif y_angle > 10:
+                    pose_text = "Looking Right"
+                elif x_angle < -10:
+                    pose_text = "Looking Down"
+                elif x_angle > 10:
+                    pose_text = "Looking Up"
+
+                # Draw pose line
+                nose_3d_projection, _ = cv2.projectPoints(np.array([nose_3d]), rot_vec, trans_vec, cam_matrix, dist_matrix)
+                p1 = (int(nose_2d[0]), int(nose_2d[1]))
+                p2 = (int(nose_2d[0] + y_angle * 10), int(nose_2d[1] - x_angle * 10))
+                cv2.line(frame, p1, p2, (255, 0, 0), 3)
+
+                cv2.putText(frame, pose_text, (20, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
+
+                # Pose screenshot logic
+                if pose_text != "Forward":
+                    if pose_timer[pose_text] is None:
+                        pose_timer[pose_text] = current_time
+                    elif (current_time - pose_timer[pose_text] >= pose_duration_threshold) and not pose_flagged[pose_text]:
+                        save_screenshot(frame, pose_text.replace(" ", "_").upper())
+                        pose_flagged[pose_text] = True
+                        cv_state["looking_away"] = True
+                else:
+                    for key in pose_timer:
+                        if key != pose_text:
+                            pose_timer[key] = None
+                            pose_flagged[key] = False
+
+                
 
         # Object logic
         object_found = any(int(box.cls) in target_classes for box in results.boxes)
@@ -174,6 +275,7 @@ def cv_monitor():
     cv_state["detected_face"] = False
     cv_state["missing_face"] = False
     cv_state["detected_object"] = False
+    cv_state["looking_away"] = False
     cv_state["running"] = False
     cv_state["open_camera"] = False
     cv_state["close_camera"] = False

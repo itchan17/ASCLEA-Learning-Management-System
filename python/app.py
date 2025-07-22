@@ -18,6 +18,7 @@ def reset_cv_state():
     cv_state["running"] = False
     cv_state["open_camera"] = False
     cv_state["close_camera"] = False
+    cv_state["looking_away"] = False  
 
 
 @app.route('/start-camera', methods=['POST'])
@@ -41,7 +42,8 @@ def detection():
     return jsonify({
         "detected_face": cv_state["detected_face"],
         "missing_face": cv_state["missing_face"],
-        "detected_object": cv_state["detected_object"]
+        "detected_object": cv_state["detected_object"],
+        "looking_away": cv_state["looking_away"]
     })
 
 if __name__ == '__main__':
