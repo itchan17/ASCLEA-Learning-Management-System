@@ -16,10 +16,10 @@ export default function EmailVerification() {
         post("/forget-password", {
             replace: true,
             onError: () => {
-                reset();
+                setData({ email: "" });
             },
             onSuccess: (page) => {
-                reset();
+                setData({ email: "" });
                 setSuccessMsg(page.props.flash.success);
             },
         });

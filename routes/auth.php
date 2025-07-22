@@ -8,14 +8,15 @@ use App\Http\Controllers\Auth\LoginController;
 use Inertia\Inertia;
 
 // Login Routes
-Route::get('/login', [LoginController::class, 'show'])->middleware('preventBack')->name('login');
-Route::post('/login', [LoginController::class, 'loginUser'])->name('login.user');
-
-// Registration routes 
-// Render registration page
-Route::get('/register', [RegistrationController::class, 'show'])->name('register');
-// Register user
-Route::post('/register', [RegistrationController::class, 'registerUser'])->name('register.user');
+Route::middleware('guest')->group(function() {
+    Route::get('/login', [LoginController::class, 'show'])->middleware('preventBack')->name('login');
+    Route::post('/login', [LoginController::class, 'loginUser'])->name('login.user');
+    // Registration routes 
+    // Render registration page
+    Route::get('/register', [RegistrationController::class, 'show'])->middleware('preventBack')->name('register');
+    // Register user
+    Route::post('/register', [RegistrationController::class, 'registerUser'])->name('register.user');
+});
 
 
 // For email verification

@@ -19,6 +19,7 @@ export default function ChangePassword() {
         setErrorMsg(null);
         e.preventDefault();
         post(route("reset.password.post"), {
+            replace: true,
             onError: (error) => setErrorMsg(error),
             onSuccess: () =>
                 reset("password", "password_confirmation", "token"),

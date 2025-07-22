@@ -23,6 +23,7 @@ const RegistrationFields = () => {
         setErrorMessage("");
 
         router.post(route("register.user"), registration, {
+            replace: true, // Prevent user from going back to this page
             onStart: () => setLoading(true),
             onFinish: () => setLoading(false),
             onError: (error) => {
