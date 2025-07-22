@@ -4,13 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Exception;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
@@ -32,7 +31,7 @@ class LoginController extends Controller
             return $response;
         }
 
-        // Add validation logic here
+        // Validating user input
          $validator = Validator::make($credentials, [
                 'email' => 'required|email',
                 'password' => 'required'
@@ -41,9 +40,10 @@ class LoginController extends Controller
                 'required' => 'The :attribute field is required.',
         ]);
 
-        // Send an error message to client
+        // Send an error message to client if valid input
         if ($validator->stopOnFirstFailure()->fails()) {
-            return back()->withErrors(['message' => $validator->errors()->first(),]);
+            throw ValidationException::withMessages(['error' => $validator->errors()->first(),]);
+            
         }
 
         // If auth failed run the Ratelimiter and return an error in client
@@ -52,9 +52,9 @@ class LoginController extends Controller
             // This will track the attempts of the user
             RateLimiter::hit($this->throttleKey(), 60);
 
-            return back()->withErrors([
-            'message' => 'The provided credentials do not match our records.',
-        ]);
+            throw ValidationException::withMessages([
+                'error' => 'The provided credentials do not match our records.',
+            ]);
         }
  
         $request->session()->regenerate();    
@@ -76,19 +76,16 @@ class LoginController extends Controller
         
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
-        return back()->withErrors([
-            'message' => "Too many login attempts. Please try again in {$seconds} seconds.",
+        throw ValidationException::withMessages([
+            'error' => "Too many login attempts. Please try again in {$seconds} seconds.",
         ]);
     }
 
     public function logout(Request $request)
     {
         Auth::logout();
-    
         $request->session()->invalidate();
-    
         $request->session()->regenerateToken();
-    
         return redirect()->route('login');
     }
 }

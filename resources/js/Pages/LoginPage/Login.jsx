@@ -139,7 +139,8 @@ export default function Login() {
                             Forgot password?
                         </Link>
                     </div>
-                    {errors.message && (
+
+                    {errors.error && (
                         <div
                             role="alert"
                             className="alert alert-error rounded-none font-nunito-sans mt-4"
@@ -157,7 +158,7 @@ export default function Login() {
                                     d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
                                 />
                             </svg>
-                            <span>{errors.message}</span>
+                            <span>{errors.error}</span>
                         </div>
                     )}
                     <div className="grid">

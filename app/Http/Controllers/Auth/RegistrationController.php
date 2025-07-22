@@ -31,7 +31,7 @@ class RegistrationController extends Controller
 
         // Send an error message to front end
         if ($validator->stopOnFirstFailure()->fails()) {
-            return back()->withErrors(['message' => $validator->errors()->first(),]);
+            throw ValidationException::withMessages(['error' => $validator->errors()->first(),]);
         }
 
         // Get the id of student role
