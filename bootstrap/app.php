@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckUserRole;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\PreventBack;
 use Illuminate\Foundation\Application;
@@ -25,7 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
         ]);
         $middleware->alias([
-            'preventBack' => PreventBack::class
+            'preventBack' => PreventBack::class,
+            'checkRole' => CheckUserRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

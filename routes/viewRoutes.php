@@ -14,7 +14,7 @@ Route::get('/', function () {
 // View dashboard
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard/Dashboard');
-})->middleware(['auth', 'verified', 'preventBack'])->name('dashboard.index');
+})->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin,faculty,student'])->name('dashboard.index');
 
 // -----Start-----
 // Program routes 
