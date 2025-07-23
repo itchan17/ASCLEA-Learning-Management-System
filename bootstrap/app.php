@@ -14,11 +14,18 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            Route::middleware('web')
-                ->group(base_path('routes/auth.php'));
-                
-            Route::middleware('web')
-                ->group(base_path('routes/viewRoutes.php'));        
+            Route::middleware('web')->group(function () {
+                require base_path('routes/auth.php');
+                require base_path('routes/programs.php');
+                require base_path('routes/admission.php');
+                require base_path('routes/dashboard.php');
+                require base_path('routes/grades.php');
+                require base_path('routes/accounting.php');
+                require base_path('routes/paymentHistory.php');
+                require base_path('routes/administration.php');
+                require base_path('routes/archives.php');
+                require base_path('routes/profile.php');
+            });
         },
     )
     ->withMiddleware(function (Middleware $middleware) {
