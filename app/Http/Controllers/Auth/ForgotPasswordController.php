@@ -42,7 +42,7 @@ class ForgotPasswordController extends Controller
         ]);
 
         // This send an password reset email to the user containing the token
-        Mail::send('email.forgetPassword', ['token' => $token], function($message) use($request){
+        Mail::send('emails.forgetPassword', ['token' => $token], function($message) use($request){
             $message->to($request->email);
             $message->subject('Reset Password');
         });
