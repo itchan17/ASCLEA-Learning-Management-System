@@ -3,13 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
+Route::get('/admission', function () {
+            return Inertia::render('Admission/AdmissionPage');
+        })->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin,student']);
+
 Route::prefix('admission')
     ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin'])
     ->group(function () {
-        Route::get('/', function () {
-            return Inertia::render('Admission/AdmissionPage');
-        });
-
         // Route for selected applicant to view their admission details
         Route::get('/pending/{applicantId}', function ($applicantId) {
             return Inertia::render('Admission/PendingPage/EnrollmentRequest', [

@@ -2,22 +2,41 @@ import { create } from "zustand";
 
 const useUserStore = create((set) => ({
     user: {
-        id: 1,
-        role: "admin",
-        verified: true,
-        firstName: "John",
-        lastName: "Doe",
-        middleName: "Aaron",
-        program: "Licensure Examination for Teachers",
-        email: "johndoe@email.com",
-        status: "Enrolled",
-        phone: "09123456789",
-        birthday: "1995-01-01",
-        gender: "Male",
-        houseNoSt: "123 Main St",
-        province: "Metro Manila",
-        city: "Quezon City",
-        barangay: "Barangay Central",
+        user_id: "",
+        role: "",
+        approved: true,
+        first_name: "",
+        last_name: "",
+        middle_name: "",
+        email: "",
+        contact_number: "",
+        birthdate: "",
+        gender: "",
+        house_no: "",
+        province: "",
+        city: "",
+        barangay: "",
+    },
+
+    setAuthUser: (authUser) => {
+        set({
+            user: {
+                user_id: authUser.user_id,
+                role: authUser.role.role_name,
+                approved: true,
+                first_name: authUser.first_name,
+                last_name: authUser.last_name,
+                middle_name: authUser.middle_name,
+                email: authUser.email,
+                contact_number: authUser.contact_number,
+                birthdate: authUser.birthdate,
+                gender: authUser.gender,
+                house_no: authUser.house_no,
+                province: authUser.province,
+                city: authUser.city,
+                barangay: authUser.barangay,
+            },
+        });
     },
 }));
 
