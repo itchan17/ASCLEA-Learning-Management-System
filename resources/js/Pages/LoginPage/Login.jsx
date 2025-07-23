@@ -16,6 +16,7 @@ export default function Login() {
 
     function login(e) {
         clearErrors();
+        setSuccessMsg(null);
         e.preventDefault();
         post(route("login.user"), {
             replace: true,
