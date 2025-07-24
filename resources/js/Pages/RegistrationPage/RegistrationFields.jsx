@@ -1,7 +1,42 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
+import { router, usePage } from "@inertiajs/react";
+import { useRoute } from "ziggy-js";
+import useRegistrationStore from "../../Stores/Registration/registrationStore";
 
 const RegistrationFields = () => {
+    const route = useRoute();
+
+    // Registration store
+    const registration = useRegistrationStore((state) => state.registration);
+    const handleRegistrationChange = useRegistrationStore(
+        (state) => state.handleRegistrationChange
+    );
+    const clearRegistration = useRegistrationStore(
+        (state) => state.clearRegistration
+    );
+
+    const [errorMessage, setErrorMessage] = useState("");
+    const [loading, setLoading] = useState(false);
+
+    const register = () => {
+        setErrorMessage("");
+
+        router.post(route("register.user"), registration, {
+            replace: true, // Prevent user from going back to this page
+            onStart: () => setLoading(true),
+            onFinish: () => setLoading(false),
+            onError: (error) => {
+                setErrorMessage(error);
+                setLoading(false);
+            },
+            onSuccess: () => {
+                clearRegistration();
+                setLoading(false);
+            },
+        });
+    };
+
     return (
         <>
             <div className="mx-auto max-w-4xl bg-white">
@@ -9,9 +44,10 @@ const RegistrationFields = () => {
                     <div class="relative">
                         <input
                             type="text"
+                            value={registration.last_name}
                             onChange={(e) =>
                                 handleRegistrationChange(
-                                    "lastname",
+                                    "last_name",
                                     e.target.value
                                 )
                             }
@@ -29,9 +65,10 @@ const RegistrationFields = () => {
                     <div class="relative">
                         <input
                             type="text"
+                            value={registration.first_name}
                             onChange={(e) =>
                                 handleRegistrationChange(
-                                    "firstname",
+                                    "first_name",
                                     e.target.value
                                 )
                             }
@@ -50,9 +87,10 @@ const RegistrationFields = () => {
                     <div class="relative">
                         <input
                             type="text"
+                            value={registration.middle_name}
                             onChange={(e) =>
                                 handleRegistrationChange(
-                                    "middlename",
+                                    "middle_name",
                                     e.target.value
                                 )
                             }
@@ -74,9 +112,10 @@ const RegistrationFields = () => {
                     <div>
                         <input
                             type="date"
+                            value={registration.birthdate}
                             onChange={(e) =>
                                 handleRegistrationChange(
-                                    "birthday",
+                                    "birthdate",
                                     e.target.value
                                 )
                             }
@@ -85,8 +124,12 @@ const RegistrationFields = () => {
                     </div>
                     <div>
                         <select
+                            value={registration.gender}
                             onChange={(e) =>
-                                handleRegistrationChange("sex", e.target.value)
+                                handleRegistrationChange(
+                                    "gender",
+                                    e.target.value
+                                )
                             }
                             className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
                         >
@@ -94,8 +137,8 @@ const RegistrationFields = () => {
                                 Select sex{" "}
                                 <span className="text-ascend-red">*</span>
                             </option>
-                            <option>Male</option>
-                            <option>Female</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
                         </select>
                     </div>
                 </div>
@@ -104,9 +147,10 @@ const RegistrationFields = () => {
                     <div class="relative">
                         <input
                             type="text"
+                            value={registration.house_no}
                             onChange={(e) =>
                                 handleRegistrationChange(
-                                    "HouseStreet",
+                                    "house_no",
                                     e.target.value
                                 )
                             }
@@ -126,6 +170,7 @@ const RegistrationFields = () => {
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 pt-4">
                     <select
+                        value={registration.province}
                         onChange={(e) =>
                             handleRegistrationChange("province", e.target.value)
                         }
@@ -139,6 +184,7 @@ const RegistrationFields = () => {
                     </select>
 
                     <select
+                        value={registration.city}
                         onChange={(e) =>
                             handleRegistrationChange("city", e.target.value)
                         }
@@ -152,6 +198,7 @@ const RegistrationFields = () => {
                     </select>
 
                     <select
+                        value={registration.barangay}
                         onChange={(e) =>
                             handleRegistrationChange("barangay", e.target.value)
                         }
@@ -169,9 +216,10 @@ const RegistrationFields = () => {
                     <div class="relative">
                         <input
                             type="text"
+                            value={registration.contact_number}
                             onChange={(e) =>
                                 handleRegistrationChange(
-                                    "lastname",
+                                    "contact_number",
                                     e.target.value
                                 )
                             }
@@ -189,9 +237,10 @@ const RegistrationFields = () => {
                     <div class="relative">
                         <input
                             type="text"
+                            value={registration.email}
                             onChange={(e) =>
                                 handleRegistrationChange(
-                                    "firstname",
+                                    "email",
                                     e.target.value
                                 )
                             }
@@ -212,7 +261,7 @@ const RegistrationFields = () => {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 pt-4">
                     <select
                         onChange={(e) =>
-                            handleRegistrationChange("prgogram", e.target.value)
+                            handleRegistrationChange("program", e.target.value)
                         }
                         className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
                     >
@@ -228,6 +277,7 @@ const RegistrationFields = () => {
                     <div class="relative">
                         <input
                             type="password"
+                            value={registration.password}
                             onChange={(e) =>
                                 handleRegistrationChange(
                                     "password",
@@ -248,9 +298,10 @@ const RegistrationFields = () => {
                     <div class="relative">
                         <input
                             type="password"
+                            value={registration.password_confirmation}
                             onChange={(e) =>
                                 handleRegistrationChange(
-                                    "confirmpassword",
+                                    "password_confirmation",
                                     e.target.value
                                 )
                             }
@@ -268,8 +319,34 @@ const RegistrationFields = () => {
                     </div>
                 </div>
 
+                {errorMessage.error && (
+                    <div
+                        role="alert"
+                        className="alert alert-error rounded-none font-nunito-sans mt-4"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-6 w-6 shrink-0 stroke-current"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                        </svg>
+                        <span>{errorMessage.error}</span>
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 gap-4 pt-4">
-                    <PrimaryButton text="Register" />
+                    <PrimaryButton
+                        isDisabled={loading}
+                        doSomething={register}
+                        text="Register"
+                    />
                 </div>
             </div>
         </>

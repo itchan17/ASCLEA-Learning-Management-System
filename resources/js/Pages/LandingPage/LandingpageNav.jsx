@@ -58,7 +58,7 @@ export default function LandingpageNav() {
                         />
                     </Link>
 
-                    <Link href={"/registration"}>
+                    <Link href={"/register"}>
                         <PrimaryButton text={"Register"} />
                     </Link>
                 </div>
@@ -128,7 +128,7 @@ export default function LandingpageNav() {
                         />
                     </Link>
 
-                    <Link href={"/registration"}>
+                    <Link href={"/register"}>
                         <PrimaryButton text={"Register"} />
                     </Link>
                 </div>

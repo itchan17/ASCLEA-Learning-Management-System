@@ -99,9 +99,8 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
 
                 <img
                     ref={profileRef}
-                    src="https://avatar.iran.liara.run/public"
                     alt="Profile image"
-                    className="w-12 h-12 rounded-full cursor-pointer object-cover"
+                    className="w-12 h-12 rounded-full cursor-pointer object-cover bg-ascend-gray1"
                     onClick={() => openDropdown("profile")}
                 ></img>
             </div>

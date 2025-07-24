@@ -157,7 +157,7 @@ export default function Sidebar({
                             link.roles.includes(user?.role)
                         ) {
                             if (user?.role === "student") {
-                                return user?.verified ||
+                                return user?.approved ||
                                     link.url === "/admission"
                                     ? link
                                     : null;

@@ -14,6 +14,11 @@ const ProfileDropdown = forwardRef((props, ref) => {
         props.setDropdown("");
     };
 
+    const handleLogout = () => {
+        router.post(route("logout.user"), {}, { replace: true });
+        props.setDropdown("");
+    };
+
     return (
         <div
             ref={ref}
@@ -27,7 +32,10 @@ const ProfileDropdown = forwardRef((props, ref) => {
                     <IoPersonCircle className="text-size5" />
                     <span>Profile</span>
                 </div>
-                <div className="flex space-x-2 px-5 py-3 hover:bg-ascend-lightblue transition-hover duration-300 cursor-pointer">
+                <div
+                    onClick={handleLogout}
+                    className="flex space-x-2 px-5 py-3 hover:bg-ascend-lightblue transition-hover duration-300 cursor-pointer"
+                >
                     <IoLogOutSharp className="text-size5" />
                     <span>Sign out</span>
                 </div>

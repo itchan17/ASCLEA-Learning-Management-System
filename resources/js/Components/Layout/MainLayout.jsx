@@ -1,10 +1,21 @@
 import { useState, useEffect } from "react";
 import Navbar from "./Navbar/Navbar";
 import Sidebar from "./Sidebar/Sidebar";
+import { usePage } from "@inertiajs/react";
+import useUserStore from "../../Stores/User/userStore";
 
 export default function MainLayout({ children }) {
+    const setAuthUser = useUserStore((state) => state.setAuthUser);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isMdScreen, setIsMdScreen] = useState(window.innerWidth < 1024);
+
+    // Get the autheticated user data
+    const { user } = usePage().props.auth;
+
+    // Initialize the data uf auth user
+    useEffect(() => {
+        if (user) setAuthUser(user);
+    }, []);
 
     // Get the width of window
     useEffect(() => {
