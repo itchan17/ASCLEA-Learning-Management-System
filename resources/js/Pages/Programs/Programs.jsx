@@ -4,6 +4,7 @@ import AddProgramForm from "./ProgramComponent/AddProgramForm";
 import useProgramStore from "../../Stores/Programs/programStore";
 import ProgramCard from "./ProgramComponent/ProgramCard";
 import EmptyState from "../../Components/EmptyState/EmptyState";
+import RoleGuard from "../../Components/Auth/RoleGuard";
 
 export default function Programs() {
     // Program Store
@@ -11,8 +12,10 @@ export default function Programs() {
     const setActiveTab = useProgramStore((state) => state.setActiveTab);
 
     console.log(programList);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     console.log("Render Programs");
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editProgram, setEditProgram] = useState(false);
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
@@ -22,51 +25,50 @@ export default function Programs() {
         setActiveTab(0);
     }, []);
 
+    useEffect(() => {
+        console.log("Edit program: " + editProgram);
+    }, [editProgram]);
+
     return (
-        <>
-            <div className="font-nunito-sans space-y-5">
+        <div className="font-nunito-sans space-y-5">
+            <RoleGuard allowedRoles={["admin", "faculty"]}>
                 <div className="flex justify-end">
                     <PrimaryButton
                         doSomething={toggleModal}
                         text={"Add Program"}
                     />
                 </div>
+            </RoleGuard>
 
-                {/* Program placeholder */}
-                <div className="w-full flex flex-wrap gap-5">
-                    <ProgramCard
-                        programId={1}
-                        programName={"Licensure Examination for Teacher"}
-                    />
-
-                    <ProgramCard
-                        programId={2}
-                        programName={"Certificate in Teaching Program"}
-                    />
-                </div>
-
-                {/* Display created program */}
-                {/* <div className="w-full flex flex-wrap gap-5">
-                    {programList?.length > 0 ? (
-                        programList.map((program, index) => {
-                            return (
-                                <ProgramCard
-                                    key={index}
-                                    programName={program.programName}
-                                />
-                            );
-                        })
-                    ) : (
-                        <EmptyState
-                            imgSrc={"/images/illustrations/launch.svg"}
-                            text={`“No programs? Time to fill this space to start learning
+            {/* Display created program */}
+            <div className="w-full flex flex-wrap gap-5">
+                {programList?.length > 0 ? (
+                    programList.map((program, index) => {
+                        return (
+                            <ProgramCard
+                                key={index}
+                                programDetails={program}
+                                setIsModalOpen={setIsModalOpen}
+                                setEditProgram={setEditProgram}
+                            />
+                        );
+                    })
+                ) : (
+                    <EmptyState
+                        imgSrc={"/images/illustrations/launch.svg"}
+                        text={`“No programs? Time to fill this space to start learning
                 adventures!”`}
-                        />
-                    )}
-                </div> */}
-
-                {isModalOpen && <AddProgramForm toggleModal={toggleModal} />}
+                    />
+                )}
             </div>
-        </>
+
+            {isModalOpen && (
+                <AddProgramForm
+                    editProgram={editProgram}
+                    setEditProgram={setEditProgram}
+                    toggleModal={toggleModal}
+                />
+            )}
+        </div>
     );
 }

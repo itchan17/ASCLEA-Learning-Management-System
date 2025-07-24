@@ -99,16 +99,17 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
 
                 <img
                     ref={profileRef}
-                    src="https://avatar.iran.liara.run/public"
                     alt="Profile image"
-                    className="w-12 h-12 rounded-full cursor-pointer object-cover"
+                    className="w-12 h-12 rounded-full cursor-pointer object-cover bg-ascend-gray1"
                     onClick={() => openDropdown("profile")}
                 ></img>
             </div>
 
             {/* Dropdown */}
             {dropDown === "notif" && <NotifDropdown ref={dropdownRef} />}
-            {dropDown === "profile" && <ProfileDropdown ref={dropdownRef} />}
+            {dropDown === "profile" && (
+                <ProfileDropdown setDropdown={setDropdown} ref={dropdownRef} />
+            )}
         </nav>
     );
 }

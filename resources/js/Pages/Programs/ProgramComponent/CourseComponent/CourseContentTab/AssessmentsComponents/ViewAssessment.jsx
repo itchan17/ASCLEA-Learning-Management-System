@@ -14,6 +14,7 @@ import { useRoute } from "ziggy-js";
 import useAssessmentsStore from "../../../../../../Stores/Programs/CourseContent/assessmentsStore";
 import { formatFullDate } from "../../../../../../Utils/formatFullDate";
 import { formatDueDateTime } from "../../../../../../Utils/formatDueDateTime";
+import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
 
 export default function ViewAssessment() {
     const route = useRoute();
@@ -77,41 +78,43 @@ export default function ViewAssessment() {
                         </span>
                     </div>
 
-                    <div className="dropdown dropdown-end cursor-pointer ">
-                        <div
-                            tabIndex={0}
-                            role="button"
-                            className="rounded-4xl p-3 hover:bg-ascend-lightblue transition-all duration-300"
-                        >
-                            <BsThreeDotsVertical className="text-size5 text-ascend-black" />
-                        </div>
+                    <RoleGuard allowedRoles={["admin", "faculty"]}>
+                        <div className="dropdown dropdown-end cursor-pointer ">
+                            <div
+                                tabIndex={0}
+                                role="button"
+                                className="rounded-4xl p-3 hover:bg-ascend-lightblue transition-all duration-300"
+                            >
+                                <BsThreeDotsVertical className="text-size5 text-ascend-black" />
+                            </div>
 
-                        <ul
-                            tabIndex={0}
-                            className="dropdown-content menu bg-ascend-white w-42 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-                        >
-                            <li onClick={clickViewResponses}>
-                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    View responses
-                                </a>
-                            </li>
-                            <li>
-                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Edit assessment
-                                </a>
-                            </li>
-                            <li>
-                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Archive assessment
-                                </a>
-                            </li>
-                            <li>
-                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Reset assessment
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                            <ul
+                                tabIndex={0}
+                                className="dropdown-content menu bg-ascend-white w-42 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                            >
+                                <li onClick={clickViewResponses}>
+                                    <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        View responses
+                                    </a>
+                                </li>
+                                <li>
+                                    <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        Edit assessment
+                                    </a>
+                                </li>
+                                <li>
+                                    <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        Archive assessment
+                                    </a>
+                                </li>
+                                <li>
+                                    <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        Reset assessment
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </RoleGuard>
                 </div>
 
                 {assessmentDetails && (

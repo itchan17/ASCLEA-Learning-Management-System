@@ -1,14 +1,14 @@
 import React from "react";
 import PrimaryButton from "../../../../Components/Button/PrimaryButton";
 import SecondaryButton from "../../../../Components/Button/SecondaryButton";
-import useUserStore from "../../../../Stores/Programs/userStore";
+import useCourseList from "../../../../Stores/Programs/courseLIstStore";
 
 export default function AssignCourseForm({ toggleModal }) {
     // User Store
-    const handleAddCourseChange = useUserStore(
+    const handleAddCourseChange = useCourseList(
         (state) => state.handleAddCourseChange
     );
-    const handleAddCourse = useUserStore((state) => state.handleAddCourse);
+    const handleAddCourse = useCourseList((state) => state.handleAddCourse);
 
     const addCoourse = () => {
         handleAddCourse();

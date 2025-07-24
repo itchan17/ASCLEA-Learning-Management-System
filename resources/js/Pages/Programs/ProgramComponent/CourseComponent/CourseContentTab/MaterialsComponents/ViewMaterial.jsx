@@ -8,6 +8,7 @@ import DOMPurify from "dompurify";
 import "../../../../../../../css/global.css";
 import File from "../File";
 import { handleClickBackBtn } from "../../../../../../Utils/handleClickBackBtn";
+import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
 
 export default function ViewMaterial() {
     // const postHtml = DOMPurify.sanitize(postContent.postDescription);
@@ -31,31 +32,33 @@ export default function ViewMaterial() {
                         </span>
                     </div>
 
-                    <div className="dropdown dropdown-end cursor-pointer ">
-                        <div
-                            tabIndex={0}
-                            role="button"
-                            className="rounded-4xl p-3 hover:bg-ascend-lightblue transition-all duration-300"
-                        >
-                            <BsThreeDotsVertical className="text-size5 text-ascend-black" />
-                        </div>
+                    <RoleGuard allowedRoles={["admin", "faculty"]}>
+                        <div className="dropdown dropdown-end cursor-pointer ">
+                            <div
+                                tabIndex={0}
+                                role="button"
+                                className="rounded-4xl p-3 hover:bg-ascend-lightblue transition-all duration-300"
+                            >
+                                <BsThreeDotsVertical className="text-size5 text-ascend-black" />
+                            </div>
 
-                        <ul
-                            tabIndex={0}
-                            className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-                        >
-                            <li>
-                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Edit
-                                </a>
-                            </li>
-                            <li>
-                                <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Remove
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                            <ul
+                                tabIndex={0}
+                                className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                            >
+                                <li>
+                                    <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        Remove
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </RoleGuard>
                 </div>
 
                 <ReactQuill

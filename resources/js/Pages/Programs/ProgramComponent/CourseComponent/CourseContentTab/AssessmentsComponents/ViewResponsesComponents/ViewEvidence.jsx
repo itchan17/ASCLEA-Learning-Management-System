@@ -17,7 +17,7 @@ export default function ViewEvidence({ setIsEvidenceOpen }) {
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap gap-5 items-center justify-between">
                     <div className="flex items-center space-x-5">
                         <div className="w-20 h-20 bg-ascend-gray1 rounded-full shrink-0"></div>
                         <div>

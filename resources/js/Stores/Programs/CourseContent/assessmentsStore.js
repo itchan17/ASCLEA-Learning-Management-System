@@ -1,12 +1,16 @@
 import { create } from "zustand";
 import useCreateQuizStore from "./createQuizStore";
 import useUserStore from "../../User/userStore";
+import useModulesStore from "./modulesStore";
 
 const useAssessmentsStore = create((set) => ({
     isFormOpen: false,
 
     assessmentDetails: {
         id: null,
+        sectionId: null,
+        sortOrder: null,
+        contentType: "assessment",
         assessmentStatus: null,
         assessmentType: "",
         assessmentDueDateTime: "",
@@ -23,6 +27,9 @@ const useAssessmentsStore = create((set) => ({
     assessmentList: [
         {
             id: 1,
+            sectionId: 1,
+            sortOrder: 2,
+            contentType: "assessment",
             assessmentType: "quiz",
             assessmentDueDateTime: "2025-07-15T23:59",
             assessmentPoints: 100,
@@ -41,6 +48,9 @@ const useAssessmentsStore = create((set) => ({
         },
         {
             id: 2,
+            sectionId: 2,
+            sortOrder: 1,
+            contentType: "assessment",
             assessmentType: "activity",
             assessmentDueDateTime: "2025-07-20T23:59",
             assessmentPoints: 50,
@@ -128,7 +138,7 @@ const useAssessmentsStore = create((set) => ({
         });
     },
 
-    hanndleAddAssessments: () => {
+    hanndleAddAssessments: (sectionId) => {
         const user = useUserStore.getState().user;
         const { assessmentDetails, assessmentList, clearAssessmentDetails } =
             useAssessmentsStore.getState();
@@ -141,14 +151,44 @@ const useAssessmentsStore = create((set) => ({
                 ? assessmentList[assessmentList.length - 1].id + 1
                 : 1;
 
-        const updatedAssessmentDetails = {
-            ...assessmentDetails,
-            id: newId, // temporarily set the id
-            assessmentPostDate: today,
-            userPosted: `${user.firstName} ${user.lastName}`,
-        };
-        console.log(updatedAssessmentDetails);
-        set({ assessmentList: [updatedAssessmentDetails, ...assessmentList] });
+        if (sectionId) {
+            const sectionList = useModulesStore.getState().sectionList;
+
+            console.log(sectionList);
+            const sectionDetails = sectionList.find(
+                (section) => section.id === sectionId
+            );
+
+            const contentList = sectionDetails.sectionContentList;
+            const lastItem = contentList[contentList.length - 1];
+
+            const sortOrder = lastItem ? lastItem.sortOrder + 1 : 1;
+
+            const updatedAssessmentDetails = {
+                ...assessmentDetails,
+                id: newId, // temporarily set the id
+                sectionId,
+                sortOrder,
+                assessmentPostDate: today,
+                userPosted: `${user.firstName} ${user.lastName}`,
+            };
+            console.log(updatedAssessmentDetails);
+            set({
+                assessmentList: [updatedAssessmentDetails, ...assessmentList],
+            });
+        } else {
+            const updatedAssessmentDetails = {
+                ...assessmentDetails,
+                id: newId, // temporarily set the id
+                assessmentPostDate: today,
+                userPosted: `${user.firstName} ${user.lastName}`,
+            };
+            console.log(updatedAssessmentDetails);
+            set({
+                assessmentList: [updatedAssessmentDetails, ...assessmentList],
+            });
+        }
+
         clearAssessmentDetails();
     },
 }));

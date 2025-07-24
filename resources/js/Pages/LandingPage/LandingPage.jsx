@@ -190,10 +190,10 @@ export default function LandingPage({ text }) {
                 </div>
             </section>
 
-            {/* Admission Requirements */}
+            {/* Frequently Asked Questions */}
             <section
-                id="admission"
-                className="relative bg-cover bg-center h-[1200px] space-y-10 bg-gradient-to-r from-black to-ascend-blue"
+                id="frequently-asked-questions"
+                className="relative bg-cover bg-center h-full md:h-[1100px] space-y-10 bg-gradient-to-r from-black to-ascend-blue"
             >
                 <div
                     className="bg-cover absolute z-0 w-full h-full opacity-15"
@@ -202,43 +202,82 @@ export default function LandingPage({ text }) {
                     }}
                 ></div>
                 <div className="flex flex-col items-center px-5 lg:px-[100px] py-20 lg:py-40 w-full space-y-10">
-                    <h1 className="relative z-10 text-4xl text-center font-shippori font-semibold text-ascend-white">
-                        Admission Requirements
+                    <h1 className="text-4xl text-center font-shippori font-semibold text-ascend-white">
+                        Frequently Asked Questions
                     </h1>
-                    <div className="relative w-full sm:w-0">
-                        <div
-                            data-aos="flip-left"
-                            className="absolute w-full sm:-right-70 lg:-left-2 top-95 lg:top-20 sm:w-120 sm:h-100 bg-ascend-white space-y-10 border border-ascend-gray1 shadow-[5px_10px_15px_0px_#0a0a0a] p-8 text-ascend-black"
-                        >
-                            <h1 className="font-shippori text-center text-size6 font-semibold">
-                                For CTP
-                            </h1>
-                            <ol class="list-decimal ml-5 text-size4 font-nunito-sans">
-                                <li>
-                                    Original and Photocopy of TOR (Honorable
-                                    Dismissal)
-                                </li>
-                                <li>
-                                    Original and Photocopy of Birth Cert. (PSA)
-                                </li>
-                                <li>Photocopy of Marriage Certificate</li>
-                                <li>Passport size picture (3pcs)</li>
-                                <li>Long Brown and Plastic Envelope</li>
-                                <li>Application Form</li>
-                            </ol>
+
+                    <div className="space-y-5 w-full p-10 bg-ascend-white text-ascend-black">
+                        <div className="collapse collapse-arrow bg-ascend-white rounded-none shadow-shadow1 border border-ascend-gray1">
+                            <input type="radio" name="my-accordion-2" />
+                            <div className="collapse-title font-semibold">
+                                How can I reset my password?
+                            </div>
+                            <div className="collapse-content text-sm">
+                                Lorem ipsum dolor sit amet, consectetur
+                                adipiscing elit. Nulla quis lorem ut libero
+                                malesuada feugiat.
+                            </div>
                         </div>
-                        <div
-                            data-aos="flip-right"
-                            className="absolute w-full sm:-right-50 lg:-right-2 sm:w-120 h-100 bg-ascend-white space-y-10 border border-ascend-gray1 shadow-[5px_10px_15px_0px_#0a0a0a] p-8 text-ascend-black"
-                        >
-                            <h1 className="font-shippori text-center text-size6 font-semibold ">
-                                For LET
-                            </h1>
-                            <ol class="list-decimal ml-5 text-size4 font-nunito-sans">
-                                <li>Accomplished Application Form</li>
-                                <li>NOA Photocopy</li>
-                                <li>ID size picture (2pcs) </li>
-                            </ol>
+
+                        <div className="collapse collapse-arrow bg-ascend-white rounded-none shadow-shadow1 border border-ascend-gray1">
+                            <input type="radio" name="my-accordion-2" />
+                            <div className="collapse-title font-semibold">
+                                Where can I view my courses?
+                            </div>
+                            <div className="collapse-content text-sm">
+                                Lorem ipsum dolor sit amet, consectetur
+                                adipiscing elit. Pellentesque in ipsum id orci
+                                porta dapibus.
+                            </div>
+                        </div>
+
+                        <div className="collapse collapse-arrow bg-ascend-white rounded-none shadow-shadow1 border border-ascend-gray1">
+                            <input type="radio" name="my-accordion-2" />
+                            <div className="collapse-title font-semibold">
+                                How do I contact support?
+                            </div>
+                            <div className="collapse-content text-sm">
+                                Lorem ipsum dolor sit amet, consectetur
+                                adipiscing elit. Vestibulum ante ipsum primis in
+                                faucibus orci luctus et.
+                            </div>
+                        </div>
+
+                        <div className="collapse collapse-arrow bg-ascend-white rounded-none shadow-shadow1 border border-ascend-gray1">
+                            <input type="radio" name="my-accordion-2" />
+                            <div className="collapse-title font-semibold">
+                                Can I update my profile information?
+                            </div>
+                            <div className="collapse-content text-sm">
+                                Lorem ipsum dolor sit amet, consectetur
+                                adipiscing elit. Done shadow-shadow1
+                                bascend-gray1 border-gray1c sollicitudin
+                                molestie malesuada.
+                            </div>
+                        </div>
+
+                        <div className="collapse collapse-arrow bg-ascend-white rounded-none shadow-shadow1 border border-ascend-gray1">
+                            <input type="radio" name="my-accordion-2" />
+                            <div className="collapse-title font-semibold">
+                                Is there a mobile app available?
+                            </div>
+                            <div className="collapse-content text-sm">
+                                Lorem ipsum dolor sit amet, consectetur
+                                adipiscing elit. Cras ultricies ligula sed magna
+                                dictum porta.
+                            </div>
+                        </div>
+
+                        <div className="collapse collapse-arrow bg-ascend-white rounded-none shadow-shadow1 border border-ascend-gray1">
+                            <input type="radio" name="my-accordion-2" />
+                            <div className="collapse-title font-semibold">
+                                How do I delete my account?
+                            </div>
+                            <div className="collapse-content text-sm">
+                                Lorem ipsum dolor sit amet, consectetur
+                                adipiscing elit. Curabitur arcu erat, accumsan
+                                id imperdiet et, porttitor at sem.
+                            </div>
                         </div>
                     </div>
                 </div>

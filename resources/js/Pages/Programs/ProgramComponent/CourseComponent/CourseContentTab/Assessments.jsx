@@ -4,6 +4,7 @@ import EmptyState from "../../../../../Components/EmptyState/EmptyState";
 import AssessmentForm from "./AssessmentsComponents/AssessmentForm";
 import AssessmentItem from "./AssessmentsComponents/AssessmentItem";
 import useAssessmentsStore from "../../../../../Stores/Programs/CourseContent/assessmentsStore";
+import RoleGuard from "../../../../../Components/Auth/RoleGuard";
 
 export default function Assessments() {
     // Assessments Store
@@ -21,16 +22,22 @@ export default function Assessments() {
             targetForm.current?.scrollIntoView({ behavior: "smooth" });
         }
     }, [isFormOpen]);
+
+    useEffect(() => {
+        console.log(assessmentList);
+    }, [assessmentList]);
     return (
         <div className="font-nunito-sans text-ascend-black space-y-5">
             <div className="flex flex-wrap gap-2 justify-between items-center">
                 <h1 className="text-size6 font-bold">Course Assessments</h1>
 
-                <PrimaryButton
-                    isDisabled={isFormOpen}
-                    doSomething={toggleAssessmentForm}
-                    text="Add Assessment"
-                />
+                <RoleGuard allowedRoles={["admin", "faculty"]}>
+                    <PrimaryButton
+                        isDisabled={isFormOpen}
+                        doSomething={toggleAssessmentForm}
+                        text="Add Assessment"
+                    />
+                </RoleGuard>
             </div>
 
             {isFormOpen && (
@@ -38,16 +45,18 @@ export default function Assessments() {
                     <AssessmentForm toggleForm={toggleAssessmentForm} />
                 </div>
             )}
+
             {/* <AssessmentItem /> */}
-            {assessmentList.length > 0 &&
+            {assessmentList.length > 0 ? (
                 assessmentList.map((assessment, i) => (
                     <AssessmentItem key={i} assessmentDetails={assessment} />
-                ))}
-
-            {/* <EmptyState
-                imgSrc={"/images/illustrations/empty.svg"}
-                text={`“There’s a whole lot of nothing going on—time to make something happen!”`}
-            /> */}
+                ))
+            ) : (
+                <EmptyState
+                    imgSrc={"/images/illustrations/empty.svg"}
+                    text={`“There’s a whole lot of nothing going on—time to make something happen!”`}
+                />
+            )}
         </div>
     );
 }

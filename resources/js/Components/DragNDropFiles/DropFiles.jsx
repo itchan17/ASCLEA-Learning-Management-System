@@ -6,6 +6,7 @@ export default function DropFiles({
     toggleDropFiles,
     handleFileChange,
     fieldName,
+    withCancel = false,
 }) {
     // callback function for handling drop files
     const onDrop = useCallback((acceptedFiles) => {
@@ -53,15 +54,17 @@ export default function DropFiles({
 
     return (
         <div className="space-y-5">
-            <div className="flex items-center justify-between">
-                <label className="font-bold">Upload Files</label>
-                <span
-                    onClick={toggleDropFiles}
-                    className="cursor-pointer text-ascend-red"
-                >
-                    Cancel
-                </span>
-            </div>
+            {!withCancel && (
+                <div className="flex items-center justify-between">
+                    <label className="font-bold">Upload Files</label>
+                    <span
+                        onClick={toggleDropFiles}
+                        className="cursor-pointer text-ascend-red"
+                    >
+                        Cancel
+                    </span>
+                </div>
+            )}
 
             {/* File Dropzone */}
             <section className="">

@@ -3,12 +3,14 @@ import BackButton from "../../../../Components/Button/BackButton";
 import PrimaryButton from "../../../../Components/Button/PrimaryButton";
 import { IoSearch } from "react-icons/io5";
 import AssignCourseForm from "./AssignCourseForm";
-import useUserStore from "../../../../Stores/Programs/userStore";
+import useCourseList from "../../../../Stores/Programs/courseLIstStore";
 import { handleClickBackBtn } from "../../../../Utils/handleClickBackBtn";
+import RoleGuard from "../../../../Components/Auth/RoleGuard";
+import EmptyState from "../../../../Components/EmptyState/EmptyState";
 
 export default function ViewUser() {
     // User Store
-    const courseList = useUserStore((state) => state.courseList);
+    const courseList = useCourseList((state) => state.courseList);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -20,10 +22,12 @@ export default function ViewUser() {
         <div className=" space-y-5 text-ascend-black">
             <div className="flex justify-between items-center ">
                 <BackButton doSomething={handleClickBackBtn} />
-                <PrimaryButton
-                    doSomething={toggleModal}
-                    text={"Assign Course"}
-                />
+                <RoleGuard allowedRoles={["admin"]}>
+                    <PrimaryButton
+                        doSomething={toggleModal}
+                        text={"Assign Course"}
+                    />
+                </RoleGuard>
             </div>
             <div className="flex items-center space-x-5">
                 <div className="w-16 h-16 bg-ascend-gray1 rounded-4xl"></div>
@@ -63,15 +67,23 @@ export default function ViewUser() {
                                     <td>{course.courseCode}</td>
                                     <td>{course.courseName}</td>
                                     <td>{course.courseStatus}</td>
-                                    <td>
-                                        <span className="text-ascend-red underline">
-                                            Remove
-                                        </span>
-                                    </td>
+                                    <RoleGuard allowedRoles={["admin"]}>
+                                        <td>
+                                            <span className="text-ascend-red underline">
+                                                Remove
+                                            </span>
+                                        </td>
+                                    </RoleGuard>
                                 </tr>
                             ))}
                     </tbody>
                 </table>
+                {courseList?.length === 0 && (
+                    <EmptyState
+                        imgSrc={"/images/illustrations/not_assigned.svg"}
+                        text={`No assigned courses found. Click Assign Course to get your students started.`}
+                    />
+                )}
             </div>
 
             {isModalOpen && <AssignCourseForm toggleModal={toggleModal} />}

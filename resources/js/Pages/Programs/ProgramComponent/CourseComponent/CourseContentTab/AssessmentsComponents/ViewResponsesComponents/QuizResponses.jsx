@@ -229,7 +229,7 @@ export default function QuizReponses({ responsesData }) {
 
             {/* Feedback */}
             <div className="space-y-5">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap gap-5 items-center justify-between">
                     <div className="flex items-end space-x-3">
                         <h1 className="text-size5 break-words font-semibold">
                             Feedback
@@ -287,8 +287,8 @@ export default function QuizReponses({ responsesData }) {
             </div>
 
             {/* Table */}
-            <div className="flex items-center justify-end">
-                <div className="w-full min-w-0">
+            <div className="flex flex-wrap gap-5 items-center justify-between">
+                <div className="min-w-0">
                     <h1 className="text-size5 break-words font-semibold">
                         Student Scores
                     </h1>
