@@ -35,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // ------ START ------
         $middleware->validateCsrfTokens(except: [
             '/login',
+            '/logout',
             '/programs',
             'programs/*',
         ]);

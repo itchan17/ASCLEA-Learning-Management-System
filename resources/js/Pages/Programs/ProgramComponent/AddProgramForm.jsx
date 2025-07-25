@@ -5,6 +5,8 @@ import AddCourse from "./CourseComponent/AddCourse";
 import CourseItem from "./CourseComponent/CourseItem";
 import useProgramStore from "../../../Stores/Programs/programStore";
 import useCourseStore from "../../../Stores/Programs/courseStore";
+import { router } from "@inertiajs/react";
+import { useRoute } from "ziggy-js";
 
 export default function AddProgramForm({
     toggleModal,
@@ -12,7 +14,7 @@ export default function AddProgramForm({
     setEditProgram,
 }) {
     console.log("Render Add Program Form");
-
+    const route = useRoute();
     // Program Store
     const program = useProgramStore((state) => state.program);
     const handleProgramChange = useProgramStore(
@@ -38,10 +40,20 @@ export default function AddProgramForm({
     // Add program
     const handleAdd = (e) => {
         e.preventDefault();
-        addProgram();
-        setEditProgram(false);
-        // Close modal form
-        toggleModal();
+        // Handle post request for creating program
+        router.post(
+            route("program.create"),
+            {
+                program_name: "Licensure examination for Teachers",
+                program_description:
+                    "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+            },
+            { onSuccess: (page) => console.log(page) }
+        );
+        // addProgram();
+        // setEditProgram(false);
+        // // Close modal form
+        // toggleModal();
     };
 
     const handleEditProgram = (e) => {
