@@ -9,7 +9,6 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException; 
 use Inertia\Inertia;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
@@ -39,11 +38,10 @@ class RegistrationController extends Controller
 
         $data = $request->only([
             'first_name', 'last_name', 'middle_name', 'birthdate',
-            'gender', 'contact_number', 'email',
+            'gender', 'contact_number', 'email','password',
             'house_no', 'province', 'city', 'barangay'
         ]);
 
-        $data['password'] = Hash::make($request->password);
         $data['role_id'] = $roleId;
         
         $user = User::create($data);

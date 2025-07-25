@@ -6,11 +6,6 @@ use Inertia\Inertia;
 Route::prefix('programs')
     ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin,faculty,student'])
     ->group(function () {
-        
-        // Programs index page
-        Route::get('/', function () {
-            return Inertia::render('Programs/Programs');
-        })->name('programs.index');
 
         // Route for selected program
         Route::get('/{programId}', function ($programId) {
