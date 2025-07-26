@@ -16,6 +16,12 @@ const useCourseStore = create((set) => ({
         courseStatus: "",
     },
 
+    clearCourseList: () => {
+        set(() => ({
+            courseList: [],
+        }));
+    },
+
     // Set the active tab inside the course content
     setActiveTab: (tab) => {
         const { activeTab } = useCourseStore.getState();

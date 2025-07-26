@@ -14,13 +14,18 @@ class ProgramController extends Controller
 {
     // Display the program page
     public function show() {
-        return Inertia::render('Programs/Programs');
+        $programList = Program::select('program_id', 'program_name', 'program_description')->get();
+
+        return Inertia::render('Programs/Programs', [
+            'program_list' => $programList
+        ]);
     }
 
     public function store(Request $req) {
         // Throw an error if try to access by unauthorized user
         Gate::authorize('create', Program::class);
 
+        // dd($req->all());
         // Validate input
         $validated = $req->validate([
             'program_name' => 'required|max:255',

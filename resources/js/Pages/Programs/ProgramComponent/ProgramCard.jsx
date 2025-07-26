@@ -79,7 +79,7 @@ export default function ProgramCard({
 
             <div className="h-16 px-5 flex items-center">
                 <h1 className="font-bold overflow-hidden text-ellipsis text-nowrap group-hover:text-ascend-blue transition-all duration-300">
-                    {programDetails.programName}
+                    {programDetails.program_name}
                 </h1>
             </div>
         </div>

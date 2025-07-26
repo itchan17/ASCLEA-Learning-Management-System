@@ -1,4 +1,5 @@
 import React from "react";
+import Loader from "../Loader";
 
 export default function PrimaryButton({
     doSomething,
@@ -20,7 +21,7 @@ export default function PrimaryButton({
         >
             {icon && <div className="text-size5">{icon}</div>}
             {isDisabled ? (
-                <span className="loading loading-bars loading-sm"></span>
+                <Loader />
             ) : (
                 <span className={`font-semibold ${textColor}`}>{text}</span>
             )}

@@ -5,7 +5,7 @@ import AddCourse from "./CourseComponent/AddCourse";
 import CourseItem from "./CourseComponent/CourseItem";
 import useProgramStore from "../../../Stores/Programs/programStore";
 import useCourseStore from "../../../Stores/Programs/courseStore";
-import { router } from "@inertiajs/react";
+import { router, useForm } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 
 export default function AddProgramForm({
@@ -13,23 +13,31 @@ export default function AddProgramForm({
     editProgram,
     setEditProgram,
 }) {
-    console.log("Render Add Program Form");
     const route = useRoute();
+
     // Program Store
-    const program = useProgramStore((state) => state.program);
-    const handleProgramChange = useProgramStore(
-        (state) => state.handleProgramChange
-    );
-    const addProgram = useProgramStore((state) => state.addProgram);
+    // const program = useProgramStore((state) => state.program);
+    // const handleProgramChange = useProgramStore(
+    //     (state) => state.handleProgramChange
+    // );
+    // const addProgram = useProgramStore((state) => state.addProgram);
     const editProgramDetails = useProgramStore(
         (state) => state.editProgramDetails
     );
+    const setProgramList = useProgramStore((state) => state.setProgramList);
 
     // Course Store
     const courseList = useCourseStore((state) => state.courseList);
     const addCourseFunc = useCourseStore((state) => state.addCourse);
+    const clearCourseList = useCourseStore((state) => state.clearCourseList);
 
     const [addCourse, setAddCourse] = useState(false);
+
+    const { data, setData, post, processing, errors, clearErrors } = useForm({
+        program_name: "",
+        program_description: "",
+        course_list: [],
+    });
 
     const saveCourse = (e) => {
         e.preventDefault();
@@ -37,23 +45,39 @@ export default function AddProgramForm({
         toggleAddCourse();
     };
 
-    // Add program
-    const handleAdd = (e) => {
+    useEffect(() => {
+        // Check if user added a course the set the course_list of the form
+        if (Array.isArray(courseList) && courseList.length > 0) {
+            setData("course_list", courseList);
+        }
+    }, [courseList]);
+
+    // Handle add program form subsmission
+    const handleAddProgram = (e) => {
         e.preventDefault();
-        // Handle post request for creating program
-        router.post(
-            route("program.create"),
-            {
-                program_name: "Licensure examination for Teachers",
-                program_description:
-                    "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+        clearErrors();
+
+        // Send a post request to server
+        post(route("program.create"), {
+            onSuccess: (page) => {
+                setData({
+                    program_name: "",
+                    program_description: "",
+                    course_list: [],
+                });
+                clearCourseList();
+
+                // Get the data response from the flash succes
+                // Add the new program to progmramList array
+                if (page.props.flash.success.data) {
+                    setProgramList(page.props.flash.success.data);
+                }
+
+                toggleModal();
             },
-            { onSuccess: (page) => console.log(page) }
-        );
-        // addProgram();
-        // setEditProgram(false);
-        // // Close modal form
-        // toggleModal();
+        });
+
+        setEditProgram(false);
     };
 
     const handleEditProgram = (e) => {
@@ -68,13 +92,12 @@ export default function AddProgramForm({
         setAddCourse(!addCourse);
     };
 
-    useEffect(() => {
-        console.log(courseList);
-    }, [courseList]);
-
     return (
         <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
-            <form className="bg-ascend-white opacity-100 p-5 w-150 space-y-5  max-h-[calc(100vh-5rem)] overflow-y-auto my-10">
+            <form
+                onSubmit={handleAddProgram}
+                className="bg-ascend-white opacity-100 p-5 w-150 space-y-5  max-h-[calc(100vh-5rem)] overflow-y-auto my-10"
+            >
                 <h1 className="text-size4 font-bold">
                     {editProgram ? "Edit" : "Add"} Program
                 </h1>
@@ -84,26 +107,33 @@ export default function AddProgramForm({
                         <span className="text-ascend-red">*</span>
                     </label>
                     <input
-                        value={program.programName}
-                        className="border w-full p-2 h-9 focus:outline-ascend-blue"
+                        value={data.program_name}
+                        className={`border ${
+                            errors.program_name
+                                ? "border-2 border-ascend-red"
+                                : ""
+                        } w-full p-2 h-9 focus:outline-ascend-blue`}
                         type="text"
                         onChange={(e) =>
-                            handleProgramChange("programName", e.target.value)
+                            setData("program_name", e.target.value)
                         }
                     />
+                    {errors.program_name && (
+                        <span className="text-ascend-red">
+                            {errors.program_name}
+                        </span>
+                    )}
                 </div>
+
                 <div>
                     <label htmlFor="">Program Description</label>
                     <textarea
-                        value={program.programDescription}
+                        value={data.program_description}
                         id=""
                         className="border w-full p-2 focus:outline-ascend-blue"
                         rows={5}
                         onChange={(e) =>
-                            handleProgramChange(
-                                "programDescription",
-                                e.target.value
-                            )
+                            setData("program_description", e.target.value)
                         }
                     ></textarea>
                 </div>
@@ -158,6 +188,7 @@ export default function AddProgramForm({
 
                 <div className="flex justify-end space-x-2">
                     <SecondaryButton
+                        isDisabled={processing}
                         doSomething={() => {
                             toggleModal();
                             if (editProgram) {
@@ -172,7 +203,11 @@ export default function AddProgramForm({
                             text={"Save"}
                         />
                     ) : (
-                        <PrimaryButton doSomething={handleAdd} text={"Add"} />
+                        <PrimaryButton
+                            isDisabled={processing}
+                            btnType="submit"
+                            text={"Add"}
+                        />
                     )}
                 </div>
             </form>

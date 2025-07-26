@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('programs', function (Blueprint $table) {
             $table->uuid('program_id')->primary();
             $table->string('program_name');
-            $table->longText('program_description');
+            $table->longText('program_description')->nullable();
             $table->timestamps();
         });
     }
