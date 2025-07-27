@@ -7,24 +7,16 @@ import useProgramStore from "../../../Stores/Programs/programStore";
 import useCourseStore from "../../../Stores/Programs/courseStore";
 import { router, useForm } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
+import { update } from "lodash";
 
 export default function AddProgramForm({
     toggleModal,
     editProgram,
     setEditProgram,
+    setProgramToEdit,
+    programToEdit,
 }) {
     const route = useRoute();
-
-    // Program Store
-    // const program = useProgramStore((state) => state.program);
-    // const handleProgramChange = useProgramStore(
-    //     (state) => state.handleProgramChange
-    // );
-    // const addProgram = useProgramStore((state) => state.addProgram);
-    const editProgramDetails = useProgramStore(
-        (state) => state.editProgramDetails
-    );
-    const setProgramList = useProgramStore((state) => state.setProgramList);
 
     // Course Store
     const courseList = useCourseStore((state) => state.courseList);
@@ -33,11 +25,20 @@ export default function AddProgramForm({
 
     const [addCourse, setAddCourse] = useState(false);
 
-    const { data, setData, post, processing, errors, clearErrors } = useForm({
-        program_name: "",
-        program_description: "",
-        course_list: [],
-    });
+    const { data, setData, post, put, processing, errors, clearErrors, reset } =
+        useForm(
+            editProgram
+                ? {
+                      program_name: programToEdit.program_name,
+                      program_description:
+                          programToEdit.program_description || "",
+                  }
+                : {
+                      program_name: "",
+                      program_description: "",
+                      course_list: [],
+                  }
+        );
 
     const saveCourse = (e) => {
         e.preventDefault();
@@ -53,49 +54,51 @@ export default function AddProgramForm({
     }, [courseList]);
 
     // Handle add program form subsmission
-    const handleAddProgram = (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         clearErrors();
 
-        // Send a post request to server
-        post(route("program.create"), {
-            onSuccess: (page) => {
-                setData({
-                    program_name: "",
-                    program_description: "",
-                    course_list: [],
-                });
-                clearCourseList();
-
-                // Get the data response from the flash succes
-                // Add the new program to progmramList array
-                if (page.props.flash.success.data) {
-                    setProgramList(page.props.flash.success.data);
+        // Check first if form is set for editing
+        if (!editProgram) {
+            // Send a post request to server to create program
+            post(route("program.create", []), {
+                onSuccess: () => {
+                    reset();
+                    clearCourseList();
+                    toggleModal();
+                },
+            });
+        } else {
+            // Send a put request to server to update program
+            put(
+                route("program.update", { program: programToEdit.program_id }),
+                {
+                    onSuccess: () => {
+                        reset();
+                        toggleModal();
+                        setEditProgram(false);
+                    },
                 }
-
-                toggleModal();
-            },
-        });
-
-        setEditProgram(false);
-    };
-
-    const handleEditProgram = (e) => {
-        e.preventDefault();
-        editProgramDetails(program.id);
-
-        // Close modal form
-        toggleModal();
+            );
+        }
     };
 
     const toggleAddCourse = () => {
         setAddCourse(!addCourse);
     };
 
+    const handleCloseForm = () => {
+        toggleModal();
+        if (editProgram) {
+            setEditProgram(false);
+        }
+        setProgramToEdit(null);
+    };
+
     return (
         <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
             <form
-                onSubmit={handleAddProgram}
+                onSubmit={handleSubmit}
                 className="bg-ascend-white opacity-100 p-5 w-150 space-y-5  max-h-[calc(100vh-5rem)] overflow-y-auto my-10"
             >
                 <h1 className="text-size4 font-bold">
@@ -189,26 +192,15 @@ export default function AddProgramForm({
                 <div className="flex justify-end space-x-2">
                     <SecondaryButton
                         isDisabled={processing}
-                        doSomething={() => {
-                            toggleModal();
-                            if (editProgram) {
-                                setEditProgram(false);
-                            }
-                        }}
+                        doSomething={handleCloseForm}
                         text={"Close"}
                     />
-                    {editProgram ? (
-                        <PrimaryButton
-                            doSomething={handleEditProgram}
-                            text={"Save"}
-                        />
-                    ) : (
-                        <PrimaryButton
-                            isDisabled={processing}
-                            btnType="submit"
-                            text={"Add"}
-                        />
-                    )}
+
+                    <PrimaryButton
+                        isDisabled={processing}
+                        btnType="submit"
+                        text={editProgram ? "Save" : "Add"}
+                    />
                 </div>
             </form>
         </div>

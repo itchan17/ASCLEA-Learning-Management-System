@@ -15,6 +15,7 @@ return new class extends Migration
             $table->uuid('program_id')->primary();
             $table->string('program_name');
             $table->longText('program_description')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

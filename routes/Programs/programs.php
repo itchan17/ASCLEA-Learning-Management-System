@@ -13,6 +13,12 @@ Route::prefix('programs')
     
         // Create program
         Route::post('/',  [ProgramController::class, 'store'])->name('program.create');
+
+        // Update program
+        Route::put('/{program}',  [ProgramController::class, 'update'])->name('program.update');
+
+        // Archive program
+        Route::delete('/{program}',  [ProgramController::class, 'archive'])->name('program.archive');
 });
 
 

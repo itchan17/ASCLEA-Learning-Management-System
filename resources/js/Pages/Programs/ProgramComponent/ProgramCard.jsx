@@ -11,14 +11,11 @@ export default function ProgramCard({
     programDetails,
     setIsModalOpen,
     setEditProgram,
+    setProgramToEdit,
 }) {
-    // Const Program Store
-    const setProgram = useProgramStore((state) => state.setProgram);
-    const deleteProgram = useProgramStore((state) => state.deleteProgram);
-
     const route = useRoute();
     const handleCardClick = () => {
-        router.visit(route("program.view", programDetails.id));
+        router.visit(route("program.view", programDetails.program_id));
     };
 
     const stopPropagation = (e) => {
@@ -27,18 +24,19 @@ export default function ProgramCard({
 
     const handleEditClick = () => {
         setIsModalOpen(true);
-        setProgram(programDetails);
+        setProgramToEdit(programDetails); // Set the program details that will be passed on AddProgramForm to set the data of slected program to edit
         setEditProgram(true);
-
-        // Close the dropdown after clicked
-        closeDropDown();
+        closeDropDown(); // Close the dropdown after clicked
     };
 
     const handleArchiveClick = () => {
-        deleteProgram(programDetails.id);
-
-        // Close the dropdown after clicked
-        closeDropDown();
+        // Send a delete request to server that will archiove program through soft delete
+        router.delete(
+            route("program.archive", {
+                program: programDetails.program_id,
+            })
+        );
+        closeDropDown(); // Close the dropdown after clicked
     };
     return (
         <div

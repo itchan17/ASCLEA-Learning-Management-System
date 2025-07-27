@@ -8,18 +8,15 @@ import RoleGuard from "../../Components/Auth/RoleGuard";
 import { usePage } from "@inertiajs/react";
 import Loader from "../../Components/Loader";
 
-export default function Programs() {
-    // Program Store
-    const programList = useProgramStore((state) => state.programList);
-    const setProgramList = useProgramStore((state) => state.setProgramList);
-    const setActiveTab = useProgramStore((state) => state.setActiveTab);
+export default function Programs({ program_list: programList }) {
+    const { flash } = usePage().props; // Used for setting message for the toast
 
-    console.log(programList);
-    console.log("Render Programs");
+    // Program Store
+    const setActiveTab = useProgramStore((state) => state.setActiveTab);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editProgram, setEditProgram] = useState(false);
-    const [hasLoaded, setHasLoaded] = useState(false);
+    const [programToEdit, setProgramToEdit] = useState(null);
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
@@ -27,18 +24,6 @@ export default function Programs() {
 
     useEffect(() => {
         setActiveTab(0);
-    }, []);
-
-    useEffect(() => {
-        console.log("Edit program: " + editProgram);
-    }, [editProgram]);
-
-    const { program_list } = usePage().props;
-    useEffect(() => {
-        if (program_list.length > 0) {
-            setProgramList(program_list);
-        }
-        setHasLoaded(true);
     }, []);
 
     return (
@@ -54,16 +39,15 @@ export default function Programs() {
 
             {/* Display created program */}
             <div className="w-full flex flex-wrap gap-5">
-                {!hasLoaded ? (
-                    <Loader color="bg-ascend-blue" size="xl" />
-                ) : programList.length > 0 ? (
-                    programList.map((program, index) => {
+                {programList.length > 0 ? (
+                    programList.map((program) => {
                         return (
                             <ProgramCard
-                                key={index}
+                                key={program.program_id}
                                 programDetails={program}
                                 setIsModalOpen={setIsModalOpen}
                                 setEditProgram={setEditProgram}
+                                setProgramToEdit={setProgramToEdit}
                             />
                         );
                     })
@@ -81,6 +65,8 @@ export default function Programs() {
                     editProgram={editProgram}
                     setEditProgram={setEditProgram}
                     toggleModal={toggleModal}
+                    setProgramToEdit={setProgramToEdit}
+                    programToEdit={programToEdit}
                 />
             )}
         </div>

@@ -36,17 +36,18 @@ class ProgramPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Program $program): bool
+    public function update(User $user): bool
     {
-        return false;
+        // Check if the auth user has a role admin
+        return $user->role->role_name === 'admin';
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Program $program): bool
+    public function delete(User $user): bool
     {
-        return false;
+         return $user->role->role_name === 'admin';
     }
 
     /**
