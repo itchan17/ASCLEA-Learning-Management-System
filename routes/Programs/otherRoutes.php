@@ -7,12 +7,7 @@ Route::prefix('programs')
     ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin,faculty,student'])
     ->group(function () {
 
-        // Route for selected program
-        Route::get('/{programId}', function ($programId) {
-            return Inertia::render('Programs/ProgramComponent/ProgramContent', [
-                'programId' => $programId,
-            ]);
-        })->name('program.view');
+       
 
         // Route for selected course in the program
         Route::get('/{programId}/course/{courseId}', function ($programId, $courseId) {

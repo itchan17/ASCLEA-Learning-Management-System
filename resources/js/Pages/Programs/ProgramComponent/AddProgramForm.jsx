@@ -70,16 +70,13 @@ export default function AddProgramForm({
             });
         } else {
             // Send a put request to server to update program
-            put(
-                route("program.update", { program: programToEdit.program_id }),
-                {
-                    onSuccess: () => {
-                        reset();
-                        toggleModal();
-                        setEditProgram(false);
-                    },
-                }
-            );
+            put(route("program.update", programToEdit.program_id), {
+                onSuccess: () => {
+                    reset();
+                    toggleModal();
+                    setEditProgram(false);
+                },
+            });
         }
     };
 

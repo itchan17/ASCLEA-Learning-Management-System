@@ -15,7 +15,7 @@ export default function ProgramCard({
 }) {
     const route = useRoute();
     const handleCardClick = () => {
-        router.visit(route("program.view", programDetails.program_id));
+        router.visit(route("program.show", programDetails.program_id));
     };
 
     const stopPropagation = (e) => {
@@ -31,11 +31,7 @@ export default function ProgramCard({
 
     const handleArchiveClick = () => {
         // Send a delete request to server that will archiove program through soft delete
-        router.delete(
-            route("program.archive", {
-                program: programDetails.program_id,
-            })
-        );
+        router.delete(route("program.archive", programDetails.program_id));
         closeDropDown(); // Close the dropdown after clicked
     };
     return (

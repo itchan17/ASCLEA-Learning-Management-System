@@ -19,6 +19,9 @@ Route::prefix('programs')
 
         // Archive program
         Route::delete('/{program}',  [ProgramController::class, 'archive'])->name('program.archive');
+
+        // Show the selected program
+        Route::get('/{program}', [ProgramController::class, 'showProgram'])->name('program.show');
 });
 
 

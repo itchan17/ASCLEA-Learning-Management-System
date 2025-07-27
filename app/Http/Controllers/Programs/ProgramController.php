@@ -67,6 +67,15 @@ class ProgramController extends Controller
         $programToArchive = Program::find($program->program_id);  
         $programToArchive->delete(); 
 
-        return back()->with('success', 'Program archived successfully.');
+        return to_route('programs.index')->with('success', 'Program archived successfully.');
+    }
+
+    public function  showProgram(Program $program) {
+
+        // Show the selected program
+        return Inertia::render('Programs/ProgramComponent/ProgramContent', [
+            'program' => $program->only(['program_id', 'program_name', 'program_description']),
+        ]);
+
     }
 }
