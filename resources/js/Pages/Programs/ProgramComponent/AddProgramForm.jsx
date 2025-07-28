@@ -13,10 +13,16 @@ export default function AddProgramForm({
     toggleModal,
     editProgram,
     setEditProgram,
-    setProgramToEdit,
-    programToEdit,
 }) {
     const route = useRoute();
+
+    // Program Store
+    const setProgramDataToUpdate = useProgramStore(
+        (state) => state.setProgramDataToUpdate
+    );
+    const programDataToUpdate = useProgramStore(
+        (state) => state.programDataToUpdate
+    );
 
     // Course Store
     const courseList = useCourseStore((state) => state.courseList);
@@ -29,9 +35,9 @@ export default function AddProgramForm({
         useForm(
             editProgram
                 ? {
-                      program_name: programToEdit.program_name,
+                      program_name: programDataToUpdate.program_name,
                       program_description:
-                          programToEdit.program_description || "",
+                          programDataToUpdate.program_description || "",
                   }
                 : {
                       program_name: "",
@@ -70,7 +76,7 @@ export default function AddProgramForm({
             });
         } else {
             // Send a put request to server to update program
-            put(route("program.update", programToEdit.program_id), {
+            put(route("program.update", programDataToUpdate.program_id), {
                 onSuccess: () => {
                     reset();
                     toggleModal();
@@ -89,7 +95,7 @@ export default function AddProgramForm({
         if (editProgram) {
             setEditProgram(false);
         }
-        setProgramToEdit(null);
+        setProgramDataToUpdate(null);
     };
 
     return (

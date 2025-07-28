@@ -11,9 +11,14 @@ export default function ProgramCard({
     programDetails,
     setIsModalOpen,
     setEditProgram,
-    setProgramToEdit,
 }) {
     const route = useRoute();
+
+    // Program Store
+    const setProgramDataToUpdate = useProgramStore(
+        (state) => state.setProgramDataToUpdate
+    );
+
     const handleCardClick = () => {
         router.visit(route("program.show", programDetails.program_id));
     };
@@ -24,7 +29,7 @@ export default function ProgramCard({
 
     const handleEditClick = () => {
         setIsModalOpen(true);
-        setProgramToEdit(programDetails); // Set the program details that will be passed on AddProgramForm to set the data of slected program to edit
+        setProgramDataToUpdate(programDetails); // Set the program details that will be passed on AddProgramForm to set the data of slected program to edit
         setEditProgram(true);
         closeDropDown(); // Close the dropdown after clicked
     };

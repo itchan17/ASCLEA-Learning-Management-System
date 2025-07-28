@@ -16,7 +16,6 @@ export default function Programs({ program_list: programList }) {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editProgram, setEditProgram] = useState(false);
-    const [programToEdit, setProgramToEdit] = useState(null);
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
@@ -47,7 +46,6 @@ export default function Programs({ program_list: programList }) {
                                 programDetails={program}
                                 setIsModalOpen={setIsModalOpen}
                                 setEditProgram={setEditProgram}
-                                setProgramToEdit={setProgramToEdit}
                             />
                         );
                     })
@@ -65,8 +63,6 @@ export default function Programs({ program_list: programList }) {
                     editProgram={editProgram}
                     setEditProgram={setEditProgram}
                     toggleModal={toggleModal}
-                    setProgramToEdit={setProgramToEdit}
-                    programToEdit={programToEdit}
                 />
             )}
         </div>

@@ -12,10 +12,16 @@ import AddProgramForm from "./AddProgramForm";
 import { useRoute } from "ziggy-js";
 import RoleGuard from "../../../Components/Auth/RoleGuard";
 import { closeDropDown } from "../../../Utils/closeDropdown";
+import useProgramStore from "../../../Stores/Programs/programStore";
 
 export default function Courses() {
-    const { program: programDetails } = usePage().props; // Get the the data of showed program from props
+    const { flash, program: programDetails } = usePage().props; // Get the the data of showed program from props
     const route = useRoute();
+
+    // Program Store
+    const setProgramDataToUpdate = useProgramStore(
+        (state) => state.setProgramDataToUpdate
+    );
 
     // Course Store
     const courseList = useCourseStore((state) => state.courseList);
@@ -42,14 +48,14 @@ export default function Courses() {
     console.log("Render Courses");
 
     const handleEditClick = () => {
-        // setIsProgramFormOpen(true);
-        // setProgram(programDetails);
-        // setEditProgram(true);
-        // // Close the dropdown after clicked
-        // const elem = document.activeElement;
-        // if (elem) {
-        //     elem?.blur();
-        // }
+        setProgramDataToUpdate(programDetails);
+        setIsProgramFormOpen(true);
+        setEditProgram(true);
+        // Close the dropdown after clicked
+        const elem = document.activeElement;
+        if (elem) {
+            elem?.blur();
+        }
     };
 
     const handleArchiveClick = () => {
@@ -87,7 +93,7 @@ export default function Courses() {
                                 tabIndex={0}
                                 className="dropdown-content menu bg-ascend-white w-36 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                             >
-                                <li>
+                                <li onClick={handleEditClick}>
                                     <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                         Edit program
                                     </a>
