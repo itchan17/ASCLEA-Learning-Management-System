@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('programs')
     ->middleware(['auth', 'verified'])
     ->group(function () {
-        
         // Programs index page
         Route::get('/', [ProgramController::class, 'show'])->middleware(['checkRole:admin,faculty,student'])->name('programs.index');
     
@@ -22,6 +21,9 @@ Route::prefix('programs')
 
         // Show the selected program
         Route::get('/{program}', [ProgramController::class, 'showProgram'])->name('program.show');
+
+        // Validate added course in add program form
+        Route::post('/validate-course', [ProgramController::class, 'validateAddedCourse'])->name('validate.course');
 });
 
 

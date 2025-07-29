@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Program extends Model
+class Course extends Model
 {
-    use HasUuids, SoftDeletes;
+     use HasUuids;
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -30,15 +29,20 @@ class Program extends Model
      *
      * @var string
      */
-    protected $primaryKey = 'program_id';
+    protected $primaryKey = 'course_id';
 
     protected $fillable = [
-        'program_name',
-        'program_description',
+        'course_code',
+        'course_name',
+        'course_description',
+        'course_day',
+        'start_time',
+        'end_time',
+        'program_id',
     ];
 
-    public function courses(): HasMany
+    public function program(): BelongsTo
     {
-        return $this->hasMany(Course::class, 'program_id');
+        return $this->belongsTo(Program::class, 'program_id');
     }
 }

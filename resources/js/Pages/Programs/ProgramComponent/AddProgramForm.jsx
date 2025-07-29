@@ -25,11 +25,16 @@ export default function AddProgramForm({
     );
 
     // Course Store
-    const courseList = useCourseStore((state) => state.courseList);
-    const addCourseFunc = useCourseStore((state) => state.addCourse);
-    const clearCourseList = useCourseStore((state) => state.clearCourseList);
+    // const courseList = useCourseStore((state) => state.courseList);
+    // const addCourseFunc = useCourseStore((state) => state.addCourse);
+    // const clearCourseList = useCourseStore((state) => state.clearCourseList);
+    const course = useCourseStore((state) => state.course);
+    const clearCourse = useCourseStore((state) => state.clearCourse);
 
+    // Local states
     const [addCourse, setAddCourse] = useState(false);
+    const [addCourseError, setAddCourseError] = useState(null);
+    const [isValidating, setIsValidating] = useState(false);
 
     const { data, setData, post, put, processing, errors, clearErrors, reset } =
         useForm(
@@ -48,16 +53,30 @@ export default function AddProgramForm({
 
     const saveCourse = (e) => {
         e.preventDefault();
-        addCourseFunc();
-        toggleAddCourse();
+        setAddCourseError(null);
+        setIsValidating(true);
+
+        router.post(route("validate.course"), course, {
+            onError: (error) => {
+                setAddCourseError(error);
+                setIsValidating(false);
+            },
+            onSuccess: (page) => {
+                // setCourseList(course);
+                setData("course_list", [...data.course_list, course]);
+                clearCourse();
+                setIsValidating(false);
+                toggleAddCourse();
+            },
+        });
     };
 
-    useEffect(() => {
-        // Check if user added a course the set the course_list of the form
-        if (Array.isArray(courseList) && courseList.length > 0) {
-            setData("course_list", courseList);
-        }
-    }, [courseList]);
+    // useEffect(() => {
+    //     // Check if user added a course the set the course_list of the form
+    //     if (Array.isArray(courseList) && courseList.length > 0) {
+    //         setData("course_list", courseList);
+    //     }
+    // }, [courseList]);
 
     // Handle add program form subsmission
     const handleSubmit = (e) => {
@@ -70,7 +89,6 @@ export default function AddProgramForm({
             post(route("program.create", []), {
                 onSuccess: () => {
                     reset();
-                    clearCourseList();
                     toggleModal();
                 },
             });
@@ -144,23 +162,15 @@ export default function AddProgramForm({
                     ></textarea>
                 </div>
                 {/* Display this header when there's a course */}
-                {courseList.length > 0 && (
+                {data.course_list.length > 0 && (
                     <h1 className="text-size4 font-bold">Courses</h1>
                 )}
 
                 {/* Display courses added */}
-                {courseList.length > 0 && (
+                {data.course_list.length > 0 && (
                     <div className="divide-y-[0.5px] divide-ascend-gray1">
-                        {courseList.map((course, index) => (
-                            <CourseItem
-                                key={index}
-                                index={index}
-                                courseCode={course.courseCode}
-                                courseName={course.courseName}
-                                courseDay={course.courseDay}
-                                fromTime={course.fromTime}
-                                toTime={course.toTime}
-                            />
+                        {data.course_list.map((course, i) => (
+                            <CourseItem key={i} course={course} />
                         ))}
                     </div>
                 )}
@@ -180,8 +190,15 @@ export default function AddProgramForm({
 
                 {addCourse && (
                     <>
-                        <AddCourse toggleAddCourse={toggleAddCourse} />
-                        <PrimaryButton doSomething={saveCourse} text={"Save"} />
+                        <AddCourse
+                            errors={addCourseError}
+                            toggleAddCourse={toggleAddCourse}
+                        />
+                        <PrimaryButton
+                            isDisabled={isValidating}
+                            doSomething={saveCourse}
+                            text={"Save"}
+                        />
                     </>
                 )}
 

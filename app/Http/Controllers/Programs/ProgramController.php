@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Programs;
 
 use App\Http\Controllers\Controller;
+use App\Models\Course;
 use App\Models\Program;
-
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -30,10 +31,20 @@ class ProgramController extends Controller
             'program_name' => 'required|unique:programs,program_name|max:255',
             'program_description' => 'string|nullable',
         ]);
-
+   
         // Create program
         $program = Program::create($validated);
-   
+       
+        $course_list = $req->all()['course_list'];
+
+        // Check if course_list is array and has value
+        if (is_array($course_list) && !empty($course_list)) {
+           foreach($course_list as $key => $course){
+                $course['program_id'] = $program->program_id; // Add program_id FK
+                Course::create($course); // Store course in courses table
+           }
+        }
+
         // Return a flash success 
         return back()->with('success', 'Program created successfully.');
     }
@@ -70,12 +81,26 @@ class ProgramController extends Controller
         return to_route('programs.index')->with('success', 'Program archived successfully.');
     }
 
-    public function  showProgram(Program $program) {
-
-        // Show the selected program
+    // Show the selected program
+    public function showProgram(Program $program) {
+        // Return a prop containing the program data
         return Inertia::render('Programs/ProgramComponent/ProgramContent', [
             'program' => $program->only(['program_id', 'program_name', 'program_description']),
         ]);
 
+    }
+
+    // This function validates the added course in the program form
+    public function validateAddedCourse(Request $req){
+        $req->validate([ 
+            'course_code' => "string|nullable",
+            'course_name' => "required|string|max:255",
+            'course_description' => "string|nullable",
+            'course_day' => "string|nullable",
+            'start_time' => "string|nullable|date_format:H:i",
+            'end_time' => "string|nullable|date_format:H:i|after:start_time",
+        ]);
+
+        return back()->with('message', "Course validated successfully.");
     }
 }
