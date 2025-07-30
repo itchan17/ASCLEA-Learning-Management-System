@@ -98,7 +98,7 @@ export default function AddProgramForm({
         setAddCourse(!addCourse);
     };
 
-    const handleCloseForm = () => {
+    const handleCancelForm = () => {
         toggleModal();
         if (editProgram) {
             setEditProgram(false);
@@ -208,8 +208,8 @@ export default function AddProgramForm({
                 <div className="flex justify-end space-x-2">
                     <SecondaryButton
                         isDisabled={processing}
-                        doSomething={handleCloseForm}
-                        text={"Close"}
+                        doSomething={handleCancelForm}
+                        text={"Cancel"}
                     />
 
                     <PrimaryButton

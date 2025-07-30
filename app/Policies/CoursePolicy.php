@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
-use App\Models\Program;
+use App\Models\Course;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class ProgramPolicy
+class CoursePolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -22,9 +22,9 @@ class ProgramPolicy
      */
     public function view(User $user): bool
     {
-        // Add more logic here to prevent users that are not member
-        $role = $user->role?->role_name;
-        return in_array($role, ['admin', 'faculty', 'student'], true);
+        // Add more logic here to prevent unassigned user from accessing the course
+       $role = $user->role?->role_name;
+       return in_array($role, ['admin', 'faculty', 'student'], true);
     }
 
     /**
@@ -50,13 +50,14 @@ class ProgramPolicy
      */
     public function delete(User $user): bool
     {
-         return $user->role->role_name === 'admin';
+        // Check if the auth user has a role admin
+        return $user->role->role_name === 'admin';
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Program $program): bool
+    public function restore(User $user, Course $course): bool
     {
         return false;
     }
@@ -64,7 +65,7 @@ class ProgramPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Program $program): bool
+    public function forceDelete(User $user, Course $course): bool
     {
         return false;
     }

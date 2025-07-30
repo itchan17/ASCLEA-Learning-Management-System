@@ -7,35 +7,60 @@ import { usePage, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
 
 export default function AddCourseForm({ toggleModal, isEdit = false }) {
-    const { program } = usePage().props;
+    const { course: courseDetails, program } = usePage().props;
 
     // Course Store
     const course = useCourseStore((state) => state.course);
-    const handleEditCourse = useCourseStore((state) => state.handleEditCourse);
+    const clearCourse = useCourseStore((state) => state.clearCourse);
 
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState(null);
 
-    // Add the course
-    const addCourse = () => {
+    // Handle submisison of the course form
+    const handleSubmitCourse = () => {
         setIsLoading(true);
         setErrors(null);
-        router.post(route("course.create", program.program_id), course, {
-            except: ["program"],
-            onError: (errors) => {
-                setErrors(errors);
-                setIsLoading(false);
-            },
-            onSuccess: () => {
-                setIsLoading(false);
-                toggleModal();
-            },
-        });
+
+        // Check form if set to edit
+        if (!isEdit) {
+            router.post(route("course.create", program.program_id), course, {
+                except: ["program"],
+                onError: (errors) => {
+                    console.log(errors);
+                    setErrors(errors);
+                    setIsLoading(false);
+                },
+                onSuccess: () => {
+                    setIsLoading(false);
+                    clearCourse();
+                    toggleModal();
+                },
+            });
+        } else {
+            router.put(
+                route("course.update", {
+                    course: courseDetails.course_id,
+                }),
+                course,
+                {
+                    except: ["program"],
+                    onError: (errors) => {
+                        console.log(errors);
+                        setErrors(errors);
+                        setIsLoading(false);
+                    },
+                    onSuccess: () => {
+                        setIsLoading(false);
+                        clearCourse();
+                        toggleModal();
+                    },
+                }
+            );
+        }
     };
 
-    // Edit course
-    const editCourse = () => {
-        handleEditCourse(Number(programId), Number(courseId));
+    const handleCancelForm = () => {
+        clearCourse();
         toggleModal();
     };
 
@@ -49,18 +74,15 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
                 <div className="flex justify-end space-x-2">
                     <SecondaryButton
                         isDisabled={isLoading}
-                        doSomething={toggleModal}
+                        doSomething={handleCancelForm}
                         text={"Cancel"}
                     />
-                    {isEdit ? (
-                        <PrimaryButton doSomething={editCourse} text={"Save"} />
-                    ) : (
-                        <PrimaryButton
-                            isDisabled={isLoading}
-                            doSomething={addCourse}
-                            text={"Add"}
-                        />
-                    )}
+
+                    <PrimaryButton
+                        isDisabled={isLoading}
+                        doSomething={handleSubmitCourse}
+                        text={isEdit ? "Save" : "Add"}
+                    />
                 </div>
             </form>
         </div>

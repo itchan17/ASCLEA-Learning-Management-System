@@ -14,7 +14,7 @@ use Inertia\Inertia;
 class ProgramController extends Controller
 {
     // Display the program page
-    public function show() {
+    public function index() {
         $programList = Program::select('program_id', 'program_name', 'program_description')->latest()->get();
 
         return Inertia::render('Programs/Programs', [
@@ -23,8 +23,6 @@ class ProgramController extends Controller
     }
 
     public function store(Request $req) {
-        // Throw an error if try to access by unauthorized user
-        Gate::authorize('create', Program::class);
 
         // Validate input
         $validated = $req->validate([
@@ -51,9 +49,6 @@ class ProgramController extends Controller
 
     // Handle updating the program details
     public function update(Request $req, Program $program) {
-        
-        // Throw an error if try to access by unauthorized user
-        Gate::authorize('update', Program::class);
 
         $validated = $req->validate([
             'program_name'  => [
@@ -72,11 +67,8 @@ class ProgramController extends Controller
 
     // Handle archiving program through soft delete
     public function archive(Program $program) {
-        // Throw an error if try to access by unauthorized user
-        Gate::authorize('delete', Program::class);
-
-        $programToArchive = Program::find($program->program_id);  
-        $programToArchive->delete(); 
+    
+        $program->delete(); 
 
         return to_route('programs.index')->with('success', 'Program archived successfully.');
     }

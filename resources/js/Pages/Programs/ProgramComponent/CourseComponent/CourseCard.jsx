@@ -2,13 +2,10 @@ import { useState } from "react";
 import { PiNotebookFill } from "react-icons/pi";
 import { router, usePage } from "@inertiajs/react";
 import "../../../../../css/global.css";
-import { useRoute } from "ziggy-js";
+import { route } from "ziggy-js";
 
 export default function CourseCard({ courseDetails }) {
     const [isExpanded, setIsExpanded] = useState(false);
-
-    const route = useRoute();
-    const { programId } = usePage().props;
 
     const toggleExpanded = (e) => {
         e.stopPropagation();
@@ -16,9 +13,14 @@ export default function CourseCard({ courseDetails }) {
     };
 
     const handleCardClick = () => {
-        router.visit(route("program.course.view", { programId, courseId }), {
-            preserveScroll: false,
-        });
+        router.visit(
+            route("program.course.show", {
+                course: courseDetails.course_id,
+            }),
+            {
+                preserveScroll: false,
+            }
+        );
     };
 
     return (
@@ -32,7 +34,8 @@ export default function CourseCard({ courseDetails }) {
                 </div>
                 <div className="w-full overflow-hidden">
                     <h1 className="text-size3 font-bold truncate w-full">
-                        {courseDetails && `${courseDetails.course_code} - `}{" "}
+                        {courseDetails.course_code &&
+                            `${courseDetails.course_code} - `}{" "}
                         {courseDetails.course_name}
                     </h1>
 

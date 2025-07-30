@@ -6,17 +6,6 @@ use Inertia\Inertia;
 Route::prefix('programs')
     ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin,faculty,student'])
     ->group(function () {
-
-       
-
-        // Route for selected course in the program
-        Route::get('/{programId}/course/{courseId}', function ($programId, $courseId) {
-            return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContent', [
-                'programId' => $programId,
-                'courseId' => $courseId,
-            ]);
-        })->name('program.course.view');
-
         // Route for viewing material
         Route::get('/{programId}/course/{courseId}/material/{materialId}', function ($programId, $courseId, $materialId) {
             return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/MaterialsComponents/ViewMaterial', [
