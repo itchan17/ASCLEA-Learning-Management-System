@@ -86,6 +86,7 @@ class ProgramController extends Controller
         // Return a prop containing the program data
         return Inertia::render('Programs/ProgramComponent/ProgramContent', [
             'program' => $program->only(['program_id', 'program_name', 'program_description']),
+            'courses' => fn () => $program->courses() ->latest()->select(['course_id', 'course_code', 'course_name', 'course_description', 'updated_at'])->get(),
         ]);
 
     }
@@ -96,9 +97,9 @@ class ProgramController extends Controller
             'course_code' => "string|nullable",
             'course_name' => "required|string|max:255",
             'course_description' => "string|nullable",
-            'course_day' => "string|nullable",
-            'start_time' => "string|nullable|date_format:H:i",
-            'end_time' => "string|nullable|date_format:H:i|after:start_time",
+            'course_day' => "string|nullable|required_with:start_time,end_time",
+            'start_time' => "string|nullable|date_format:H:i|required_with:end_time",
+            'end_time' => "string|nullable|date_format:H:i|after:start_time|required_with:start_time",
         ]);
 
         return back()->with('message', "Course validated successfully.");

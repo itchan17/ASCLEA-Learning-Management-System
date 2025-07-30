@@ -4,12 +4,7 @@ import { router, usePage } from "@inertiajs/react";
 import "../../../../../css/global.css";
 import { useRoute } from "ziggy-js";
 
-export default function CourseCard({
-    courseId,
-    courseCode,
-    courseName,
-    courseDescription,
-}) {
+export default function CourseCard({ courseDetails }) {
     const [isExpanded, setIsExpanded] = useState(false);
 
     const route = useRoute();
@@ -37,21 +32,28 @@ export default function CourseCard({
                 </div>
                 <div className="w-full overflow-hidden">
                     <h1 className="text-size3 font-bold truncate w-full">
-                        {courseCode && `${courseCode} - `} {courseName}
+                        {courseDetails && `${courseDetails.course_code} - `}{" "}
+                        {courseDetails.course_name}
                     </h1>
 
-                    {courseDescription && (
+                    {courseDetails.course_description && (
                         <p className="text-size1">
                             {isExpanded
-                                ? courseDescription
-                                : `${courseDescription.slice(0, 80)}${
-                                      courseDescription.length > 80 ? "..." : ""
+                                ? courseDetails.course_description
+                                : `${courseDetails.course_description.slice(
+                                      0,
+                                      80
+                                  )}${
+                                      courseDetails.course_description.length >
+                                      80
+                                          ? "..."
+                                          : ""
                                   }`}
                         </p>
                     )}
-                    {courseDescription && (
+                    {courseDetails.course_description && (
                         <div className="w-full text-end">
-                            {courseDescription.length > 80 && (
+                            {courseDetails.course_description.length > 80 && (
                                 <span
                                     onClick={toggleExpanded}
                                     className="text-size1 font-bold"

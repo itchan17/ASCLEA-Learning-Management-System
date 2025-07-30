@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::middleware('web')->group(function () {
                 require base_path('routes/auth.php');
                 require base_path('routes/Programs/programs.php');
+                require base_path('routes/Programs/courses.php');
                 require base_path('routes/Programs/otherRoutes.php');
                 require base_path('routes/admission.php');
                 require base_path('routes/dashboard.php');

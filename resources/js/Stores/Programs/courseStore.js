@@ -5,12 +5,12 @@ const useCourseStore = create((set) => ({
     activeTab: 0,
     // courseList: [],
     course: {
-        course_code: "CS101",
-        course_name: "1",
-        course_description: "This course introduces the basics of computing.",
-        course_day: "Monday",
-        start_time: "10:00",
-        end_time: "11:00",
+        course_code: "",
+        course_name: "",
+        course_description: "",
+        course_day: "",
+        start_time: "",
+        end_time: "",
     },
 
     // clearCourseList: () => {

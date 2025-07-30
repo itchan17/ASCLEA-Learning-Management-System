@@ -11,16 +11,16 @@ Route::prefix('programs')
         Route::get('/', [ProgramController::class, 'show'])->middleware(['checkRole:admin,faculty,student'])->name('programs.index');
     
         // Create program
-        Route::post('/',  [ProgramController::class, 'store'])->name('program.create');
+        Route::post('/create',  [ProgramController::class, 'store'])->name('program.create');
 
         // Update program
-        Route::put('/{program}',  [ProgramController::class, 'update'])->name('program.update');
+        Route::put('/{program}/update',  [ProgramController::class, 'update'])->name('program.update');
 
         // Archive program
-        Route::delete('/{program}',  [ProgramController::class, 'archive'])->name('program.archive');
+        Route::delete('/{program}/delete',  [ProgramController::class, 'archive'])->name('program.archive');
 
         // Show the selected program
-        Route::get('/{program}', [ProgramController::class, 'showProgram'])->name('program.show');
+        Route::get('/{program}', [ProgramController::class, 'showProgram'])->middleware(['checkRole:admin,faculty,student'])->name('program.show');
 
         // Validate added course in add program form
         Route::post('/validate-course', [ProgramController::class, 'validateAddedCourse'])->name('validate.course');
