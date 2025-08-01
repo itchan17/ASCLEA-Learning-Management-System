@@ -15,14 +15,11 @@ import { formatTime } from "../../../../../Utils/formatTime";
 import { closeDropDown } from "../../../../../Utils/closeDropdown";
 
 export default function Home({}) {
-    const { programId, courseId, course } = usePage().props;
-
-    // Program Store
-    const programList = useProgramStore((state) => state.programList);
+    const { program, course } = usePage().props;
+    console.log(course);
 
     // Course Store
     const setCourse = useCourseStore((state) => state.setCourseDetails);
-    const archiveCourse = useCourseStore((state) => state.archiveCourse);
 
     // Post Store
     const postList = usePostStore((state) => state.postList);
@@ -56,7 +53,12 @@ export default function Home({}) {
 
     const handleArchiveCourse = () => {
         // Navigate first, then delete
-        router.delete(route("course.archive", course.course_id));
+        router.delete(
+            route("course.archive", {
+                program: program.program_id,
+                course: course.course_id,
+            })
+        );
 
         // Close the dropdown after clicked
         closeDropDown();
@@ -103,10 +105,11 @@ export default function Home({}) {
                     </RoleGuard>
                 </div>
                 <span className="text-size4 font-semibold">
-                    {`${
-                        course.course_day.charAt(0).toUpperCase() +
-                        course.course_day.slice(1)
-                    }: ${formatTime(course.start_time)} to
+                    {course.course_day &&
+                        `${
+                            course.course_day.charAt(0).toUpperCase() +
+                            course.course_day.slice(1)
+                        }: ${formatTime(course.start_time)} to
                     ${formatTime(course.end_time)}`}
                 </span>
                 <p className="break-words">{course?.course_description}</p>

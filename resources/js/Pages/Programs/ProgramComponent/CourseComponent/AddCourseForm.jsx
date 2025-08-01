@@ -7,10 +7,10 @@ import { usePage, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
 
 export default function AddCourseForm({ toggleModal, isEdit = false }) {
-    const { course: courseDetails, program } = usePage().props;
+    const { course, program } = usePage().props;
 
     // Course Store
-    const course = useCourseStore((state) => state.course);
+    const courseDetails = useCourseStore((state) => state.course);
     const clearCourse = useCourseStore((state) => state.clearCourse);
 
     const [isLoading, setIsLoading] = useState(false);
@@ -39,9 +39,10 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
         } else {
             router.put(
                 route("course.update", {
-                    course: courseDetails.course_id,
+                    program: program.program_id,
+                    course: course.course_id,
                 }),
-                course,
+                courseDetails,
                 {
                     except: ["program"],
                     onError: (errors) => {
