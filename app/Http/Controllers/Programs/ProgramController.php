@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 class ProgramController extends Controller
 {
@@ -77,7 +79,7 @@ class ProgramController extends Controller
     public function showProgram(Program $program) {
         // Return a prop containing the program data
         return Inertia::render('Programs/ProgramComponent/ProgramContent', [
-            'program' => $program->only(['program_id', 'program_name', 'program_description']),
+            'program' => $program->only(['program_id', 'program_name', 'program_description', 'background_image']),
             'courses' => fn () => $program->courses() ->latest()->select(['course_id', 'course_code', 'course_name', 'course_description', 'updated_at'])->get(),
         ]);
 
@@ -95,5 +97,25 @@ class ProgramController extends Controller
         ]);
 
         return back()->with('message', "Course validated successfully.");
+    }
+
+    public function updateBackground(Program $program, Request $req) {
+        
+        if($req->hasFile('background_image')){
+            $image = $req->background_image;
+            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+            $path = $image->storeAs('programBackgroundImages', $filename, 'public');
+
+            if ($program->background_image) {
+                Storage::disk('public')->delete($program->background_image);
+            }
+            
+            $program->background_image = $path;
+            $program->save();
+
+            return back()->with(['success' => 'Backgroung image updated successfully.']);
+        }
+       
+        return back()->withErrors(['background_image' => 'No file uploaded.']);
     }
 }
