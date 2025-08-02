@@ -17,10 +17,8 @@ class ProgramController extends Controller
 {
     // Display the program page
     public function index() {
-        $programList = Program::select('program_id', 'program_name', 'program_description')->latest()->get();
-
         return Inertia::render('Programs/Programs', [
-            'program_list' => $programList
+            'program_list' => Program::select('program_id', 'program_name', 'background_image')->latest()->get()
         ]);
     }
 

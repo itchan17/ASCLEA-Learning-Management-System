@@ -23,19 +23,23 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
 
         // Check form if set to edit
         if (!isEdit) {
-            router.post(route("course.create", program.program_id), course, {
-                except: ["program"],
-                onError: (errors) => {
-                    console.log(errors);
-                    setErrors(errors);
-                    setIsLoading(false);
-                },
-                onSuccess: () => {
-                    setIsLoading(false);
-                    clearCourse();
-                    toggleModal();
-                },
-            });
+            router.post(
+                route("course.create", program.program_id),
+                courseDetails,
+                {
+                    except: ["program"],
+                    onError: (errors) => {
+                        console.log(errors);
+                        setErrors(errors);
+                        setIsLoading(false);
+                    },
+                    onSuccess: () => {
+                        setIsLoading(false);
+                        clearCourse();
+                        toggleModal();
+                    },
+                }
+            );
         } else {
             router.put(
                 route("course.update", {

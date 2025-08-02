@@ -13,6 +13,7 @@ import { useRoute } from "ziggy-js";
 import RoleGuard from "../../../Components/Auth/RoleGuard";
 import { closeDropDown } from "../../../Utils/closeDropdown";
 import useProgramStore from "../../../Stores/Programs/programStore";
+import Loader from "../../../Components/Loader";
 
 export default function Courses() {
     const { flash, program: programDetails, courses } = usePage().props; // Get the the data of showed program from props
@@ -32,8 +33,9 @@ export default function Courses() {
 
     const [isProgramFormOpen, setIsProgramFormOpen] = useState(false);
     const [editProgram, setEditProgram] = useState(false);
-
     const [isOpen, setIsOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [updateBgError, setUpdateBgError] = useState(null);
 
     const toggleEditProgram = () => {
         setIsProgramFormOpen(!isProgramFormOpen);
@@ -69,14 +71,17 @@ export default function Courses() {
 
     const handleBackgroundChange = (e) => {
         if (e.target.files[0]) {
+            setIsLoading(true);
             router.post(
                 route("program.background.update", programDetails.program_id),
                 { _method: "put", background_image: e.target.files[0] },
                 {
-                    onProgress: (progress) => {
-                        console.log(progress);
+                    showProgress: false,
+                    onError: (error) => {
+                        setUpdateBgError(error);
+                        setIsLoading(false);
                     },
-                    onError: (error) => console.log(error),
+                    onSuccess: () => setIsLoading(false),
                 }
             );
         }
@@ -84,30 +89,43 @@ export default function Courses() {
 
     return (
         <div className="w-full space-y-5 font-nunito-sans text-ascend-black">
-            {console.log(programDetails.background_image)}
             <div
-                className={`relative w-full h-50 rounded-tl-xl rounded-br-xl bg-cover bg-center ${
-                    programDetails.background_image ? "" : "bg-ascend-gray1"
+                className={`relative w-full group h-70 rounded-tl-xl rounded-br-xl bg-cover bg-center ${
+                    !programDetails.background_image && "bg-ascend-gray1"
                 }`}
                 style={
-                    programDetails.background_image
-                        ? {
-                              backgroundImage: `url('/storage/${programDetails.background_image}')`,
-                          }
-                        : {}
+                    programDetails.background_image && {
+                        backgroundImage: `url('/storage/${programDetails.background_image}')`,
+                    }
                 }
             >
+                {/* Loading indicator for updating background */}
+                {isLoading && (
+                    <>
+                        <div className="absolute z-20 h-full w-full  bg-ascend-lightblue opacity-40"></div>
+                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
+                            <Loader color="bg-ascend-blue" size="lg" />
+                        </div>
+                    </>
+                )}
+
                 <RoleGuard allowedRoles={["admin"]}>
-                    <label htmlFor="inputBg">
-                        <IoImageSharp className="text-size4 text-ascend-black absolute top-2 right-2 cursor-pointer" />
+                    <label
+                        htmlFor="inputBg"
+                        className={`absolute z-10 top-2 right-2 flex opacity-0 ${
+                            isLoading ? "" : "group-hover:opacity-100"
+                        } transition-all duration-300 items-center gap-2 bg-ascend-blue text-ascend-white px-2 py-1 cursor-pointer`}
+                    >
+                        <span>Change background</span>
+                        <IoImageSharp className="text-size4" />
+                        <input
+                            onChange={(e) => handleBackgroundChange(e)}
+                            className="hidden"
+                            type="file"
+                            id="inputBg"
+                            accept="image/*"
+                        />
                     </label>
-                    <input
-                        onChange={(e) => handleBackgroundChange(e)}
-                        className="hidden"
-                        type="file"
-                        id="inputBg"
-                        accept="image/*"
-                    />
                 </RoleGuard>
             </div>
 
