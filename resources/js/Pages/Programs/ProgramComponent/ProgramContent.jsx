@@ -11,7 +11,7 @@ export default function ProgramContent() {
 
     // Tab list
     const tabs = ["Courses", "People"];
-
+    console.log(activeTab);
     return (
         <div className="space-y-5">
             <Tabs

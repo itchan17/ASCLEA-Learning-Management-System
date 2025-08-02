@@ -16,9 +16,6 @@ return Application::configure(basePath: dirname(__DIR__))
         then: function () {
             Route::middleware('web')->group(function () {
                 require base_path('routes/auth.php');
-                require base_path('routes/Programs/programs.php');
-                require base_path('routes/Programs/courses.php');
-                require base_path('routes/Programs/otherRoutes.php');
                 require base_path('routes/admission.php');
                 require base_path('routes/dashboard.php');
                 require base_path('routes/grades.php');
@@ -27,6 +24,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 require base_path('routes/administration.php');
                 require base_path('routes/archives.php');
                 require base_path('routes/profile.php');
+                // Program related routes
+                require base_path('routes/Programs/programs.php');
+                require base_path('routes/Programs/courses.php');
+                require base_path('routes/Programs/people.php');
+                require base_path('routes/Programs/otherRoutes.php');
             });
         },
     )
