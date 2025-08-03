@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { IoSearch } from "react-icons/io5";
 import SecondaryButton from "../../../../Components/Button/SecondaryButton";
 import PrimaryButton from "../../../../Components/Button/PrimaryButton";
@@ -8,6 +8,7 @@ import { route } from "ziggy-js";
 import axios from "axios";
 import Loader from "../../../../Components/Loader";
 import { capitalize } from "lodash";
+import debounce from "lodash.debounce";
 
 export default function AddStudentForm({ toggleModal }) {
     // People Store
@@ -20,6 +21,8 @@ export default function AddStudentForm({ toggleModal }) {
     const [isLoading, setIsLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [filter, setFilter] = useState("");
     const [userList, setUserList] = useState([]);
 
     const loaderRef = useRef(null);
@@ -27,12 +30,17 @@ export default function AddStudentForm({ toggleModal }) {
     const { program } = usePage().props;
 
     const fetchUserList = async () => {
-        setIsLoading(true);
-        if (isLoading || !hasMore) return;
-
         try {
+            setIsLoading(true);
             const res = await axios.get(
-                route("program.list.users", [program.program_id, { page }])
+                route("program.list.users", {
+                    program: program.program_id,
+                    _query: {
+                        page,
+                        search: searchQuery,
+                        role: filter,
+                    },
+                })
             );
             setUserList((prev) => [...prev, ...res.data.data]);
             setIsLoading(false);
@@ -44,25 +52,68 @@ export default function AddStudentForm({ toggleModal }) {
         }
     };
 
+    useEffect(() => {
+        fetchUserList();
+    }, [searchQuery, filter]);
+
+    // Observer that fetch another page when the loader is intersecting in the viewport
     const handleObserver = useCallback(
         (entries) => {
             const target = entries[0];
-            if (target.isIntersecting) fetchUserList();
+
+            if (target.isIntersecting && !isLoading && hasMore) {
+                fetchUserList();
+            }
         },
         [isLoading, hasMore]
     );
 
     useEffect(() => {
+        // Create the observer function
+        // Reset and re-create whenever there are changes in dependecies
         const observer = new IntersectionObserver(handleObserver, {
             root: null,
-            rootMargin: "200px",
+            rootMargin: "100px",
             threshold: 0,
         });
 
         if (loaderRef.current) observer.observe(loaderRef.current);
 
-        return () => observer.disconnect();
-    }, [handleObserver]);
+        return () => {
+            observer.disconnect();
+        };
+    }, [handleObserver, searchQuery, filter]);
+
+    // Debounce on change handlers
+    const handleOnChangeSearchQuery = (e) => {
+        setUserList([]);
+        setPage(1);
+        setHasMore(true);
+        setSearchQuery(e.target.value);
+    };
+
+    const debouncedSearchChange = useMemo(() => {
+        return debounce(handleOnChangeSearchQuery, 300);
+    }, []);
+
+    const handleOnChangeFilter = (e) => {
+        setUserList([]);
+        setPage(1);
+        setHasMore(true);
+        setFilter(e.target.value);
+    };
+
+    const debouncedFilterChange = useMemo(() => {
+        return debounce(handleOnChangeFilter, 300);
+    }, []);
+
+    // This remove side effects of debouncer
+    useEffect(() => {
+        return () => {
+            debouncedSearchChange.cancel();
+            debouncedFilterChange.cancel();
+        };
+    });
 
     const handleAdd = (e) => {
         e.preventDefault();
@@ -74,6 +125,7 @@ export default function AddStudentForm({ toggleModal }) {
         clearNewPeople();
         toggleModal();
     };
+
     return (
         <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center text-ascend-black">
             <form
@@ -84,6 +136,7 @@ export default function AddStudentForm({ toggleModal }) {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                     <div className="relative col-span-1 sm:col-span-2">
                         <input
+                            onChange={debouncedSearchChange}
                             className="border w-full pl-10 pr-3 py-2 border-ascend-black focus:outline-ascend-blue"
                             type="text"
                             placeholder="Search by typing name or email"
@@ -92,6 +145,7 @@ export default function AddStudentForm({ toggleModal }) {
                     </div>
                     <select
                         className={`textField border w-full px-3 py-2  focus:outline-ascend-blue`}
+                        onChange={debouncedFilterChange}
                     >
                         <option value="">All</option>
                         <option value="student">Student</option>
@@ -127,15 +181,29 @@ export default function AddStudentForm({ toggleModal }) {
                             </div>
                         ))}
 
-                    {hasMore && (
+                    {hasMore && userList.length > 0 ? (
+                        // First condition is the observed loader, display only if data has more user and userList is not empty
                         <div
                             ref={loaderRef}
-                            className={`flex items-center   ${
-                                userList.length > 0 ? "py-5" : "min-h-full"
-                            }`}
+                            className={`flex items-center py-3 `}
                         >
                             <Loader color="bg-ascend-blue" />
                         </div>
+                    ) : isLoading && userList.length === 0 ? (
+                        // Loader for intial render, searching, and filtering
+                        // Display if the userList is empty which mean user used search, filter, or its an intial render
+                        <div className="flex items-center min-h-full">
+                            <Loader color="bg-ascend-blue" />
+                        </div>
+                    ) : (
+                        !isLoading &&
+                        userList.length === 0 && (
+                            <div className="flex items-center justify-center min-h-full">
+                                <h1 className="text-ascend-black font-nunito-sans text-size4">
+                                    No users
+                                </h1>
+                            </div>
+                        )
                     )}
                 </div>
                 <div className="flex justify-end space-x-2">
