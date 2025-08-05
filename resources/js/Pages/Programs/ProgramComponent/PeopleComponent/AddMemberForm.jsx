@@ -3,31 +3,30 @@ import { IoSearch } from "react-icons/io5";
 import SecondaryButton from "../../../../Components/Button/SecondaryButton";
 import PrimaryButton from "../../../../Components/Button/PrimaryButton";
 import usePeopleStore from "../../../../Stores/Programs/peopleStore";
-import { usePage } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import axios from "axios";
 import Loader from "../../../../Components/Loader";
 import { capitalize } from "lodash";
 import debounce from "lodash.debounce";
 
-export default function AddStudentForm({ toggleModal }) {
-    // People Store
-    const handleAddPeopleChange = usePeopleStore(
-        (state) => state.handleAddPeopleChange
-    );
-    const clearNewPeople = usePeopleStore((state) => state.clearNewPeople);
-    const handleAddPeople = usePeopleStore((state) => state.handleAddPeople);
+export default function AddMemberForm({ toggleModal }) {
+    const { program } = usePage().props;
 
+    // For handling add member
+    const [selectedUsers, setSelectedUsers] = useState([]);
+    const [unSelectedUsers, setUnSelectedUsers] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
+    const [isAddLoading, setIsAddLoading] = useState(false);
+
+    // For displaying user list
     const [isLoading, setIsLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [filter, setFilter] = useState("");
     const [userList, setUserList] = useState([]);
-
     const loaderRef = useRef(null);
-
-    const { program } = usePage().props;
 
     const fetchUserList = async () => {
         try {
@@ -113,16 +112,72 @@ export default function AddStudentForm({ toggleModal }) {
             debouncedSearchChange.cancel();
             debouncedFilterChange.cancel();
         };
-    });
+    }, []);
 
-    const handleAdd = (e) => {
-        e.preventDefault();
-        handleAddPeople();
-        toggleModal();
+    const handleAddNewMemberChange = (userId) => {
+        // Add and remove user 1 by 1
+        const updatedUsers = selectedUsers.some((id) => id === userId) // Check if the id is allready in the list
+            ? selectedUsers.filter((id) => id !== userId) // If true filter the list by removing the duplicated id
+            : [...selectedUsers, userId]; // If false add the id to the list
+
+        setSelectedUsers(updatedUsers);
+
+        if (selectAll) {
+            // Add the unselected users
+            const updatedUnselectedUsers = unSelectedUsers.some(
+                (id) => id === userId
+            )
+                ? unSelectedUsers.filter((id) => id !== userId)
+                : [...unSelectedUsers, userId];
+
+            setUnSelectedUsers(updatedUnselectedUsers);
+        }
+    };
+
+    const handleSelectAll = () => {
+        // Set all the current loaded users as selected user
+        if (!selectAll) {
+            const allUsers = userList.map((user) => user.user_id);
+            setSelectedUsers(allUsers);
+        } else {
+            setSelectedUsers([]);
+            setUnSelectedUsers([]);
+        }
+        setSelectAll(!selectAll);
+    };
+
+    useEffect(() => {
+        // If selectAll is true update the selectedUsers to check the checkbox as the user srolls
+        if (selectAll) {
+            const allUsers = userList.map((user) => user.user_id);
+            setSelectedUsers(allUsers);
+        }
+    }, [userList]);
+
+    const handleAddMember = () => {
+        if (selectAll || selectedUsers.length > 0) {
+            setIsAddLoading(true);
+            router.post(
+                route("program.add.member", program.program_id),
+                {
+                    is_select_all: selectAll,
+                    selected_users: selectedUsers,
+                    unselected_users: unSelectedUsers,
+                },
+                {
+                    onError: () => {
+                        setIsAddLoading(false);
+                    },
+                    onSuccess: () => {
+                        toggleModal();
+                        setIsAddLoading(false);
+                    },
+                }
+            );
+        }
     };
 
     const handleCancel = () => {
-        clearNewPeople();
         toggleModal();
     };
 
@@ -132,7 +187,7 @@ export default function AddStudentForm({ toggleModal }) {
                 onSubmit={(e) => handleAdd(e)}
                 className="bg-ascend-white opacity-100 p-5 w-160 space-y-5  max-h-[calc(100vh-5rem)] overflow-y-auto my-10"
             >
-                <h1 className="text-size4 font-bold">Add Student</h1>
+                <h1 className="text-size4 font-bold">Add Member</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                     <div className="relative col-span-1 sm:col-span-2">
                         <input
@@ -152,6 +207,16 @@ export default function AddStudentForm({ toggleModal }) {
                         <option value="faculty">Faculty</option>
                     </select>
                 </div>
+                {userList.length > 0 && (
+                    <div className="flex items-center mb-0 gap-2">
+                        <input
+                            type="checkbox"
+                            className="accent-ascend-blue w-4 h-4"
+                            onChange={handleSelectAll}
+                        />
+                        <span>Select all</span>
+                    </div>
+                )}
                 <div className="h-72 overflow-y-auto divide-y-1 divide-ascend-gray1">
                     {userList.length > 0 &&
                         userList.map((user) => (
@@ -161,8 +226,13 @@ export default function AddStudentForm({ toggleModal }) {
                             >
                                 <input
                                     type="checkbox"
+                                    checked={selectedUsers.some(
+                                        (id) => id === user.user_id
+                                    )}
                                     className="accent-ascend-blue w-4 h-4"
-                                    // onChange={() => handleAddPeopleChange(user)}
+                                    onChange={() =>
+                                        handleAddNewMemberChange(user.user_id)
+                                    }
                                 />
                                 <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl ml-5 mr-3"></div>
                                 <div>
@@ -212,8 +282,9 @@ export default function AddStudentForm({ toggleModal }) {
                         text={"Cancel"}
                     />
                     <PrimaryButton
-                        doSomething={(e) => handleAdd(e)}
-                        btnType={"submit"}
+                        isDisabled={isAddLoading}
+                        isLoading={isAddLoading}
+                        doSomething={handleAddMember}
                         text={"Add"}
                     />
                 </div>

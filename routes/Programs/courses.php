@@ -5,7 +5,7 @@ use App\Models\Course;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('programs/{program}')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'preventBack'])
     ->group(function () {
 
         // Create a course

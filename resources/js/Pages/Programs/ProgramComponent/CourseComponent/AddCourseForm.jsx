@@ -85,6 +85,7 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
 
                     <PrimaryButton
                         isDisabled={isLoading}
+                        isLoading={isLoading}
                         doSomething={handleSubmitCourse}
                         text={isEdit ? "Save" : "Add"}
                     />

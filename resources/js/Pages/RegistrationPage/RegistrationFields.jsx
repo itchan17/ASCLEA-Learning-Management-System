@@ -344,6 +344,7 @@ const RegistrationFields = () => {
                 <div className="grid grid-cols-1 gap-4 pt-4">
                     <PrimaryButton
                         isDisabled={loading}
+                        isLoading={loading}
                         doSomething={register}
                         text="Register"
                     />

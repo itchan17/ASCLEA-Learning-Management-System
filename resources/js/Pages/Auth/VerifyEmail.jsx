@@ -102,6 +102,7 @@ export default function VerifyEmail() {
                     <div className="grid grid-cols-1">
                         <PrimaryButton
                             isDisabled={loading}
+                            isLoading={loading}
                             doSomething={resendEmailVerification}
                             text="Resend Email"
                         />
