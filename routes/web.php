@@ -6,7 +6,7 @@ use Inertia\Inertia;
 // View Landing page
 Route::get('/', function () {
     return Inertia::render('LandingPage/LandingPage');
-});
+})->middleware('guest', 'preventBack');
 
 // For handling undefined routes
 Route::fallback(function () {

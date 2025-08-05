@@ -215,7 +215,7 @@ const RegistrationFields = () => {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-4">
                     <div class="relative">
                         <input
-                            type="text"
+                            type="number"
                             value={registration.contact_number}
                             onChange={(e) =>
                                 handleRegistrationChange(

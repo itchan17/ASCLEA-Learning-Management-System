@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
 import { router } from "@inertiajs/react";
-import { useRoute } from "ziggy-js";
+import { route } from "ziggy-js";
 import { IoLogOutSharp } from "react-icons/io5";
+import NProgress from "nprogress";
+import axios from "axios";
 
 export default function VerifyEmail() {
-    const route = useRoute();
+    NProgress.configure({ showSpinner: false }); // Remove spinner
 
     const [loading, setLoading] = useState(false);
     const [messsage, setMessage] = useState("");
@@ -28,8 +30,17 @@ export default function VerifyEmail() {
         );
     };
 
-    const handleLogout = () => {
-        router.post(route("logout.user"), {}, { replace: true });
+    const handleLogout = async () => {
+        try {
+            NProgress.start();
+            await axios.post(route("logout.user")).then(() => {
+                window.location.href = "/login"; // Redirect to login page
+            });
+        } catch (error) {
+            console.error(error);
+        } finally {
+            NProgress.done();
+        }
     };
 
     return (
