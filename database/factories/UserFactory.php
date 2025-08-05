@@ -17,7 +17,7 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-           'first_name' => $this->faker->firstName(),
+            'first_name' => $this->faker->firstName(),
             'last_name' => $this->faker->lastName(),
             'middle_name' => $this->faker->firstName(),
             'birthdate' => $this->faker->date('Y-m-d', now()->subYears(18)), 

@@ -14,16 +14,22 @@ class PeopleController extends Controller
 {
     public function listUsers(Program $program, Request $req) {
         $program_id = $program->program_id;
-        $roleId = Role::where('role_name', 'admin')->value('role_id'); // get the role id of admin to used to not selece users that has admin role
 
         // Inital query without filter or search
         // Get users that is not an admin and not a member of the program
-        $result = User::with('role')->select('user_id', 'first_name', 'last_name', 'email', 'role_id')->where('role_id', '!=', $roleId)->whereNotIn('user_id', function ($query) use ($program_id) {
+        $result = User::with('role')->select('user_id', 'first_name', 'last_name', 'email', 'role_id')->whereHas('role', function($query) {
+            $query->where('role_name', '!=', 'admin'); // Filter out admin users
+        })->whereNotNull('email_verified_at')->whereNotIn('user_id', function ($query) use ($program_id) {
             $query->select('user_id')
                 ->from('learning_members')
-                ->where('program_id', $program_id);
+                ->where('program_id', $program_id); // Select users that is not a member of the current program
+        })->where(function ($query) {
+            $query->whereHas('student', function ($q) {
+                $q->whereNotNull('approved_at'); // Filter users that has student realtionship and not approved
+            })
+            ->orWhereDoesntHave('student'); // Include users with no student relationship specifically faculty
         });
-
+        
         if($role = $req->input('role'))  {
             $filteredRoleId = Role::where('role_name', $role)->value('role_id'); // Get the filtered role from the request query
       
