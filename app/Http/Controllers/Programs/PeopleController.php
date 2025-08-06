@@ -8,6 +8,7 @@ use App\Models\Program;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class PeopleController extends Controller
@@ -25,7 +26,7 @@ class PeopleController extends Controller
                 ->where('program_id', $program_id); // Select users that is not a member of the current program
         })->where(function ($query) {
             $query->whereHas('student', function ($q) {
-                $q->whereNotNull('approved_at'); // Filter users that has student realtionship and not approved
+                $q->whereNotNull('approved_at'); // Filter users that has student relationship and not approved
             })
             ->orWhereDoesntHave('student'); // Include users with no student relationship specifically faculty
         });
@@ -70,7 +71,9 @@ class PeopleController extends Controller
             LearningMember::updateOrInsert([
                 'learning_member_id' => (string) Str::uuid(), 
                 'program_id' => $program_id, 
-                'user_id' => $user->user_id
+                'user_id' => $user->user_id,
+                'updated_at' => Carbon::now(),
+                'created_at' => Carbon::now(),
             ]);
        }
 

@@ -165,6 +165,7 @@ export default function AddMemberForm({ toggleModal }) {
                     unselected_users: unSelectedUsers,
                 },
                 {
+                    except: ["courses", "program"],
                     onError: () => {
                         setIsAddLoading(false);
                     },
