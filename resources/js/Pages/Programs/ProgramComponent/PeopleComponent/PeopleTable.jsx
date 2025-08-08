@@ -67,9 +67,9 @@ export default function PeopleTable() {
     const handleMemberClick = (userId) => {
         if (auth.user.role_name !== "student") {
             router.visit(
-                route("program.user.view", {
-                    programId: program.program_id,
-                    userId,
+                route("program.member.view", {
+                    program: program.program_id,
+                    member: userId,
                 })
             );
         }
@@ -127,7 +127,7 @@ export default function PeopleTable() {
                                         key={member.user.user_id}
                                         onClick={() =>
                                             handleMemberClick(
-                                                member.user.user_id
+                                                member.learning_member_id
                                             )
                                         }
                                         className={`${

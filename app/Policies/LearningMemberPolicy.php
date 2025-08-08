@@ -31,9 +31,10 @@ class LearningMemberPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, LearningMember $learningMember): bool
+    public function view(User $user): bool
     {
-        return false;
+        $role = $user->role?->role_name;
+        return in_array($role, ['admin', 'faculty'], true);
     }
 
     /**
@@ -55,9 +56,9 @@ class LearningMemberPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, LearningMember $learningMember): bool
+    public function delete(User $user): bool
     {
-        return false;
+        return $user->role->role_name === 'admin';
     }
 
     /**

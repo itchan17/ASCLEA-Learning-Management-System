@@ -15,5 +15,7 @@ Route::prefix('programs/{program}')
         Route::post('/member/add',  [PeopleController::class, 'addMember'])->can('addMember', LearningMember::class)->name('program.add.member');
 
         // Route for removing member in the table
-        Route::delete(('/member/{member}/remove'), [PeopleController::class, 'removeMember'])->name('program.remove.member');
+        Route::delete(('/member/{member}/remove'), [PeopleController::class, 'removeMember'])->can('delete', LearningMember::class)->name('program.remove.member');
+
+        Route::get('/member/{member}', [PeopleController::class, 'viewMember'])->can('view', LearningMember::class)->name('program.member.view');
 });

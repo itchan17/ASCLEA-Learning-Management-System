@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class PeopleController extends Controller
 {
@@ -87,9 +88,7 @@ class PeopleController extends Controller
        return back()->with('success', 'Users added successfully.');
     } 
 
-    public function removeMember($programId, $memberId) {
-     
-        $member = LearningMember::find($memberId);
+    public function removeMember($programId, LearningMember $member) {
       
         if($member) {
             $member->delete();
@@ -97,4 +96,17 @@ class PeopleController extends Controller
 
         return back()->with('success', 'Member deleted successfully.');
     }   
+
+    public function viewMember($programId, LearningMember $member) {
+    
+        return Inertia::render('Programs/ProgramComponent/PeopleComponent/ViewUser', [
+            'member_data' => fn () => $member->load(['user' => function ($query) {
+                                            $query->select('user_id', 'role_id', 'first_name', 'last_name')
+                                                ->with(['role' => function ($query) {
+                                                    $query->select('role_id', 'role_name');
+                                                }]);
+                                        }])
+        ]);
+        
+    }
 }
