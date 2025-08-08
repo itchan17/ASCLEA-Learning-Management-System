@@ -97,7 +97,7 @@ class PeopleController extends Controller
         return back()->with('success', 'Member deleted successfully.');
     }   
 
-    public function viewMember($programId, LearningMember $member) {
+    public function viewMember(Program $program, LearningMember $member) {
     
         return Inertia::render('Programs/ProgramComponent/PeopleComponent/ViewUser', [
             'member_data' => fn () => $member->load(['user' => function ($query) {
@@ -105,8 +105,20 @@ class PeopleController extends Controller
                                                 ->with(['role' => function ($query) {
                                                     $query->select('role_id', 'role_name');
                                                 }]);
-                                        }])
-        ]);
+                                        }]),
+
+            'assigned_courses' => fn () => $member->courses()->with(['course' => function ($query) {$query->select('course_id','course_code', 'course_name', 'course_day', 'start_time', 'end_time');
+                                        } ])->orderBy('created_at', 'desc')->get()
+                                    ]);
         
+    }
+
+    public function listCourses(Program $program, LearningMember $member) {
+
+        $courses = $program->courses()->whereDoesntHave('assignedCourse',  function ($query) use ($member) {
+                            $query->where('learning_member_id', $member->learning_member_id);
+                        })->select('course_id', 'course_code', 'course_name', 'course_day', 'start_time', 'end_time')->orderBy('created_at', 'desc')->get();
+
+        return response()->json($courses);
     }
 }

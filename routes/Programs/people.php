@@ -17,5 +17,10 @@ Route::prefix('programs/{program}')
         // Route for removing member in the table
         Route::delete(('/member/{member}/remove'), [PeopleController::class, 'removeMember'])->can('delete', LearningMember::class)->name('program.remove.member');
 
+        // Route for viewing specific member
         Route::get('/member/{member}', [PeopleController::class, 'viewMember'])->can('view', LearningMember::class)->name('program.member.view');
+
+        // Route for listing courses to be assigned to member
+        Route::get('/member/{member}/assign/courses', [PeopleController::class, 'listCourses'])->name('program.member.assign.courses');
+
 });

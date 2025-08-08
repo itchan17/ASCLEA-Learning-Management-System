@@ -1,7 +1,6 @@
 import { useState } from "react";
 import BackButton from "../../../../Components/Button/BackButton";
 import PrimaryButton from "../../../../Components/Button/PrimaryButton";
-import { IoSearch } from "react-icons/io5";
 import AssignCourseForm from "./AssignCourseForm";
 import useCourseList from "../../../../Stores/Programs/courseLIstStore";
 import { handleClickBackBtn } from "../../../../Utils/handleClickBackBtn";
@@ -9,10 +8,12 @@ import RoleGuard from "../../../../Components/Auth/RoleGuard";
 import EmptyState from "../../../../Components/EmptyState/EmptyState";
 import { usePage } from "@inertiajs/react";
 import { capitalize } from "lodash";
+import { formatTime } from "../../../../Utils/formatTime";
 
 export default function ViewUser() {
-    const { member_data: memberData } = usePage().props;
-    console.log();
+    const { member_data: memberData, assigned_courses: assignedCourses } =
+        usePage().props;
+    console.log(assignedCourses);
     // User Store
     const courseList = useCourseList((state) => state.courseList);
 
@@ -40,16 +41,7 @@ export default function ViewUser() {
                     <span>{capitalize(memberData.user.role.role_name)}</span>
                 </div>
             </div>
-            <div className="flex justify-end">
-                <div className="relative">
-                    <input
-                        className="w-full sm:w-50 border h-9 pl-10 p-2 border-ascend-black focus:outline-ascend-blue"
-                        type="text"
-                        placeholder="Search name"
-                    />
-                    <IoSearch className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1" />
-                </div>
-            </div>
+
             {/* Course Table */}
             <div className="overflow-x-auto">
                 <table className="table">
@@ -58,19 +50,46 @@ export default function ViewUser() {
                         <tr className="border-b-2 border-ascend-gray3">
                             <th>Course Code</th>
                             <th>Course Name</th>
-                            <th>Course Status</th>
+                            <th>Schedule</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {courseList?.length > 0 &&
-                            courseList.map((course) => (
+                        {assignedCourses &&
+                            assignedCourses.length > 0 &&
+                            assignedCourses.map((assignedCourse) => (
                                 <tr
-                                    key={course.id}
+                                    key={assignedCourse.course.course_id}
                                     className="hover:bg-ascend-lightblue cursor-pointer"
                                 >
-                                    <td>{course.courseCode}</td>
-                                    <td>{course.courseName}</td>
-                                    <td>{course.courseStatus}</td>
+                                    <td>{assignedCourse.course.course_code}</td>
+                                    <td>{assignedCourse.course.course_name}</td>
+                                    <td>
+                                        {assignedCourse.course.course_day
+                                            ? `${
+                                                  capitalize(
+                                                      assignedCourse.course
+                                                          .course_day
+                                                  ) +
+                                                  `${
+                                                      assignedCourse.course
+                                                          .start_time
+                                                          ? " - "
+                                                          : ""
+                                                  }`
+                                              }  ${
+                                                  assignedCourse.course
+                                                      .start_time
+                                                      ? `${formatTime(
+                                                            assignedCourse
+                                                                .course.end_time
+                                                        )} to ${formatTime(
+                                                            assignedCourse
+                                                                .course.end_time
+                                                        )}`
+                                                      : ""
+                                              }`
+                                            : "No schedule"}
+                                    </td>
                                     <RoleGuard allowedRoles={["admin"]}>
                                         <td>
                                             <span className="text-ascend-red underline">
@@ -82,7 +101,7 @@ export default function ViewUser() {
                             ))}
                     </tbody>
                 </table>
-                {courseList?.length === 0 && (
+                {assignedCourses.length === 0 && (
                     <EmptyState
                         imgSrc={"/images/illustrations/not_assigned.svg"}
                         text={`No assigned courses found. Click Assign Course to get your students started.`}
