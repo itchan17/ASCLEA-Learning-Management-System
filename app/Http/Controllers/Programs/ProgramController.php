@@ -91,13 +91,17 @@ class ProgramController extends Controller
         
     public function getLearningMembers($program, $role, $search) {
 
-        // Create a query for users
-        $members = $program->learningMembers() 
+        // Query for listing the users in the learning members table
+        $members = $program->learningMembers()
+            ->whereHas('user', function ($query) {
+                $query->whereNull('deleted_at'); // Exclude soft-deleted users
+            }) 
+            // Get user data from users table
             ->with([
-                'user' => fn ($query) => $query
+                'user' => fn ($query) => $query 
                     ->select('user_id', 'role_id', 'first_name', 'last_name', 'email')
                     ->with([
-                        'role' => fn ($query) => $query->select('role_id', 'role_name')
+                        'role' => fn ($query) => $query->select('role_id', 'role_name') // Get the user role
                     ])
             ]); 
 

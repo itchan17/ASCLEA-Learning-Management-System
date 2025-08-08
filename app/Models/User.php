@@ -10,10 +10,11 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, HasUuids;
+    use HasFactory, Notifiable, HasUuids, SoftDeletes;
 
     /**
      * Indicates if the IDs are auto-incrementing.

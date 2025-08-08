@@ -57,21 +57,28 @@ class PeopleController extends Controller
        if($req->is_select_all){
             $users = User::query();
 
+            // Retrieve users that not is a member of the current program
+            $users->whereDoesntHave('programs', function ($query) use ($program_id) {
+                $query->where('program_id', $program_id);
+            });
+
             if(!empty($req->unselected_users)){
-                $users->whereNotIn('user_id', $req->unselected_users);
+                $users->whereNotIn('user_id', $req->unselected_users); // Rerieve users that are not unselected
             }
 
             $users = $users->get();
        }
        else {
-            $users = User::whereIn('user_id', $req->selected_users)->get();
+            $users = User::whereIn('user_id', $req->selected_users)->get(); // Retrieve users based on the selected IDs
        }
        
+       // Data should not have duplicate in the table before inserting
        foreach($users as $user) {
-            LearningMember::updateOrInsert([
-                'learning_member_id' => (string) Str::uuid(), 
+            LearningMember::insert(
+                [
                 'program_id' => $program_id, 
                 'user_id' => $user->user_id,
+                'learning_member_id' => (string) Str::uuid(), 
                 'updated_at' => Carbon::now(),
                 'created_at' => Carbon::now(),
             ]);
