@@ -78,7 +78,7 @@ class ProgramController extends Controller
         // Return a prop containing the program data
         return Inertia::render('Programs/ProgramComponent/ProgramContent', [
             // Program data
-            'program' => $program->only(['program_id', 'program_name', 'program_description', 'background_image']),
+            'program' => fn () => $program->only(['program_id', 'program_name', 'program_description', 'background_image']),
 
             // List of courses
             'courses' => fn () => $program->courses()->latest()->select(['course_id', 'course_code', 'course_name', 

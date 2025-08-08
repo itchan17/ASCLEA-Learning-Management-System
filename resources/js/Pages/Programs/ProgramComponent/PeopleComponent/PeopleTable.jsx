@@ -65,7 +65,28 @@ export default function PeopleTable() {
     }, [filter, search]);
 
     const handleMemberClick = (userId) => {
-        router.visit(route("program.user.view", { programId: 1, userId }));
+        if (auth.user.role_name !== "student") {
+            router.visit(
+                route("program.user.view", {
+                    programId: program.program_id,
+                    userId,
+                })
+            );
+        }
+    };
+
+    const handleRemoveMember = (e, learningMemberId) => {
+        e.stopPropagation();
+
+        router.delete(
+            route("program.remove.member", {
+                program: program.program_id,
+                member: learningMemberId,
+            }),
+            {
+                only: ["members", "flash"],
+            }
+        );
     };
 
     return (
@@ -92,7 +113,7 @@ export default function PeopleTable() {
             <div className="overflow-x-auto overflow-y-hidden">
                 <table className="table">
                     <thead className="">
-                        <tr className="border-b-2 border-ascend-gray3">
+                        <tr className="border-b-2 text-ascend-black border-ascend-gray3">
                             <th>Name</th>
                             <th>Role</th>
                             <th>Email</th>
@@ -109,7 +130,11 @@ export default function PeopleTable() {
                                                 member.user.user_id
                                             )
                                         }
-                                        className="hover:bg-ascend-lightblue cursor-pointer"
+                                        className={`${
+                                            auth.user.role_name !== "student"
+                                                ? "hover:bg-ascend-lightblue cursor-pointer"
+                                                : ""
+                                        }`}
                                     >
                                         <td>
                                             <div className="flex items-center gap-3">
@@ -128,7 +153,15 @@ export default function PeopleTable() {
                                         <td>{member.user.email}</td>
                                         <RoleGuard allowedRoles={["admin"]}>
                                             <td>
-                                                <span className="text-ascend-red underline">
+                                                <span
+                                                    onClick={(e) =>
+                                                        handleRemoveMember(
+                                                            e,
+                                                            member.learning_member_id
+                                                        )
+                                                    }
+                                                    className="text-ascend-red transition-all duration-300 hover:bg-ascend-red hover:text-ascend-white font-bold py-1 px-2"
+                                                >
                                                     Remove
                                                 </span>
                                             </td>

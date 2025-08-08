@@ -13,4 +13,7 @@ Route::prefix('programs/{program}')
 
         // Route for adding members in the program
         Route::post('/member/add',  [PeopleController::class, 'addMember'])->can('addMember', LearningMember::class)->name('program.add.member');
+
+        // Route for removing member in the table
+        Route::delete(('/member/{member}/remove'), [PeopleController::class, 'removeMember'])->name('program.remove.member');
 });
