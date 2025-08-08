@@ -2,7 +2,7 @@ import React from "react";
 import { router } from "@inertiajs/react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import "../../../../css/global.css";
-import { useRoute } from "ziggy-js";
+import { route } from "ziggy-js";
 import useProgramStore from "../../../Stores/Programs/programStore";
 import { closeDropDown } from "../../../Utils/closeDropdown";
 import RoleGuard from "../../../Components/Auth/RoleGuard";
@@ -12,8 +12,6 @@ export default function ProgramCard({
     setIsModalOpen,
     setEditProgram,
 }) {
-    const route = useRoute();
-
     // Program Store
     const setProgramDataToUpdate = useProgramStore(
         (state) => state.setProgramDataToUpdate

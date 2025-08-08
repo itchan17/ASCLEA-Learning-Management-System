@@ -12,8 +12,9 @@ import Pagination from "../../../../Components/Pagination";
 import { debounce } from "lodash";
 
 export default function PeopleTable() {
-    const { members, program } = usePage().props;
+    const { members, program, auth } = usePage().props;
     console.log(members);
+
     // People Store
     const peopleList = usePeopleStore((state) => state.peopleList);
 
@@ -112,7 +113,7 @@ export default function PeopleTable() {
                                     >
                                         <td>
                                             <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl"></div>
+                                                <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl shrink-0"></div>
 
                                                 <div className="font-bold">
                                                     {`${member.user.first_name} ${member.user.last_name}`}
@@ -138,22 +139,22 @@ export default function PeopleTable() {
                         </>
                     )}
                 </table>
-                {members.data.length > 0 && members.total > 10 && (
-                    <Pagination
-                        links={members.links}
-                        currentPage={members.current_page}
-                        lastPage={members.last_page}
-                        only={["members"]}
-                    />
-                )}
-                {members.data && members.data.length === 0 && (
-                    <EmptyState
-                        paddingY="py-0"
-                        imgSrc={"/images/illustrations/alone.svg"}
-                        text={`“It’s a bit lonely here... Add some people and let the learning begin!”`}
-                    />
-                )}
             </div>
+            {members.data.length > 0 && members.total > 10 && (
+                <Pagination
+                    links={members.links}
+                    currentPage={members.current_page}
+                    lastPage={members.last_page}
+                    only={["members"]}
+                />
+            )}
+            {members.data && members.data.length === 0 && (
+                <EmptyState
+                    paddingY="py-0"
+                    imgSrc={"/images/illustrations/alone.svg"}
+                    text={`“It’s a bit lonely here... Add some people and let the learning begin!”`}
+                />
+            )}
         </div>
     );
 }

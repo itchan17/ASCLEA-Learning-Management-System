@@ -85,7 +85,8 @@ class ProgramController extends Controller
             'course_description', 'updated_at'])->get(),
 
             // Members of the program
-            'members' => $this->getLearningMembers($program, $req->input('role'), $req->input('search')) ,
+            // Return only if specifically requested / when people was rendered
+            'members' => Inertia::optional(fn () => $this->getLearningMembers($program, $req->input('role'), $req->input('search'))),
         ]);
     }
         

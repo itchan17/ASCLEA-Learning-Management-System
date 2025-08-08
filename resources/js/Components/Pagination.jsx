@@ -12,16 +12,11 @@ export default function Pagination({ links, currentPage, lastPage, only }) {
         const pageNumber = Number(label);
 
         // Keep first, last, current ±2
-        return (
-            !isNaN(pageNumber) &&
-            (pageNumber === 1 ||
-                pageNumber === lastPage ||
-                Math.abs(pageNumber - currentPage) <= 1)
-        );
+        return !isNaN(pageNumber) && Math.abs(pageNumber - currentPage) <= 1;
     });
 
     return (
-        <div className="flex justify-end w-full mt-5">
+        <div className="flex justify-center sm:justify-end w-full mt-5">
             <div className="join font-nunito-sans">
                 {filteredLinks.map((link, index) => (
                     <Link
@@ -30,7 +25,7 @@ export default function Pagination({ links, currentPage, lastPage, only }) {
                         preserveState
                         preserveScroll
                         only={only}
-                        className={`join-item btn ${
+                        className={`join-item btn rounded-none border-ascend-gray1 ${
                             link.active
                                 ? "bg-ascend-blue text-ascend-white"
                                 : " hover:bg-ascend-lightblue"
@@ -39,8 +34,9 @@ export default function Pagination({ links, currentPage, lastPage, only }) {
                         {link.label
                             .replace("«", "")
                             .replace("»", "")
-                            .replace("&laquo;", "")
+                            .replace("&laquo; Previous", "Prev")
                             .replace("&raquo;", "")
+
                             .trim()}
                     </Link>
                 ))}
