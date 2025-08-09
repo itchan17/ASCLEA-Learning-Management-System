@@ -1,8 +1,6 @@
 import { useMemo, useEffect, useState } from "react";
 import EmptyState from "../../../../Components/EmptyState/EmptyState";
-import usePeopleStore from "../../../../Stores/Programs/peopleStore";
 import { router } from "@inertiajs/react";
-import CustomSelect from "../../../../Components/CustomInputField/CustomSelect";
 import { IoSearch } from "react-icons/io5";
 import { route } from "ziggy-js";
 import RoleGuard from "../../../../Components/Auth/RoleGuard";
@@ -14,9 +12,6 @@ import { debounce } from "lodash";
 export default function PeopleTable() {
     const { members, program, auth } = usePage().props;
     console.log(members);
-
-    // People Store
-    const peopleList = usePeopleStore((state) => state.peopleList);
 
     const [filter, setFilter] = useState("");
     const [search, setSearch] = useState("");
@@ -112,8 +107,8 @@ export default function PeopleTable() {
             </div>
             <div className="overflow-x-auto overflow-y-hidden">
                 <table className="table">
-                    <thead className="">
-                        <tr className="border-b-2 text-ascend-black border-ascend-gray3">
+                    <thead className="text-ascend-black">
+                        <tr className="border-b-2 border-ascend-gray3">
                             <th>Name</th>
                             <th>Role</th>
                             <th>Email</th>
@@ -132,7 +127,7 @@ export default function PeopleTable() {
                                         }
                                         className={`${
                                             auth.user.role_name !== "student"
-                                                ? "hover:bg-ascend-lightblue cursor-pointer"
+                                                ? "hover:bg-ascend-lightblue transition-all duration-300 cursor-pointer"
                                                 : ""
                                         }`}
                                     >

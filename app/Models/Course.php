@@ -48,7 +48,7 @@ class Course extends Model
         return $this->belongsTo(Program::class, 'program_id');
     }
 
-    public function assignedCourse(): HasMany
+    public function assignedTo(): HasMany
     {
         return $this->hasMany(AssignedCourse::class, 'course_id');
     }

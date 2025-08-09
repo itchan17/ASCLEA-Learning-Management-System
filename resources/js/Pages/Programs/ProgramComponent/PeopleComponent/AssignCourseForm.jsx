@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import PrimaryButton from "../../../../Components/Button/PrimaryButton";
 import SecondaryButton from "../../../../Components/Button/SecondaryButton";
-import useCourseList from "../../../../Stores/Programs/courseLIstStore";
 import axios from "axios";
 import { route } from "ziggy-js";
-import { usePage } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { capitalize } from "lodash";
 import { formatTime } from "../../../../Utils/formatTime";
 import Loader from "../../../../Components/Loader";
@@ -12,32 +11,25 @@ import Loader from "../../../../Components/Loader";
 export default function AssignCourseForm({ toggleModal }) {
     const { member_data: memberData } = usePage().props;
 
-    // User Store
-    const handleAddCourseChange = useCourseList(
-        (state) => state.handleAddCourseChange
-    );
-    const handleAddCourse = useCourseList((state) => state.handleAddCourse);
-
-    const addCoourse = () => {
-        handleAddCourse();
-        toggleModal();
-    };
-
     const [coursesToAssign, setCoursesToassign] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [selectedCourses, setSelectedCourses] = useState([]);
+    const [isSelectAll, setIsSelectAll] = useState(false);
+    const [isAssignLoading, setIsAssignLoading] = useState(false);
 
+    // Fetches the courses to bes assigned when the components was rendered
     useEffect(() => {
         const fetchCourses = async () => {
             setIsLoading(true);
 
             try {
                 const courses = await axios.get(
-                    route("program.member.assign.courses", {
+                    route("program.member.assign.courses.list", {
                         program: memberData.program_id,
                         member: memberData.learning_member_id,
                     })
                 );
-                console.log(courses.data);
+
                 setCoursesToassign([...courses.data]);
             } catch (error) {
                 console.error(error);
@@ -50,10 +42,75 @@ export default function AssignCourseForm({ toggleModal }) {
         fetchCourses();
     }, []);
 
+    const handleAssignCourseChange = (courseId) => {
+        const updatedCourses = selectedCourses.some((id) => id === courseId) // Check if id is already selected
+            ? selectedCourses.filter((id) => id !== courseId) // If true filter out the duplciate id
+            : [...selectedCourses, courseId]; // Else add it
+
+        // Unchecked the select all is user unselect all the courses
+        // This means user clicked select all then unchecked all the user
+        if (updatedCourses.length === 0 && isSelectAll) {
+            setIsSelectAll(!isSelectAll);
+        }
+
+        setSelectedCourses(updatedCourses);
+    };
+
+    const handleSelecAllCourses = () => {
+        // Check if the select all is false
+        // This is the inital state and we're only setting it to true after running this block
+        if (!isSelectAll) {
+            const selectedCoursesId = coursesToAssign.map(
+                (course) => course.course_id
+            );
+            setSelectedCourses(selectedCoursesId);
+        } else {
+            setSelectedCourses([]);
+        }
+
+        // This is when we set the state of the select all
+        setIsSelectAll(!isSelectAll);
+    };
+
+    const handleAssignCourse = () => {
+        if (selectedCourses.length > 0) {
+            setIsAssignLoading(true);
+            console.log(memberData);
+            router.post(
+                route("program.member.assign.courses.store", {
+                    program: memberData.program_id,
+                    member: memberData.learning_member_id,
+                }),
+                { courses_to_assign: selectedCourses },
+                {
+                    only: ["assigned_courses", "flash"],
+                    onFinish: () => setIsAssignLoading(false),
+                    onSuccess: () => {
+                        setIsAssignLoading(false);
+                        toggleModal();
+                    },
+                }
+            );
+        }
+    };
+
     return (
         <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center text-ascend-black">
             <form className="bg-ascend-white opacity-100 p-5 w-160 space-y-5  max-h-[calc(100vh-5rem)] overflow-y-auto my-10 font-nunito-sans">
                 <h1 className="text-size4 font-bold">Assign Course</h1>
+
+                {coursesToAssign.length > 0 && (
+                    <div className="flex items-center mb-0 gap-2">
+                        <input
+                            type="checkbox"
+                            checked={isSelectAll}
+                            className="accent-ascend-blue w-4 h-4"
+                            onChange={handleSelecAllCourses}
+                        />
+                        <span>Select all</span>
+                    </div>
+                )}
+
                 <div className="h-72 overflow-y-auto divide-y-1 divide-ascend-gray1">
                     {!isLoading &&
                         coursesToAssign &&
@@ -61,14 +118,19 @@ export default function AssignCourseForm({ toggleModal }) {
                             <>
                                 {coursesToAssign.map((course) => (
                                     <div
-                                        key={course.id}
+                                        key={course.course_id}
                                         className="py-5 flex items-center space-x-5"
                                     >
                                         <input
                                             type="checkbox"
                                             className="accent-ascend-blue w-4 h-4"
+                                            checked={selectedCourses.some(
+                                                (id) => id === course.course_id
+                                            )}
                                             onChange={() =>
-                                                handleAddCourseChange(course)
+                                                handleAssignCourseChange(
+                                                    course.course_id
+                                                )
                                             }
                                         />
                                         <div className="flex flex-col">
@@ -121,13 +183,16 @@ export default function AssignCourseForm({ toggleModal }) {
 
                 <div className="flex justify-end space-x-2">
                     <SecondaryButton
+                        isDisabled={isAssignLoading}
                         doSomething={toggleModal}
                         text={"Cancel"}
                     />
                     <PrimaryButton
-                        doSomething={addCoourse}
+                        isLoading={isAssignLoading}
+                        isDisabled={isAssignLoading}
+                        doSomething={handleAssignCourse}
                         btnType={"submit"}
-                        text={"Add"}
+                        text={"Assign"}
                     />
                 </div>
             </form>

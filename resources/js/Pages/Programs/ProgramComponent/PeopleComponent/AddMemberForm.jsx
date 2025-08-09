@@ -2,7 +2,6 @@ import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { IoSearch } from "react-icons/io5";
 import SecondaryButton from "../../../../Components/Button/SecondaryButton";
 import PrimaryButton from "../../../../Components/Button/PrimaryButton";
-import usePeopleStore from "../../../../Stores/Programs/peopleStore";
 import { router, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import axios from "axios";
@@ -130,7 +129,14 @@ export default function AddMemberForm({ toggleModal }) {
                 ? unSelectedUsers.filter((id) => id !== userId)
                 : [...unSelectedUsers, userId];
 
-            setUnSelectedUsers(updatedUnselectedUsers);
+            if (updatedUsers.length > 0) {
+                setUnSelectedUsers(updatedUnselectedUsers);
+            } else {
+                // Reset state if theres no updatedUsers
+                // This means user clicked select all then unchecked all the user
+                setSelectAll(false);
+                setUnSelectedUsers([]);
+            }
         }
     };
 
@@ -147,7 +153,7 @@ export default function AddMemberForm({ toggleModal }) {
     };
 
     useEffect(() => {
-        // If selectAll is true update the selectedUsers to check the checkbox as the user srolls
+        // If selectAll is true update the selectedUsers to check the checkbox as the user scrolls
         if (selectAll) {
             const allUsers = userList.map((user) => user.user_id);
             setSelectedUsers(allUsers);
@@ -212,6 +218,7 @@ export default function AddMemberForm({ toggleModal }) {
                     <div className="flex items-center mb-0 gap-2">
                         <input
                             type="checkbox"
+                            checked={selectAll}
                             className="accent-ascend-blue w-4 h-4"
                             onChange={handleSelectAll}
                         />
@@ -280,6 +287,7 @@ export default function AddMemberForm({ toggleModal }) {
                 <div className="flex justify-end space-x-2">
                     <SecondaryButton
                         doSomething={handleCancel}
+                        isDisabled={isAddLoading}
                         text={"Cancel"}
                     />
                     <PrimaryButton

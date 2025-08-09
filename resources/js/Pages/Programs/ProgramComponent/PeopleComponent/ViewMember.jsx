@@ -9,18 +9,29 @@ import EmptyState from "../../../../Components/EmptyState/EmptyState";
 import { usePage } from "@inertiajs/react";
 import { capitalize } from "lodash";
 import { formatTime } from "../../../../Utils/formatTime";
+import { route } from "ziggy-js";
+import { router } from "@inertiajs/react";
 
-export default function ViewUser() {
+export default function ViewMember() {
     const { member_data: memberData, assigned_courses: assignedCourses } =
         usePage().props;
-    console.log(assignedCourses);
-    // User Store
-    const courseList = useCourseList((state) => state.courseList);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
+    };
+
+    const handleRemoveAssignedCourse = (assignedCourseId) => {
+        if (assignedCourseId) {
+            router.delete(
+                route("program.member.assign.courses.remove", {
+                    program: memberData.program_id,
+                    member: memberData.learning_member_id,
+                    assignedCourse: assignedCourseId,
+                })
+            );
+        }
     };
 
     return (
@@ -44,9 +55,9 @@ export default function ViewUser() {
 
             {/* Course Table */}
             <div className="overflow-x-auto">
-                <table className="table">
+                <table className="table font-nunito-sans">
                     {/* head */}
-                    <thead className="">
+                    <thead className="text-ascend-black">
                         <tr className="border-b-2 border-ascend-gray3">
                             <th>Course Code</th>
                             <th>Course Name</th>
@@ -59,7 +70,7 @@ export default function ViewUser() {
                             assignedCourses.map((assignedCourse) => (
                                 <tr
                                     key={assignedCourse.course.course_id}
-                                    className="hover:bg-ascend-lightblue cursor-pointer"
+                                    className="hover:bg-ascend-lightblue transition-all duration-300"
                                 >
                                     <td>{assignedCourse.course.course_code}</td>
                                     <td>{assignedCourse.course.course_name}</td>
@@ -92,7 +103,14 @@ export default function ViewUser() {
                                     </td>
                                     <RoleGuard allowedRoles={["admin"]}>
                                         <td>
-                                            <span className="text-ascend-red underline">
+                                            <span
+                                                onClick={() =>
+                                                    handleRemoveAssignedCourse(
+                                                        assignedCourse.assigned_course_id
+                                                    )
+                                                }
+                                                className="text-ascend-red transition-all duration-300 hover:bg-ascend-red hover:text-ascend-white font-bold py-1 px-2 cursor-pointer"
+                                            >
                                                 Remove
                                             </span>
                                         </td>
