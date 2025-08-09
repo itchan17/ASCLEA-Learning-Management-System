@@ -5,7 +5,7 @@ import axios from "axios";
 import { route } from "ziggy-js";
 import { router, usePage } from "@inertiajs/react";
 import { capitalize } from "lodash";
-import { formatTime } from "../../../../Utils/formatTime";
+import { formatTime } from "../../../../Utils/FormatTime";
 import Loader from "../../../../Components/Loader";
 
 export default function AssignCourseForm({ toggleModal }) {

@@ -27,7 +27,7 @@ export default function Programs({ program_list: programList }) {
 
     return (
         <div className="font-nunito-sans space-y-5">
-            <RoleGuard allowedRoles={["admin", "faculty"]}>
+            <RoleGuard allowedRoles={["admin"]}>
                 <div className="flex justify-end">
                     <PrimaryButton
                         doSomething={toggleModal}

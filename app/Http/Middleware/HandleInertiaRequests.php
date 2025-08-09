@@ -40,7 +40,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 // Verify first user exists
                 'user' => $request->user() ? [
-                    ...$request->user()->only(['role_id', 'email']) ,
+                    ...$request->user()->only(['role_id', 'user_id']) ,
                     'role_name' => $request->user()->role->role_name ?? null,
                 ] : null,
             ],

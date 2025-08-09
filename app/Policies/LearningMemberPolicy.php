@@ -23,10 +23,11 @@ class LearningMemberPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user): bool
+    public function viewMember(User $user, LearningMember $member): bool
     {
-        $role = $user->role?->role_name;
-        return in_array($role, ['admin', 'faculty'], true);
+        $isAuthorized = in_array($user->role->role_name, ['admin', 'faculty'], true) || $member->user()->where('user_id', $user->user_id)->exists(); // Check if the member is same to the authenticated user
+
+        return $isAuthorized;
     }
 
     /**

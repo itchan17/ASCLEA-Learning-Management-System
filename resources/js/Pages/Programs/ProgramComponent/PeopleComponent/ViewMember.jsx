@@ -2,20 +2,19 @@ import { useState } from "react";
 import BackButton from "../../../../Components/Button/BackButton";
 import PrimaryButton from "../../../../Components/Button/PrimaryButton";
 import AssignCourseForm from "./AssignCourseForm";
-import useCourseList from "../../../../Stores/Programs/courseLIstStore";
 import { handleClickBackBtn } from "../../../../Utils/handleClickBackBtn";
 import RoleGuard from "../../../../Components/Auth/RoleGuard";
 import EmptyState from "../../../../Components/EmptyState/EmptyState";
 import { usePage } from "@inertiajs/react";
 import { capitalize } from "lodash";
-import { formatTime } from "../../../../Utils/formatTime";
+import { formatTime } from "../../../../Utils/FormatTime";
 import { route } from "ziggy-js";
 import { router } from "@inertiajs/react";
 
 export default function ViewMember() {
     const { member_data: memberData, assigned_courses: assignedCourses } =
         usePage().props;
-
+    console.log(memberData);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const toggleModal = () => {

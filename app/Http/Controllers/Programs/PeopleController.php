@@ -106,14 +106,20 @@ class PeopleController extends Controller
     }   
 
     public function viewMember(Program $program, LearningMember $member) {
-    
+
         return Inertia::render('Programs/ProgramComponent/PeopleComponent/ViewMember', [
-            'member_data' => fn () => $member->load(['user' => function ($query) {
-                                            $query->select('user_id', 'role_id', 'first_name', 'last_name')
-                                                ->with(['role' => function ($query) {
-                                                    $query->select('role_id', 'role_name');
-                                                }]);
-                                        }]),
+
+            // Check first if user is not soft deleted or exists else abort
+            'member_data' => fn () => $member->user()->exists()
+                ? $member->load([
+                    'user' => function ($query) {
+                        $query->select('user_id', 'role_id', 'first_name', 'last_name')
+                            ->with(['role' => function ($query) {
+                                $query->select('role_id', 'role_name');
+                            }]);
+                    }
+                ])
+                : abort(404),
 
             'assigned_courses' => fn () => $member->courses()
             ->with([

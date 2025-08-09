@@ -11,7 +11,6 @@ import { debounce } from "lodash";
 
 export default function PeopleTable() {
     const { members, program, auth } = usePage().props;
-    console.log(members);
 
     const [filter, setFilter] = useState("");
     const [search, setSearch] = useState("");
@@ -59,12 +58,12 @@ export default function PeopleTable() {
         }
     }, [filter, search]);
 
-    const handleMemberClick = (userId) => {
-        if (auth.user.role_name !== "student") {
+    const handleMemberClick = (learningMemberId, userId) => {
+        if (auth.user.role_name !== "student" || auth.user.user_id === userId) {
             router.visit(
                 route("program.member.view", {
                     program: program.program_id,
-                    member: userId,
+                    member: learningMemberId,
                 })
             );
         }
@@ -122,12 +121,15 @@ export default function PeopleTable() {
                                         key={member.user.user_id}
                                         onClick={() =>
                                             handleMemberClick(
-                                                member.learning_member_id
+                                                member.learning_member_id,
+                                                member.user.user_id
                                             )
                                         }
-                                        className={`${
-                                            auth.user.role_name !== "student"
-                                                ? "hover:bg-ascend-lightblue transition-all duration-300 cursor-pointer"
+                                        className={`group hover:bg-ascend-lightblue transition-all duration-300 ${
+                                            auth.user.role_name !== "student" ||
+                                            auth.user.user_id ===
+                                                member.user.user_id
+                                                ? "cursor-pointer"
                                                 : ""
                                         }`}
                                     >
@@ -135,8 +137,23 @@ export default function PeopleTable() {
                                             <div className="flex items-center gap-3">
                                                 <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl shrink-0"></div>
 
-                                                <div className="font-bold">
-                                                    {`${member.user.first_name} ${member.user.last_name}`}
+                                                <div
+                                                    className={`font-bold ${
+                                                        auth.user.role_name !==
+                                                            "student" ||
+                                                        auth.user.user_id ===
+                                                            member.user.user_id
+                                                            ? "group-hover:underline"
+                                                            : ""
+                                                    }`}
+                                                >
+                                                    {`${member.user.first_name} ${member.user.last_name}`}{" "}
+                                                    {auth.user.user_id ===
+                                                        member.user.user_id && (
+                                                        <span className="text-size1 font-normal">
+                                                            (You)
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </div>
                                         </td>
