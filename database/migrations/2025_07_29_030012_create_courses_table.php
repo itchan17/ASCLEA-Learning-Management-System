@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('course_day')->nullable();
             $table->string('start_time')->nullable();
             $table->string('end_time')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
