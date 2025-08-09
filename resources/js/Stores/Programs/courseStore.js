@@ -3,18 +3,21 @@ import useProgramStore from "./programStore";
 
 const useCourseStore = create((set) => ({
     activeTab: 0,
-    courseList: [],
+    // courseList: [],
     course: {
-        id: null,
-        programId: null,
-        courseCode: "",
-        courseName: "",
-        courseDescription: "",
-        courseDay: "",
-        fromTime: "",
-        toTime: "",
-        courseStatus: "",
+        course_code: "CS101",
+        course_name: "1",
+        course_description: "This course introduces the basics of computing.",
+        course_day: "Monday",
+        start_time: "10:00",
+        end_time: "11:00",
     },
+
+    // clearCourseList: () => {
+    //     set(() => ({
+    //         courseList: [],
+    //     }));
+    // },
 
     // Set the active tab inside the course content
     setActiveTab: (tab) => {
@@ -37,63 +40,71 @@ const useCourseStore = create((set) => ({
     clearCourse: () =>
         set(() => ({
             course: {
-                courseCode: "",
-                courseName: "",
-                courseDescription: "",
-                courseDay: "",
-                fromTime: "",
-                toTime: "",
+                course_code: "",
+                course_name: "",
+                course_description: "",
+                course_day: "",
+                start_time: "",
+                end_time: "",
             },
         })),
 
-    addCourse: (programId) => {
-        const { course, courseList, clearCourse } = useCourseStore.getState();
+    // setCourseList: (validatedCourse) => {
+    //     console.log(validatedCourse);
+    //     const { clearCourse } = useCourseStore.getState();
+    //     const { courseList } = useCourseStore.getState();
+    //     set({ courseList: [...courseList, validatedCourse] });
+    //     clearCourse();
+    // },
 
-        // temporarily  set the id
-        const newId =
-            courseList.length > 0
-                ? courseList[courseList.length - 1].id + 1
-                : 1;
+    // addCourse: (programId) => {
+    //     const { course, courseList, clearCourse } = useCourseStore.getState();
 
-        if (programId) {
-            useProgramStore.setState((state) => ({
-                programList: state.programList.map((program) => {
-                    if (program.id === programId) {
-                        // get the last array of program's courselist and add 1 to termporary set an id
-                        const courseId =
-                            program.courseList.length > 0
-                                ? program.courseList[
-                                      program.courseList.length - 1
-                                  ].id + 1
-                                : 1;
+    //     // temporarily  set the id
+    //     const newId =
+    //         courseList.length > 0
+    //             ? courseList[courseList.length - 1].id + 1
+    //             : 1;
 
-                        const updatedCourseDetails = {
-                            ...course,
-                            id: courseId,
-                            programId,
-                        };
+    //     if (programId) {
+    //         useProgramStore.setState((state) => ({
+    //             programList: state.programList.map((program) => {
+    //                 if (program.id === programId) {
+    //                     // get the last array of program's courselist and add 1 to termporary set an id
+    //                     const courseId =
+    //                         program.courseList.length > 0
+    //                             ? program.courseList[
+    //                                   program.courseList.length - 1
+    //                               ].id + 1
+    //                             : 1;
 
-                        // return the new course to the program course list
-                        return {
-                            ...program,
-                            courseList: [
-                                ...program.courseList,
-                                updatedCourseDetails,
-                            ],
-                        };
-                    } else {
-                        return program;
-                    }
-                }),
-            }));
-        } else {
-            const updatedCourseDetails = { ...course, id: newId };
+    //                     const updatedCourseDetails = {
+    //                         ...course,
+    //                         id: courseId,
+    //                         programId,
+    //                     };
 
-            set({ courseList: [...courseList, updatedCourseDetails] });
-        }
+    //                     // return the new course to the program course list
+    //                     return {
+    //                         ...program,
+    //                         courseList: [
+    //                             ...program.courseList,
+    //                             updatedCourseDetails,
+    //                         ],
+    //                     };
+    //                 } else {
+    //                     return program;
+    //                 }
+    //             }),
+    //         }));
+    //     } else {
+    //         const updatedCourseDetails = { ...course, id: newId };
 
-        clearCourse();
-    },
+    //         set({ courseList: [...courseList, updatedCourseDetails] });
+    //     }
+
+    //     clearCourse();
+    // },
 
     handleEditCourse: (programId, courseId) => {
         const { course, clearCourse } = useCourseStore.getState();

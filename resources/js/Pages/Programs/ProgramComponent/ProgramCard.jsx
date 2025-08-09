@@ -12,13 +12,15 @@ export default function ProgramCard({
     setIsModalOpen,
     setEditProgram,
 }) {
-    // Const Program Store
-    const setProgram = useProgramStore((state) => state.setProgram);
-    const deleteProgram = useProgramStore((state) => state.deleteProgram);
-
     const route = useRoute();
+
+    // Program Store
+    const setProgramDataToUpdate = useProgramStore(
+        (state) => state.setProgramDataToUpdate
+    );
+
     const handleCardClick = () => {
-        router.visit(route("program.view", programDetails.id));
+        router.visit(route("program.show", programDetails.program_id));
     };
 
     const stopPropagation = (e) => {
@@ -27,18 +29,15 @@ export default function ProgramCard({
 
     const handleEditClick = () => {
         setIsModalOpen(true);
-        setProgram(programDetails);
+        setProgramDataToUpdate(programDetails); // Set the program details that will be passed on AddProgramForm to set the data of slected program to edit
         setEditProgram(true);
-
-        // Close the dropdown after clicked
-        closeDropDown();
+        closeDropDown(); // Close the dropdown after clicked
     };
 
     const handleArchiveClick = () => {
-        deleteProgram(programDetails.id);
-
-        // Close the dropdown after clicked
-        closeDropDown();
+        // Send a delete request to server that will archiove program through soft delete
+        router.delete(route("program.archive", programDetails.program_id));
+        closeDropDown(); // Close the dropdown after clicked
     };
     return (
         <div
@@ -79,7 +78,7 @@ export default function ProgramCard({
 
             <div className="h-16 px-5 flex items-center">
                 <h1 className="font-bold overflow-hidden text-ellipsis text-nowrap group-hover:text-ascend-blue transition-all duration-300">
-                    {programDetails.programName}
+                    {programDetails.program_name}
                 </h1>
             </div>
         </div>

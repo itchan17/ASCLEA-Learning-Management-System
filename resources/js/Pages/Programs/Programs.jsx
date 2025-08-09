@@ -5,14 +5,14 @@ import useProgramStore from "../../Stores/Programs/programStore";
 import ProgramCard from "./ProgramComponent/ProgramCard";
 import EmptyState from "../../Components/EmptyState/EmptyState";
 import RoleGuard from "../../Components/Auth/RoleGuard";
+import { usePage } from "@inertiajs/react";
+import Loader from "../../Components/Loader";
 
-export default function Programs() {
+export default function Programs({ program_list: programList }) {
+    const { flash } = usePage().props; // Used for setting message for the toast
+
     // Program Store
-    const programList = useProgramStore((state) => state.programList);
     const setActiveTab = useProgramStore((state) => state.setActiveTab);
-
-    console.log(programList);
-    console.log("Render Programs");
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editProgram, setEditProgram] = useState(false);
@@ -24,10 +24,6 @@ export default function Programs() {
     useEffect(() => {
         setActiveTab(0);
     }, []);
-
-    useEffect(() => {
-        console.log("Edit program: " + editProgram);
-    }, [editProgram]);
 
     return (
         <div className="font-nunito-sans space-y-5">
@@ -42,11 +38,11 @@ export default function Programs() {
 
             {/* Display created program */}
             <div className="w-full flex flex-wrap gap-5">
-                {programList?.length > 0 ? (
-                    programList.map((program, index) => {
+                {programList.length > 0 ? (
+                    programList.map((program) => {
                         return (
                             <ProgramCard
-                                key={index}
+                                key={program.program_id}
                                 programDetails={program}
                                 setIsModalOpen={setIsModalOpen}
                                 setEditProgram={setEditProgram}
