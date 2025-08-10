@@ -14,6 +14,9 @@ import RoleGuard from "../../../Components/Auth/RoleGuard";
 import { closeDropDown } from "../../../Utils/closeDropdown";
 import useProgramStore from "../../../Stores/Programs/programStore";
 import Loader from "../../../Components/Loader";
+import { ToastContainer } from "react-toastify";
+import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToast";
+import { displayToast } from "../../../Utils/displayToast";
 
 export default function Courses() {
     const { flash, program: programDetails, courses } = usePage().props; // Get the the data of showed program from props
@@ -65,7 +68,14 @@ export default function Courses() {
 
     const handleArchiveClick = () => {
         // Send a delete request to server that will archiove program through soft delete
-        router.delete(route("program.archive", programDetails.program_id));
+        router.delete(route("program.archive", programDetails.program_id), {
+            onSuccess: (page) => {
+                displayToast(
+                    <DefaultCustomToast message={page.props.flash.success} />,
+                    "success"
+                );
+            },
+        });
         closeDropDown(); // Close the dropdown after clicked
     };
 

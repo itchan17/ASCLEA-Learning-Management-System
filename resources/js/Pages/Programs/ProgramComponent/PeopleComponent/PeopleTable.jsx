@@ -8,6 +8,8 @@ import { usePage } from "@inertiajs/react";
 import _ from "lodash";
 import Pagination from "../../../../Components/Pagination";
 import { debounce } from "lodash";
+import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
+import { displayToast } from "../../../../Utils/displayToast";
 
 export default function PeopleTable() {
     const { members, program, auth } = usePage().props;
@@ -79,6 +81,14 @@ export default function PeopleTable() {
             }),
             {
                 only: ["members", "flash"],
+                onSuccess: (page) => {
+                    displayToast(
+                        <DefaultCustomToast
+                            message={page.props.flash.success}
+                        />,
+                        "success"
+                    );
+                },
             }
         );
     };

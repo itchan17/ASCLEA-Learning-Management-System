@@ -5,12 +5,8 @@ import useProgramStore from "../../Stores/Programs/programStore";
 import ProgramCard from "./ProgramComponent/ProgramCard";
 import EmptyState from "../../Components/EmptyState/EmptyState";
 import RoleGuard from "../../Components/Auth/RoleGuard";
-import { usePage } from "@inertiajs/react";
-import Loader from "../../Components/Loader";
 
 export default function Programs({ program_list: programList }) {
-    const { flash } = usePage().props; // Used for setting message for the toast
-
     // Program Store
     const setActiveTab = useProgramStore((state) => state.setActiveTab);
 

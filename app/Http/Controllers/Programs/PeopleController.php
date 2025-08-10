@@ -93,7 +93,9 @@ class PeopleController extends Controller
         // Data should not have duplicate in the table before inserting
         LearningMember::insert($data);
 
-        return back()->with('success', 'Users added successfully.');
+         $label = count($data) > 1 ? "Users" : "User";
+
+        return back()->with('success', "$label added successfully.");
     } 
 
     public function removeMember($programId, LearningMember $member) {

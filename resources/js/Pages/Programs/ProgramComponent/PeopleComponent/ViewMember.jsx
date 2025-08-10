@@ -10,6 +10,8 @@ import { capitalize } from "lodash";
 import { formatTime } from "../../../../Utils/FormatTime";
 import { route } from "ziggy-js";
 import { router } from "@inertiajs/react";
+import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
+import { displayToast } from "../../../../Utils/displayToast";
 
 export default function ViewMember() {
     const { member_data: memberData, assigned_courses: assignedCourses } =
@@ -28,7 +30,17 @@ export default function ViewMember() {
                     program: memberData.program_id,
                     member: memberData.learning_member_id,
                     assignedCourse: assignedCourseId,
-                })
+                }),
+                {
+                    onSuccess: (page) => {
+                        displayToast(
+                            <DefaultCustomToast
+                                message={page.props.flash.success}
+                            />,
+                            "success"
+                        );
+                    },
+                }
             );
         }
     };

@@ -7,6 +7,8 @@ import { router, usePage } from "@inertiajs/react";
 import { capitalize } from "lodash";
 import { formatTime } from "../../../../Utils/FormatTime";
 import Loader from "../../../../Components/Loader";
+import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
+import { displayToast } from "../../../../Utils/displayToast";
 
 export default function AssignCourseForm({ toggleModal }) {
     const { member_data: memberData } = usePage().props;
@@ -85,9 +87,15 @@ export default function AssignCourseForm({ toggleModal }) {
                 {
                     only: ["assigned_courses", "flash"],
                     onFinish: () => setIsAssignLoading(false),
-                    onSuccess: () => {
+                    onSuccess: (page) => {
                         setIsAssignLoading(false);
                         toggleModal();
+                        displayToast(
+                            <DefaultCustomToast
+                                message={page.props.flash.success}
+                            />,
+                            "success"
+                        );
                     },
                 }
             );

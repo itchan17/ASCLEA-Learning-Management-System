@@ -7,7 +7,7 @@ import NotifDropdown from "./NotifDropdown";
 export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
     const { url } = usePage();
     const { auth } = usePage().props;
-    console.log(auth);
+
     // States
     const [pageTitle, setPageTitle] = useState("");
     const [dropDown, setDropdown] = useState("");

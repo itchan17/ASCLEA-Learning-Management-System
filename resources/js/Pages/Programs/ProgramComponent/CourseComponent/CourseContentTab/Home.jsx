@@ -13,6 +13,8 @@ import AddCourseForm from "../AddCourseForm";
 import RoleGuard from "../../../../../Components/Auth/RoleGuard";
 import { formatTime } from "../../../../../Utils/formatTime";
 import { closeDropDown } from "../../../../../Utils/closeDropdown";
+import DefaultCustomToast from "../../../../../Components/CustomToast/DefaultCustomToast";
+import { displayToast } from "../../../../../Utils/displayToast";
 
 export default function Home({}) {
     const { program, course } = usePage().props;
@@ -57,7 +59,17 @@ export default function Home({}) {
             route("course.archive", {
                 program: program.program_id,
                 course: course.course_id,
-            })
+            }),
+            {
+                onSuccess: (page) => {
+                    displayToast(
+                        <DefaultCustomToast
+                            message={page.props.flash.success}
+                        />,
+                        "success"
+                    );
+                },
+            }
         );
 
         // Close the dropdown after clicked

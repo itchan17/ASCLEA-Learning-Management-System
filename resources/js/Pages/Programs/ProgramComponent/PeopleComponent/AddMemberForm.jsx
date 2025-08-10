@@ -8,6 +8,8 @@ import axios from "axios";
 import Loader from "../../../../Components/Loader";
 import { capitalize } from "lodash";
 import debounce from "lodash.debounce";
+import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
+import { displayToast } from "../../../../Utils/displayToast";
 
 export default function AddMemberForm({ toggleModal }) {
     const { program } = usePage().props;
@@ -175,9 +177,15 @@ export default function AddMemberForm({ toggleModal }) {
                     onError: () => {
                         setIsAddLoading(false);
                     },
-                    onSuccess: () => {
+                    onSuccess: (page) => {
                         toggleModal();
                         setIsAddLoading(false);
+                        displayToast(
+                            <DefaultCustomToast
+                                message={page.props.flash.success}
+                            />,
+                            "success"
+                        );
                     },
                 }
             );

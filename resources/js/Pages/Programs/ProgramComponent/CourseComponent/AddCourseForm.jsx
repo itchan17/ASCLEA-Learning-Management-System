@@ -5,6 +5,8 @@ import SecondaryButton from "../../../../Components/Button/SecondaryButton";
 import useCourseStore from "../../../../Stores/Programs/courseStore";
 import { usePage, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
+import { displayToast } from "../../../../Utils/displayToast";
+import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
 
 export default function AddCourseForm({ toggleModal, isEdit = false }) {
     const { course, program } = usePage().props;
@@ -33,10 +35,16 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
                         setErrors(errors);
                         setIsLoading(false);
                     },
-                    onSuccess: () => {
+                    onSuccess: (page) => {
                         setIsLoading(false);
                         clearCourse();
                         toggleModal();
+                        displayToast(
+                            <DefaultCustomToast
+                                message={page.props.flash.success}
+                            />,
+                            "success"
+                        );
                     },
                 }
             );
@@ -54,10 +62,16 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
                         setErrors(errors);
                         setIsLoading(false);
                     },
-                    onSuccess: () => {
+                    onSuccess: (page) => {
                         setIsLoading(false);
                         clearCourse();
                         toggleModal();
+                        displayToast(
+                            <DefaultCustomToast
+                                message={page.props.flash.success}
+                            />,
+                            "success"
+                        );
                     },
                 }
             );

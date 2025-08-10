@@ -6,6 +6,8 @@ import { route } from "ziggy-js";
 import useProgramStore from "../../../Stores/Programs/programStore";
 import { closeDropDown } from "../../../Utils/closeDropdown";
 import RoleGuard from "../../../Components/Auth/RoleGuard";
+import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToast";
+import { displayToast } from "../../../Utils/displayToast";
 
 export default function ProgramCard({
     programDetails,
@@ -34,7 +36,14 @@ export default function ProgramCard({
 
     const handleArchiveClick = () => {
         // Send a delete request to server that will archiove program through soft delete
-        router.delete(route("program.archive", programDetails.program_id));
+        router.delete(route("program.archive", programDetails.program_id), {
+            onSuccess: (page) => {
+                displayToast(
+                    <DefaultCustomToast message={page.props.flash.success} />,
+                    "success"
+                );
+            },
+        });
         closeDropDown(); // Close the dropdown after clicked
     };
     return (
