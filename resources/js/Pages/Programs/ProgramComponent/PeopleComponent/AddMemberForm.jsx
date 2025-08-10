@@ -242,7 +242,15 @@ export default function AddMemberForm({ toggleModal }) {
                                         handleAddNewMemberChange(user.user_id)
                                     }
                                 />
-                                <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl ml-5 mr-3"></div>
+
+                                <img
+                                    src={
+                                        user.profile_image &&
+                                        `/storage/${user.profile_image}`
+                                    }
+                                    alt="Profile image"
+                                    className="w-12 h-12 shrink-0 bg-ascend-gray1/20 rounded-4xl ml-5 mr-3 object-cover"
+                                ></img>
                                 <div>
                                     <div className="flex flex-col">
                                         <span className="font-semibold">

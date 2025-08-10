@@ -20,7 +20,7 @@ class PeopleController extends Controller
 
         // Inital query without filter or search
         // Get users that is not an admin and not a member of the program
-        $result = User::with('role')->select('user_id', 'first_name', 'last_name', 'email', 'role_id')->whereHas('role', function($query) {
+        $result = User::with('role')->select('user_id', 'first_name', 'last_name', 'email', 'profile_image', 'role_id')->whereHas('role', function($query) {
             $query->where('role_name', '!=', 'admin'); // Filter out admin users
         })->whereNotNull('email_verified_at')->whereNotIn('user_id', function ($query) use ($programId) {
             $query->select('user_id')
@@ -113,7 +113,7 @@ class PeopleController extends Controller
             'member_data' => fn () => $member->user()->exists()
                 ? $member->load([
                     'user' => function ($query) {
-                        $query->select('user_id', 'role_id', 'first_name', 'last_name')
+                        $query->select('user_id', 'role_id', 'first_name', 'last_name', 'profile_image')
                             ->with(['role' => function ($query) {
                                 $query->select('role_id', 'role_name');
                             }]);

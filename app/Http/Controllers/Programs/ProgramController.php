@@ -141,7 +141,7 @@ class ProgramController extends Controller
             // Get user data from users table
             ->with([
                 'user' => fn ($query) => $query 
-                    ->select('user_id', 'role_id', 'first_name', 'last_name', 'email')
+                    ->select('user_id', 'role_id', 'first_name', 'last_name', 'email', 'profile_image')
                     ->with([
                         'role' => fn ($query) => $query->select('role_id', 'role_name') // Get the user role
                     ])

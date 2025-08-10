@@ -135,7 +135,15 @@ export default function PeopleTable() {
                                     >
                                         <td>
                                             <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl shrink-0"></div>
+                                                <img
+                                                    src={
+                                                        member.user
+                                                            .profile_image &&
+                                                        `/storage/${member.user.profile_image}`
+                                                    }
+                                                    alt="Profile image"
+                                                    className="w-12 h-12 bg-ascend-gray1/20 rounded-4xl shrink-0"
+                                                ></img>
 
                                                 <div
                                                     className={`font-bold ${

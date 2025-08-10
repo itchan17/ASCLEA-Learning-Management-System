@@ -45,7 +45,15 @@ export default function ViewMember() {
                 </RoleGuard>
             </div>
             <div className="flex items-center space-x-5">
-                <div className="w-16 h-16 bg-ascend-gray1 rounded-4xl"></div>
+                <img
+                    src={
+                        memberData.user.profile_image &&
+                        `/storage/${memberData.user.profile_image}`
+                    }
+                    alt="Profile image"
+                    className="w-16 h-16 bg-ascend-gray1/20 rounded-4xl shrink-0"
+                ></img>
+
                 <div className="flex flex-col">
                     <span className="text-size4 font-bold">{`${memberData.user.first_name} ${memberData.user.last_name}`}</span>
                     <span>{capitalize(memberData.user.role.role_name)}</span>
@@ -71,7 +79,11 @@ export default function ViewMember() {
                                     key={assignedCourse.course.course_id}
                                     className="hover:bg-ascend-lightblue transition-all duration-300"
                                 >
-                                    <td>{assignedCourse.course.course_code}</td>
+                                    <td>
+                                        {assignedCourse.course.course_code
+                                            ? assignedCourse.course.course_code
+                                            : ""}
+                                    </td>
                                     <td>{assignedCourse.course.course_name}</td>
                                     <td>
                                         {assignedCourse.course.course_day

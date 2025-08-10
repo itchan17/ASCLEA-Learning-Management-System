@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('middle_name')->nullable();
 
+            $table->longText('profile_image')->nullable();
+
             $table->string('birthdate'); 
             $table->string('gender');
             $table->string('contact_number');
