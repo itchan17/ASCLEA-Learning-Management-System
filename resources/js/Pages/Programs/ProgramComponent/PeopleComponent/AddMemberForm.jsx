@@ -42,7 +42,21 @@ export default function AddMemberForm({ toggleModal }) {
                     },
                 })
             );
-            setUserList((prev) => [...prev, ...res.data.data]);
+            const users = [...userList, ...res.data.data];
+
+            // Prevent duplicate value to be set in the user list
+            setUserList(
+                users.reduce((acc, current) => {
+                    // Check if theres a duplicate in the acc
+                    // If not push the current user to acc
+                    // Else skip
+                    if (!acc.some((user) => user.user_id === current.user_id)) {
+                        acc.push(current);
+                    }
+                    return acc;
+                }, [])
+            );
+
             setIsLoading(false);
             setHasMore(res.data.current_page < res.data.last_page);
             setPage((prev) => prev + 1);
@@ -87,6 +101,9 @@ export default function AddMemberForm({ toggleModal }) {
     // Debounce on change handlers
     const handleOnChangeSearchQuery = (e) => {
         setUserList([]);
+        setUnSelectedUsers([]);
+        setSelectedUsers([]);
+        setSelectAll(false);
         setPage(1);
         setHasMore(true);
         setSearchQuery(e.target.value);
@@ -98,6 +115,9 @@ export default function AddMemberForm({ toggleModal }) {
 
     const handleOnChangeFilter = (e) => {
         setUserList([]);
+        setUnSelectedUsers([]);
+        setSelectedUsers([]);
+        setSelectAll(false);
         setPage(1);
         setHasMore(true);
         setFilter(e.target.value);
@@ -171,6 +191,8 @@ export default function AddMemberForm({ toggleModal }) {
                     is_select_all: selectAll,
                     selected_users: selectedUsers,
                     unselected_users: unSelectedUsers,
+                    filter: filter || null,
+                    search: searchQuery || null,
                 },
                 {
                     except: ["courses", "program"],

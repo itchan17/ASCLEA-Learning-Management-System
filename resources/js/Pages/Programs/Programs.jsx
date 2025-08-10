@@ -5,8 +5,11 @@ import useProgramStore from "../../Stores/Programs/programStore";
 import ProgramCard from "./ProgramComponent/ProgramCard";
 import EmptyState from "../../Components/EmptyState/EmptyState";
 import RoleGuard from "../../Components/Auth/RoleGuard";
+import { usePage } from "@inertiajs/react";
 
 export default function Programs({ program_list: programList }) {
+    const { auth } = usePage().props;
+
     // Program Store
     const setActiveTab = useProgramStore((state) => state.setActiveTab);
 
@@ -22,7 +25,7 @@ export default function Programs({ program_list: programList }) {
     }, []);
 
     return (
-        <div className="font-nunito-sans space-y-5">
+        <div className="flex flex-col font-nunito-sans space-y-5 h-full">
             <RoleGuard allowedRoles={["admin"]}>
                 <div className="flex justify-end">
                     <PrimaryButton
@@ -31,11 +34,10 @@ export default function Programs({ program_list: programList }) {
                     />
                 </div>
             </RoleGuard>
-
             {/* Display created program */}
-            <div className="w-full flex flex-wrap gap-5">
-                {programList.length > 0 ? (
-                    programList.map((program) => {
+            {programList.length > 0 ? (
+                <div className="w-full flex flex-wrap gap-5">
+                    {programList.map((program) => {
                         return (
                             <ProgramCard
                                 key={program.program_id}
@@ -44,15 +46,21 @@ export default function Programs({ program_list: programList }) {
                                 setEditProgram={setEditProgram}
                             />
                         );
-                    })
-                ) : (
+                    })}
+                </div>
+            ) : (
+                <div className="flex flex-1 w-full">
                     <EmptyState
                         imgSrc={"/images/illustrations/launch.svg"}
-                        text={`“No programs? Time to fill this space to start learning
-                adventures!”`}
+                        text={
+                            auth.user.role_name === "admin"
+                                ? `No programs? Time to fill this space to start learning
+                adventures!`
+                                : "No programs found at the moment. Please check back soon!"
+                        }
                     />
-                )}
-            </div>
+                </div>
+            )}
 
             {isModalOpen && (
                 <AddProgramForm

@@ -19,7 +19,7 @@ import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToa
 import { displayToast } from "../../../Utils/displayToast";
 
 export default function Courses() {
-    const { flash, program: programDetails, courses } = usePage().props; // Get the the data of showed program from props
+    const { auth, program: programDetails, courses } = usePage().props; // Get the the data of showed program from props
     const route = useRoute();
 
     const props = usePage().props;
@@ -209,7 +209,11 @@ export default function Courses() {
                 ) : (
                     <EmptyState
                         imgSrc={"/images/illustrations/blank_canvas.svg"}
-                        text={`“Nothing to see here… yet! Add some content to get going.”`}
+                        text={
+                            auth.user.role_name == "admin"
+                                ? `Nothing to see here… yet! Add some content to get going.`
+                                : "No courses found at the moment. Please check back soon!"
+                        }
                     />
                 )}
             </div>

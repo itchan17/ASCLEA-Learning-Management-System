@@ -55,7 +55,7 @@ class PeopleController extends Controller
     }
 
     public function addMember($programId, Request $req) {
- 
+    
         if($req->is_select_all){
                 $users = User::query();
 
@@ -66,6 +66,22 @@ class PeopleController extends Controller
 
                 if(!empty($req->unselected_users)){
                     $users->whereNotIn('user_id', $req->unselected_users); // Rerieve users that are not unselected
+                }
+
+                // Select all users similar to the search
+                if($search = $req->search) {
+                    $users->where(function ($query) use ($search) {
+                        $query->whereLike('first_name', "%$search%")
+                        ->orWhereLike('last_name', "%$search%")
+                        ->orWhereLike('email', "%$search%");
+                    });
+                }
+
+                // Select all users similar to the filter
+                if($filter = $req->filter) {
+                    $users->whereHas('role', function ($query) use ($filter) {
+                        $query->where('role_name', $filter);
+                    });
                 }
 
                 $users = $users->pluck('user_id')->toArray();
