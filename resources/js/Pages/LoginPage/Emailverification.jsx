@@ -110,6 +110,7 @@ export default function EmailVerification() {
                         <PrimaryButton
                             btnType="submit"
                             isDisabled={processing}
+                            isLoading={processing}
                             text="Send Link"
                         />
                     </div>

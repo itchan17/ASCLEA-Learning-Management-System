@@ -2,7 +2,7 @@ import React from "react";
 import { router } from "@inertiajs/react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import "../../../../css/global.css";
-import { useRoute } from "ziggy-js";
+import { route } from "ziggy-js";
 import useProgramStore from "../../../Stores/Programs/programStore";
 import { closeDropDown } from "../../../Utils/closeDropdown";
 import RoleGuard from "../../../Components/Auth/RoleGuard";
@@ -12,13 +12,13 @@ export default function ProgramCard({
     setIsModalOpen,
     setEditProgram,
 }) {
-    // Const Program Store
-    const setProgram = useProgramStore((state) => state.setProgram);
-    const deleteProgram = useProgramStore((state) => state.deleteProgram);
+    // Program Store
+    const setProgramDataToUpdate = useProgramStore(
+        (state) => state.setProgramDataToUpdate
+    );
 
-    const route = useRoute();
     const handleCardClick = () => {
-        router.visit(route("program.view", programDetails.id));
+        router.visit(route("program.show", programDetails.program_id));
     };
 
     const stopPropagation = (e) => {
@@ -27,25 +27,31 @@ export default function ProgramCard({
 
     const handleEditClick = () => {
         setIsModalOpen(true);
-        setProgram(programDetails);
+        setProgramDataToUpdate(programDetails); // Set the program details that will be passed on AddProgramForm to set the data of slected program to edit
         setEditProgram(true);
-
-        // Close the dropdown after clicked
-        closeDropDown();
+        closeDropDown(); // Close the dropdown after clicked
     };
 
     const handleArchiveClick = () => {
-        deleteProgram(programDetails.id);
-
-        // Close the dropdown after clicked
-        closeDropDown();
+        // Send a delete request to server that will archiove program through soft delete
+        router.delete(route("program.archive", programDetails.program_id));
+        closeDropDown(); // Close the dropdown after clicked
     };
     return (
         <div
             onClick={handleCardClick}
             className="relative border border-ascend-gray1 shadow-shadow1 w-full max-w-80 h-58 flex flex-col cursor-pointer card-hover group"
         >
-            <div className="bg-ascend-gray1 w-full h-full p-2 flex justify-end font-nunito-sans"></div>
+            <div
+                className={` w-full h-full p-2 flex justify-end font-nunito-sans bg-cover bg-center  ${
+                    !programDetails.background_image && "bg-ascend-gray1"
+                }`}
+                style={
+                    programDetails.background_image && {
+                        backgroundImage: `url('/storage/${programDetails.background_image}')`,
+                    }
+                }
+            ></div>
             <RoleGuard allowedRoles={["admin"]}>
                 <div
                     className="absolute top-2 right-[6px] dropdown dropdown-end"
@@ -79,7 +85,7 @@ export default function ProgramCard({
 
             <div className="h-16 px-5 flex items-center">
                 <h1 className="font-bold overflow-hidden text-ellipsis text-nowrap group-hover:text-ascend-blue transition-all duration-300">
-                    {programDetails.programName}
+                    {programDetails.program_name}
                 </h1>
             </div>
         </div>

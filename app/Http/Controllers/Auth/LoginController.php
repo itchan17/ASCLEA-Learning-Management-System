@@ -57,9 +57,8 @@ class LoginController extends Controller
             ]);
         }
  
-        $request->session()->regenerate();    
-        return redirect()->intended(route('dashboard.index'));
-       
+        $request->session()->regenerate();  
+        return redirect()->route('dashboard.index');
     }
 
     public function throttleKey()
@@ -86,6 +85,5 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('login');
     }
 }

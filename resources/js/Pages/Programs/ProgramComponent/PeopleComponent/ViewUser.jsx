@@ -7,8 +7,12 @@ import useCourseList from "../../../../Stores/Programs/courseLIstStore";
 import { handleClickBackBtn } from "../../../../Utils/handleClickBackBtn";
 import RoleGuard from "../../../../Components/Auth/RoleGuard";
 import EmptyState from "../../../../Components/EmptyState/EmptyState";
+import { usePage } from "@inertiajs/react";
+import { capitalize } from "lodash";
 
 export default function ViewUser() {
+    const { member_data: memberData } = usePage().props;
+    console.log();
     // User Store
     const courseList = useCourseList((state) => state.courseList);
 
@@ -32,8 +36,8 @@ export default function ViewUser() {
             <div className="flex items-center space-x-5">
                 <div className="w-16 h-16 bg-ascend-gray1 rounded-4xl"></div>
                 <div className="flex flex-col">
-                    <span className="text-size4 font-bold">John Doe</span>
-                    <span>Student</span>
+                    <span className="text-size4 font-bold">{`${memberData.user.first_name} ${memberData.user.last_name}`}</span>
+                    <span>{capitalize(memberData.user.role.role_name)}</span>
                 </div>
             </div>
             <div className="flex justify-end">

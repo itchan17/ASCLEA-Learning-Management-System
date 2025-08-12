@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException; 
 use Inertia\Inertia;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
@@ -39,14 +39,17 @@ class RegistrationController extends Controller
 
         $data = $request->only([
             'first_name', 'last_name', 'middle_name', 'birthdate',
-            'gender', 'contact_number', 'email',
+            'gender', 'contact_number', 'email','password',
             'house_no', 'province', 'city', 'barangay'
         ]);
 
-        $data['password'] = Hash::make($request->password);
         $data['role_id'] = $roleId;
         
         $user = User::create($data);
+
+        // Create data on students table after creating user
+        $student_data = ['user_id' => $user->user_id, 'enrollment_status' => 'pending'];
+        Student::create($student_data);
 
         // Trigger sending of email after user creation
         event(new Registered($user));

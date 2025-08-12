@@ -1,93 +1,193 @@
-import React from "react";
+import { useMemo, useEffect, useState } from "react";
 import EmptyState from "../../../../Components/EmptyState/EmptyState";
 import usePeopleStore from "../../../../Stores/Programs/peopleStore";
 import { router } from "@inertiajs/react";
 import CustomSelect from "../../../../Components/CustomInputField/CustomSelect";
 import { IoSearch } from "react-icons/io5";
-import { useRoute } from "ziggy-js";
+import { route } from "ziggy-js";
 import RoleGuard from "../../../../Components/Auth/RoleGuard";
+import { usePage } from "@inertiajs/react";
+import _ from "lodash";
+import Pagination from "../../../../Components/Pagination";
+import { debounce } from "lodash";
 
 export default function PeopleTable() {
+    const { members, program, auth } = usePage().props;
+    console.log(members);
+
     // People Store
     const peopleList = usePeopleStore((state) => state.peopleList);
 
-    const route = useRoute();
+    const [filter, setFilter] = useState("");
+    const [search, setSearch] = useState("");
+    const [initialRender, setInitialRender] = useState(true);
 
-    const handleRowClick = (userId) => {
-        router.visit(route("program.user.view", { programId: 1, userId }));
+    const handleFilterChange = (role) => {
+        setFilter(role);
+        setInitialRender(false);
+    };
+
+    const handleSearch = (e) => {
+        setSearch(e.target.value);
+        setInitialRender(false);
+    };
+
+    const debounceHandleSearch = useMemo(() => {
+        return debounce(handleSearch, 300);
+    }, []);
+
+    useEffect(() => {
+        return () => debounceHandleSearch.cancel();
+    }, []);
+
+    useEffect(() => {
+        if (!initialRender) {
+            console.log("GET MEMBERS");
+            const query = {};
+
+            if (filter) query.role = filter;
+            if (search.trim()) query.search = search.trim();
+
+            router.get(
+                route("program.show", {
+                    program: program.program_id,
+                    _query: query,
+                }),
+                {},
+                {
+                    showProgress: false,
+                    preserveScroll: true,
+                    preserveState: true,
+                    only: ["members"],
+                }
+            );
+        }
+    }, [filter, search]);
+
+    const handleMemberClick = (userId) => {
+        if (auth.user.role_name !== "student") {
+            router.visit(
+                route("program.member.view", {
+                    program: program.program_id,
+                    member: userId,
+                })
+            );
+        }
+    };
+
+    const handleRemoveMember = (e, learningMemberId) => {
+        e.stopPropagation();
+
+        router.delete(
+            route("program.remove.member", {
+                program: program.program_id,
+                member: learningMemberId,
+            }),
+            {
+                only: ["members", "flash"],
+            }
+        );
     };
 
     return (
         <div className="space-y-5">
             <div className="flex flex-col sm:flex-row justify-end gap-2">
-                <CustomSelect
-                    selectField={
-                        <select className="w-full sm:w-40 rounded-none appearance-none border p-2 h-9 text-size1  focus:outline-ascend-blue">
-                            <option className="" value="">
-                                All
-                            </option>
-                            <option value="student">Student</option>
-                            <option value="educator">Educator</option>
-                        </select>
-                    }
-                />
+                <select
+                    onChange={(e) => handleFilterChange(e.target.value)}
+                    className={`textField border w-full sm:w-40 px-3 py-2  focus:outline-ascend-blue`}
+                >
+                    <option value="">All</option>
+                    <option value="student">Student</option>
+                    <option value="faculty">Faculty</option>
+                </select>
                 <div className="relative">
                     <input
-                        className="w-full sm:w-50 border h-9 pl-10 p-2 border-ascend-black focus:outline-ascend-blue"
+                        className="border w-full sm:w-60 pl-10 pr-3 py-2 border-ascend-black focus:outline-ascend-blue"
                         type="text"
-                        placeholder="Search name"
+                        placeholder="Search"
+                        onChange={debounceHandleSearch}
                     />
                     <IoSearch className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1" />
                 </div>
             </div>
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overflow-y-hidden">
                 <table className="table">
                     <thead className="">
-                        <tr className="border-b-2 border-ascend-gray3">
+                        <tr className="border-b-2 text-ascend-black border-ascend-gray3">
                             <th>Name</th>
                             <th>Role</th>
                             <th>Email</th>
                         </tr>
                     </thead>
-                    {peopleList?.length > 0 && (
-                        <tbody>
-                            {peopleList.map((p, index) => (
-                                <tr
-                                    key={index}
-                                    onClick={() => handleRowClick(p.id)}
-                                    className="hover:bg-ascend-lightblue cursor-pointer"
-                                >
-                                    <td>
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl"></div>
-
-                                            <div className="font-bold">
-                                                {p.name}
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>{p.role}</td>
-                                    <td>{p.email}</td>
-                                    <RoleGuard allowedRoles={["admin"]}>
+                    {members.data && members.data.length > 0 && (
+                        <>
+                            <tbody>
+                                {members.data.map((member) => (
+                                    <tr
+                                        key={member.user.user_id}
+                                        onClick={() =>
+                                            handleMemberClick(
+                                                member.learning_member_id
+                                            )
+                                        }
+                                        className={`${
+                                            auth.user.role_name !== "student"
+                                                ? "hover:bg-ascend-lightblue cursor-pointer"
+                                                : ""
+                                        }`}
+                                    >
                                         <td>
-                                            <span className="text-ascend-red underline">
-                                                Remove
-                                            </span>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl shrink-0"></div>
+
+                                                <div className="font-bold">
+                                                    {`${member.user.first_name} ${member.user.last_name}`}
+                                                </div>
+                                            </div>
                                         </td>
-                                    </RoleGuard>
-                                </tr>
-                            ))}
-                        </tbody>
+                                        <td>
+                                            {_.capitalize(
+                                                member.user.role.role_name
+                                            )}
+                                        </td>
+                                        <td>{member.user.email}</td>
+                                        <RoleGuard allowedRoles={["admin"]}>
+                                            <td>
+                                                <span
+                                                    onClick={(e) =>
+                                                        handleRemoveMember(
+                                                            e,
+                                                            member.learning_member_id
+                                                        )
+                                                    }
+                                                    className="text-ascend-red transition-all duration-300 hover:bg-ascend-red hover:text-ascend-white font-bold py-1 px-2"
+                                                >
+                                                    Remove
+                                                </span>
+                                            </td>
+                                        </RoleGuard>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </>
                     )}
                 </table>
-                {peopleList?.length === 0 && (
-                    <EmptyState
-                        paddingY="py-0"
-                        imgSrc={"/images/illustrations/alone.svg"}
-                        text={`“It’s a bit lonely here... Add some people and let the learning begin!”`}
-                    />
-                )}
             </div>
+            {members.data.length > 0 && members.total > 10 && (
+                <Pagination
+                    links={members.links}
+                    currentPage={members.current_page}
+                    lastPage={members.last_page}
+                    only={["members"]}
+                />
+            )}
+            {members.data && members.data.length === 0 && (
+                <EmptyState
+                    paddingY="py-0"
+                    imgSrc={"/images/illustrations/alone.svg"}
+                    text={`“It’s a bit lonely here... Add some people and let the learning begin!”`}
+                />
+            )}
         </div>
     );
 }

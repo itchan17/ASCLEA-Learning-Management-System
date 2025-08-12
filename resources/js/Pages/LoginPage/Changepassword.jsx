@@ -124,6 +124,7 @@ export default function ChangePassword() {
                 <div className="grid">
                     <PrimaryButton
                         isDisabled={processing}
+                        isLoading={processing}
                         btnType="submit"
                         text="Reset Password"
                         className="w-full"
