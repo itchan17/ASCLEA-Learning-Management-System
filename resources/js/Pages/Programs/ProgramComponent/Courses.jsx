@@ -15,8 +15,11 @@ import { closeDropDown } from "../../../Utils/closeDropdown";
 import useProgramStore from "../../../Stores/Programs/programStore";
 
 export default function Courses() {
-    const { flash, program: programDetails } = usePage().props; // Get the the data of showed program from props
+    const { flash, program: programDetails, courses } = usePage().props; // Get the the data of showed program from props
     const route = useRoute();
+
+    const props = usePage().props;
+    console.log(props);
 
     // Program Store
     const setProgramDataToUpdate = useProgramStore(
@@ -132,15 +135,12 @@ export default function Courses() {
 
             {/* Display courses */}
             <div className="w-full flex flex-wrap gap-5">
-                {programDetails?.courseList?.length > 0 ? (
-                    programDetails?.courseList.map((course) => {
+                {courses && courses.length > 0 ? (
+                    courses.map((course) => {
                         return (
                             <CourseCard
-                                key={course.id}
-                                courseId={course.id}
-                                courseCode={course.courseCode}
-                                courseName={course.courseName}
-                                courseDescription={course.courseDescription}
+                                key={course.course_id}
+                                courseDetails={course}
                             />
                         );
                     })

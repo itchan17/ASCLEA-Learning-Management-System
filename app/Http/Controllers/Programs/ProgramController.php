@@ -14,7 +14,7 @@ use Inertia\Inertia;
 class ProgramController extends Controller
 {
     // Display the program page
-    public function show() {
+    public function index() {
         $programList = Program::select('program_id', 'program_name', 'program_description')->latest()->get();
 
         return Inertia::render('Programs/Programs', [
@@ -23,8 +23,6 @@ class ProgramController extends Controller
     }
 
     public function store(Request $req) {
-        // Throw an error if try to access by unauthorized user
-        Gate::authorize('create', Program::class);
 
         // Validate input
         $validated = $req->validate([
@@ -51,9 +49,6 @@ class ProgramController extends Controller
 
     // Handle updating the program details
     public function update(Request $req, Program $program) {
-        
-        // Throw an error if try to access by unauthorized user
-        Gate::authorize('update', Program::class);
 
         $validated = $req->validate([
             'program_name'  => [
@@ -72,11 +67,8 @@ class ProgramController extends Controller
 
     // Handle archiving program through soft delete
     public function archive(Program $program) {
-        // Throw an error if try to access by unauthorized user
-        Gate::authorize('delete', Program::class);
-
-        $programToArchive = Program::find($program->program_id);  
-        $programToArchive->delete(); 
+    
+        $program->delete(); 
 
         return to_route('programs.index')->with('success', 'Program archived successfully.');
     }
@@ -86,6 +78,7 @@ class ProgramController extends Controller
         // Return a prop containing the program data
         return Inertia::render('Programs/ProgramComponent/ProgramContent', [
             'program' => $program->only(['program_id', 'program_name', 'program_description']),
+            'courses' => fn () => $program->courses() ->latest()->select(['course_id', 'course_code', 'course_name', 'course_description', 'updated_at'])->get(),
         ]);
 
     }
@@ -96,9 +89,9 @@ class ProgramController extends Controller
             'course_code' => "string|nullable",
             'course_name' => "required|string|max:255",
             'course_description' => "string|nullable",
-            'course_day' => "string|nullable",
-            'start_time' => "string|nullable|date_format:H:i",
-            'end_time' => "string|nullable|date_format:H:i|after:start_time",
+            'course_day' => "string|nullable|required_with:start_time,end_time",
+            'start_time' => "string|nullable|date_format:H:i|required_with:end_time",
+            'end_time' => "string|nullable|date_format:H:i|after:start_time|required_with:start_time",
         ]);
 
         return back()->with('message', "Course validated successfully.");

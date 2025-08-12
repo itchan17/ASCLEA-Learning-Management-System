@@ -1,9 +1,8 @@
 import React from "react";
-import PrimaryButton from "../../../../Components/Button/PrimaryButton";
 import CustomSelect from "../../../../Components/CustomInputField/CustomSelect";
 import useCourseStore from "../../../../Stores/Programs/courseStore";
 
-export default function AddCourse({ toggleAddCourse, errors }) {
+export default function AddCourse({ errors }) {
     //Course Store
     const course = useCourseStore((state) => state.course);
     const handleCourseChange = useCourseStore(
@@ -87,6 +86,11 @@ export default function AddCourse({ toggleAddCourse, errors }) {
                                 </select>
                             }
                         />
+                        {errors && errors.course_day && (
+                            <span className="text-ascend-red">
+                                {errors.course_day}
+                            </span>
+                        )}
                     </div>
                     <div>
                         <div className="grid grid-cols-2 gap-3">

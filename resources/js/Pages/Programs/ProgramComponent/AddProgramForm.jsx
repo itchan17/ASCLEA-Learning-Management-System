@@ -25,9 +25,6 @@ export default function AddProgramForm({
     );
 
     // Course Store
-    // const courseList = useCourseStore((state) => state.courseList);
-    // const addCourseFunc = useCourseStore((state) => state.addCourse);
-    // const clearCourseList = useCourseStore((state) => state.clearCourseList);
     const course = useCourseStore((state) => state.course);
     const clearCourse = useCourseStore((state) => state.clearCourse);
 
@@ -71,13 +68,6 @@ export default function AddProgramForm({
         });
     };
 
-    // useEffect(() => {
-    //     // Check if user added a course the set the course_list of the form
-    //     if (Array.isArray(courseList) && courseList.length > 0) {
-    //         setData("course_list", courseList);
-    //     }
-    // }, [courseList]);
-
     // Handle add program form subsmission
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -108,7 +98,7 @@ export default function AddProgramForm({
         setAddCourse(!addCourse);
     };
 
-    const handleCloseForm = () => {
+    const handleCancelForm = () => {
         toggleModal();
         if (editProgram) {
             setEditProgram(false);
@@ -119,7 +109,12 @@ export default function AddProgramForm({
     return (
         <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
             <form
-                onSubmit={handleSubmit}
+                onKeyDown={(e) => {
+                    // prevent enter from submiiting/closing the form
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                    }
+                }}
                 className="bg-ascend-white opacity-100 p-5 w-150 space-y-5  max-h-[calc(100vh-5rem)] overflow-y-auto my-10"
             >
                 <h1 className="text-size4 font-bold">
@@ -161,13 +156,14 @@ export default function AddProgramForm({
                         }
                     ></textarea>
                 </div>
+
                 {/* Display this header when there's a course */}
-                {data.course_list.length > 0 && (
+                {data.course_list && data.course_list.length > 0 && (
                     <h1 className="text-size4 font-bold">Courses</h1>
                 )}
 
                 {/* Display courses added */}
-                {data.course_list.length > 0 && (
+                {data.course_list && data.course_list.length > 0 && (
                     <div className="divide-y-[0.5px] divide-ascend-gray1">
                         {data.course_list.map((course, i) => (
                             <CourseItem key={i} course={course} />
@@ -212,13 +208,13 @@ export default function AddProgramForm({
                 <div className="flex justify-end space-x-2">
                     <SecondaryButton
                         isDisabled={processing}
-                        doSomething={handleCloseForm}
-                        text={"Close"}
+                        doSomething={handleCancelForm}
+                        text={"Cancel"}
                     />
 
                     <PrimaryButton
                         isDisabled={processing}
-                        btnType="submit"
+                        doSomething={handleSubmit}
                         text={editProgram ? "Save" : "Add"}
                     />
                 </div>
