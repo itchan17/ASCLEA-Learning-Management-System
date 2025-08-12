@@ -4,12 +4,12 @@ use App\Http\Controllers\Programs\CourseController;
 use App\Models\Course;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('programs')
+Route::prefix('programs/{program}')
     ->middleware(['auth', 'verified'])
     ->group(function () {
 
         // Create a course
-        Route::post('/{program}/course/create', [CourseController::class, 'store'])->can('create', Course::class)->name('course.create');
+        Route::post('/course/create', [CourseController::class, 'store'])->can('create', Course::class)->name('course.create');
 
         // Update course
         Route::put('/courses/{course}/update',  [CourseController::class, 'update'])->can('update', Course::class)->name('course.update');

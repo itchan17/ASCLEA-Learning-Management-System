@@ -6,6 +6,7 @@ import { route } from "ziggy-js";
 
 export default function CourseCard({ courseDetails }) {
     const [isExpanded, setIsExpanded] = useState(false);
+    const { program } = usePage().props;
 
     const toggleExpanded = (e) => {
         e.stopPropagation();
@@ -15,6 +16,7 @@ export default function CourseCard({ courseDetails }) {
     const handleCardClick = () => {
         router.visit(
             route("program.course.show", {
+                program: program.program_id,
                 course: courseDetails.course_id,
             }),
             {

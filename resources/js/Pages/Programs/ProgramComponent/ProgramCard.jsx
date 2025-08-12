@@ -44,7 +44,16 @@ export default function ProgramCard({
             onClick={handleCardClick}
             className="relative border border-ascend-gray1 shadow-shadow1 w-full max-w-80 h-58 flex flex-col cursor-pointer card-hover group"
         >
-            <div className="bg-ascend-gray1 w-full h-full p-2 flex justify-end font-nunito-sans"></div>
+            <div
+                className={` w-full h-full p-2 flex justify-end font-nunito-sans bg-cover bg-center  ${
+                    !programDetails.background_image && "bg-ascend-gray1"
+                }`}
+                style={
+                    programDetails.background_image && {
+                        backgroundImage: `url('/storage/${programDetails.background_image}')`,
+                    }
+                }
+            ></div>
             <RoleGuard allowedRoles={["admin"]}>
                 <div
                     className="absolute top-2 right-[6px] dropdown dropdown-end"

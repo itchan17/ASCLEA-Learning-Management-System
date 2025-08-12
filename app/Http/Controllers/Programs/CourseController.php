@@ -28,24 +28,43 @@ class CourseController extends Controller
 
     // Update course
     public function update(Program $program, Course $course, Request $req) {
-        // Validate user input
-        $validated = $this->validateCourse($req->all());
+        if($course->program_id === $program->program_id) {
+            // Validate user input
+            $validated = $this->validateCourse($req->all());
 
-        $course->update($validated);
+            $course->update($validated);
 
-        return back()->with('success', 'Course updated successfully.');
+            return back()->with('success', 'Course updated successfully.');
+        }
+        else {
+            abort(404);
+        }  
     }
 
     // Archive course
-    public function archive(Course $course) {
-        $course->delete();
+    public function archive(Program $program, Course $course) {
+        if($course->program_id === $program->program_id) {
+            $course->delete();
 
-        return to_route('program.show', $course->program)->with('success', 'Course archived successfully.');
+            return to_route('program.show', $course->program)->with('success', 'Course archived successfully.');
+        }
+        else {
+            abort(404);
+        }     
     }
 
     // Show selected course
-    public function showCourse(Course $course) {
-           return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContent', ['course' => $course->only(['course_id', 'course_code', 'course_name', 'course_description', 'course_day', 'start_time', 'end_time'])]);
+    public function showCourse(Program $program, Course $course) {
+        if($course->program_id === $program->program_id) {
+             return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContent', 
+             [
+                'program' => $program->only(['program_id']),
+                'course' => $course->only(['course_id', 'course_code', 'course_name', 'course_description', 'course_day', 'start_time', 'end_time'])
+            ]);
+        }  
+        else {
+            abort(404);
+        }    
     }
 
     public function validateCourse($data) {

@@ -46,7 +46,7 @@ export default function AddCourse({ errors }) {
             <div>
                 <label htmlFor="">Course Description</label>
                 <textarea
-                    value={course.course_description}
+                    value={course.course_description || ""}
                     id=""
                     className="border w-full p-2 focus:outline-ascend-blue"
                     rows={5}

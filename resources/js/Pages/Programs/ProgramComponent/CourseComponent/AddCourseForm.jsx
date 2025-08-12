@@ -7,10 +7,10 @@ import { usePage, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
 
 export default function AddCourseForm({ toggleModal, isEdit = false }) {
-    const { course: courseDetails, program } = usePage().props;
+    const { course, program } = usePage().props;
 
     // Course Store
-    const course = useCourseStore((state) => state.course);
+    const courseDetails = useCourseStore((state) => state.course);
     const clearCourse = useCourseStore((state) => state.clearCourse);
 
     const [isLoading, setIsLoading] = useState(false);
@@ -23,25 +23,30 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
 
         // Check form if set to edit
         if (!isEdit) {
-            router.post(route("course.create", program.program_id), course, {
-                except: ["program"],
-                onError: (errors) => {
-                    console.log(errors);
-                    setErrors(errors);
-                    setIsLoading(false);
-                },
-                onSuccess: () => {
-                    setIsLoading(false);
-                    clearCourse();
-                    toggleModal();
-                },
-            });
+            router.post(
+                route("course.create", program.program_id),
+                courseDetails,
+                {
+                    except: ["program"],
+                    onError: (errors) => {
+                        console.log(errors);
+                        setErrors(errors);
+                        setIsLoading(false);
+                    },
+                    onSuccess: () => {
+                        setIsLoading(false);
+                        clearCourse();
+                        toggleModal();
+                    },
+                }
+            );
         } else {
             router.put(
                 route("course.update", {
-                    course: courseDetails.course_id,
+                    program: program.program_id,
+                    course: course.course_id,
                 }),
-                course,
+                courseDetails,
                 {
                     except: ["program"],
                     onError: (errors) => {

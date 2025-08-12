@@ -24,6 +24,8 @@ Route::prefix('programs')
 
         // Validate added course in add program form
         Route::post('/validate-course', [ProgramController::class, 'validateAddedCourse'])->name('validate.course');
+
+        Route::put('/{program}/background/update', [ProgramController::class, 'updateBackground'])->can('update', Program::class)->name('program.background.update');
 });
 
 
