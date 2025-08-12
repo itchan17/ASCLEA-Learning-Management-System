@@ -56,7 +56,7 @@ const RegistrationPage = () => {
                                     Log in to continue your review journey!
                                 </p>
                                 <div className="flex justify-center">
-                                    <Link href={"/login"}>
+                                    <Link replace href={"/login"}>
                                         <PrimaryButton
                                             text="Login"
                                             btnColor="bg-ascend-white"
