@@ -27,7 +27,7 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
                 route("course.create", program.program_id),
                 courseDetails,
                 {
-                    except: ["program"],
+                    only: ["courses", "flash"],
                     onError: (errors) => {
                         console.log(errors);
                         setErrors(errors);
@@ -48,7 +48,7 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
                 }),
                 courseDetails,
                 {
-                    except: ["program"],
+                    only: ["course", "flash"],
                     onError: (errors) => {
                         console.log(errors);
                         setErrors(errors);
@@ -85,6 +85,7 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
 
                     <PrimaryButton
                         isDisabled={isLoading}
+                        isLoading={isLoading}
                         doSomething={handleSubmitCourse}
                         text={isEdit ? "Save" : "Add"}
                     />

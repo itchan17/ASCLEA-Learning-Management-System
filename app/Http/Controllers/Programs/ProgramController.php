@@ -74,13 +74,56 @@ class ProgramController extends Controller
     }
 
     // Show the selected program
-    public function showProgram(Program $program) {
+    public function showProgram(Program $program, Request $req) {
         // Return a prop containing the program data
         return Inertia::render('Programs/ProgramComponent/ProgramContent', [
-            'program' => $program->only(['program_id', 'program_name', 'program_description', 'background_image']),
-            'courses' => fn () => $program->courses() ->latest()->select(['course_id', 'course_code', 'course_name', 'course_description', 'updated_at'])->get(),
-        ]);
+            // Program data
+            'program' => fn () => $program->only(['program_id', 'program_name', 'program_description', 'background_image']),
 
+            // List of courses
+            'courses' => fn () => $program->courses()->latest()->select(['course_id', 'course_code', 'course_name', 
+            'course_description', 'updated_at'])->get(),
+
+            // Members of the program
+            // Return only if specifically requested / when people was rendered
+            'members' => Inertia::optional(fn () => $this->getLearningMembers($program, $req->input('role'), $req->input('search'))),
+        ]);
+    }
+        
+    public function getLearningMembers($program, $role, $search) {
+
+        // Query for listing the users in the learning members table
+        $members = $program->learningMembers()
+            ->whereHas('user', function ($query) {
+                $query->whereNull('deleted_at'); // Exclude soft-deleted users
+            }) 
+            // Get user data from users table
+            ->with([
+                'user' => fn ($query) => $query 
+                    ->select('user_id', 'role_id', 'first_name', 'last_name', 'email')
+                    ->with([
+                        'role' => fn ($query) => $query->select('role_id', 'role_name') // Get the user role
+                    ])
+            ]); 
+
+        // FIlter based on roles
+        if ($role) {
+            $members->whereHas('user.role', function ($query) use ($role) {
+                $query->where('role_name', $role); // Get users based on the role
+            });
+        }
+
+        // FIlter based on search
+        if($search) {
+            // Get suers based on search query
+            $members->whereHas('user', function ($query) use ($search) {
+                $query->whereLike('first_name', "%$search%")
+                    ->orWhereLike('last_name', "%$search%")
+                    ->orWhereLike('email', "%$search%");
+            });
+        }
+     
+        return $members->orderBy('created_at', 'desc')->paginate(10, ['*'], 'members')->withQueryString();
     }
 
     // This function validates the added course in the program form

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
@@ -45,6 +46,10 @@ class RegistrationController extends Controller
         $data['role_id'] = $roleId;
         
         $user = User::create($data);
+
+        // Create data on students table after creating user
+        $student_data = ['user_id' => $user->user_id, 'enrollment_status' => 'pending'];
+        Student::create($student_data);
 
         // Trigger sending of email after user creation
         event(new Registered($user));

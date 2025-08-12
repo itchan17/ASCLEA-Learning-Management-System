@@ -5,7 +5,7 @@ use App\Models\Program;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('programs')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'preventBack'])
     ->group(function () {
         // Programs index page
         Route::get('/', [ProgramController::class, 'index'])->can('viewAny', Program::class)->name('programs.index');

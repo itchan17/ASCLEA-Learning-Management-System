@@ -55,14 +55,6 @@ Route::prefix('programs')
                 'assessmentId' => $assessmentId,
             ]);
         })->name('program.course.assessment.responses');
-
-         // Route for selected user in the program
-        Route::get('/{programId}/user/{userId}', function ($programId, $userId) {
-            return Inertia::render('Programs/ProgramComponent/PeopleComponent/ViewUser', [
-                'programId' => $programId,
-                'userId' => $userId,
-            ]);
-        })->name('program.user.view');
 });
 
        

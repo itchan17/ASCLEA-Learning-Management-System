@@ -192,6 +192,7 @@ export default function AddProgramForm({
                         />
                         <PrimaryButton
                             isDisabled={isValidating}
+                            isLoading={isValidating}
                             doSomething={saveCourse}
                             text={"Save"}
                         />
@@ -214,6 +215,7 @@ export default function AddProgramForm({
 
                     <PrimaryButton
                         isDisabled={processing}
+                        isLoading={processing}
                         doSomething={handleSubmit}
                         text={editProgram ? "Save" : "Add"}
                     />

@@ -167,6 +167,7 @@ export default function Login() {
                             btnType="submit"
                             text="Login"
                             isDisabled={processing}
+                            isLoading={processing}
                         />
                     </div>
                 </form>
