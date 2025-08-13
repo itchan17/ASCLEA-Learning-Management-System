@@ -14,8 +14,11 @@ import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustom
 import { displayToast } from "../../../../Utils/displayToast";
 
 export default function ViewMember() {
-    const { member_data: memberData, assigned_courses: assignedCourses } =
-        usePage().props;
+    const {
+        auth,
+        member_data: memberData,
+        assigned_courses: assignedCourses,
+    } = usePage().props;
     console.log(memberData);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -145,7 +148,11 @@ export default function ViewMember() {
                 {assignedCourses.length === 0 && (
                     <EmptyState
                         imgSrc={"/images/illustrations/not_assigned.svg"}
-                        text={`No assigned courses found. Click Assign Course to get your students started.`}
+                        text={
+                            auth.user.role_name === "admin"
+                                ? `No assigned courses found. Click Assign Course to kick off the learning.`
+                                : "No courses assigned yet. Please check back soon."
+                        }
                     />
                 )}
             </div>

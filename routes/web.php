@@ -7,12 +7,3 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('LandingPage/LandingPage');
 })->middleware('guest', 'preventBack');
-
-// For handling undefined routes
-Route::fallback(function () {
-    return Inertia::render('Errors/NotFound')
-        ->toResponse(request())
-        ->setStatusCode(404);
-});
-
-
