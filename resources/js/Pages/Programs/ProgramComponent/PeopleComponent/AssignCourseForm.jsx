@@ -85,6 +85,7 @@ export default function AssignCourseForm({ toggleModal }) {
                 }),
                 { courses_to_assign: selectedCourses },
                 {
+                    showProgress: false,
                     only: ["assigned_courses", "flash"],
                     onFinish: () => setIsAssignLoading(false),
                     onSuccess: (page) => {

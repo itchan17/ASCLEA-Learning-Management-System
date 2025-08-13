@@ -15,6 +15,7 @@ import { formatTime } from "../../../../../Utils/formatTime";
 import { closeDropDown } from "../../../../../Utils/closeDropdown";
 import DefaultCustomToast from "../../../../../Components/CustomToast/DefaultCustomToast";
 import { displayToast } from "../../../../../Utils/displayToast";
+import AlertModal from "../../../../../Components/AlertModal";
 
 export default function Home({}) {
     const { program, course } = usePage().props;
@@ -29,6 +30,10 @@ export default function Home({}) {
 
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [openCourseForm, setOpenCourseForm] = useState(false);
+
+    // States for alert modal
+    const [openAlerModal, setOpenAlertModal] = useState(false);
+    const [isArchiveLoading, setIsArchiveLoading] = useState(false);
 
     const targetForm = useRef(null);
 
@@ -53,14 +58,16 @@ export default function Home({}) {
         closeDropDown();
     };
 
-    const handleArchiveCourse = () => {
+    const archiveCourse = () => {
         // Navigate first, then delete
+        setIsArchiveLoading(true);
         router.delete(
             route("course.archive", {
                 program: program.program_id,
                 course: course.course_id,
             }),
             {
+                showProgress: false,
                 onSuccess: (page) => {
                     displayToast(
                         <DefaultCustomToast
@@ -69,15 +76,35 @@ export default function Home({}) {
                         "success"
                     );
                 },
+                onFinish: () => {
+                    setIsArchiveLoading(false);
+                    setOpenAlertModal(false);
+                },
             }
         );
+    };
 
+    const handleArchiveCourseClick = () => {
+        setOpenAlertModal(true);
         // Close the dropdown after clicked
         closeDropDown();
     };
 
     return (
         <div className="space-y-5 w-full text-ascend-black font-nunito-sans">
+            {/* Display alert modal */}
+            {openAlerModal && (
+                <AlertModal
+                    title={"Archive Course"}
+                    description={
+                        "Are you sure you want to archive this course? It can be restored later if necessary"
+                    }
+                    closeModal={() => setOpenAlertModal(false)}
+                    onConfirm={archiveCourse}
+                    isLoading={isArchiveLoading}
+                />
+            )}
+
             <div className="space-y-1 pb-5 border-b border-ascend-gray1">
                 <div className="flex items-start gap-2 md:gap-20">
                     <h1 className="flex-1 min-w-0 text-size7 break-words font-semibold">
@@ -107,7 +134,7 @@ export default function Home({}) {
                                         Edit course
                                     </a>
                                 </li>
-                                <li onClick={handleArchiveCourse}>
+                                <li onClick={handleArchiveCourseClick}>
                                     <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                         Archive course
                                     </a>

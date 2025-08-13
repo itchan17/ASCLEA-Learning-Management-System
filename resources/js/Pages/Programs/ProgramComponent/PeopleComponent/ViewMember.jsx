@@ -12,6 +12,7 @@ import { route } from "ziggy-js";
 import { router } from "@inertiajs/react";
 import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
 import { displayToast } from "../../../../Utils/displayToast";
+import AlertModal from "../../../../Components/AlertModal";
 
 export default function ViewMember() {
     const {
@@ -20,21 +21,34 @@ export default function ViewMember() {
         assigned_courses: assignedCourses,
     } = usePage().props;
     console.log(memberData);
+
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // States for alert modal
+    const [openAlerModal, setOpenAlertModal] = useState(false);
+    const [assignedCourseToRemove, setAssignedCourseToRemove] = useState(null);
+    const [isRemoveLoading, setIsRemoveLoading] = useState(false);
 
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
     };
 
     const handleRemoveAssignedCourse = (assignedCourseId) => {
-        if (assignedCourseId) {
+        setAssignedCourseToRemove(assignedCourseId);
+        setOpenAlertModal(true);
+    };
+
+    const removeAssignedCourse = () => {
+        if (assignedCourseToRemove) {
+            setIsRemoveLoading(true);
             router.delete(
                 route("program.member.assign.courses.remove", {
                     program: memberData.program_id,
                     member: memberData.learning_member_id,
-                    assignedCourse: assignedCourseId,
+                    assignedCourse: assignedCourseToRemove,
                 }),
                 {
+                    showProgress: false,
                     onSuccess: (page) => {
                         displayToast(
                             <DefaultCustomToast
@@ -43,6 +57,11 @@ export default function ViewMember() {
                             "success"
                         );
                     },
+                    onFinish: () => {
+                        setAssignedCourseToRemove(null);
+                        setIsRemoveLoading(false);
+                        setOpenAlertModal(false);
+                    },
                 }
             );
         }
@@ -50,6 +69,18 @@ export default function ViewMember() {
 
     return (
         <div className=" space-y-5 text-ascend-black">
+            {/* Display alert modal */}
+            {openAlerModal && (
+                <AlertModal
+                    title={"Remove Assigned Course"}
+                    description={
+                        "Are you sure you want to remove this course? All associated data will be lost permanently."
+                    }
+                    closeModal={() => setOpenAlertModal(false)}
+                    onConfirm={removeAssignedCourse}
+                    isLoading={isRemoveLoading}
+                />
+            )}
             <div className="flex justify-between items-center ">
                 <BackButton doSomething={handleClickBackBtn} />
                 <RoleGuard allowedRoles={["admin"]}>

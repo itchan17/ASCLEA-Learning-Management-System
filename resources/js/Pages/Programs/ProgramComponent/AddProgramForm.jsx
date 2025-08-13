@@ -55,6 +55,7 @@ export default function AddProgramForm({
         setIsValidating(true);
 
         router.post(route("validate.course"), course, {
+            showProgress: false,
             onError: (error) => {
                 setAddCourseError(error);
                 setIsValidating(false);
@@ -78,6 +79,7 @@ export default function AddProgramForm({
         if (!editProgram) {
             // Send a post request to server to create program
             post(route("program.create", []), {
+                showProgress: false,
                 onSuccess: (page) => {
                     reset();
                     toggleModal();
@@ -92,6 +94,7 @@ export default function AddProgramForm({
         } else {
             // Send a put request to server to update program
             put(route("program.update", programDataToUpdate.program_id), {
+                showProgress: false,
                 onSuccess: (page) => {
                     reset();
                     toggleModal();

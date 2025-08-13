@@ -195,6 +195,7 @@ export default function AddMemberForm({ toggleModal }) {
                     search: searchQuery || null,
                 },
                 {
+                    showProgress: false,
                     except: ["courses", "program"],
                     onError: () => {
                         setIsAddLoading(false);

@@ -29,6 +29,7 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
                 route("course.create", program.program_id),
                 courseDetails,
                 {
+                    showProgress: false,
                     only: ["courses", "flash"],
                     onError: (errors) => {
                         console.log(errors);
@@ -56,6 +57,7 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
                 }),
                 courseDetails,
                 {
+                    showProgress: false,
                     only: ["course", "flash"],
                     onError: (errors) => {
                         console.log(errors);
