@@ -20,16 +20,16 @@ return new class extends Migration
 
             $table->longText('profile_image')->nullable();
 
-            $table->string('birthdate'); 
-            $table->string('gender');
-            $table->string('contact_number');
+            $table->string('birthdate')->nullable(); 
+            $table->string('gender')->nullable();
+            $table->string('contact_number')->nullable();
 
             $table->string('email')->unique();
 
-            $table->string('house_no');
-            $table->string('province');
-            $table->string('city');
-            $table->string('barangay');
+            $table->string('house_no')->nullable();
+            $table->string('province')->nullable();
+            $table->string('city')->nullable();
+            $table->string('barangay')->nullable();
 
             $table->string('password');
 
