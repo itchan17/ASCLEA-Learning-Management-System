@@ -58,8 +58,8 @@ class CourseController extends Controller
         if($course->program_id === $program->program_id) {
              return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContent', 
              [
-                'program' => $program->only(['program_id']),
-                'course' => $course->only(['course_id', 'course_code', 'course_name', 'course_description', 'course_day', 'start_time', 'end_time'])
+                'program' => fn () => $program->only(['program_id']),
+                'course' => fn () => $course->only(['course_id', 'course_code', 'course_name', 'course_description', 'course_day', 'start_time', 'end_time'])
             ]);
         }  
         else {
