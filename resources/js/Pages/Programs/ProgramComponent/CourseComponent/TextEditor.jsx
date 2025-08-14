@@ -22,13 +22,14 @@ export default function TextEditor({ value, setValue, fieldName }) {
             handler: () => {},
         },
     };
-    console.log(value);
+
     return (
         <ReactQuill
             modules={module}
             theme="snow"
-            value={value}
-            onChange={(value) => setValue(fieldName, value)}
+            onChange={(val, delta, force, editor) =>
+                setValue(fieldName, editor.getText().trim() === "" ? null : val)
+            }
         />
     );
 }

@@ -7,21 +7,18 @@ const useAssessmentsStore = create((set) => ({
     isFormOpen: false,
 
     assessmentDetails: {
-        id: null,
-        sectionId: null,
-        sortOrder: null,
-        contentType: "assessment",
-        assessmentStatus: null,
-        assessmentType: "",
-        assessmentDueDateTime: "",
-        assessmentPoints: 0,
-        assessmentTitle: "",
-        assessmentDescription: "",
-        assessmentFiles: [],
-        assessmentQuiz: null,
-        assessmentPostDate: "",
-        userPosted: "",
-        responseReceived: 0,
+        assessment_title: "",
+        assessment_description: null,
+        status: "published",
+        assessment_type: "",
+        due_datetime: "",
+        total_points: 0,
+        assessment_files: [],
+        // sectionId: null,
+        // sortOrder: null,
+        // contentType: "assessment",
+        // assessmentQuiz: null,
+        // responseReceived: 0,
     },
 
     assessmentList: [
@@ -117,7 +114,7 @@ const useAssessmentsStore = create((set) => ({
         set({
             assessmentDetails: {
                 ...assessmentDetails,
-                assessmentFiles: assessmentDetails.assessmentFiles.filter(
+                assessment_files: assessmentDetails.assessment_files.filter(
                     (file, index) => index !== fileId
                 ),
             },

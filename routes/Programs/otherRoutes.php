@@ -23,15 +23,6 @@ Route::prefix('programs')
                 'fileId' => $fileId,
             ]);
         })->name('program.course.file.view');
-
-        // Route for viewing assessment
-        Route::get('/{programId}/course/{courseId}/assessment/{assessmentId}', function ($programId, $courseId, $assessmentId) {
-            return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/ViewAssessment', [
-                'programId' => $programId,
-                'courseId' => $courseId,
-                'assessmentId' => $assessmentId,
-            ]);
-        })->name('program.course.assessment.view');  
 });
 
 Route::prefix('programs')

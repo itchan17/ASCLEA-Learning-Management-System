@@ -11,8 +11,8 @@ export default function AssessmentItem({ assessmentDetails }) {
     const route = useRoute();
 
     // get the id from url
-    const { programId, courseId } = usePage().props;
-
+    const { course, program } = usePage().props;
+    console.log(course, program);
     const stopPropagation = (e) => {
         e.stopPropagation();
     };
@@ -20,9 +20,9 @@ export default function AssessmentItem({ assessmentDetails }) {
     const handleCardClick = () => {
         router.visit(
             route("program.course.assessment.view", {
-                programId,
-                courseId,
-                assessmentId: assessmentDetails.id,
+                program: program.program_id,
+                course: course.course_id,
+                assessment: assessmentDetails.id,
             }),
             {
                 preserveScroll: false,
@@ -33,8 +33,8 @@ export default function AssessmentItem({ assessmentDetails }) {
     const handleQuizClick = () => {
         router.visit(
             route("program.course.quiz-form.edit", {
-                programId,
-                courseId,
+                program: program.program_id,
+                course: course.course_id,
                 quizFormId: assessmentDetails.assessmentQuiz.id,
             })
         );

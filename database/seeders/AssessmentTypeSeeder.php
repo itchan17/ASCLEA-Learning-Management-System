@@ -7,25 +7,21 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
-class RoleSeeder extends Seeder
+class AssessmentTypeSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-         DB::table('roles')->insert([
+        DB::table('assessment_types')->insert([
             [
-                'role_id' => Str::uuid(),
-                'role_name' => 'admin',
+                'assessment_type_id' => Str::uuid(),
+                'assessment_type' => 'activity',
             ],
             [
-                'role_id' => Str::uuid(),
-                'role_name' => 'faculty',
-            ],
-            [
-                'role_id' => Str::uuid(),
-                'role_name' => 'student',
+                'assessment_type_id' => Str::uuid(),
+                'assessment_type' => 'quiz',
             ],
         ]);
     }

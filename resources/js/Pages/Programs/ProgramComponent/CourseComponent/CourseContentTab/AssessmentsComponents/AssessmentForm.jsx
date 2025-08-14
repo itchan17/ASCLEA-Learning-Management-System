@@ -3,15 +3,15 @@ import TextEditor from "../../TextEditor";
 import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
 import SecondaryButton from "../../../../../../Components/Button/SecondaryButton";
 import useAssessmentsStore from "../../../../../../Stores/Programs/CourseContent/assessmentsStore";
-import CustomSelect from "../../../../../../Components/CustomInputField/CustomSelect";
 import { AiFillFileAdd } from "react-icons/ai";
 import "../../../../../../../css/global.css";
 import DropFiles from "../../../../../../Components/DragNDropFiles/DropFiles";
 import FileCard from "../../FileCard";
 import { SiGoogleforms } from "react-icons/si";
 import { router, usePage } from "@inertiajs/react";
-import { useRoute } from "ziggy-js";
+import { route } from "ziggy-js";
 import { IoCaretDownOutline } from "react-icons/io5";
+import { closeDropDown } from "../../../../../../Utils/closeDropdown";
 
 export default function AssessmentForm({
     toggleForm,
@@ -19,8 +19,7 @@ export default function AssessmentForm({
     formWidth,
     sectionId,
 }) {
-    const { programId, courseId } = usePage().props;
-    const route = useRoute();
+    const { program, course } = usePage().props;
 
     // Assessments Store
     const assessmentDetails = useAssessmentsStore(
@@ -32,9 +31,9 @@ export default function AssessmentForm({
     const removeAttachedFile = useAssessmentsStore(
         (state) => state.removeAttachedFile
     );
-    const hanndleAddAssessments = useAssessmentsStore(
-        (state) => state.hanndleAddAssessments
-    );
+    // const hanndleAddAssessments = useAssessmentsStore(
+    //     (state) => state.hanndleAddAssessments
+    // );
     const handleCreateIntialQuizForm = useAssessmentsStore(
         (state) => state.handleCreateIntialQuizForm
     );
@@ -43,31 +42,29 @@ export default function AssessmentForm({
     );
 
     const [isShowDropFiles, setIsShowDropFiles] = useState(false);
+    const [primaryBtnText, setPrimaryBtnText] = useState("Publish");
 
     const handleCLickEditForm = (quizFormId) => {
         router.visit(
             route("program.course.quiz-form.edit", {
-                programId,
-                courseId,
-                quizFormId,
+                programId: program.program_id,
+                courseId: course.course_id,
+                quizFormId: 1,
             })
         );
     };
-    useEffect(() => {
-        console.log(assessmentDetails);
-    }, [assessmentDetails]);
 
     const toggleShowDropFiles = () => {
         setIsShowDropFiles(!isShowDropFiles);
     };
 
-    const changeAsssessmentType = (quizType) => {
+    const changeAsssessmentType = (assessmentType) => {
         // check if the type is quiz
-        if (quizType === "quiz") {
+        if (assessmentType === "quiz") {
             // this will create an empty quiz form
             handleCreateIntialQuizForm();
         }
-        handleAssessmentChange("assessmentType", quizType);
+        handleAssessmentChange("assessment_type", assessmentType);
     };
 
     const cancelAssessmentForm = () => {
@@ -75,13 +72,31 @@ export default function AssessmentForm({
         clearAssessmentDetails();
     };
 
-    const addAssessment = () => {
-        toggleForm();
-        hanndleAddAssessments(sectionId);
-        clearAssessmentDetails();
+    const handleSaveAssessment = () => {
+        router.post(
+            route("assessment.create", {
+                program: program.program_id,
+                course: course.course_id,
+            }),
+            { ...assessmentDetails },
+            {
+                onError: (error) => console.log(error),
+                onSuccess: (page) => console.log("Page" + page),
+            }
+        );
+        console.log(assessmentDetails);
+        // toggleForm();
+        // hanndleAddAssessments(sectionId);
+        // clearAssessmentDetails();
+    };
+
+    const statusChange = (btnText, fieldName, status) => {
+        closeDropDown();
+        setPrimaryBtnText(btnText);
+        handleAssessmentChange(fieldName, status);
     };
     return (
-        <div
+        <form
             className={`border ${formWidth} border-ascend-gray1 shadow-shadow1 p-5 space-y-5 bg-ascend-white`}
         >
             <h1 className="text-size4 font-bold">
@@ -89,38 +104,32 @@ export default function AssessmentForm({
             </h1>
             <div
                 className={`grid sm:grid-cols-2 ${
-                    assessmentDetails.assessmentType === "activity"
+                    assessmentDetails.assessment_type === "activity"
                         ? "lg:grid-cols-3"
                         : "lg:grid-cols-2"
                 } gap-5`}
             >
                 <div>
                     <label>Assessment Type</label>
-                    <CustomSelect
-                        selectField={
-                            <select
-                                value={assessmentDetails.assessmentType}
-                                onChange={(e) =>
-                                    changeAsssessmentType(e.target.value)
-                                }
-                                className="w-full rounded-none appearance-none border border-ascend-gray1 p-2 h-9  focus:outline-ascend-blue"
-                            >
-                                <option className="" value="">
-                                    Select type
-                                </option>
-                                <option value="activity">Activity</option>
-                                <option value="quiz">Quiz</option>
-                            </select>
-                        }
-                    />
+                    <select
+                        value={assessmentDetails.assessment_type}
+                        onChange={(e) => changeAsssessmentType(e.target.value)}
+                        className="textField w-full rounded-none appearance-none border border-ascend-gray1 p-2 h-9  focus:outline-ascend-blue"
+                    >
+                        <option className="" value="">
+                            Select type
+                        </option>
+                        <option value="activity">Activity</option>
+                        <option value="quiz">Quiz</option>
+                    </select>
                 </div>
                 <div>
                     <label>Due Date and Time</label>
                     <input
-                        value={assessmentDetails.assessmentDueDateTime || ""}
+                        value={assessmentDetails.due_datetime || ""}
                         onChange={(e) =>
                             handleAssessmentChange(
-                                "assessmentDueDateTime",
+                                "due_datetime",
                                 e.target.value
                             )
                         }
@@ -129,14 +138,14 @@ export default function AssessmentForm({
                     />
                 </div>
 
-                {assessmentDetails.assessmentType === "activity" && (
+                {assessmentDetails.assessment_type === "activity" && (
                     <div>
                         <label>Points</label>
                         <input
-                            value={assessmentDetails.assessmentPoints}
+                            value={assessmentDetails.total_points}
                             onChange={(e) =>
                                 handleAssessmentChange(
-                                    "assessmentPoints",
+                                    "total_points",
                                     e.target.value
                                 )
                             }
@@ -150,10 +159,10 @@ export default function AssessmentForm({
                 <label>Title</label>
                 <input
                     type="text"
-                    value={assessmentDetails.assessmentTitle}
+                    value={assessmentDetails.assessment_title}
                     onChange={(e) =>
                         handleAssessmentChange(
-                            "assessmentTitle",
+                            "assessment_title",
                             e.target.value
                         )
                     }
@@ -163,14 +172,13 @@ export default function AssessmentForm({
             <div>
                 <label>Description</label>
                 <TextEditor
-                    fieldName={"assessmentDescription"}
-                    value={assessmentDetails.assessmentDescription}
+                    fieldName={"assessment_description"}
                     setValue={handleAssessmentChange}
                 />
             </div>
 
             {/* Quiz Form */}
-            {assessmentDetails.assessmentType === "quiz" && (
+            {assessmentDetails.assessment_type === "quiz" && (
                 <div className="space-y-5">
                     <div>
                         <label className="font-bold pb-5">Quiz Form</label>
@@ -195,17 +203,17 @@ export default function AssessmentForm({
 
             {/* Display drop files */}
             {isShowDropFiles &&
-                assessmentDetails.assessmentType === "activity" && (
+                assessmentDetails.assessment_type === "activity" && (
                     <DropFiles
                         handleFileChange={handleAssessmentChange}
-                        fieldName={"assessmentFiles"}
+                        fieldName={"assessment_files"}
                         toggleDropFiles={toggleShowDropFiles}
                     />
                 )}
 
             {/* Display the attached files */}
-            {assessmentDetails.assessmentFiles?.length > 0 &&
-                assessmentDetails.assessmentType === "activity" && (
+            {assessmentDetails.assessment_files?.length > 0 &&
+                assessmentDetails.assessment_type === "activity" && (
                     <>
                         <div>
                             <label className="font-bold pb-5">
@@ -213,7 +221,7 @@ export default function AssessmentForm({
                             </label>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                            {assessmentDetails.assessmentFiles.map(
+                            {assessmentDetails.assessment_files.map(
                                 (file, index) => {
                                     return (
                                         <div key={index}>
@@ -234,12 +242,12 @@ export default function AssessmentForm({
 
             <div
                 className={`flex ${
-                    assessmentDetails.assessmentType === "activity"
+                    assessmentDetails.assessment_type === "activity"
                         ? "justify-between"
                         : "justify-end"
                 }`}
             >
-                {assessmentDetails.assessmentType === "activity" && (
+                {assessmentDetails.assessment_type === "activity" && (
                     <SecondaryButton
                         doSomething={toggleShowDropFiles}
                         icon={<AiFillFileAdd />}
@@ -252,10 +260,10 @@ export default function AssessmentForm({
                         text={"Cancel"}
                     />
 
-                    <div className="flex space-x-[0.5px]">
+                    <div className="flex space-x-[2px]">
                         <PrimaryButton
-                            doSomething={addAssessment}
-                            text={"Publish"}
+                            doSomething={handleSaveAssessment}
+                            text={primaryBtnText}
                         />
 
                         {/* Dropdown button */}
@@ -272,16 +280,32 @@ export default function AssessmentForm({
 
                             <ul
                                 tabIndex={0}
-                                className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-30 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                                className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                             >
-                                <li>
+                                <li
+                                    onClick={() =>
+                                        statusChange(
+                                            "Publsih",
+                                            "status",
+                                            "published"
+                                        )
+                                    }
+                                >
                                     <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                         Publish
                                     </a>
                                 </li>
-                                <li>
+                                <li
+                                    onClick={() =>
+                                        statusChange(
+                                            "Save as Draft",
+                                            "status",
+                                            "draft"
+                                        )
+                                    }
+                                >
                                     <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                        Save draft
+                                        Save as draft
                                     </a>
                                 </li>
                             </ul>
@@ -289,6 +313,6 @@ export default function AssessmentForm({
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
     );
 }
