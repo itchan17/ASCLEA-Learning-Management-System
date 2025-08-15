@@ -16,3 +16,6 @@ Route::fallback(function () {
 });
 
 
+Route::get('/MockQuiz', function () {
+    return Inertia::render('CheatingMitigation/MockQuiz');
+})->middleware('guest', 'preventBack');

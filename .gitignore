@@ -24,15 +24,15 @@ yarn-error.log
 /.zed
 
 
-# Ignore Python virtual environments
-cvpython/
-venv/
+# Python virtual environment
+/venv/
 
-# Byte-compiled / cache files
+# Python cache files
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
 
 # OS-specific
 .DS_Store
