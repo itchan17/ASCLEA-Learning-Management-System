@@ -4,44 +4,31 @@ namespace App\Http\Controllers\Programs;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Programs\SaveAssessmentRequest;
-use App\Models\Programs\Assessment;
-use App\Models\Programs\AssessmentType;
-use Illuminate\Auth\Events\Validated;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Services\Programs\AssessmentService;
 use Inertia\Inertia;
+
 
 class AssessmentController extends Controller
 {
+    protected AssessmentService $assessmentService;
+
+    public function __construct(AssessmentService $service) {
+        $this->assessmentService = $service;
+    }
+
     public function createAssessment(SaveAssessmentRequest $req, $program, $course) {
        
         $validatedAssessment = $req->validated();
-   
-        // Get the id of assessment types
-        $typeId = AssessmentType::where('assessment_type', $validatedAssessment['assessment_type'])->value('assessment_type_id');
-
-        // Set value of other columns
-        $validatedAssessment['course_id'] = $course;
-        $validatedAssessment['created_by'] = Auth::user()->user_id;
-        $validatedAssessment['assessment_type_id'] = $typeId;
-
-        $assessment = Assessment::create($validatedAssessment);
-
+        
+        $assesssment = $this->assessmentService->saveAssessment($validatedAssessment, $course);
+        
 
         if($req->hasFile("assessment_files"))
         {
-            $uploadedFiles = [];
-            foreach($req->assessment_files as $index => $file){
-                // Store the files in private storage
-                $filename = uniqid().'.'.$file->getClientOriginalExtension();
-                $path = $file->storeAs('assessmentFiles', $filename);
-
-                // Add the file data inside this array
-                $uploadedFiles[$index] = [];
-            }
-
-            // Save the files data in the table
+           $this->assessmentService->saveAssessmentFiles($req->assessment_files, $assesssment);
         }
+
+        return back()->with('success', "Assessment created successfully.");
     }
 
     public function showAssessment() {

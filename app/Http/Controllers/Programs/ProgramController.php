@@ -185,8 +185,7 @@ class ProgramController extends Controller
         
         if($req->hasFile('background_image')){
             $image = $req->background_image;
-            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-            $path = $image->storeAs('programBackgroundImages', $filename, 'public');
+            $path = $image->store('programBackgroundImages', 'public');
 
             if ($program->background_image) {
                 Storage::disk('public')->delete($program->background_image);

@@ -12,6 +12,8 @@ import { router, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import { IoCaretDownOutline } from "react-icons/io5";
 import { closeDropDown } from "../../../../../../Utils/closeDropdown";
+import { displayToast } from "../../../../../../Utils/displayToast";
+import DefaultCustomToast from "../../../../../../Components/CustomToast/DefaultCustomToast";
 
 export default function AssessmentForm({
     toggleForm,
@@ -43,6 +45,8 @@ export default function AssessmentForm({
 
     const [isShowDropFiles, setIsShowDropFiles] = useState(false);
     const [primaryBtnText, setPrimaryBtnText] = useState("Publish");
+    const [errors, setErrors] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleCLickEditForm = (quizFormId) => {
         router.visit(
@@ -73,6 +77,9 @@ export default function AssessmentForm({
     };
 
     const handleSaveAssessment = () => {
+        setIsLoading(true);
+        setErrors(null);
+
         router.post(
             route("assessment.create", {
                 program: program.program_id,
@@ -80,15 +87,29 @@ export default function AssessmentForm({
             }),
             { ...assessmentDetails },
             {
-                onError: (error) => console.log(error),
-                onSuccess: (page) => console.log("Page" + page),
+                preserveScroll: true,
+                preserveState: true,
+                onError: (error) => {
+                    setErrors(error);
+                },
+                onSuccess: (page) => {
+                    toggleForm();
+                    clearAssessmentDetails();
+                    displayToast(
+                        <DefaultCustomToast
+                            message={page.props.flash.success}
+                        />,
+                        "success"
+                    );
+                },
+                onFinish: () => setIsLoading(false),
             }
         );
-        console.log(assessmentDetails);
-        // toggleForm();
-        // hanndleAddAssessments(sectionId);
-        // clearAssessmentDetails();
     };
+
+    useEffect(() => {
+        console.log(errors);
+    }, [errors]);
 
     const statusChange = (btnText, fieldName, status) => {
         closeDropDown();
@@ -110,11 +131,18 @@ export default function AssessmentForm({
                 } gap-5`}
             >
                 <div>
-                    <label>Assessment Type</label>
+                    <label className="font-bold">
+                        Assessment Type
+                        <span className="text-ascend-red">*</span>
+                    </label>
                     <select
                         value={assessmentDetails.assessment_type}
                         onChange={(e) => changeAsssessmentType(e.target.value)}
-                        className="textField w-full rounded-none appearance-none border border-ascend-gray1 p-2 h-9  focus:outline-ascend-blue"
+                        className={`textField w-full rounded-none appearance-none border border-ascend-gray1 px-3 py-2  focus:outline-ascend-blue ${
+                            errors && errors.assessment_type
+                                ? "border-2 border-ascend-red"
+                                : ""
+                        }`}
                     >
                         <option className="" value="">
                             Select type
@@ -122,9 +150,14 @@ export default function AssessmentForm({
                         <option value="activity">Activity</option>
                         <option value="quiz">Quiz</option>
                     </select>
+                    {errors && errors.assessment_type && (
+                        <span className="text-ascend-red">
+                            {errors.assessment_type}
+                        </span>
+                    )}
                 </div>
                 <div>
-                    <label>Due Date and Time</label>
+                    <label className="font-bold">Due Date and Time</label>
                     <input
                         value={assessmentDetails.due_datetime || ""}
                         onChange={(e) =>
@@ -134,13 +167,22 @@ export default function AssessmentForm({
                             )
                         }
                         type="datetime-local"
-                        className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
+                        className={`px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue ${
+                            errors && errors.due_datetime
+                                ? "border-2 border-ascend-red"
+                                : ""
+                        }`}
                     />
+                    {errors && errors.due_datetime && (
+                        <span className="text-ascend-red">
+                            {errors.due_datetime}
+                        </span>
+                    )}
                 </div>
 
                 {assessmentDetails.assessment_type === "activity" && (
                     <div>
-                        <label>Points</label>
+                        <label className="font-bold">Total Points</label>
                         <input
                             value={assessmentDetails.total_points}
                             onChange={(e) =>
@@ -150,13 +192,26 @@ export default function AssessmentForm({
                                 )
                             }
                             type="number"
-                            className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
+                            min="0"
+                            onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57"
+                            className={`px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue ${
+                                errors && errors.total_points
+                                    ? "border-2 border-ascend-red"
+                                    : ""
+                            }`}
                         />
+                        {errors && errors.total_points && (
+                            <span className="text-ascend-red">
+                                {errors.total_points}
+                            </span>
+                        )}
                     </div>
                 )}
             </div>
             <div>
-                <label>Title</label>
+                <label className="font-bold">
+                    Title<span className="text-ascend-red">*</span>
+                </label>
                 <input
                     type="text"
                     value={assessmentDetails.assessment_title}
@@ -166,11 +221,20 @@ export default function AssessmentForm({
                             e.target.value
                         )
                     }
-                    className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
+                    className={`px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue ${
+                        errors && errors.assessment_title
+                            ? "border-2 border-ascend-red"
+                            : ""
+                    }`}
                 />
+                {errors && errors.assessment_title && (
+                    <span className="text-ascend-red">
+                        {errors.assessment_title}
+                    </span>
+                )}
             </div>
             <div>
-                <label>Description</label>
+                <label className="font-bold">Description</label>
                 <TextEditor
                     fieldName={"assessment_description"}
                     setValue={handleAssessmentChange}
@@ -214,13 +278,21 @@ export default function AssessmentForm({
             {/* Display the attached files */}
             {assessmentDetails.assessment_files?.length > 0 &&
                 assessmentDetails.assessment_type === "activity" && (
-                    <>
-                        <div>
-                            <label className="font-bold pb-5">
-                                Attached Files
-                            </label>
+                    <div>
+                        <div className="mb-5">
+                            <label className="font-bold">Attached Files</label>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+
+                        <div
+                            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 ${
+                                errors &&
+                                Object.entries(errors).some(([key, message]) =>
+                                    key.startsWith("assessment_files")
+                                )
+                                    ? "p-2 border-2 border-ascend-red"
+                                    : ""
+                            }`}
+                        >
                             {assessmentDetails.assessment_files.map(
                                 (file, index) => {
                                     return (
@@ -237,7 +309,25 @@ export default function AssessmentForm({
                                 }
                             )}
                         </div>
-                    </>
+
+                        {errors && (
+                            <div className="flex flex-col">
+                                {Object.entries(errors).map(
+                                    ([key, message]) => {
+                                        if (
+                                            key.startsWith("assessment_files")
+                                        ) {
+                                            return (
+                                                <span className="text-ascend-red">
+                                                    {message}
+                                                </span>
+                                            );
+                                        }
+                                    }
+                                )}
+                            </div>
+                        )}
+                    </div>
                 )}
 
             <div

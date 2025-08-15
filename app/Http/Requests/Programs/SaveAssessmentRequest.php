@@ -52,6 +52,8 @@ class SaveAssessmentRequest extends FormRequest
             $attributes["assessment_files.$index"] = $file->getClientOriginalName();
         }
 
+        $attributes['due_datetime'] = 'due date and time';
+
         return $attributes;
     }
 }

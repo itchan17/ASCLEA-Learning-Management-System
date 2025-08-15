@@ -91,7 +91,7 @@ const useAssessmentsStore = create((set) => ({
         const { assessmentDetails } = useAssessmentsStore.getState();
 
         // Check if the field is assessmentFiles then add the new files in the array
-        if (field === "assessmentFiles" && Array.isArray(value)) {
+        if (field === "assessment_files" && Array.isArray(value)) {
             set({
                 assessmentDetails: {
                     ...assessmentDetails,
@@ -124,13 +124,13 @@ const useAssessmentsStore = create((set) => ({
     clearAssessmentDetails: () => {
         set({
             assessmentDetails: {
-                assessmentType: "",
-                assessmentDueDate: "",
-                assessmentDuration: "",
-                assessmentPoints: "",
-                assessmentTitle: "",
-                assessmentDescription: "",
-                assessmentFiles: [],
+                assessment_title: "",
+                assessment_description: null,
+                status: "published",
+                assessment_type: "",
+                due_datetime: "",
+                total_points: 0,
+                assessment_files: [],
             },
         });
     },
