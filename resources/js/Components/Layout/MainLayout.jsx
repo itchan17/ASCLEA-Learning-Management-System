@@ -54,11 +54,8 @@ export default function MainLayout({ children }) {
                     setIsSidebarOpen={setIsSidebarOpen}
                     isMdScreen={isMdScreen}
                 />
-                <main
-                    className="flex-1 px-6 py-2 sm:px-8 sm:py-5 w-full max-w-[1900px] overflow-y-auto"
-                    scroll-region=""
-                >
-                    {children}
+                <main className="flex-1 flex justify-center items-start px-6 py-5 sm:px-8 w-full overflow-y-auto bg-gray-50">
+                    <div className="w-full max-w-[1400px]">{children}</div>
                 </main>
             </div>
         </div>

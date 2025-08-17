@@ -14,6 +14,7 @@ import { IoCaretDownOutline } from "react-icons/io5";
 import { closeDropDown } from "../../../../../../Utils/closeDropdown";
 import { displayToast } from "../../../../../../Utils/displayToast";
 import DefaultCustomToast from "../../../../../../Components/CustomToast/DefaultCustomToast";
+import { capitalize } from "lodash";
 
 export default function AssessmentForm({
     toggleForm,
@@ -43,10 +44,19 @@ export default function AssessmentForm({
         (state) => state.clearAssessmentDetails
     );
 
-    const [isShowDropFiles, setIsShowDropFiles] = useState(false);
     const [primaryBtnText, setPrimaryBtnText] = useState("Publish");
     const [errors, setErrors] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+
+    // Clear assessment details once form was rendered
+    // to avoid persisting state
+    useEffect(() => {
+        clearAssessmentDetails();
+    }, []);
+
+    useEffect(() => {
+        console.log(errors);
+    }, [errors]);
 
     const handleCLickEditForm = (quizFormId) => {
         router.visit(
@@ -58,23 +68,14 @@ export default function AssessmentForm({
         );
     };
 
-    const toggleShowDropFiles = () => {
-        setIsShowDropFiles(!isShowDropFiles);
-    };
-
-    const changeAsssessmentType = (assessmentType) => {
-        // check if the type is quiz
-        if (assessmentType === "quiz") {
-            // this will create an empty quiz form
-            handleCreateIntialQuizForm();
-        }
-        handleAssessmentChange("assessment_type", assessmentType);
-    };
-
-    const cancelAssessmentForm = () => {
-        toggleForm();
-        clearAssessmentDetails();
-    };
+    // const changeAsssessmentType = (assessmentType) => {
+    //     // check if the type is quiz
+    //     if (assessmentType === "quiz") {
+    //         // this will create an empty quiz form
+    //         handleCreateIntialQuizForm();
+    //     }
+    //     handleAssessmentChange("assessment_type", assessmentType);
+    // };
 
     const handleSaveAssessment = () => {
         setIsLoading(true);
@@ -107,173 +108,203 @@ export default function AssessmentForm({
         );
     };
 
-    useEffect(() => {
-        console.log(errors);
-    }, [errors]);
+    const cancelAssessmentForm = () => {
+        toggleForm();
+        clearAssessmentDetails();
+    };
 
+    // Used for dropdown button to set the status of the assessment
     const statusChange = (btnText, fieldName, status) => {
         closeDropDown();
         setPrimaryBtnText(btnText);
         handleAssessmentChange(fieldName, status);
     };
+
+    const handleChooseAssessmentType = (assessmentType) => {
+        // Check if type is quiz
+        // Set the button to save as draft and status to draft
+        // since user can only save quiz as draft to allow them to edit quiz form before publish
+        if (assessmentType === "quiz") {
+            setPrimaryBtnText("Save as draft");
+            handleAssessmentChange("status", "draft");
+        }
+
+        handleAssessmentChange("assessment_type", assessmentType);
+    };
+
+    // Hanndles displaying of toast to inform user
+    // that assessment has to be save as draft first to enable
+    // quiz form editing
+    const handleClickQuizInform = () => {
+        const message = "Please save as draft first to edit the quiz.";
+        displayToast(<DefaultCustomToast message={message} />, "info");
+    };
+
     return (
         <form
             className={`border ${formWidth} border-ascend-gray1 shadow-shadow1 p-5 space-y-5 bg-ascend-white`}
         >
             <h1 className="text-size4 font-bold">
-                {formTitle || "Add Assessment"}
+                {!assessmentDetails.assessment_type
+                    ? "Choose Assessment Type"
+                    : formTitle ||
+                      `Add ${capitalize(assessmentDetails.assessment_type)}`}
             </h1>
-            <div
-                className={`grid sm:grid-cols-2 ${
-                    assessmentDetails.assessment_type === "activity"
-                        ? "lg:grid-cols-3"
-                        : "lg:grid-cols-2"
-                } gap-5`}
-            >
-                <div>
-                    <label className="font-bold">
-                        Assessment Type
-                        <span className="text-ascend-red">*</span>
-                    </label>
-                    <select
-                        value={assessmentDetails.assessment_type}
-                        onChange={(e) => changeAsssessmentType(e.target.value)}
-                        className={`textField w-full rounded-none appearance-none border border-ascend-gray1 px-3 py-2  focus:outline-ascend-blue ${
-                            errors && errors.assessment_type
-                                ? "border-2 border-ascend-red"
-                                : ""
-                        }`}
-                    >
-                        <option className="" value="">
-                            Select type
-                        </option>
-                        <option value="activity">Activity</option>
-                        <option value="quiz">Quiz</option>
-                    </select>
-                    {errors && errors.assessment_type && (
-                        <span className="text-ascend-red">
-                            {errors.assessment_type}
-                        </span>
-                    )}
-                </div>
-                <div>
-                    <label className="font-bold">Due Date and Time</label>
-                    <input
-                        value={assessmentDetails.due_datetime || ""}
-                        onChange={(e) =>
-                            handleAssessmentChange(
-                                "due_datetime",
-                                e.target.value
-                            )
-                        }
-                        type="datetime-local"
-                        className={`px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue ${
-                            errors && errors.due_datetime
-                                ? "border-2 border-ascend-red"
-                                : ""
-                        }`}
-                    />
-                    {errors && errors.due_datetime && (
-                        <span className="text-ascend-red">
-                            {errors.due_datetime}
-                        </span>
-                    )}
-                </div>
 
-                {assessmentDetails.assessment_type === "activity" && (
-                    <div>
-                        <label className="font-bold">Total Points</label>
-                        <input
-                            value={assessmentDetails.total_points}
-                            onChange={(e) =>
-                                handleAssessmentChange(
-                                    "total_points",
-                                    e.target.value
-                                )
+            {/* Options for choosing the assessment type */}
+            {!assessmentDetails.assessment_type && (
+                <div className="flex flex-wrap justify-center gap-5">
+                    <div className="grid w-60 lg:w-80">
+                        <PrimaryButton
+                            doSomething={() =>
+                                handleChooseAssessmentType("activity")
                             }
-                            type="number"
-                            min="0"
-                            onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57"
-                            className={`px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue ${
-                                errors && errors.total_points
-                                    ? "border-2 border-ascend-red"
-                                    : ""
-                            }`}
+                            fontWeight="font-bold"
+                            text={"Activity"}
                         />
-                        {errors && errors.total_points && (
-                            <span className="text-ascend-red">
-                                {errors.total_points}
-                            </span>
+                    </div>
+                    <div className="grid w-60 lg:w-80">
+                        <PrimaryButton
+                            doSomething={() =>
+                                handleChooseAssessmentType("quiz")
+                            }
+                            fontWeight="font-bold"
+                            text={"Quiz"}
+                        />
+                    </div>
+                </div>
+            )}
+
+            {/* Assessment Fields Start*/}
+            {assessmentDetails.assessment_type && (
+                <div className="space-y-5">
+                    <div
+                        className={`grid grid-cols-1 sm:grid-cols-2 ${
+                            assessmentDetails.assessment_type === "activity"
+                                ? "lg:grid-cols-3"
+                                : "lg:grid-cols-2"
+                        } gap-5`}
+                    >
+                        <div>
+                            <label className="font-bold">
+                                Title<span className="text-ascend-red">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={assessmentDetails.assessment_title}
+                                onChange={(e) =>
+                                    handleAssessmentChange(
+                                        "assessment_title",
+                                        e.target.value
+                                    )
+                                }
+                                className={`px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue ${
+                                    errors && errors.assessment_title
+                                        ? "border-2 border-ascend-red"
+                                        : ""
+                                }`}
+                            />
+                            {errors && errors.assessment_title && (
+                                <span className="text-ascend-red">
+                                    {errors.assessment_title}
+                                </span>
+                            )}
+                        </div>
+                        <div>
+                            <label className="font-bold">
+                                Due Date and Time
+                            </label>
+                            <input
+                                value={assessmentDetails.due_datetime || ""}
+                                onChange={(e) =>
+                                    handleAssessmentChange(
+                                        "due_datetime",
+                                        e.target.value
+                                    )
+                                }
+                                type="datetime-local"
+                                className={`px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue ${
+                                    errors && errors.due_datetime
+                                        ? "border-2 border-ascend-red"
+                                        : ""
+                                }`}
+                            />
+                            {errors && errors.due_datetime && (
+                                <span className="text-ascend-red">
+                                    {errors.due_datetime}
+                                </span>
+                            )}
+                        </div>
+
+                        {assessmentDetails.assessment_type === "activity" && (
+                            <div>
+                                <label className="font-bold">
+                                    Total Points
+                                </label>
+                                <input
+                                    value={assessmentDetails.total_points}
+                                    onChange={(e) =>
+                                        handleAssessmentChange(
+                                            "total_points",
+                                            e.target.value
+                                        )
+                                    }
+                                    type="number"
+                                    min="0"
+                                    onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57"
+                                    className={`px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue ${
+                                        errors && errors.total_points
+                                            ? "border-2 border-ascend-red"
+                                            : ""
+                                    }`}
+                                />
+                                {errors && errors.total_points && (
+                                    <span className="text-ascend-red">
+                                        {errors.total_points}
+                                    </span>
+                                )}
+                            </div>
                         )}
                     </div>
-                )}
-            </div>
-            <div>
-                <label className="font-bold">
-                    Title<span className="text-ascend-red">*</span>
-                </label>
-                <input
-                    type="text"
-                    value={assessmentDetails.assessment_title}
-                    onChange={(e) =>
-                        handleAssessmentChange(
-                            "assessment_title",
-                            e.target.value
-                        )
-                    }
-                    className={`px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue ${
-                        errors && errors.assessment_title
-                            ? "border-2 border-ascend-red"
-                            : ""
-                    }`}
-                />
-                {errors && errors.assessment_title && (
-                    <span className="text-ascend-red">
-                        {errors.assessment_title}
-                    </span>
-                )}
-            </div>
-            <div>
-                <label className="font-bold">Description</label>
-                <TextEditor
-                    fieldName={"assessment_description"}
-                    setValue={handleAssessmentChange}
-                />
-            </div>
 
-            {/* Quiz Form */}
+                    <div>
+                        <label className="font-bold">Description</label>
+                        <TextEditor
+                            fieldName={"assessment_description"}
+                            setValue={handleAssessmentChange}
+                        />
+                    </div>
+                </div>
+            )}
+            {/* Assessment Fields End*/}
+
+            {/* Quiz form palce holder to display */}
             {assessmentDetails.assessment_type === "quiz" && (
                 <div className="space-y-5">
                     <div>
                         <label className="font-bold pb-5">Quiz Form</label>
                     </div>
                     <div
-                        onClick={() =>
-                            handleCLickEditForm(
-                                assessmentDetails.assessmentQuiz.id
-                            )
-                        }
+                        onClick={handleClickQuizInform}
                         className="flex h-15 items-center space-x-4 p-2 border border-ascend-gray1 bg-ascend-white hover-change-bg-color cursor-pointer"
                     >
                         <div className="w-full flex overflow-hidden font-semibold font-nunito-sans text-ascebd-black">
                             <SiGoogleforms className="text-size5 text-ascend-blue" />
-                            <h4 className="ml-2 truncate">
-                                {assessmentDetails.assessmentQuiz.quizTitle}
-                            </h4>
+                            <h4 className="ml-2 truncate">Quiz form</h4>
                         </div>
                     </div>
                 </div>
             )}
 
+            {/* Component for activity type */}
             {/* Display drop files */}
-            {isShowDropFiles &&
-                assessmentDetails.assessment_type === "activity" && (
-                    <DropFiles
-                        handleFileChange={handleAssessmentChange}
-                        fieldName={"assessment_files"}
-                        toggleDropFiles={toggleShowDropFiles}
-                    />
-                )}
+            {assessmentDetails.assessment_type === "activity" && (
+                <DropFiles
+                    handleFileChange={handleAssessmentChange}
+                    fieldName={"assessment_files"}
+                    withCancel={false}
+                />
+            )}
 
             {/* Display the attached files */}
             {assessmentDetails.assessment_files?.length > 0 &&
@@ -330,79 +361,72 @@ export default function AssessmentForm({
                     </div>
                 )}
 
-            <div
-                className={`flex ${
-                    assessmentDetails.assessment_type === "activity"
-                        ? "justify-between"
-                        : "justify-end"
-                }`}
-            >
-                {assessmentDetails.assessment_type === "activity" && (
-                    <SecondaryButton
-                        doSomething={toggleShowDropFiles}
-                        icon={<AiFillFileAdd />}
-                        text={"Add Files"}
-                    />
-                )}
-                <div className="flex gap-2">
+            {/* Form buttons Start*/}
+            <div className={`flex justify-end`}>
+                <div className="flex flex-wrap justify-end w-full sm:w-fit gap-2">
                     <SecondaryButton
                         doSomething={cancelAssessmentForm}
                         text={"Cancel"}
                     />
 
                     <div className="flex space-x-[2px]">
-                        <PrimaryButton
-                            doSomething={handleSaveAssessment}
-                            text={primaryBtnText}
-                        />
+                        {assessmentDetails.assessment_type && (
+                            <PrimaryButton
+                                doSomething={handleSaveAssessment}
+                                text={primaryBtnText}
+                            />
+                        )}
 
                         {/* Dropdown button */}
-                        <div className="dropdown dropdown-end cursor-pointer ">
-                            <button
-                                tabIndex={0}
-                                role="button"
-                                className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
-                            >
-                                <div className="text-size1 ">
-                                    {<IoCaretDownOutline />}
-                                </div>
-                            </button>
+                        {assessmentDetails.assessment_type === "activity" && (
+                            <div className="dropdown dropdown-end cursor-pointer ">
+                                <button
+                                    tabIndex={0}
+                                    role="button"
+                                    className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
+                                >
+                                    <div className="text-size1 ">
+                                        {<IoCaretDownOutline />}
+                                    </div>
+                                </button>
 
-                            <ul
-                                tabIndex={0}
-                                className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-                            >
-                                <li
-                                    onClick={() =>
-                                        statusChange(
-                                            "Publsih",
-                                            "status",
-                                            "published"
-                                        )
-                                    }
+                                <ul
+                                    tabIndex={0}
+                                    className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                                 >
-                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                        Publish
-                                    </a>
-                                </li>
-                                <li
-                                    onClick={() =>
-                                        statusChange(
-                                            "Save as Draft",
-                                            "status",
-                                            "draft"
-                                        )
-                                    }
-                                >
-                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                        Save as draft
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
+                                    <li
+                                        onClick={() =>
+                                            statusChange(
+                                                "Publsih",
+                                                "status",
+                                                "published"
+                                            )
+                                        }
+                                    >
+                                        <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                            Publish
+                                        </a>
+                                    </li>
+                                    <li
+                                        onClick={() =>
+                                            statusChange(
+                                                "Save as Draft",
+                                                "status",
+                                                "draft"
+                                            )
+                                        }
+                                    >
+                                        <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                            Save as draft
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
+            {/* Form buttons End*/}
         </form>
     );
 }

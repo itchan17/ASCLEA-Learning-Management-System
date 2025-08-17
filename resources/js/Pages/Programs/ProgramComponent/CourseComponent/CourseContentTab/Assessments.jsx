@@ -8,24 +8,31 @@ import RoleGuard from "../../../../../Components/Auth/RoleGuard";
 
 export default function Assessments() {
     // Assessments Store
-    const isFormOpen = useAssessmentsStore((state) => state.isFormOpen);
-    const toggleAssessmentForm = useAssessmentsStore(
-        (state) => state.toggleAssessmentForm
-    );
+    // const isFormOpen = useAssessmentsStore((state) => state.isFormOpen);
+    // const toggleAssessmentForm = useAssessmentsStore(
+    //     (state) => state.toggleAssessmentForm
+    // );
     const assessmentList = useAssessmentsStore((state) => state.assessmentList);
+
+    const [isAssessmentFormOpen, setIsAssessmentFormOpen] = useState(false);
 
     const targetForm = useRef(null);
 
     // Scroll into the form once opened
     useEffect(() => {
-        if (isFormOpen) {
+        if (isAssessmentFormOpen) {
             targetForm.current?.scrollIntoView({ behavior: "smooth" });
         }
-    }, [isFormOpen]);
+    }, [isAssessmentFormOpen]);
 
     useEffect(() => {
         console.log(assessmentList);
     }, [assessmentList]);
+
+    const toggleAssessmentForm = () => {
+        setIsAssessmentFormOpen(!isAssessmentFormOpen);
+    };
+
     return (
         <div className="font-nunito-sans text-ascend-black space-y-5">
             <div className="flex flex-wrap gap-2 justify-between items-center">
@@ -33,14 +40,14 @@ export default function Assessments() {
 
                 <RoleGuard allowedRoles={["admin", "faculty"]}>
                     <PrimaryButton
-                        isDisabled={isFormOpen}
+                        isDisabled={isAssessmentFormOpen}
                         doSomething={toggleAssessmentForm}
                         text="Add Assessment"
                     />
                 </RoleGuard>
             </div>
 
-            {isFormOpen && (
+            {isAssessmentFormOpen && (
                 <div ref={targetForm}>
                     <AssessmentForm toggleForm={toggleAssessmentForm} />
                 </div>
