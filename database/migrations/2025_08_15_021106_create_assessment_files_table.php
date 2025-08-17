@@ -16,6 +16,7 @@ return new class extends Migration
             $table->uuid("assessment_id");
             $table->foreign("assessment_id")->references("assessment_id")->on("assessments")->onDelete("cascade");
             $table->string("file_path");
+            $table->string("original_file_path")->nullable();
             $table->string("file_name");
             $table->string("file_type");
             $table->timestamps();

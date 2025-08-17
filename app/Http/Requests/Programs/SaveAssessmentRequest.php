@@ -31,7 +31,7 @@ class SaveAssessmentRequest extends FormRequest
 
             // Files
             'assessment_files' => 'nullable|array|max:20',
-            'assessment_files.*' => 'file|mimes:pdf,doc,docx,png,jpg,jpeg|max:204800'
+            'assessment_files.*' => 'file|mimes:pdf,docx,pptx,png,jpg,jpeg|max:204800'
         ];
     }
 

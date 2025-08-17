@@ -21,6 +21,7 @@ export default function AssessmentForm({
     formTitle,
     formWidth,
     sectionId,
+    isedit = false,
 }) {
     const { program, course } = usePage().props;
 
@@ -51,7 +52,9 @@ export default function AssessmentForm({
     // Clear assessment details once form was rendered
     // to avoid persisting state
     useEffect(() => {
-        clearAssessmentDetails();
+        if (!isedit) {
+            clearAssessmentDetails();
+        }
     }, []);
 
     useEffect(() => {
@@ -90,6 +93,7 @@ export default function AssessmentForm({
             {
                 preserveScroll: true,
                 preserveState: true,
+                showProgress: false,
                 onError: (error) => {
                     setErrors(error);
                 },
@@ -303,6 +307,15 @@ export default function AssessmentForm({
                     handleFileChange={handleAssessmentChange}
                     fieldName={"assessment_files"}
                     withCancel={false}
+                    allowedFiles={{
+                        "image/png": [".png"],
+                        "image/jpeg": [".jpeg", ".jpg"],
+                        "application/pdf": [".pdf"],
+                        "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+                            [".pptx"],
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                            [".docx"],
+                    }}
                 />
             )}
 
@@ -365,6 +378,7 @@ export default function AssessmentForm({
             <div className={`flex justify-end`}>
                 <div className="flex flex-wrap justify-end w-full sm:w-fit gap-2">
                     <SecondaryButton
+                        isDisabled={isLoading}
                         doSomething={cancelAssessmentForm}
                         text={"Cancel"}
                     />
@@ -372,6 +386,8 @@ export default function AssessmentForm({
                     <div className="flex space-x-[2px]">
                         {assessmentDetails.assessment_type && (
                             <PrimaryButton
+                                isDisabled={isLoading}
+                                isLoading={isLoading}
                                 doSomething={handleSaveAssessment}
                                 text={primaryBtnText}
                             />
