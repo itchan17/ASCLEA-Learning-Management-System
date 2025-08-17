@@ -3,11 +3,13 @@
 namespace App\Models\Programs;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Quiz extends Model
 {
-    use HasUuids;
+    use HasUuids, HasFactory;
 
     public $incrementing = false;
 
@@ -25,4 +27,9 @@ class Quiz extends Model
         'cheating_mitigation',
         'show_answers_after',
     ];
+
+    public function assessment(): BelongsTo
+    {
+        return  $this->belongsTo(Assessment::class, 'assessment_id');
+    }
 }

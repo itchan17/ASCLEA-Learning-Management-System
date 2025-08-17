@@ -40,4 +40,9 @@ class AssessmentController extends Controller
     {
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/ViewAssessment');
     }
+
+    public function showEditQuizForm()
+    {
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/QuizForm');
+    }
 }

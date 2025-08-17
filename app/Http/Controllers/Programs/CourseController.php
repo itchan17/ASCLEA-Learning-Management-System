@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Programs;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Program;
+use App\Services\Programs\AssessmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -12,8 +13,16 @@ use Inertia\Inertia;
 
 class CourseController extends Controller
 {
+    protected AssessmentService $assessmentService;
+
+    public function __construct(AssessmentService $service)
+    {
+        $this->assessmentService = $service;
+    }
+
     // Create a course
-    public function store(Program $program, Request $req) {
+    public function store(Program $program, Request $req)
+    {
 
         // Validate user input
         $validated = $this->validateCourse($req->all());
@@ -22,53 +31,59 @@ class CourseController extends Controller
         $validated['program_id'] = $program->program_id;
 
         Course::create($validated);
-        
+
         return back()->with('success', 'Course created successfully.');
     }
 
     // Update course
-    public function update(Program $program, Course $course, Request $req) {
-        if($course->program_id === $program->program_id) {
+    public function update(Program $program, Course $course, Request $req)
+    {
+        if ($course->program_id === $program->program_id) {
             // Validate user input
             $validated = $this->validateCourse($req->all());
 
             $course->update($validated);
 
             return back()->with('success', 'Course updated successfully.');
-        }
-        else {
+        } else {
             abort(404);
-        }  
+        }
     }
 
     // Archive course
-    public function archive(Program $program, Course $course) {
-        if($course->program_id === $program->program_id) {
+    public function archive(Program $program, Course $course)
+    {
+        if ($course->program_id === $program->program_id) {
             $course->delete();
 
             return to_route('program.show', $course->program)->with('success', 'Course archived successfully.');
-        }
-        else {
+        } else {
             abort(404);
-        }     
+        }
     }
 
     // Show selected course
-    public function showCourse(Program $program, Course $course) {
-        if($course->program_id === $program->program_id) {
-             return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContent', 
-             [
-                'program' => fn () => $program->only(['program_id']),
-                'course' => fn () => $course->only(['course_id', 'course_code', 'course_name', 'course_description', 'course_day', 'start_time', 'end_time'])
-            ]);
-        }  
-        else {
+    public function showCourse(Program $program, Course $course)
+    {
+        if ($course->program_id === $program->program_id) {
+            return Inertia::render(
+                'Programs/ProgramComponent/CourseComponent/CourseContent',
+                [
+                    'program' => fn() => $program->only(['program_id']),
+
+                    'course' => fn() => $course->only(['course_id', 'course_code', 'course_name', 'course_description', 'course_day', 'start_time', 'end_time']),
+
+                    'assessments' => fn() => Inertia::deepMerge($this->assessmentService->getAssessments($course->course_id))
+                ]
+            );
+        } else {
             abort(404);
-        }    
+        }
     }
 
-    public function validateCourse($data) {
-        $validator = Validator::make($data, [   
+    public function validateCourse($data)
+    {
+        $validator = Validator::make($data, [
             'course_code' => "string|nullable",
             'course_name' => "required|string|max:255",
             'course_description' => "string|nullable",

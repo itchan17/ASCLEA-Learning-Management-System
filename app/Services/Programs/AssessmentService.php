@@ -2,6 +2,7 @@
 
 namespace App\Services\Programs;
 
+use App\Models\Course;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\AssessmentFile;
 use App\Models\Programs\AssessmentType;
@@ -89,5 +90,15 @@ class AssessmentService
         ];
 
         Quiz::create($initialQuizDta);
+    }
+
+    public function getAssessments(string $courseId)
+    {
+
+        return Assessment::where('course_id', $courseId)->with('assessmentType')->with(['author' => function ($query) {
+            $query->select('user_id', 'first_name', 'last_name');
+        }])->with(['quiz' => function ($query) {
+            $query->select('assessment_id', 'quiz_id', 'quiz_title');
+        }])->orderBy('created_at', 'desc')->paginate(5);
     }
 }

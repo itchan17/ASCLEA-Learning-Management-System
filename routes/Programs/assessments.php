@@ -15,4 +15,6 @@ Route::prefix('programs/{program}/courses/{course}')
         // Route for viewing assessment
         Route::get('/assessments/{assessment}', [AssessmentController::class, 'showAssessment'])->name('program.course.assessment.view');
 
-});
+        // Route for display the edit page of quiz
+        Route::get('/quiz-form/{quiz}/edit', [AssessmentController::class, 'showEditQuizForm'])->name('program.course.quiz-form.edit');
+    });

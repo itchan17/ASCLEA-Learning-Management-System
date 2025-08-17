@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Programs\Assessment;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Course extends Model
 {
-     use HasUuids, SoftDeletes;
+    use HasUuids, SoftDeletes;
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -51,5 +52,10 @@ class Course extends Model
     public function assignedTo(): HasMany
     {
         return $this->hasMany(AssignedCourse::class, 'course_id');
+    }
+
+    public function assessments(): HasMany
+    {
+        return  $this->hasMany(Assessment::class, 'course_id');
     }
 }

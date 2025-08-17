@@ -5,16 +5,46 @@ import AssessmentForm from "./AssessmentsComponents/AssessmentForm";
 import AssessmentItem from "./AssessmentsComponents/AssessmentItem";
 import useAssessmentsStore from "../../../../../Stores/Programs/CourseContent/assessmentsStore";
 import RoleGuard from "../../../../../Components/Auth/RoleGuard";
+import { usePage, WhenVisible } from "@inertiajs/react";
+import Loader from "../../../../../Components/Loader";
 
 export default function Assessments() {
+    const {
+        data: assessments,
+        current_page: currentPage,
+        last_page: lastPage,
+    } = usePage().props.assessments;
+
+    console.log(`COurrentPage: ${currentPage} LastPage: ${lastPage}`);
     // Assessments Store
     // const isFormOpen = useAssessmentsStore((state) => state.isFormOpen);
     // const toggleAssessmentForm = useAssessmentsStore(
     //     (state) => state.toggleAssessmentForm
     // );
-    const assessmentList = useAssessmentsStore((state) => state.assessmentList);
+    // const assessmentList = useAssessmentsStore((state) => state.assessmentList);
 
     const [isAssessmentFormOpen, setIsAssessmentFormOpen] = useState(false);
+    const [assessmentList, setAssessmentList] = useState([]);
+
+    useEffect(() => {
+        const assmnts = [...assessmentList, ...assessments];
+        const uniqueAssessments = assmnts.reduce((acc, current) => {
+            // Check if theres a duplicate in the acc
+            // If not push the current user to acc
+            // Else skip
+            if (
+                !acc.some(
+                    (assessment) =>
+                        assessment.assessment_id === current.assessment_id
+                )
+            ) {
+                acc.push(current);
+            }
+            return acc;
+        }, []);
+
+        setAssessmentList(uniqueAssessments);
+    }, [assessments]);
 
     const targetForm = useRef(null);
 
@@ -56,13 +86,33 @@ export default function Assessments() {
             {/* <AssessmentItem /> */}
             {assessmentList.length > 0 ? (
                 assessmentList.map((assessment, i) => (
-                    <AssessmentItem key={i} assessmentDetails={assessment} />
+                    <AssessmentItem
+                        key={assessment.assessment_id}
+                        assessmentDetails={assessment}
+                    />
                 ))
             ) : (
                 <EmptyState
                     imgSrc={"/images/illustrations/empty.svg"}
                     text={`“There’s a whole lot of nothing going on—time to make something happen!”`}
                 />
+            )}
+
+            {currentPage < lastPage && (
+                <WhenVisible
+                    params={{
+                        data: {
+                            page: currentPage + 1,
+                        },
+                        preserveUrl: true,
+                        only: ["assessments"],
+                    }}
+                    always
+                >
+                    <div className=" w-full flex justify-center">
+                        <Loader color="bg-ascend-blue" />
+                    </div>
+                </WhenVisible>
             )}
         </div>
     );

@@ -25,13 +25,16 @@ export default function CourseContent() {
 
     // Tab list
     const tabs = [
-        "Home",
-        "Modules",
-        "Assessments",
-        user?.role !== "student" ? "Grades" : null,
+        { name: "Home", onlyData: [] },
+        { name: "Modules", onlyData: [] },
+        { name: "Assessments", onlyData: ["assessments"] },
+        {
+            name: `${user?.role !== "student" ? "Grades" : null}`,
+            onlyData: [],
+        },
     ];
 
-    const handleClickTab = (tabIndex) => {
+    const handleClickTab = (tabIndex, onlyData) => {
         setActiveTab(tabIndex);
         setIsLoading(true);
         router.get(
@@ -41,8 +44,8 @@ export default function CourseContent() {
             }),
             {},
             {
+                only: onlyData,
                 preserveState: true,
-                preserveScroll: true,
                 onFinish: () => setIsLoading(false),
             }
         );
@@ -56,13 +59,13 @@ export default function CourseContent() {
                     tab ? (
                         <div
                             key={index}
-                            onClick={() => handleClickTab(index)}
+                            onClick={() => handleClickTab(index, tab.onlyData)}
                             className={`py-1.5 px-8 cursor-pointer font-bold hover:bg-ascend-lightblue  transition-all duration-300 ${
                                 activeTab === index &&
                                 "bg-ascend-lightblue text-ascend-blue"
                             }`}
                         >
-                            <span>{tab}</span>
+                            <span>{tab.name}</span>
                         </div>
                     ) : null
                 )}

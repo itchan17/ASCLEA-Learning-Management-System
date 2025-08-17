@@ -6,6 +6,7 @@ import { useRoute } from "ziggy-js";
 import { formatDueDateTime } from "../../../../../../Utils/formatDueDateTime";
 import { formatFullDate } from "../../../../../../Utils/formatFullDate";
 import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
+import { capitalize } from "lodash";
 
 export default function AssessmentItem({ assessmentDetails }) {
     const route = useRoute();
@@ -22,7 +23,7 @@ export default function AssessmentItem({ assessmentDetails }) {
             route("program.course.assessment.view", {
                 program: program.program_id,
                 course: course.course_id,
-                assessment: assessmentDetails.id,
+                assessment: assessmentDetails.assessment_id,
             }),
             {
                 preserveScroll: false,
@@ -35,7 +36,7 @@ export default function AssessmentItem({ assessmentDetails }) {
             route("program.course.quiz-form.edit", {
                 program: program.program_id,
                 course: course.course_id,
-                quizFormId: assessmentDetails.assessmentQuiz.id,
+                quiz: assessmentDetails.quiz.quiz_id,
             })
         );
     };
@@ -46,11 +47,27 @@ export default function AssessmentItem({ assessmentDetails }) {
             className="flex flex-col justify-between border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 cursor-pointer card-hover"
         >
             <div className="flex items-center gap-2 md:gap-20">
-                <h1 className="flex-1 min-w-0 text-size2 truncate font-bold">
-                    {assessmentDetails.assessmentType === "quiz"
-                        ? "New Quiz"
-                        : "New Activity"}
-                </h1>
+                <div className="flex-1 min-w-0 flex gap-5">
+                    <h1 className="text-size2 truncate font-bold">
+                        {assessmentDetails.assessment_type.assessment_type ===
+                        "quiz"
+                            ? "New Quiz"
+                            : "New Activity"}
+                    </h1>
+                    <div
+                        className={`px-2 ${
+                            assessmentDetails.status === "published"
+                                ? "px-2 bg-ascend-green"
+                                : "px-2 bg-ascend-yellow"
+                        }`}
+                    >
+                        <span className="text-size1 font-bold text-ascend-white">
+                            {assessmentDetails.status === "published"
+                                ? "Publshed"
+                                : "Draft"}
+                        </span>
+                    </div>
+                </div>
 
                 <RoleGuard allowedRoles={["admin", "faculty"]}>
                     <div className="h-8 flex items-center">
@@ -87,17 +104,17 @@ export default function AssessmentItem({ assessmentDetails }) {
             </div>
             <div>
                 <h1 className="flex-1 min-w-0 text-size4 truncate font-bold">
-                    {assessmentDetails.assessmentTitle}
+                    {assessmentDetails.assessment_title}
                 </h1>
                 <span className="text-size1">
                     {assessmentDetails.assessmentDueDateTime &&
                         `Due on ${formatDueDateTime(
-                            assessmentDetails.assessmentDueDateTime
+                            assessmentDetails.due_datetime
                         )}`}
                 </span>
             </div>
 
-            {assessmentDetails.assessmentType === "quiz" && (
+            {assessmentDetails.assessment_type.assessment_type === "quiz" && (
                 <div
                     onClick={(e) => {
                         stopPropagation(e);
@@ -108,7 +125,7 @@ export default function AssessmentItem({ assessmentDetails }) {
                     <div className="w-full flex overflow-hidden font-semibold font-nunito-sans text-ascebd-black">
                         <SiGoogleforms className="text-size5 text-ascend-blue" />
                         <h4 className="ml-2 truncate">
-                            {assessmentDetails.assessmentQuiz.quizTitle}
+                            {assessmentDetails.quiz.quiz_title}
                         </h4>
                     </div>
                 </div>
@@ -116,11 +133,12 @@ export default function AssessmentItem({ assessmentDetails }) {
 
             <div className="flex flex-wrap-reverse justify-between items-baseline font-nunito-sans gap-2">
                 <span className="text-size1">
-                    Posted on{" "}
-                    {formatFullDate(assessmentDetails.assessmentPostDate)}
+                    Posted on {formatFullDate(assessmentDetails.created_at)}
                 </span>
                 <span className="font-bold">
-                    {assessmentDetails.userPosted}
+                    {`${capitalize(
+                        assessmentDetails.author.first_name
+                    )} ${capitalize(assessmentDetails.author.last_name)}`}
                 </span>
             </div>
         </div>
