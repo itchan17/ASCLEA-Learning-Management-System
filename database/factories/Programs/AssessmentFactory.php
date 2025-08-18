@@ -20,7 +20,7 @@ class AssessmentFactory extends Factory
 
         return [
             'assessment_title' => $this->faker->sentence(3),
-            'assessment_description' => $this->faker->paragraph,
+            'assessment_description' => "<p>" . $this->faker->paragraph . "</p>",
             'due_datetime' => $this->faker->dateTimeBetween('now', '+10 days'),
             'created_by' => $adminUserId,
             'created_at' => $this->faker->date(now()),

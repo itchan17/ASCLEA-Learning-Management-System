@@ -11,6 +11,7 @@ use App\Services\PdfConverter;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class AssessmentService
 {
@@ -98,8 +99,34 @@ class AssessmentService
             $query->select('user_id', 'first_name', 'last_name');
         }])->with(['quiz' => function ($query) {
             $query->select('assessment_id', 'quiz_id', 'quiz_title');
+        }])->with(['files' => function ($query) {
+            $query->select('assessment_id', 'assessment_file_id', 'file_name');
         }])->orderBy('created_at', 'desc')->orderBy('assessment_id', 'desc')->paginate(5);
     }
 
-    public function removeAssessmentFiiles() {}
+    public function updateAssessment(Assessment $assessment, array $updatedData, bool $isUnpublish = false)
+    {
+        if ($isUnpublish) {
+            $assessment->update(["status" => "draft"]);
+        } else {
+            $assessment->update($updatedData);
+        }
+    }
+
+    public function removeAssessmentFiiles(array $removedFiles)
+    {
+
+        foreach ($removedFiles as $removedFileId) {
+            $file = AssessmentFile::find($removedFileId);
+
+            if ($file->file_path !== $file->original_file_path) {
+                // Remove the two files
+                Storage::delete([$file->file_path, $file->original_file_path]);
+            }
+
+            Storage::delete($file->file_path);
+
+            $file->delete();
+        }
+    }
 }

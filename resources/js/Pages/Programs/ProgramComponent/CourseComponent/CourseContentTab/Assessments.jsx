@@ -22,6 +22,12 @@ export default function Assessments() {
     //     (state) => state.toggleAssessmentForm
     // );
     // const assessmentList = useAssessmentsStore((state) => state.assessmentList);
+    const setAssessmentIdToEdit = useAssessmentsStore(
+        (state) => state.setAssessmentIdToEdit
+    );
+    const assessmentIdToEdit = useAssessmentsStore(
+        (state) => state.assessmentIdToEdit
+    );
 
     const [isAssessmentFormOpen, setIsAssessmentFormOpen] = useState(false);
     const [assessmentList, setAssessmentList] = useState([]);
@@ -53,6 +59,10 @@ export default function Assessments() {
         console.log(assessmentList);
     }, [assessmentList]);
 
+    useEffect(() => {
+        setAssessmentIdToEdit(null);
+    }, []);
+
     const toggleAssessmentForm = () => {
         setIsAssessmentFormOpen(!isAssessmentFormOpen);
     };
@@ -71,7 +81,7 @@ export default function Assessments() {
                 </RoleGuard>
             </div>
 
-            {isAssessmentFormOpen && (
+            {isAssessmentFormOpen && !assessmentIdToEdit && (
                 <div ref={targetForm}>
                     <AssessmentForm toggleForm={toggleAssessmentForm} />
                 </div>
@@ -81,6 +91,7 @@ export default function Assessments() {
             {assessmentList.length > 0 ? (
                 assessmentList.map((assessment, i) => (
                     <AssessmentItem
+                        setIsAssessmentFormOpen={setIsAssessmentFormOpen}
                         key={assessment.assessment_id}
                         assessmentDetails={assessment}
                     />

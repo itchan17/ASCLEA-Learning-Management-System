@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('assessment_title');
             $table->longText('assessment_description')->nullable();
             $table->dateTime('due_datetime')->nullable();
-            $table->decimal('total_points');
+            $table->integer('total_points');
             $table->uuid('created_by');
             $table->enum('status', ['published', 'draft']);
             $table->foreign('created_by')->references('user_id')->on('users');

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Assessment extends Model
@@ -49,5 +50,10 @@ class Assessment extends Model
     public function quiz(): HasOne
     {
         return $this->hasOne(Quiz::class, 'assessment_id');
+    }
+
+    public function files(): HasMany
+    {
+        return $this->hasMany(AssessmentFile::class, 'assessment_id');
     }
 }

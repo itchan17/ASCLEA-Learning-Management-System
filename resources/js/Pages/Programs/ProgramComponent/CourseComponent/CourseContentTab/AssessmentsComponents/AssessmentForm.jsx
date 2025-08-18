@@ -21,7 +21,8 @@ export default function AssessmentForm({
     formTitle,
     formWidth,
     sectionId,
-    isedit = false,
+    isEdit = false,
+    assessmentId,
 }) {
     const { program, course } = usePage().props;
 
@@ -35,25 +36,26 @@ export default function AssessmentForm({
     const removeAttachedFile = useAssessmentsStore(
         (state) => state.removeAttachedFile
     );
-    // const hanndleAddAssessments = useAssessmentsStore(
-    //     (state) => state.hanndleAddAssessments
-    // );
-    const handleCreateIntialQuizForm = useAssessmentsStore(
-        (state) => state.handleCreateIntialQuizForm
+    const removeUploadedFile = useAssessmentsStore(
+        (state) => state.removeUploadedFile
     );
     const clearAssessmentDetails = useAssessmentsStore(
         (state) => state.clearAssessmentDetails
     );
+    const setAssessmentIdToEdit = useAssessmentsStore(
+        (state) => state.setAssessmentIdToEdit
+    );
 
-    const [primaryBtnText, setPrimaryBtnText] = useState("Publish");
     const [errors, setErrors] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
     // Clear assessment details once form was rendered
     // to avoid persisting state
     useEffect(() => {
-        if (!isedit) {
-            clearAssessmentDetails();
+        console.log(assessmentDetails);
+        if (!isEdit) {
+            setAssessmentIdToEdit(null); // Reeset the value to show all the assessments
+            clearAssessmentDetails(); // Clear the data first
         }
     }, []);
 
@@ -61,67 +63,85 @@ export default function AssessmentForm({
         console.log(errors);
     }, [errors]);
 
-    const handleCLickEditForm = (quizFormId) => {
-        router.visit(
-            route("program.course.quiz-form.edit", {
-                programId: program.program_id,
-                courseId: course.course_id,
-                quizFormId: 1,
-            })
-        );
-    };
-
-    // const changeAsssessmentType = (assessmentType) => {
-    //     // check if the type is quiz
-    //     if (assessmentType === "quiz") {
-    //         // this will create an empty quiz form
-    //         handleCreateIntialQuizForm();
-    //     }
-    //     handleAssessmentChange("assessment_type", assessmentType);
-    // };
-
-    const handleSaveAssessment = () => {
+    const handeSubmit = () => {
         setIsLoading(true);
         setErrors(null);
 
-        router.post(
-            route("assessment.create", {
-                program: program.program_id,
-                course: course.course_id,
-            }),
-            { ...assessmentDetails },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                showProgress: false,
-                only: ["assessments", "flash"],
-                onError: (error) => {
-                    setErrors(error);
-                },
-                onSuccess: (page) => {
-                    toggleForm();
-                    clearAssessmentDetails();
-                    displayToast(
-                        <DefaultCustomToast
-                            message={page.props.flash.success}
-                        />,
-                        "success"
-                    );
-                },
-                onFinish: () => setIsLoading(false),
-            }
-        );
+        if (isEdit) {
+            console.log("EDIT FORM");
+            // Update assessment
+            console.log(assessmentDetails);
+            router.post(
+                route("assessment.update", {
+                    program: program.program_id,
+                    course: course.course_id,
+                    assessment: assessmentId,
+                }),
+                { _method: "put", ...assessmentDetails },
+                {
+                    preserveScroll: true,
+                    preserveState: true,
+                    showProgress: false,
+                    only: ["assessments", "flash"],
+                    onError: (error) => {
+                        setErrors(error);
+                    },
+                    onSuccess: (page) => {
+                        toggleForm();
+                        clearAssessmentDetails();
+                        setAssessmentIdToEdit(null); // Reeset the value to show all the assessments
+                        displayToast(
+                            <DefaultCustomToast
+                                message={page.props.flash.success}
+                            />,
+                            "success"
+                        );
+                    },
+                    onFinish: () => setIsLoading(false),
+                }
+            );
+        } else {
+            // Add new assessment
+            router.post(
+                route("assessment.create", {
+                    program: program.program_id,
+                    course: course.course_id,
+                }),
+                { ...assessmentDetails },
+                {
+                    preserveScroll: true,
+                    preserveState: true,
+                    showProgress: false,
+                    only: ["assessments", "flash"],
+                    onError: (error) => {
+                        setErrors(error);
+                    },
+                    onSuccess: (page) => {
+                        toggleForm();
+                        clearAssessmentDetails();
+                        setAssessmentIdToEdit(null); // Reeset the value to show all the assessments
+                        displayToast(
+                            <DefaultCustomToast
+                                message={page.props.flash.success}
+                            />,
+                            "success"
+                        );
+                    },
+                    onFinish: () => setIsLoading(false),
+                }
+            );
+        }
     };
 
     const cancelAssessmentForm = () => {
         toggleForm();
         clearAssessmentDetails();
+        setAssessmentIdToEdit(null); // Clear the the value to ensure no
     };
 
     // Used for dropdown button to set the status of the assessment
     const statusChange = (btnText, fieldName, status) => {
         closeDropDown();
-        setPrimaryBtnText(btnText);
         handleAssessmentChange(fieldName, status);
     };
 
@@ -130,7 +150,6 @@ export default function AssessmentForm({
         // Set the button to save as draft and status to draft
         // since user can only save quiz as draft to allow them to edit quiz form before publish
         if (assessmentType === "quiz") {
-            setPrimaryBtnText("Save as draft");
             handleAssessmentChange("status", "draft");
         }
 
@@ -144,6 +163,10 @@ export default function AssessmentForm({
         const message = "Please save as draft first to edit the quiz.";
         displayToast(<DefaultCustomToast message={message} />, "info");
     };
+
+    useEffect(() => {
+        console.log(assessmentDetails);
+    }, [assessmentDetails]);
 
     return (
         <form
@@ -256,7 +279,6 @@ export default function AssessmentForm({
                                     }
                                     type="number"
                                     min="0"
-                                    onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57"
                                     className={`px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue ${
                                         errors && errors.total_points
                                             ? "border-2 border-ascend-red"
@@ -275,6 +297,7 @@ export default function AssessmentForm({
                     <div>
                         <label className="font-bold">Description</label>
                         <TextEditor
+                            value={assessmentDetails.assessment_description}
                             fieldName={"assessment_description"}
                             setValue={handleAssessmentChange}
                         />
@@ -321,7 +344,8 @@ export default function AssessmentForm({
             )}
 
             {/* Display the attached files */}
-            {assessmentDetails.assessment_files?.length > 0 &&
+            {(assessmentDetails.assessment_files.length > 0 ||
+                (isEdit && assessmentDetails?.uploaded_files.length > 0)) &&
                 assessmentDetails.assessment_type === "activity" && (
                     <div>
                         <div className="mb-5">
@@ -338,6 +362,21 @@ export default function AssessmentForm({
                                     : ""
                             }`}
                         >
+                            {isEdit &&
+                                assessmentDetails.uploaded_files.map((file) => (
+                                    <div key={file.assessment_file_id}>
+                                        <FileCard
+                                            removeAttachedFile={() =>
+                                                removeUploadedFile(
+                                                    file.assessment_file_id
+                                                )
+                                            }
+                                            fileId={file.assessment_file_id}
+                                            fileName={file.file_name}
+                                        />
+                                    </div>
+                                ))}
+
                             {assessmentDetails.assessment_files.map(
                                 (file, index) => {
                                     return (
@@ -389,13 +428,19 @@ export default function AssessmentForm({
                             <PrimaryButton
                                 isDisabled={isLoading}
                                 isLoading={isLoading}
-                                doSomething={handleSaveAssessment}
-                                text={primaryBtnText}
+                                doSomething={handeSubmit}
+                                text={
+                                    assessmentDetails.status === "published"
+                                        ? "Publish"
+                                        : "Save as draft"
+                                }
                             />
                         )}
 
                         {/* Dropdown button */}
-                        {assessmentDetails.assessment_type === "activity" && (
+                        {(isEdit ||
+                            assessmentDetails.assessment_type ===
+                                "activity") && (
                             <div className="dropdown dropdown-end cursor-pointer ">
                                 <button
                                     tabIndex={0}

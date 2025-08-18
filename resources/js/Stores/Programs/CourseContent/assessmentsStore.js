@@ -6,6 +6,15 @@ import useModulesStore from "./modulesStore";
 const useAssessmentsStore = create((set) => ({
     isFormOpen: false,
 
+    // Helps for identifying which assessmtn to edit
+    // If assessment has the same id set to this
+    // The card will be hide and the form will be displayed
+    // If user click other assessment to edit assessment card will be shwon again
+    assessmentIdToEdit: null,
+    setAssessmentIdToEdit: (assessmentId) => {
+        set({ assessmentIdToEdit: assessmentId });
+    },
+
     assessmentDetails: {
         assessment_title: "",
         assessment_description: null,
@@ -14,11 +23,30 @@ const useAssessmentsStore = create((set) => ({
         due_datetime: "",
         total_points: 0,
         assessment_files: [],
+        removed_files: [],
         // sectionId: null,
         // sortOrder: null,
         // contentType: "assessment",
         // assessmentQuiz: null,
         // responseReceived: 0,
+    },
+
+    // Set the data of assessment thaw will be use to edit
+    setAssessmentDetails: (dataToEdit) => {
+        // Manually set because of nested objects
+        set({
+            assessmentDetails: {
+                assessment_title: dataToEdit.assessment_title,
+                assessment_description: dataToEdit.assessment_description,
+                status: dataToEdit.status,
+                assessment_type: dataToEdit.assessment_type.assessment_type,
+                due_datetime: dataToEdit.due_datetime,
+                total_points: dataToEdit.total_points,
+                assessment_files: [],
+                uploaded_files: dataToEdit.files,
+                removed_files: [],
+            },
+        });
     },
 
     assessmentList: [
@@ -117,6 +145,21 @@ const useAssessmentsStore = create((set) => ({
                 assessment_files: assessmentDetails.assessment_files.filter(
                     (file, index) => index !== fileId
                 ),
+            },
+        });
+    },
+
+    // This add the id of uploaded file into removed_files array
+    removeUploadedFile: (fileId) => {
+        const { assessmentDetails } = useAssessmentsStore.getState();
+
+        set({
+            assessmentDetails: {
+                ...assessmentDetails,
+                uploaded_files: assessmentDetails.uploaded_files.filter(
+                    (file) => file.assessment_file_id !== fileId
+                ),
+                removed_files: [...assessmentDetails.removed_files, fileId],
             },
         });
     },
