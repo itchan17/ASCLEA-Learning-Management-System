@@ -94,6 +94,7 @@ export default function AssessmentForm({
                 preserveScroll: true,
                 preserveState: true,
                 showProgress: false,
+                only: ["assessments", "flash"],
                 onError: (error) => {
                     setErrors(error);
                 },

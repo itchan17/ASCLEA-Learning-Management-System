@@ -27,23 +27,17 @@ export default function Assessments() {
     const [assessmentList, setAssessmentList] = useState([]);
 
     useEffect(() => {
-        const assmnts = [...assessmentList, ...assessments];
-        const uniqueAssessments = assmnts.reduce((acc, current) => {
-            // Check if theres a duplicate in the acc
-            // If not push the current user to acc
-            // Else skip
-            if (
-                !acc.some(
-                    (assessment) =>
-                        assessment.assessment_id === current.assessment_id
-                )
-            ) {
-                acc.push(current);
-            }
-            return acc;
-        }, []);
+        if (currentPage === 1) {
+            setAssessmentList([...assessments]);
+        } else {
+            const assmnts = [...assessmentList, ...assessments];
+            // Map handle remove duplicate values based on the assessment id
+            const uniqueAssessments = [
+                ...new Map(assmnts.map((a) => [a.assessment_id, a])).values(),
+            ];
 
-        setAssessmentList(uniqueAssessments);
+            setAssessmentList(uniqueAssessments);
+        }
     }, [assessments]);
 
     const targetForm = useRef(null);

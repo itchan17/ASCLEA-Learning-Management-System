@@ -44,18 +44,12 @@ export default function AddMemberForm({ toggleModal }) {
             );
             const users = [...userList, ...res.data.data];
 
+            const uniqueUsers = [
+                ...new Map(users.map((user) => [user.user_id, user])).values(),
+            ];
+
             // Prevent duplicate value to be set in the user list
-            setUserList(
-                users.reduce((acc, current) => {
-                    // Check if theres a duplicate in the acc
-                    // If not push the current user to acc
-                    // Else skip
-                    if (!acc.some((user) => user.user_id === current.user_id)) {
-                        acc.push(current);
-                    }
-                    return acc;
-                }, [])
-            );
+            setUserList(uniqueUsers);
 
             setIsLoading(false);
             setHasMore(res.data.current_page < res.data.last_page);

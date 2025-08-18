@@ -13,7 +13,7 @@ export default function AssessmentItem({ assessmentDetails }) {
 
     // get the id from url
     const { course, program } = usePage().props;
-    console.log(course, program);
+
     const stopPropagation = (e) => {
         e.stopPropagation();
     };
