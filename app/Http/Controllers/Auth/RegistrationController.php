@@ -40,7 +40,7 @@ class RegistrationController extends Controller
         $data = $request->only([
             'first_name', 'last_name', 'middle_name', 'birthdate',
             'gender', 'contact_number', 'email',
-            'house_no', 'province', 'city', 'barangay'
+            'house_no', 'region', 'province', 'city', 'barangay' // added region
         ]);
 
         $data['password'] = Hash::make($request->password);
@@ -68,7 +68,8 @@ class RegistrationController extends Controller
             'contact_number' => 'required|string|min:11|max:15',
             'email' => 'required|email|unique:users,email',
             'house_no' => 'required|string|max:255',
-            'province' => 'required|string|max:255',
+            'region' => 'required|string|max:255', // added region
+            'province' => 'required|string|max:255', 
             'city' => 'required|string|max:255',
             'barangay' => 'required|string|max:255',
             'password' => [

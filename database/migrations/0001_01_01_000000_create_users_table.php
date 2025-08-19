@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('email')->unique();
 
             $table->string('house_no');
+            $table->string('region'); // added region
             $table->string('province');
             $table->string('city');
             $table->string('barangay');
