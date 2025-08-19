@@ -15,6 +15,7 @@ import { closeDropDown } from "../../../../../../Utils/closeDropdown";
 import { displayToast } from "../../../../../../Utils/displayToast";
 import DefaultCustomToast from "../../../../../../Components/CustomToast/DefaultCustomToast";
 import { capitalize } from "lodash";
+import axios from "axios";
 
 export default function AssessmentForm({
     toggleForm,
@@ -45,6 +46,10 @@ export default function AssessmentForm({
     const setAssessmentIdToEdit = useAssessmentsStore(
         (state) => state.setAssessmentIdToEdit
     );
+    const setAssessmentList = useAssessmentsStore(
+        (state) => state.setAssessmentList
+    );
+    const assessmentList = useAssessmentsStore((state) => state.assessmentList);
 
     const [errors, setErrors] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -63,6 +68,80 @@ export default function AssessmentForm({
         console.log(errors);
     }, [errors]);
 
+    const updateAssessment = async () => {
+        try {
+            const assessmentFormData = new FormData();
+
+            // Append data into FormData to enbale uploading files
+            for (let key in assessmentDetails) {
+                const value = assessmentDetails[key];
+
+                // Skips appending data with null value
+                // Make sure data is nullable in backend valdiation
+                if (value === null || value === undefined) {
+                    continue;
+                }
+
+                // Append array values
+                if (Array.isArray(value)) {
+                    value.forEach((v, i) => {
+                        assessmentFormData.append(`${key}[${i}]`, v);
+                    });
+                } else {
+                    assessmentFormData.append(key, value);
+                }
+            }
+
+            assessmentFormData.append("_method", "PUT");
+
+            const response = await axios.post(
+                route("assessment.update", {
+                    program: program.program_id,
+                    course: course.course_id,
+                    assessment: assessmentId,
+                }),
+                assessmentFormData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                }
+            );
+            if (response.status === 200) {
+                setIsLoading(false);
+                toggleForm();
+                clearAssessmentDetails();
+                setAssessmentIdToEdit(null);
+
+                // Change the updated assessment data in the list
+                const updatedAssessmentList = assessmentList.map((assessment) =>
+                    assessment.assessment_id ===
+                    response.data.data.assessment_id
+                        ? response.data.data
+                        : assessment
+                );
+
+                // Set the updated data
+                setAssessmentList(updatedAssessmentList);
+                displayToast(
+                    <DefaultCustomToast message={response.data.success} />,
+                    "success"
+                );
+            }
+        } catch (error) {
+            console.error(error);
+            if (error.response.data.errors) {
+                setErrors(error.response.data.errors); // Set the validation error
+            } else {
+                displayToast(
+                    <DefaultCustomToast
+                        message={"Something went wrong. Please try again."}
+                    />,
+                    "error"
+                );
+            }
+            setIsLoading(false);
+        }
+    };
+
     const handeSubmit = () => {
         setIsLoading(true);
         setErrors(null);
@@ -71,35 +150,8 @@ export default function AssessmentForm({
             console.log("EDIT FORM");
             // Update assessment
             console.log(assessmentDetails);
-            router.post(
-                route("assessment.update", {
-                    program: program.program_id,
-                    course: course.course_id,
-                    assessment: assessmentId,
-                }),
-                { _method: "put", ...assessmentDetails },
-                {
-                    preserveScroll: true,
-                    preserveState: true,
-                    showProgress: false,
-                    only: ["assessments", "flash"],
-                    onError: (error) => {
-                        setErrors(error);
-                    },
-                    onSuccess: (page) => {
-                        toggleForm();
-                        clearAssessmentDetails();
-                        setAssessmentIdToEdit(null); // Reeset the value to show all the assessments
-                        displayToast(
-                            <DefaultCustomToast
-                                message={page.props.flash.success}
-                            />,
-                            "success"
-                        );
-                    },
-                    onFinish: () => setIsLoading(false),
-                }
-            );
+
+            updateAssessment();
         } else {
             // Add new assessment
             router.post(
@@ -109,8 +161,7 @@ export default function AssessmentForm({
                 }),
                 { ...assessmentDetails },
                 {
-                    preserveScroll: true,
-                    preserveState: true,
+                    preserveScroll: false,
                     showProgress: false,
                     only: ["assessments", "flash"],
                     onError: (error) => {

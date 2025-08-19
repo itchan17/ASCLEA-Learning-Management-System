@@ -15,6 +15,11 @@ const useAssessmentsStore = create((set) => ({
         set({ assessmentIdToEdit: assessmentId });
     },
 
+    assessmentList: [],
+    setAssessmentList: (assessments) => {
+        set({ assessmentList: assessments });
+    },
+
     assessmentDetails: {
         assessment_title: "",
         assessment_description: null,
@@ -40,7 +45,11 @@ const useAssessmentsStore = create((set) => ({
                 assessment_description: dataToEdit.assessment_description,
                 status: dataToEdit.status,
                 assessment_type: dataToEdit.assessment_type.assessment_type,
-                due_datetime: dataToEdit.due_datetime,
+                due_datetime: dataToEdit.due_datetime
+                    ? new Date(dataToEdit.due_datetime)
+                          .toISOString()
+                          .slice(0, 16)
+                    : null, // Converts time into format: Y-m-d\TH:i
                 total_points: dataToEdit.total_points,
                 assessment_files: [],
                 uploaded_files: dataToEdit.files,
@@ -49,54 +58,54 @@ const useAssessmentsStore = create((set) => ({
         });
     },
 
-    assessmentList: [
-        {
-            id: 1,
-            sectionId: 1,
-            sortOrder: 2,
-            contentType: "assessment",
-            assessmentType: "quiz",
-            assessmentDueDateTime: "2025-07-15T23:59",
-            assessmentPoints: 100,
-            assessmentTitle: "Chapter 3 Quiz: Photosynthesis",
-            assessmentDescription:
-                "<h2>This quiz will cover all topics in Chapter 3, including light-dependent and light-independent reactions. Please review all diagrams and key concepts.</h2>",
-            assessmentFiles: [],
-            assessmentQuiz: {
-                id: 1,
-                quizTitle: "First quiz",
-                quizDescription: "",
-            },
-            assessmentPostDate: "2025-07-07",
-            userPosted: "John Doe",
-            responseReceived: 3,
-        },
-        {
-            id: 2,
-            sectionId: 2,
-            sortOrder: 1,
-            contentType: "assessment",
-            assessmentType: "activity",
-            assessmentDueDateTime: "2025-07-20T23:59",
-            assessmentPoints: 50,
-            assessmentTitle: "Lab Activity: Plant Cell Observation",
-            assessmentDescription: `
-                                        <h2>Instructions:</h2>
-                                        <ol>
-                                            <li>Obtain the prepared slides of plant cells from your instructor.</li>
-                                            <li>Set up the microscope and carefully observe the slides.</li>
-                                            <li>Draw and label the visible parts of the plant cells.</li>
-                                            <li>Complete the observation sheet provided.</li>
-                                            <li>Submit both the labeled diagram and the observation sheet before the deadline.</li>
-                                        </ol>
-                                    `,
-            assessmentFiles: [],
-            assessmentQuiz: null,
-            assessmentPostDate: "2025-07-08",
-            userPosted: "Jane Smith",
-            responseReceived: 5,
-        },
-    ],
+    // assessmentList: [
+    //     {
+    //         id: 1,
+    //         sectionId: 1,
+    //         sortOrder: 2,
+    //         contentType: "assessment",
+    //         assessmentType: "quiz",
+    //         assessmentDueDateTime: "2025-07-15T23:59",
+    //         assessmentPoints: 100,
+    //         assessmentTitle: "Chapter 3 Quiz: Photosynthesis",
+    //         assessmentDescription:
+    //             "<h2>This quiz will cover all topics in Chapter 3, including light-dependent and light-independent reactions. Please review all diagrams and key concepts.</h2>",
+    //         assessmentFiles: [],
+    //         assessmentQuiz: {
+    //             id: 1,
+    //             quizTitle: "First quiz",
+    //             quizDescription: "",
+    //         },
+    //         assessmentPostDate: "2025-07-07",
+    //         userPosted: "John Doe",
+    //         responseReceived: 3,
+    //     },
+    //     {
+    //         id: 2,
+    //         sectionId: 2,
+    //         sortOrder: 1,
+    //         contentType: "assessment",
+    //         assessmentType: "activity",
+    //         assessmentDueDateTime: "2025-07-20T23:59",
+    //         assessmentPoints: 50,
+    //         assessmentTitle: "Lab Activity: Plant Cell Observation",
+    //         assessmentDescription: `
+    //                                     <h2>Instructions:</h2>
+    //                                     <ol>
+    //                                         <li>Obtain the prepared slides of plant cells from your instructor.</li>
+    //                                         <li>Set up the microscope and carefully observe the slides.</li>
+    //                                         <li>Draw and label the visible parts of the plant cells.</li>
+    //                                         <li>Complete the observation sheet provided.</li>
+    //                                         <li>Submit both the labeled diagram and the observation sheet before the deadline.</li>
+    //                                     </ol>
+    //                                 `,
+    //         assessmentFiles: [],
+    //         assessmentQuiz: null,
+    //         assessmentPostDate: "2025-07-08",
+    //         userPosted: "Jane Smith",
+    //         responseReceived: 5,
+    //     },
+    // ],
 
     // this handle creation of emty quiz form
     // the logic for creating empty form and saving it to database will be write here

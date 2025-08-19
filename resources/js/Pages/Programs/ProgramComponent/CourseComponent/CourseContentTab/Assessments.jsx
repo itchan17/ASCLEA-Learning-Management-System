@@ -28,9 +28,16 @@ export default function Assessments() {
     const assessmentIdToEdit = useAssessmentsStore(
         (state) => state.assessmentIdToEdit
     );
+    const assessmentList = useAssessmentsStore((state) => state.assessmentList);
+    const setAssessmentList = useAssessmentsStore(
+        (state) => state.setAssessmentList
+    );
 
     const [isAssessmentFormOpen, setIsAssessmentFormOpen] = useState(false);
-    const [assessmentList, setAssessmentList] = useState([]);
+
+    useEffect(() => {
+        console.log("RENDER ASSESSMENT");
+    }, []);
 
     useEffect(() => {
         if (currentPage === 1) {
@@ -54,10 +61,6 @@ export default function Assessments() {
             targetForm.current?.scrollIntoView({ behavior: "smooth" });
         }
     }, [isAssessmentFormOpen]);
-
-    useEffect(() => {
-        console.log(assessmentList);
-    }, [assessmentList]);
 
     useEffect(() => {
         setAssessmentIdToEdit(null);
@@ -110,6 +113,7 @@ export default function Assessments() {
                             page: currentPage + 1,
                         },
                         preserveUrl: true,
+                        preserveScroll: false,
                         only: ["assessments"],
                     }}
                     always

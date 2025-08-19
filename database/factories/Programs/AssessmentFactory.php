@@ -21,7 +21,7 @@ class AssessmentFactory extends Factory
         return [
             'assessment_title' => $this->faker->sentence(3),
             'assessment_description' => "<p>" . $this->faker->paragraph . "</p>",
-            'due_datetime' => $this->faker->dateTimeBetween('now', '+10 days'),
+            'due_datetime' => $this->faker->dateTimeBetween('now', '+10 days')->format('Y-m-d\TH:i'),
             'created_by' => $adminUserId,
             'created_at' => $this->faker->date(now()),
             'updated_at' => $this->faker->date(now())

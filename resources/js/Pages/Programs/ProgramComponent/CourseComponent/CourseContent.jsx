@@ -45,7 +45,7 @@ export default function CourseContent() {
             {},
             {
                 only: onlyData,
-                preserveState: true,
+                preserveScroll: false,
                 onFinish: () => setIsLoading(false),
             }
         );

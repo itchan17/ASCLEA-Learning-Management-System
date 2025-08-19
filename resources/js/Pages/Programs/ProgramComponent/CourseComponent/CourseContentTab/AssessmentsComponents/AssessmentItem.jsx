@@ -12,6 +12,7 @@ import { closeDropDown } from "../../../../../../Utils/closeDropdown";
 import useAssessmentsStore from "../../../../../../Stores/Programs/CourseContent/assessmentsStore";
 import { displayToast } from "../../../../../../Utils/displayToast";
 import DefaultCustomToast from "../../../../../../Components/CustomToast/DefaultCustomToast";
+import axios from "axios";
 
 export default function AssessmentItem({
     assessmentDetails,
@@ -26,6 +27,10 @@ export default function AssessmentItem({
     );
     const assessmentIdToEdit = useAssessmentsStore(
         (state) => state.assessmentIdToEdit
+    );
+    const assessmentList = useAssessmentsStore((state) => state.assessmentList);
+    const setAssessmentList = useAssessmentsStore(
+        (state) => state.setAssessmentList
     );
 
     // get the id from url
@@ -73,21 +78,58 @@ export default function AssessmentItem({
         setIsAssessmentFormOpen(false);
     };
 
-    const unpublishAssessment = () => {
+    const unpublishAssessment = async () => {
         closeDropDown();
-        router.put(
-            route("assessment.unpublish", {
+
+        try {
+            const response = await axios.put(
+                route("assessment.unpublish", {
+                    program: program.program_id,
+                    course: course.course_id,
+                    assessment: assessmentDetails.assessment_id,
+                })
+            );
+
+            if (response.status === 200) {
+                const updatedAssessmentList = assessmentList.map((assessment) =>
+                    assessment.assessment_id ===
+                    response.data.data.assessment_id
+                        ? response.data.data
+                        : assessment
+                );
+
+                setAssessmentList(updatedAssessmentList);
+                displayToast(
+                    <DefaultCustomToast message={response.data.success} />,
+                    "success"
+                );
+            }
+        } catch (error) {
+            console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please try again."}
+                />,
+                "error"
+            );
+        }
+    };
+
+    const handleDeleteAsessment = async () => {
+        closeDropDown();
+
+        router.delete(
+            route("assessment.delete", {
                 program: program.program_id,
                 course: course.course_id,
                 assessment: assessmentDetails.assessment_id,
             }),
-            {},
             {
-                preserveScroll: true,
-                preserveState: true,
                 only: ["assessments", "flash"],
+                showProgress: false,
+
+                preserveScroll: false,
                 onSuccess: (page) => {
-                    console.log(page);
                     displayToast(
                         <DefaultCustomToast
                             message={page.props.flash.success}
@@ -98,11 +140,6 @@ export default function AssessmentItem({
             }
         );
     };
-
-    useEffect(() => {
-        console.log(isEdit);
-        console.log(assessmentIdToEdit);
-    }, [assessmentIdToEdit]);
 
     return (
         <>
@@ -166,9 +203,9 @@ export default function AssessmentItem({
                                                 </a>
                                             </li>
                                         )}
-                                        <li>
+                                        <li onClick={handleDeleteAsessment}>
                                             <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                Archive assessment
+                                                Delete assessment
                                             </a>
                                         </li>
                                     </ul>

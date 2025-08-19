@@ -23,4 +23,7 @@ Route::prefix('programs/{program}/courses/{course}')
 
         // Unppulsh assessment
         Route::put('/assessments/{assessment}/unpublish', [AssessmentController::class, 'unPublishAssessment'])->name('assessment.unpublish');
+
+        // Delete assessment
+        Route::delete('/assessments/{assessment}/delete', [AssessmentController::class, 'deleteAssessment'])->name('assessment.delete');
     });

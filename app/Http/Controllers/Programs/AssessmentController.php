@@ -53,28 +53,42 @@ class AssessmentController extends Controller
 
         $validatedUpdatedAssessment = $req->validated();
 
-        $this->assessmentService->updateAssessment($assessment, $validatedUpdatedAssessment);
+        $updatedAssessment = $this->assessmentService->updateAssessment($assessment, $validatedUpdatedAssessment);
 
         if (!empty($req->removed_files)) {
             $this->assessmentService->removeAssessmentFiiles($req->removed_files);
         }
 
         if ($req->hasFile("assessment_files")) {
-            $this->assessmentService->saveAssessmentFiles($req->assessment_files, $assessment);
+            $this->assessmentService->saveAssessmentFiles($req->assessment_files, $updatedAssessment);
         }
 
         if ($req->assessment_type === "quiz") {
-            $this->assessmentService->createInitialQuizForm($assessment);
+            $this->assessmentService->createInitialQuizForm($updatedAssessment);
         }
 
-        return back()->with('success', "Assessment updated successfully.");
+        $updatedAssessmentData = $this->assessmentService->getUpdatedAssessment($updatedAssessment);
+
+        return response()->json(['success' => "Assessment updated sucessfully.", 'data' => $updatedAssessmentData]);
     }
 
     // Independent controller that handle unpublishing of assessment
     public function unPublishAssessment($program, $course, Assessment $assessment)
     {
-        $this->assessmentService->updateAssessment($assessment, [], true);
+        // Update the status of assessment
+        // With true parameter indicating that the function was called for updating assessment status to draft
+        $udpatedAssessment = $this->assessmentService->updateAssessment($assessment, [], true);
 
-        return back()->with('success', "Assessment successfully unpublished.");
+        // Get the updated data what will be returned in reponse
+        $updatedAssessmentData = $this->assessmentService->getUpdatedAssessment($udpatedAssessment);
+
+        return response()->json(['success' => "Assessment unpublished sucessfully.", 'data' => $updatedAssessmentData]);
+    }
+
+    public function deleteAssessment($program, $course, Assessment $assessment)
+    {
+        $this->assessmentService->deleteAssessmentAndFiles($assessment);
+
+        return back()->with('success', "Assessment deleted successfully.");
     }
 }

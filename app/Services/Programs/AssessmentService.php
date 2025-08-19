@@ -106,19 +106,42 @@ class AssessmentService
 
     public function updateAssessment(Assessment $assessment, array $updatedData, bool $isUnpublish = false)
     {
+        // Check if the request is inly forn unplishin the assessment
         if ($isUnpublish) {
-            $assessment->update(["status" => "draft"]);
+            $assessment->update(['status' => 'draft']);
         } else {
             $assessment->update($updatedData);
         }
+
+        return $assessment->refresh();
+    }
+
+    // Get the data
+    public function getUpdatedAssessment(Assessment $updatedAssessment)
+    {
+        // Return all relevant data of assessment and hide unecessary data
+        return $updatedAssessment->makeHidden(
+            [
+                'feedback',
+                'created_by',
+                'assesment_type_id',
+            ]
+        )->load([
+            'assessmentType',
+            'author:user_id,first_name,last_name',
+            'quiz:assessment_id,quiz_id,quiz_title',
+            'files:assessment_id,assessment_file_id,file_name',
+        ]);
     }
 
     public function removeAssessmentFiiles(array $removedFiles)
     {
-
+        // Loop through each file and remove it
         foreach ($removedFiles as $removedFileId) {
             $file = AssessmentFile::find($removedFileId);
 
+            // Check if file is not equal to original
+            // If not it means the files was converted and it also has to deleted the original file
             if ($file->file_path !== $file->original_file_path) {
                 // Remove the two files
                 Storage::delete([$file->file_path, $file->original_file_path]);
@@ -128,5 +151,20 @@ class AssessmentService
 
             $file->delete();
         }
+    }
+
+    public function deleteAssessmentAndFiles(Assessment $assessment)
+    {
+        if (!empty($assessment->files)) {
+            $files = [];
+
+            foreach ($assessment->files as $index => $file) {
+
+                $files[$index] = $file->assessment_file_id;
+            }
+
+            $this->removeAssessmentFiiles($files);
+        }
+        $assessment->delete();
     }
 }

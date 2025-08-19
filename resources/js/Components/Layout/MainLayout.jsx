@@ -36,7 +36,7 @@ export default function MainLayout({ children }) {
     };
 
     return (
-        <div className="flex relative h-screen">
+        <div className="flex relative h-screen overflow-y-hidden">
             <Sidebar
                 isSidebarOpen={isSidebarOpen}
                 setIsSidebarOpen={setIsSidebarOpen}
@@ -54,7 +54,10 @@ export default function MainLayout({ children }) {
                     setIsSidebarOpen={setIsSidebarOpen}
                     isMdScreen={isMdScreen}
                 />
-                <main className="flex-1 flex justify-center items-start px-6 py-5 sm:px-8 w-full overflow-y-auto bg-gray-50">
+                <main
+                    className="flex-1 flex justify-center items-start px-6 py-5 sm:px-8 w-full overflow-y-auto bg-gray-50"
+                    scroll-region=""
+                >
                     <div className="w-full max-w-[1400px]">{children}</div>
                 </main>
             </div>
