@@ -43,9 +43,6 @@ export default function AssessmentForm({
     const clearAssessmentDetails = useAssessmentsStore(
         (state) => state.clearAssessmentDetails
     );
-    const setAssessmentIdToEdit = useAssessmentsStore(
-        (state) => state.setAssessmentIdToEdit
-    );
     const setAssessmentList = useAssessmentsStore(
         (state) => state.setAssessmentList
     );
@@ -57,16 +54,11 @@ export default function AssessmentForm({
     // Clear assessment details once form was rendered
     // to avoid persisting state
     useEffect(() => {
-        console.log(assessmentDetails);
         if (!isEdit) {
-            setAssessmentIdToEdit(null); // Reeset the value to show all the assessments
+            // Reset the value to show all the assessments
             clearAssessmentDetails(); // Clear the data first
         }
     }, []);
-
-    useEffect(() => {
-        console.log(errors);
-    }, [errors]);
 
     const updateAssessment = async () => {
         try {
@@ -106,11 +98,6 @@ export default function AssessmentForm({
                 }
             );
             if (response.status === 200) {
-                setIsLoading(false);
-                toggleForm();
-                clearAssessmentDetails();
-                setAssessmentIdToEdit(null);
-
                 // Change the updated assessment data in the list
                 const updatedAssessmentList = assessmentList.map((assessment) =>
                     assessment.assessment_id ===
@@ -125,6 +112,10 @@ export default function AssessmentForm({
                     <DefaultCustomToast message={response.data.success} />,
                     "success"
                 );
+
+                setIsLoading(false);
+                toggleForm();
+                clearAssessmentDetails();
             }
         } catch (error) {
             console.error(error);
@@ -147,10 +138,7 @@ export default function AssessmentForm({
         setErrors(null);
 
         if (isEdit) {
-            console.log("EDIT FORM");
             // Update assessment
-            console.log(assessmentDetails);
-
             updateAssessment();
         } else {
             // Add new assessment
@@ -161,7 +149,7 @@ export default function AssessmentForm({
                 }),
                 { ...assessmentDetails },
                 {
-                    preserveScroll: false,
+                    preserveScroll: true,
                     showProgress: false,
                     only: ["assessments", "flash"],
                     onError: (error) => {
@@ -170,7 +158,7 @@ export default function AssessmentForm({
                     onSuccess: (page) => {
                         toggleForm();
                         clearAssessmentDetails();
-                        setAssessmentIdToEdit(null); // Reeset the value to show all the assessments
+                        // Reeset the value to show all the assessments
                         displayToast(
                             <DefaultCustomToast
                                 message={page.props.flash.success}
@@ -187,7 +175,6 @@ export default function AssessmentForm({
     const cancelAssessmentForm = () => {
         toggleForm();
         clearAssessmentDetails();
-        setAssessmentIdToEdit(null); // Clear the the value to ensure no
     };
 
     // Used for dropdown button to set the status of the assessment
@@ -221,7 +208,9 @@ export default function AssessmentForm({
 
     return (
         <form
-            className={`border ${formWidth} border-ascend-gray1 shadow-shadow1 p-5 space-y-5 bg-ascend-white`}
+            className={`border ${formWidth} border-ascend-gray1 ${
+                isEdit ? "" : "shadow-shadow1"
+            } p-5 space-y-5 bg-ascend-white`}
         >
             <h1 className="text-size4 font-bold">
                 {!assessmentDetails.assessment_type

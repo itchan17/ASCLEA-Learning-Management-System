@@ -4,17 +4,6 @@ import useUserStore from "../../User/userStore";
 import useModulesStore from "./modulesStore";
 
 const useAssessmentsStore = create((set) => ({
-    isFormOpen: false,
-
-    // Helps for identifying which assessmtn to edit
-    // If assessment has the same id set to this
-    // The card will be hide and the form will be displayed
-    // If user click other assessment to edit assessment card will be shwon again
-    assessmentIdToEdit: null,
-    setAssessmentIdToEdit: (assessmentId) => {
-        set({ assessmentIdToEdit: assessmentId });
-    },
-
     assessmentList: [],
     setAssessmentList: (assessments) => {
         set({ assessmentList: assessments });
@@ -106,23 +95,6 @@ const useAssessmentsStore = create((set) => ({
     //         responseReceived: 5,
     //     },
     // ],
-
-    // this handle creation of emty quiz form
-    // the logic for creating empty form and saving it to database will be write here
-    handleCreateIntialQuizForm: () => {
-        const quizdetails = useCreateQuizStore.getState().quizDetails;
-        const { handleAssessmentChange } = useAssessmentsStore.getState();
-
-        // set inital id to 1
-        quizdetails.id = 101;
-        handleAssessmentChange("assessmentQuiz", quizdetails);
-        console.log(quizdetails);
-    },
-
-    toggleAssessmentForm: () => {
-        const { isFormOpen } = useAssessmentsStore.getState();
-        set({ isFormOpen: !isFormOpen });
-    },
 
     handleAssessmentChange: (field, value) => {
         const { assessmentDetails } = useAssessmentsStore.getState();

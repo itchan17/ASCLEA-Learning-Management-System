@@ -21,13 +21,6 @@ export default function Assessments() {
     // const toggleAssessmentForm = useAssessmentsStore(
     //     (state) => state.toggleAssessmentForm
     // );
-    // const assessmentList = useAssessmentsStore((state) => state.assessmentList);
-    const setAssessmentIdToEdit = useAssessmentsStore(
-        (state) => state.setAssessmentIdToEdit
-    );
-    const assessmentIdToEdit = useAssessmentsStore(
-        (state) => state.assessmentIdToEdit
-    );
     const assessmentList = useAssessmentsStore((state) => state.assessmentList);
     const setAssessmentList = useAssessmentsStore(
         (state) => state.setAssessmentList
@@ -62,10 +55,6 @@ export default function Assessments() {
         }
     }, [isAssessmentFormOpen]);
 
-    useEffect(() => {
-        setAssessmentIdToEdit(null);
-    }, []);
-
     const toggleAssessmentForm = () => {
         setIsAssessmentFormOpen(!isAssessmentFormOpen);
     };
@@ -84,7 +73,7 @@ export default function Assessments() {
                 </RoleGuard>
             </div>
 
-            {isAssessmentFormOpen && !assessmentIdToEdit && (
+            {isAssessmentFormOpen && (
                 <div ref={targetForm}>
                     <AssessmentForm toggleForm={toggleAssessmentForm} />
                 </div>
