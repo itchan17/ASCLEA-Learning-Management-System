@@ -27,16 +27,20 @@ const RegistrationFields = () => {
     }, []);
 
     const handleRegionChange = (regionCode) => {
-        handleRegistrationChange("region", regionCode);
+        const selectedRegion = regionList.find(r => r.region_code === regionCode);
+        handleRegistrationChange("region", selectedRegion.region_code);
+        handleRegistrationChange("region_name", selectedRegion.region_name); // new
         provinces(regionCode).then((res) => {
             setProvinceList(res);
-            setCityList([]); // clear cities
-            setBarangayList([]); // clear barangays
+            setCityList([]);
+            setBarangayList([]);
         });
     };
 
     const handleProvinceChange = (provinceCode) => {
-        handleRegistrationChange("province", provinceCode);
+        const selectedProvince = provinceList.find(p => p.province_code === provinceCode);
+        handleRegistrationChange("province", selectedProvince.province_code);
+        handleRegistrationChange("province_name", selectedProvince.province_name); // new
         cities(provinceCode).then((res) => {
             setCityList(res);
             setBarangayList([]);
@@ -44,10 +48,18 @@ const RegistrationFields = () => {
     };
 
     const handleCityChange = (cityCode) => {
-        handleRegistrationChange("city", cityCode);
+        const selectedCity = cityList.find(c => c.city_code === cityCode);
+        handleRegistrationChange("city", selectedCity.city_code);
+        handleRegistrationChange("city_name", selectedCity.city_name); // new
         barangays(cityCode).then((res) => {
             setBarangayList(res);
         });
+    };
+
+    const handleBarangayChange = (brgyCode) => {
+        const selectedBarangay = barangayList.find(b => b.brgy_code === brgyCode);
+        handleRegistrationChange("barangay", selectedBarangay.brgy_code);
+        handleRegistrationChange("barangay_name", selectedBarangay.brgy_name); // new
     };
 
     // Registration store
@@ -211,72 +223,72 @@ const RegistrationFields = () => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-4">
-                    {/* Region */}
-                    <div>
-                        <select
-                            value={registration.region}
-                            onChange={(e) => handleRegionChange(e.target.value)}
-                            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
-                        >
-                            <option value="">Select Region</option>
-                            {regionList.map((reg) => (
-                                <option key={reg.region_code} value={reg.region_code}>
-                                    {reg.region_name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    {/* Province */}
-                    <div>
-                        <select
-                            value={registration.province}
-                            onChange={(e) => handleProvinceChange(e.target.value)}
-                            disabled={!provinceList.length}
-                            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
-                        >
-                            <option value="">Select Province</option>
-                            {provinceList.map((prov) => (
-                                <option key={prov.province_code} value={prov.province_code}>
-                                    {prov.province_name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    {/* City */}
-                    <div>
-                        <select
-                            value={registration.city}
-                            onChange={(e) => handleCityChange(e.target.value)}
-                            disabled={!cityList.length}
-                            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
-                        >
-                            <option value="">Select City</option>
-                            {cityList.map((ct) => (
-                                <option key={ct.city_code} value={ct.city_code}>
-                                    {ct.city_name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    {/* Barangay */}
-                    <div>
-                        <select
-                            value={registration.barangay}
-                            onChange={(e) => handleRegistrationChange("barangay", e.target.value)}
-                            disabled={!barangayList.length}
-                            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
-                        >
-                            <option value="">Select Barangay</option>
-                            {barangayList.map((brgy) => (
-                                <option key={brgy.brgy_code} value={brgy.brgy_code}>
-                                    {brgy.brgy_name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-4">
+    {/* Region */}
+    <div>
+        <select
+            value={registration.region}
+            onChange={(e) => handleRegionChange(e.target.value)}
+            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
+        >
+            <option value="">Select Region</option>
+            {regionList.map((reg) => (
+                <option key={reg.region_code} value={reg.region_code}>
+                    {reg.region_name}
+                </option>
+            ))}
+        </select>
+    </div>
+    {/* Province */}
+    <div>
+        <select
+            value={registration.province}
+            onChange={(e) => handleProvinceChange(e.target.value)}
+            disabled={!provinceList.length}
+            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
+        >
+            <option value="">Select Province</option>
+            {provinceList.map((prov) => (
+                <option key={prov.province_code} value={prov.province_code}>
+                    {prov.province_name}
+                </option>
+            ))}
+        </select>
+    </div>
+    {/* City */}
+    <div>
+        <select
+            value={registration.city}
+            onChange={(e) => handleCityChange(e.target.value)}
+            disabled={!cityList.length}
+            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
+        >
+            <option value="">Select City</option>
+            {cityList.map((ct) => (
+                <option key={ct.city_code} value={ct.city_code}>
+                    {ct.city_name}
+                </option>
+            ))}
+        </select>
+    </div>
+    {/* Barangay */}
+    <div>
+        <select
+            value={registration.barangay}
+            onChange={(e) => handleBarangayChange(e.target.value)}
+            disabled={!barangayList.length}
+            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
+        >
+            <option value="">Select Barangay</option>
+            {barangayList.map((brgy) => (
+                <option key={brgy.brgy_code} value={brgy.brgy_code}>
+                    {brgy.brgy_name}
+                </option>
+            ))}
+        </select>
+    </div>
+</div>
 
-                </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-4">
                     <div class="relative">
@@ -295,7 +307,7 @@ const RegistrationFields = () => {
                             for="ContactOutlined"
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
-                            Contact Number
+                            Contact Number <span className="text-ascend-red">*</span>
                         </label>
                     </div>
                     <div class="relative">

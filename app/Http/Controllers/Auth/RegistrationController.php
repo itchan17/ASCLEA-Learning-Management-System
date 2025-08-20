@@ -38,10 +38,16 @@ class RegistrationController extends Controller
         $roleId = DB::table('roles')->where('role_name', 'student')->value('role_id');
 
         $data = $request->only([
-            'first_name', 'last_name', 'middle_name', 'birthdate',
-            'gender', 'contact_number', 'email',
-            'house_no', 'region', 'province', 'city', 'barangay' // added region
-        ]);
+        'first_name', 'last_name', 'middle_name', 'birthdate',
+        'gender', 'contact_number', 'email',
+        'house_no'
+    ]);
+
+        // Save the names directly
+        $data['region'] = $request->region_name;
+        $data['province'] = $request->province_name;
+        $data['city'] = $request->city_name;
+        $data['barangay'] = $request->barangay_name;
 
         $data['password'] = Hash::make($request->password);
         $data['role_id'] = $roleId;
