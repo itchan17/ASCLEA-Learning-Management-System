@@ -10,10 +10,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Assessment extends Model
 {
-    use HasUuids, HasFactory;
+    use HasUuids, HasFactory, SoftDeletes;
 
     public $incrementing = false;
 

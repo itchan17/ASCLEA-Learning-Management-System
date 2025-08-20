@@ -43,10 +43,14 @@ export default function AssessmentForm({
     const clearAssessmentDetails = useAssessmentsStore(
         (state) => state.clearAssessmentDetails
     );
-    const setAssessmentList = useAssessmentsStore(
-        (state) => state.setAssessmentList
-    );
+
     const assessmentList = useAssessmentsStore((state) => state.assessmentList);
+    const addNewAssessment = useAssessmentsStore(
+        (state) => state.addNewAssessment
+    );
+    const updateAssessmentInList = useAssessmentsStore(
+        (state) => state.updateAssessmentInList
+    );
 
     const [errors, setErrors] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -60,54 +64,49 @@ export default function AssessmentForm({
         }
     }, []);
 
-    const updateAssessment = async () => {
-        try {
-            const assessmentFormData = new FormData();
+    const appendToFormData = (assessmentFormData) => {
+        // Append data into FormData to enbale uploading files
+        for (let key in assessmentDetails) {
+            const value = assessmentDetails[key];
 
-            // Append data into FormData to enbale uploading files
-            for (let key in assessmentDetails) {
-                const value = assessmentDetails[key];
-
-                // Skips appending data with null value
-                // Make sure data is nullable in backend valdiation
-                if (value === null || value === undefined) {
-                    continue;
-                }
-
-                // Append array values
-                if (Array.isArray(value)) {
-                    value.forEach((v, i) => {
-                        assessmentFormData.append(`${key}[${i}]`, v);
-                    });
-                } else {
-                    assessmentFormData.append(key, value);
-                }
+            // Skips appending data with null value
+            // Make sure data is nullable in backend valdiation
+            if (value === null || value === undefined) {
+                continue;
             }
 
-            assessmentFormData.append("_method", "PUT");
+            // Append array values
+            if (Array.isArray(value)) {
+                value.forEach((v, i) => {
+                    assessmentFormData.append(`${key}[${i}]`, v);
+                });
+            } else {
+                assessmentFormData.append(key, value);
+            }
+        }
+    };
+
+    const addAssessment = async () => {
+        try {
+            const assessmentFormData = new FormData();
+            appendToFormData(assessmentFormData);
 
             const response = await axios.post(
-                route("assessment.update", {
+                route("assessment.create", {
                     program: program.program_id,
                     course: course.course_id,
-                    assessment: assessmentId,
                 }),
                 assessmentFormData,
                 {
                     headers: { "Content-Type": "multipart/form-data" },
                 }
             );
-            if (response.status === 200) {
-                // Change the updated assessment data in the list
-                const updatedAssessmentList = assessmentList.map((assessment) =>
-                    assessment.assessment_id ===
-                    response.data.data.assessment_id
-                        ? response.data.data
-                        : assessment
-                );
+            console.log(response);
 
+            if (response.status === 200) {
                 // Set the updated data
-                setAssessmentList(updatedAssessmentList);
+                addNewAssessment(response.data.data);
+
                 displayToast(
                     <DefaultCustomToast message={response.data.success} />,
                     "success"
@@ -133,6 +132,51 @@ export default function AssessmentForm({
         }
     };
 
+    const updateAssessment = async () => {
+        try {
+            const assessmentFormData = new FormData();
+            appendToFormData(assessmentFormData);
+            assessmentFormData.append("_method", "PUT");
+
+            const response = await axios.post(
+                route("assessment.update", {
+                    program: program.program_id,
+                    course: course.course_id,
+                    assessment: assessmentId,
+                }),
+                assessmentFormData,
+                {
+                    headers: { "Content-Type": "multipart/form-data" },
+                }
+            );
+
+            // Change the updated assessment data in the list
+            updateAssessmentInList(response.data.data);
+
+            displayToast(
+                <DefaultCustomToast message={response.data.success} />,
+                "success"
+            );
+
+            setIsLoading(false);
+            toggleForm();
+            clearAssessmentDetails();
+        } catch (error) {
+            console.error(error);
+            if (error.response.data.errors) {
+                setErrors(error.response.data.errors); // Set the validation error
+            } else {
+                displayToast(
+                    <DefaultCustomToast
+                        message={"Something went wrong. Please try again."}
+                    />,
+                    "error"
+                );
+            }
+            setIsLoading(false);
+        }
+    };
+
     const handeSubmit = () => {
         setIsLoading(true);
         setErrors(null);
@@ -142,33 +186,35 @@ export default function AssessmentForm({
             updateAssessment();
         } else {
             // Add new assessment
-            router.post(
-                route("assessment.create", {
-                    program: program.program_id,
-                    course: course.course_id,
-                }),
-                { ...assessmentDetails },
-                {
-                    preserveScroll: true,
-                    showProgress: false,
-                    only: ["assessments", "flash"],
-                    onError: (error) => {
-                        setErrors(error);
-                    },
-                    onSuccess: (page) => {
-                        toggleForm();
-                        clearAssessmentDetails();
-                        // Reeset the value to show all the assessments
-                        displayToast(
-                            <DefaultCustomToast
-                                message={page.props.flash.success}
-                            />,
-                            "success"
-                        );
-                    },
-                    onFinish: () => setIsLoading(false),
-                }
-            );
+            // router.post(
+            //     route("assessment.create", {
+            //         program: program.program_id,
+            //         course: course.course_id,
+            //     }),
+            //     { ...assessmentDetails },
+            //     {
+            //         preserveScroll: true,
+            //         showProgress: false,
+            //         only: ["assessments", "flash"],
+            //         onError: (error) => {
+            //             setErrors(error);
+            //         },
+            //         onSuccess: (page) => {
+            //             toggleForm();
+            //             clearAssessmentDetails();
+            //             // Reeset the value to show all the assessments
+            //             displayToast(
+            //                 <DefaultCustomToast
+            //                     message={page.props.flash.success}
+            //                 />,
+            //                 "success"
+            //             );
+            //         },
+            //         onFinish: () => setIsLoading(false),
+            //     }
+            // );
+
+            addAssessment();
         }
     };
 

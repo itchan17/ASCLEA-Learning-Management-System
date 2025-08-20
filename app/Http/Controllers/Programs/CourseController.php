@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Programs;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Program;
-use App\Services\Programs\AssessmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -13,12 +12,6 @@ use Inertia\Inertia;
 
 class CourseController extends Controller
 {
-    protected AssessmentService $assessmentService;
-
-    public function __construct(AssessmentService $service)
-    {
-        $this->assessmentService = $service;
-    }
 
     // Create a course
     public function store(Program $program, Request $req)
@@ -72,8 +65,6 @@ class CourseController extends Controller
                     'program' => fn() => $program->only(['program_id']),
 
                     'course' => fn() => $course->only(['course_id', 'course_code', 'course_name', 'course_description', 'course_day', 'start_time', 'end_time']),
-
-                    'assessments' => fn() => Inertia::deepMerge($this->assessmentService->getAssessments($course->course_id))
                 ]
             );
         } else {

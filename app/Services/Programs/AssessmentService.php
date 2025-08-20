@@ -95,13 +95,17 @@ class AssessmentService
 
     public function getAssessments(string $courseId)
     {
+        $user = Auth::user();
+
         return Assessment::where('course_id', $courseId)->with('assessmentType')->with(['author' => function ($query) {
             $query->select('user_id', 'first_name', 'last_name');
         }])->with(['quiz' => function ($query) {
             $query->select('assessment_id', 'quiz_id', 'quiz_title');
         }])->with(['files' => function ($query) {
             $query->select('assessment_id', 'assessment_file_id', 'file_name', 'file_path');
-        }])->select('assessment_id', 'assessment_type_id', 'created_by', 'assessment_title', 'assessment_description', 'status', 'course_id', 'due_datetime', 'total_points', 'created_at', 'updated_at')->orderBy('created_at', 'desc')->orderBy('assessment_id', 'desc')->paginate(5);
+        }])->withTrashed()->where(function ($query) use ($user) {
+            $query->whereNull('deleted_at')->orWhere('created_by', $user->user_id);
+        })->select('assessment_id', 'assessment_type_id', 'created_by', 'assessment_title', 'assessment_description', 'status', 'course_id', 'due_datetime', 'total_points', 'created_at', 'updated_at', 'deleted_at')->orderBy('created_at', 'desc')->orderBy('assessment_id', 'desc')->paginate(5);
     }
 
     public function updateAssessment(Assessment $assessment, array $updatedData, bool $isUnpublish = false)
@@ -117,10 +121,10 @@ class AssessmentService
     }
 
     // Get the data
-    public function getUpdatedAssessment(Assessment $updatedAssessment)
+    public function getAssessmentCompleteDetails(Assessment $assessment)
     {
         // Return all relevant data of assessment and hide unecessary data
-        return $updatedAssessment->makeHidden(
+        return $assessment->makeHidden(
             [
                 'feedback'
             ]
@@ -151,18 +155,19 @@ class AssessmentService
         }
     }
 
-    public function deleteAssessmentAndFiles(Assessment $assessment)
+    public function deleteAssessment(Assessment $assessment)
     {
-        if (!empty($assessment->files)) {
-            $files = [];
+        $assessment->delete(); // Soft delete the assessment
 
-            foreach ($assessment->files as $index => $file) {
+        return  $this->getAssessmentCompleteDetails($assessment);
+    }
 
-                $files[$index] = $file->assessment_file_id;
-            }
+    public function restoreAssessment(string $assessmentId)
+    {
+        $assessment = Assessment::withTrashed()->findOrFail($assessmentId);
 
-            $this->removeAssessmentFiiles($files);
-        }
-        $assessment->delete();
+        $assessment->restore();
+
+        return  $this->getAssessmentCompleteDetails($assessment);
     }
 }

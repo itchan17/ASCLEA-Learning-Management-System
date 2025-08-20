@@ -35,17 +35,16 @@ class AssessmentController extends Controller
             $this->assessmentService->createInitialQuizForm($assessment);
         }
 
-        return back()->with('success', "Assessment created successfully.");
+        $assessmentCompleteDetails = $this->assessmentService->getAssessmentCompleteDetails($assessment);
+
+        return response()->json(['success' => "Assessment created successfully.", 'data' => $assessmentCompleteDetails]);
     }
 
-    public function showAssessment()
+    public function listAssessments($program, $course)
     {
-        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/ViewAssessment');
-    }
+        $assessments = $this->assessmentService->getAssessments($course);
 
-    public function showEditQuizForm()
-    {
-        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/QuizForm');
+        return response()->json($assessments);
     }
 
     public function updateAssessment(SaveAssessmentRequest $req, $program, $course, Assessment $assessment)
@@ -67,7 +66,7 @@ class AssessmentController extends Controller
             $this->assessmentService->createInitialQuizForm($updatedAssessment);
         }
 
-        $updatedAssessmentData = $this->assessmentService->getUpdatedAssessment($updatedAssessment);
+        $updatedAssessmentData = $this->assessmentService->getAssessmentCompleteDetails($updatedAssessment);
 
         return response()->json(['success' => "Assessment updated sucessfully.", 'data' => $updatedAssessmentData]);
     }
@@ -80,15 +79,38 @@ class AssessmentController extends Controller
         $udpatedAssessment = $this->assessmentService->updateAssessment($assessment, [], true);
 
         // Get the updated data what will be returned in reponse
-        $updatedAssessmentData = $this->assessmentService->getUpdatedAssessment($udpatedAssessment);
+        $updatedAssessmentData = $this->assessmentService->getAssessmentCompleteDetails($udpatedAssessment);
 
         return response()->json(['success' => "Assessment unpublished sucessfully.", 'data' => $updatedAssessmentData]);
     }
 
     public function deleteAssessment($program, $course, Assessment $assessment)
     {
-        $this->assessmentService->deleteAssessmentAndFiles($assessment);
+        $deletedAssessment = $this->assessmentService->deleteAssessment($assessment);
 
-        return back()->with('success', "Assessment deleted successfully.");
+        return response()->json(["success" => "Assessment deleted successfully.", "deletedAssessment" => $deletedAssessment]);
+    }
+
+    public function restoreAssessment($program, $course, $assessment)
+    {
+
+        $restoredAssessment = $this->assessmentService->restoreAssessment($assessment);
+
+        return response()->json(["success" => "Assessment deleted successfully.", "restoredAssessment" => $restoredAssessment]);
+    }
+
+    public function showAssessment($program, $course, Assessment $assessment)
+    {
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/ViewAssessment', [
+            "programId" => $program,
+            "courseId" => $course,
+            "assessment" => fn() => $this->assessmentService->getAssessmentCompleteDetails($assessment)
+        ]);
+    }
+
+    public function showEditQuizForm()
+    {
+
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/QuizForm');
     }
 }

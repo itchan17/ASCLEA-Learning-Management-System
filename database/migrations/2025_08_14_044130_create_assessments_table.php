@@ -26,6 +26,7 @@ return new class extends Migration
             $table->foreign('created_by')->references('user_id')->on('users');
             $table->json('feedback')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

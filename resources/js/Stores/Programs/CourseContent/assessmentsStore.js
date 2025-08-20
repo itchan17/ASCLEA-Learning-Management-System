@@ -9,6 +9,16 @@ const useAssessmentsStore = create((set) => ({
         set({ assessmentList: assessments });
     },
 
+    page: 1,
+
+    hasMore: true,
+
+    setPagination: (page, hasMore) => {
+        set({ page, hasMore });
+    },
+
+    resetPagination: () => set({ page: 1, hasMore: true, lastPage: null }),
+
     assessmentDetails: {
         assessment_title: "",
         assessment_description: null,
@@ -45,6 +55,48 @@ const useAssessmentsStore = create((set) => ({
                 removed_files: [],
             },
         });
+    },
+
+    removeAssessment: (id) => {
+        const { assessmentList } = useAssessmentsStore.getState();
+        const newList = assessmentList.filter(
+            (assessment) => assessment.assessment_id !== id
+        );
+        set({
+            assessmentList: newList,
+        });
+    },
+
+    addToAssessmentList: (newAssessments) => {
+        const { assessmentList } = useAssessmentsStore.getState();
+
+        const assmnts = [...assessmentList, ...newAssessments];
+
+        // Map handle removing duplicate values based on the assessment id
+        const uniqueAssessments = [
+            ...new Map(assmnts.map((a) => [a.assessment_id, a])).values(),
+        ];
+
+        set({
+            assessmentList: uniqueAssessments,
+        });
+    },
+
+    addNewAssessment: (newAssessment) => {
+        const { assessmentList } = useAssessmentsStore.getState();
+
+        set({ assessmentList: [newAssessment, ...assessmentList] });
+    },
+
+    updateAssessmentInList: (updatedAssessment) => {
+        const { assessmentList } = useAssessmentsStore.getState();
+
+        const updatedAssessmentList = assessmentList.map((assessment) =>
+            assessment.assessment_id === updatedAssessment.assessment_id
+                ? updatedAssessment
+                : assessment
+        );
+        set({ assessmentList: updatedAssessmentList });
     },
 
     // assessmentList: [

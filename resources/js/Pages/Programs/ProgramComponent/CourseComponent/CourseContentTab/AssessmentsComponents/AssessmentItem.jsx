@@ -28,6 +28,9 @@ export default function AssessmentItem({
     const setAssessmentList = useAssessmentsStore(
         (state) => state.setAssessmentList
     );
+    const updateAssessmentInList = useAssessmentsStore(
+        (state) => state.updateAssessmentInList
+    );
 
     // get the id from url
     const { course, program, auth } = usePage().props;
@@ -43,26 +46,31 @@ export default function AssessmentItem({
     };
 
     const handleCardClick = () => {
-        router.visit(
-            route("program.course.assessment.view", {
-                program: program.program_id,
-                course: course.course_id,
-                assessment: assessmentDetails.assessment_id,
-            }),
-            {
-                preserveScroll: false,
-            }
-        );
+        if (!assessmentDetails.deleted_at) {
+            router.visit(
+                route("program.course.assessment.view", {
+                    program: program.program_id,
+                    course: course.course_id,
+                    assessment: assessmentDetails.assessment_id,
+                }),
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                }
+            );
+        }
     };
 
     const handleQuizClick = () => {
-        router.visit(
-            route("program.course.quiz-form.edit", {
-                program: program.program_id,
-                course: course.course_id,
-                quiz: assessmentDetails.quiz.quiz_id,
-            })
-        );
+        if (!assessmentDetails.deleted_at) {
+            router.visit(
+                route("program.course.quiz-form.edit", {
+                    program: program.program_id,
+                    course: course.course_id,
+                    quiz: assessmentDetails.quiz.quiz_id,
+                })
+            );
+        }
     };
 
     const handleEditClick = () => {
@@ -84,20 +92,17 @@ export default function AssessmentItem({
                 })
             );
 
-            if (response.status === 200) {
-                const updatedAssessmentList = assessmentList.map((assessment) =>
-                    assessment.assessment_id ===
-                    response.data.data.assessment_id
-                        ? response.data.data
-                        : assessment
-                );
+            const updatedAssessmentList = assessmentList.map((assessment) =>
+                assessment.assessment_id === response.data.data.assessment_id
+                    ? response.data.data
+                    : assessment
+            );
 
-                setAssessmentList(updatedAssessmentList);
-                displayToast(
-                    <DefaultCustomToast message={response.data.success} />,
-                    "success"
-                );
-            }
+            setAssessmentList(updatedAssessmentList);
+            displayToast(
+                <DefaultCustomToast message={response.data.success} />,
+                "success"
+            );
         } catch (error) {
             console.error(error);
             displayToast(
@@ -111,28 +116,60 @@ export default function AssessmentItem({
 
     const handleDeleteAsessment = async () => {
         closeDropDown();
+        console.log(assessmentDetails.assessment_id);
+        try {
+            const response = await axios.delete(
+                route("assessment.delete", {
+                    program: program.program_id,
+                    course: course.course_id,
+                    assessment: assessmentDetails.assessment_id,
+                })
+            );
+            console.log(response);
+            updateAssessmentInList(response.data.deletedAssessment);
 
-        router.delete(
-            route("assessment.delete", {
-                program: program.program_id,
-                course: course.course_id,
-                assessment: assessmentDetails.assessment_id,
-            }),
-            {
-                only: ["assessments", "flash"],
-                showProgress: false,
+            displayToast(
+                <DefaultCustomToast message={response.data.success} />,
+                "success"
+            );
+        } catch (error) {
+            console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please try again"}
+                />,
+                "error"
+            );
+        }
+    };
 
-                preserveScroll: false,
-                onSuccess: (page) => {
-                    displayToast(
-                        <DefaultCustomToast
-                            message={page.props.flash.success}
-                        />,
-                        "success"
-                    );
-                },
-            }
-        );
+    const handleRestoreAsessment = async () => {
+        closeDropDown();
+        console.log(assessmentDetails.assessment_id);
+        try {
+            const response = await axios.put(
+                route("assessment.restore", {
+                    program: program.program_id,
+                    course: course.course_id,
+                    assessment: assessmentDetails.assessment_id,
+                })
+            );
+            console.log(response);
+            updateAssessmentInList(response.data.restoredAssessment);
+
+            displayToast(
+                <DefaultCustomToast message={response.data.success} />,
+                "success"
+            );
+        } catch (error) {
+            console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please try again"}
+                />,
+                "error"
+            );
+        }
     };
 
     return (
@@ -149,19 +186,28 @@ export default function AssessmentItem({
                                 ? "New Quiz"
                                 : "New Activity"}
                         </h1>
-                        <div
-                            className={`px-2 ${
-                                assessmentDetails.status === "published"
-                                    ? "px-2 bg-ascend-green"
-                                    : "px-2 bg-ascend-yellow"
-                            }`}
-                        >
-                            <span className="text-size1 font-bold text-ascend-white">
-                                {assessmentDetails.status === "published"
-                                    ? "Publshed"
-                                    : "Draft"}
-                            </span>
-                        </div>
+
+                        {assessmentDetails.deleted_at ? (
+                            <div className={`px-2 bg-ascend-red`}>
+                                <span className="text-size1 font-bold text-ascend-white">
+                                    {"Deleted"}
+                                </span>
+                            </div>
+                        ) : (
+                            <div
+                                className={`px-2 ${
+                                    assessmentDetails.status === "published"
+                                        ? "px-2 bg-ascend-green"
+                                        : "px-2 bg-ascend-yellow"
+                                }`}
+                            >
+                                <span className="text-size1 font-bold text-ascend-white">
+                                    {assessmentDetails.status === "published"
+                                        ? "Publshed"
+                                        : "Draft"}
+                                </span>
+                            </div>
+                        )}
                     </div>
 
                     {auth.user.user_id === assessmentDetails.created_by && (
@@ -183,25 +229,49 @@ export default function AssessmentItem({
                                         tabIndex={0}
                                         className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-45 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                                     >
-                                        {assessmentDetails.status ===
-                                        "draft" ? (
-                                            <li onClick={handleEditClick}>
+                                        {assessmentDetails.deleted_at ? (
+                                            <li
+                                                onClick={handleRestoreAsessment}
+                                            >
                                                 <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                    Edit assessment
+                                                    Restore assessment
                                                 </a>
                                             </li>
                                         ) : (
-                                            <li onClick={unpublishAssessment}>
-                                                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                    Unpublish Assessment
-                                                </a>
-                                            </li>
+                                            <>
+                                                {assessmentDetails.status ===
+                                                "draft" ? (
+                                                    <li
+                                                        onClick={
+                                                            handleEditClick
+                                                        }
+                                                    >
+                                                        <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                            Edit assessment
+                                                        </a>
+                                                    </li>
+                                                ) : (
+                                                    <li
+                                                        onClick={
+                                                            unpublishAssessment
+                                                        }
+                                                    >
+                                                        <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                            Unpublish Assessment
+                                                        </a>
+                                                    </li>
+                                                )}
+                                                <li
+                                                    onClick={
+                                                        handleDeleteAsessment
+                                                    }
+                                                >
+                                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                        Delete assessment
+                                                    </a>
+                                                </li>
+                                            </>
                                         )}
-                                        <li onClick={handleDeleteAsessment}>
-                                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                Delete assessment
-                                            </a>
-                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -239,7 +309,10 @@ export default function AssessmentItem({
                 {assessmentDetails.files.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                         {assessmentDetails.files.map((file) => (
-                            <File fileName={file.file_name}></File>
+                            <File
+                                key={file.assessment_file_id}
+                                fileName={file.file_name}
+                            ></File>
                         ))}
                     </div>
                 )}

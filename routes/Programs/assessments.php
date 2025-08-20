@@ -9,8 +9,12 @@ Route::prefix('programs/{program}/courses/{course}')
     ->middleware(['auth', 'verified', 'preventBack'])
     ->group(function () {
 
+
         // Create assesmsent
         Route::post('/assessments/create', [AssessmentController::class, 'createAssessment'])->name('assessment.create');
+
+        // Get assessments
+        Route::get('/assessments', [AssessmentController::class, 'listAssessments'])->name('program.course.assessments');
 
         // Route for viewing assessment
         Route::get('/assessments/{assessment}', [AssessmentController::class, 'showAssessment'])->name('program.course.assessment.view');
@@ -26,4 +30,7 @@ Route::prefix('programs/{program}/courses/{course}')
 
         // Delete assessment
         Route::delete('/assessments/{assessment}/delete', [AssessmentController::class, 'deleteAssessment'])->name('assessment.delete');
+
+        // Delete assessment
+        Route::put('/assessments/{assessment}/restore', [AssessmentController::class, 'restoreAssessment'])->name('assessment.restore');
     });
