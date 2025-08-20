@@ -100,8 +100,8 @@ class AssessmentService
         }])->with(['quiz' => function ($query) {
             $query->select('assessment_id', 'quiz_id', 'quiz_title');
         }])->with(['files' => function ($query) {
-            $query->select('assessment_id', 'assessment_file_id', 'file_name');
-        }])->orderBy('created_at', 'desc')->orderBy('assessment_id', 'desc')->paginate(5);
+            $query->select('assessment_id', 'assessment_file_id', 'file_name', 'file_path');
+        }])->select('assessment_id', 'assessment_type_id', 'created_by', 'assessment_title', 'assessment_description', 'status', 'course_id', 'due_datetime', 'total_points', 'created_at', 'updated_at')->orderBy('created_at', 'desc')->orderBy('assessment_id', 'desc')->paginate(5);
     }
 
     public function updateAssessment(Assessment $assessment, array $updatedData, bool $isUnpublish = false)
@@ -122,15 +122,13 @@ class AssessmentService
         // Return all relevant data of assessment and hide unecessary data
         return $updatedAssessment->makeHidden(
             [
-                'feedback',
-                'created_by',
-                'assesment_type_id',
+                'feedback'
             ]
         )->load([
             'assessmentType',
             'author:user_id,first_name,last_name',
             'quiz:assessment_id,quiz_id,quiz_title',
-            'files:assessment_id,assessment_file_id,file_name',
+            'files:assessment_id,assessment_file_id,file_name,file_path',
         ]);
     }
 

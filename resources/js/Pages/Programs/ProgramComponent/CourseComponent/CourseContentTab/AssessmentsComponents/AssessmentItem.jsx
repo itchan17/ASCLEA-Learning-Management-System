@@ -14,6 +14,7 @@ import { displayToast } from "../../../../../../Utils/displayToast";
 import DefaultCustomToast from "../../../../../../Components/CustomToast/DefaultCustomToast";
 import axios from "axios";
 import ModalContainer from "../../../../../../Components/ModalContainer";
+import File from "../File";
 
 export default function AssessmentItem({
     assessmentDetails,
@@ -29,7 +30,7 @@ export default function AssessmentItem({
     );
 
     // get the id from url
-    const { course, program } = usePage().props;
+    const { course, program, auth } = usePage().props;
 
     const [isEdit, setIsEdit] = useState(false);
 
@@ -163,46 +164,49 @@ export default function AssessmentItem({
                         </div>
                     </div>
 
-                    <RoleGuard allowedRoles={["admin", "faculty"]}>
-                        <div className="h-8 flex items-center">
-                            <div
-                                onClick={stopPropagation}
-                                className="dropdown dropdown-end cursor-pointer"
-                            >
+                    {auth.user.user_id === assessmentDetails.created_by && (
+                        <RoleGuard allowedRoles={["admin", "faculty"]}>
+                            <div className="h-8 flex items-center">
                                 <div
-                                    tabIndex={0}
-                                    role="button"
-                                    className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue transition-all duration-300"
+                                    onClick={stopPropagation}
+                                    className="dropdown dropdown-end cursor-pointer"
                                 >
-                                    <BsThreeDotsVertical className="text-size3" />
-                                </div>
+                                    <div
+                                        tabIndex={0}
+                                        role="button"
+                                        className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue transition-all duration-300"
+                                    >
+                                        <BsThreeDotsVertical className="text-size3" />
+                                    </div>
 
-                                <ul
-                                    tabIndex={0}
-                                    className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-45 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-                                >
-                                    {assessmentDetails.status === "draft" ? (
-                                        <li onClick={handleEditClick}>
+                                    <ul
+                                        tabIndex={0}
+                                        className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-45 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                                    >
+                                        {assessmentDetails.status ===
+                                        "draft" ? (
+                                            <li onClick={handleEditClick}>
+                                                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                    Edit assessment
+                                                </a>
+                                            </li>
+                                        ) : (
+                                            <li onClick={unpublishAssessment}>
+                                                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                    Unpublish Assessment
+                                                </a>
+                                            </li>
+                                        )}
+                                        <li onClick={handleDeleteAsessment}>
                                             <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                Edit assessment
+                                                Delete assessment
                                             </a>
                                         </li>
-                                    ) : (
-                                        <li onClick={unpublishAssessment}>
-                                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                Unpublish Assessment
-                                            </a>
-                                        </li>
-                                    )}
-                                    <li onClick={handleDeleteAsessment}>
-                                        <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                            Delete assessment
-                                        </a>
-                                    </li>
-                                </ul>
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
-                    </RoleGuard>
+                        </RoleGuard>
+                    )}
                 </div>
                 <div>
                     <h1 className="flex-1 min-w-0 text-size4 truncate font-bold">
@@ -216,8 +220,7 @@ export default function AssessmentItem({
                     </span>
                 </div>
 
-                {assessmentDetails.assessment_type.assessment_type ===
-                    "quiz" && (
+                {assessmentDetails.quiz && (
                     <div
                         onClick={(e) => {
                             stopPropagation(e);
@@ -231,6 +234,13 @@ export default function AssessmentItem({
                                 {assessmentDetails.quiz.quiz_title}
                             </h4>
                         </div>
+                    </div>
+                )}
+                {assessmentDetails.files.length > 0 && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                        {assessmentDetails.files.map((file) => (
+                            <File fileName={file.file_name}></File>
+                        ))}
                     </div>
                 )}
 
