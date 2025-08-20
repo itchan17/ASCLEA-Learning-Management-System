@@ -20,6 +20,11 @@ def reset_cv_state():
     cv_state["close_camera"] = False
     cv_state["looking_away"] = False  
 
+@app.route('/reset_cv', methods=['POST'])
+def reset_cv():
+    reset_cv_state()
+    return jsonify({"status": "reset"})
+
 @app.route('/Asclea_Detection', methods=['POST'])
 def asclea_detection():
     data = request.get_json()
@@ -36,7 +41,6 @@ def asclea_detection():
         image_np = np.array(image)
         frame = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
 
-        reset_cv_state()
         detect_from_frame(frame, target_classes=target_classes)
 
         return jsonify({

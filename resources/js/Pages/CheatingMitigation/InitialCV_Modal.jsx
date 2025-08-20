@@ -38,7 +38,7 @@ return (
     <div className="bg-white p-6 w-[32rem] space-y-5 max-h-[calc(100vh-5rem)] overflow-y-auto shadow-2xl rounded-lg">
       <p className="text-center text-lg font-semibold font-nunito-sans">Facial Detection</p>
       
-      <div className="w-79 h-79 border-4 border-ascend-gray1 rounded-md flex items-center justify-center mx-auto">
+      <div className="w-79 h-79 border-4 border-ascend-blue rounded-md flex items-center justify-center mx-auto">
         {!cameraStarted && (
             <p className="text-ascend-gray1 text-size2 font-nunito-sans">Camera is off</p>
         )}

@@ -2,6 +2,9 @@ import React, { useRef, useState, useEffect } from 'react';
 import InitialCV_Modal from './InitialCV_Modal';
 import { FaCheckCircle, FaExclamationTriangle, FaCamera } from "react-icons/fa";
 import Webcam from 'react-webcam';
+import { ToastContainer, toast, Bounce } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const Monitoring = () => {
   const [cameraStarted, setCameraStarted] = React.useState(false);
@@ -13,10 +16,12 @@ const Monitoring = () => {
   const [showTestModal, setShowTestModal] = React.useState(false);
   const [minimized, setMinimized] = useState(false);
   const webcamRef = useRef(null);
+  const [webcamReady, setWebcamReady] = useState(false);
 
 
   const [count, setCount] = React.useState(0);
   const [warningLogs, setWarningLogs] = React.useState([]);
+  
 
   const detectionIntervalRef = React.useRef(null);
 
@@ -58,7 +63,23 @@ const Monitoring = () => {
     if (warning) {
       setWarningLogs(prevLogs => [...prevLogs, warning]);
       setCount(prevCount => prevCount + 1);
+      console.log("WarningLogs:", [...warningLogs, warning]);
+
+      toast.warn(warning, {
+      position: "top-left",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+      style: { fontSize: "16px", padding: "8px" },
+      })
     }
+
+
   }, [objectDetected, missingFace, lookingAway]);
 
 
@@ -75,6 +96,11 @@ const startCV = async () => {
         setCount(0);
         setCameraStarted(true);
 
+        await fetch("http://127.0.0.1:5000/reset_cv", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+        });
+
         const detectLoop = async () => {
         if (!webcamRef.current) {
             setTimeout(detectLoop, 1000); // Retry
@@ -82,6 +108,12 @@ const startCV = async () => {
         }
 
         const imageSrc = webcamRef.current.getScreenshot();
+
+          if (!imageSrc) {
+            console.log("Webcam warming up... retrying");
+            setTimeout(detectLoop, 1000);
+            return;
+          }
 
         try {
             const response = await fetch("http://127.0.0.1:5000/Asclea_Detection", {
@@ -142,54 +174,17 @@ return (
       {/* Camera Status */}
       <div className="flex items-center space-x-3 mt-[2px]">
         <span>Camera Status:</span>
-        {cameraStarted ? (
-          <div className="flex items-center space-x-1 text-ascend-green">
-            <FaCheckCircle className="w-4 h-4 relative top-[-1px]" />
-            <span>Active</span>
-          </div>
-        ) : (
-          <div className="flex items-center space-x-1 text-ascend-red">
-            <FaExclamationTriangle className="w-4 h-4 relative top-[-1px]" />
-            <span>Inactive</span>
-          </div>
-        )}
-      </div>
-
-      {/* Warnings */}
-      <div className="relative group">
-        <div className="flex items-center space-x-1 cursor-pointer">
-          <FaExclamationTriangle className="w-4 h-4 text-ascend-yellow relative top-[-1px]" />
-          <span>Warnings: {count}</span>
-        </div>
-        <div className="absolute z-10 w-64 p-3 bg-white shadow-xl border border-gray-200 rounded-md top-8 left-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none group-hover:pointer-events-auto">
-          <div className="flex items-center mb-2 space-x-2">
-            <FaExclamationTriangle className="w-5 h-5 text-ascend-yellow" />
-            <span className="font-nunito-sans text-size3 font-semibold">Warning Logs: {count}</span>
-          </div>
-
-          <p className="text-size1 mb-2">
-            Please stay within camera view and follow exam rules to avoid review.
-          </p>
-
-          {/* Scrollable list */}
-          <div className="max-h-40 overflow-y-auto pr-1">
-            <ul className="text-sm space-y-1">
-                {warningLogs.length > 0 ? (
-                warningLogs.map((log, index) => {
-                    const [time, message] = log.split(" - ");
-                    return (
-                    <div key={index} className="text-size1">
-                        <span className="text-black font-bold">{time}</span>
-                        <span className="text-black font-semibold"> – {message}</span>
-                    </div>
-                    );
-                })
-                ) : (
-                <div className="text-sm text-ascend-gray1">No warnings yet.</div>
-                )}
-            </ul>
-          </div>
-        </div>
+          {webcamReady ? (
+            <div className="flex items-center space-x-1 text-ascend-green">
+              <FaCheckCircle className="w-4 h-4 relative top-[-1px]" />
+              <span>Active</span>
+            </div>
+          ) : (
+            <div className="flex items-center space-x-1 text-ascend-red">
+              <FaExclamationTriangle className="w-4 h-4 relative top-[-1px]" />
+              <span>Inactive</span>
+            </div>
+          )}
       </div>
     </div>
 
@@ -197,16 +192,16 @@ return (
   <div
     className={`fixed z-[60] transition-all duration-300 rounded-md overflow-hidden bg-black
       ${showTestModal
-        ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-82 h-82 border-4 border-ascend-gray1'
+        ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-82 h-82 border-4 border-ascend-blue'
         : minimized
-          ? 'bottom-4 right-4 w-12 h-12 border border-gray-300 rounded-full'
-          : 'top-4 right-4 w-40 h-40 border-4 border-gray-300'}
+          ? 'bottom-4 right-4 w-12 h-12 border border-ascend-blue rounded-full'
+          : 'top-4 right-4 w-40 h-40 border-4 border-ascend-blue'}
     `}
   >
     {/* Minimize Button */}
     <button
       onClick={() => setMinimized(!minimized)}
-      className="absolute top-1 right-1 z-10 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded"
+      className="absolute top-1 right-1 z-10 bg-ascend-blue bg-opacity-50 text-white text-xs px-2 py-1 rounded"
     >
       {minimized ? '⤢' : '—'}
     </button>
@@ -224,15 +219,20 @@ return (
         height: 160,
         facingMode: "user",
       }}
+
+      onUserMedia={() => { 
+        console.log("Webcam started successfully"); 
+        setWebcamReady(true); 
+      }} 
+
+      onUserMediaError={(err) => { 
+        console.error("Webcam error:", err); 
+        setWebcamReady(false); 
+      }}
+      
     />
   </div>
 )}
-
-
-
-
-
-
       <InitialCV_Modal
         show={showTestModal} 
         toggleModal={() => setShowTestModal(false)}
@@ -242,6 +242,8 @@ return (
         webcamRef={webcamRef}
         cameraStarted={cameraStarted}
       />
+
+      <ToastContainer />
   </>
 );
 }
