@@ -13,8 +13,8 @@ use Inertia\Inertia;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function () {
             Route::middleware('web')->group(function () {
@@ -46,7 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
             '/programs',
             'programs/*',
         ]);
-         // ------ END ------
+        // ------ END ------
         $middleware->web(append: [
             HandleInertiaRequests::class,
         ]);
@@ -68,6 +68,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 ]);
             }
 
-        return $response;
-    });
+            return $response;
+        });
     })->create();

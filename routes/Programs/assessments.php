@@ -1,14 +1,11 @@
 <?php
 
 use App\Http\Controllers\Programs\AssessmentController;
-use App\Models\Course;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::prefix('programs/{program}/courses/{course}')
     ->middleware(['auth', 'verified', 'preventBack'])
     ->group(function () {
-
 
         // Create assesmsent
         Route::post('/assessments/create', [AssessmentController::class, 'createAssessment'])->name('assessment.create');
@@ -20,7 +17,7 @@ Route::prefix('programs/{program}/courses/{course}')
         Route::get('/assessments/{assessment}', [AssessmentController::class, 'showAssessment'])->name('program.course.assessment.view');
 
         // Route for display the edit page of quiz
-        Route::get('/quiz-form/{quiz}/edit', [AssessmentController::class, 'showEditQuizForm'])->name('program.course.quiz-form.edit');
+        Route::get('/assessments/{assessment}/quiz-form/{quiz}/edit', [AssessmentController::class, 'showEditQuizForm'])->name('program.course.quiz-form.edit');
 
         // Update assessment
         Route::put('/assessments/{assessment}/update', [AssessmentController::class, 'updateAssessment'])->name('assessment.update');

@@ -68,6 +68,7 @@ export default function AssessmentItem({
                 route("program.course.quiz-form.edit", {
                     program: program.program_id,
                     course: course.course_id,
+                    assessment: assessmentDetails.assessment_id,
                     quiz: assessmentDetails.quiz.quiz_id,
                 })
             );

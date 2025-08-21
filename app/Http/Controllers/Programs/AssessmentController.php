@@ -7,6 +7,7 @@ use App\Http\Requests\Programs\SaveAssessmentRequest;
 use App\Models\Programs\Assessment;
 use App\Services\Programs\AssessmentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 
@@ -21,6 +22,8 @@ class AssessmentController extends Controller
 
     public function createAssessment(SaveAssessmentRequest $req, $program, $course)
     {
+        // Check if user is authorized to create an assessment
+        Gate::authorize('createAssessment', [Assessment::class, $course]);
 
         $validatedAssessment = $req->validated();
 
@@ -42,6 +45,9 @@ class AssessmentController extends Controller
 
     public function listAssessments($program, $course)
     {
+        // Check if user can access the list of assessments
+        Gate::authorize('getAssessments', [Assessment::class, $course]);
+
         $assessments = $this->assessmentService->getAssessments($course);
 
         return response()->json($assessments);
@@ -49,6 +55,8 @@ class AssessmentController extends Controller
 
     public function updateAssessment(SaveAssessmentRequest $req, $program, $course, Assessment $assessment)
     {
+        // Check if user can update assessment
+        Gate::authorize('updateAssessment', $assessment);
 
         $validatedUpdatedAssessment = $req->validated();
 
@@ -74,6 +82,9 @@ class AssessmentController extends Controller
     // Independent controller that handle unpublishing of assessment
     public function unPublishAssessment($program, $course, Assessment $assessment)
     {
+        // Check if user can unpublish assessment
+        Gate::authorize('updateAssessment', $assessment);
+
         // Update the status of assessment
         // With true parameter indicating that the function was called for updating assessment status to draft
         $udpatedAssessment = $this->assessmentService->updateAssessment($assessment, [], true);
@@ -86,13 +97,19 @@ class AssessmentController extends Controller
 
     public function archiveAssessment($program, $course, Assessment $assessment)
     {
+
+        // Check if user can unpublish assessment
+        Gate::authorize('archiveAssessment', $assessment);
+
         $archivedAssessment = $this->assessmentService->archiveAssessment($assessment);
 
         return response()->json(["success" => "Assessment archived successfully.", "archivedAssessment" => $archivedAssessment]);
     }
 
-    public function restoreAssessment($program, $course, $assessment)
+    public function restoreAssessment($program, $course,  $assessment)
     {
+        // Check if user can unpublish assessment
+        Gate::authorize('restoreAssessment', [Assessment::class, $assessment]);
 
         $restoredAssessment = $this->assessmentService->restoreAssessment($assessment);
 
@@ -101,6 +118,9 @@ class AssessmentController extends Controller
 
     public function showAssessment($program, $course, Assessment $assessment)
     {
+        // Check if user an view specific assessment
+        Gate::authorize('viewAssessment', [Assessment::class, $course]);
+
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/ViewAssessment', [
             "programId" => $program,
             "courseId" => $course,
@@ -108,8 +128,11 @@ class AssessmentController extends Controller
         ]);
     }
 
-    public function showEditQuizForm()
+    public function showEditQuizForm($program, $course, Assessment $assessment, $quiz)
     {
+        // Check if user an view edit quiz form page of teh assessment
+        Gate::authorize('viewAssessment',  $assessment);
+
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/QuizForm');
     }
 }
