@@ -84,11 +84,11 @@ class AssessmentController extends Controller
         return response()->json(['success' => "Assessment unpublished sucessfully.", 'data' => $updatedAssessmentData]);
     }
 
-    public function deleteAssessment($program, $course, Assessment $assessment)
+    public function archiveAssessment($program, $course, Assessment $assessment)
     {
-        $deletedAssessment = $this->assessmentService->deleteAssessment($assessment);
+        $archivedAssessment = $this->assessmentService->archiveAssessment($assessment);
 
-        return response()->json(["success" => "Assessment deleted successfully.", "deletedAssessment" => $deletedAssessment]);
+        return response()->json(["success" => "Assessment archived successfully.", "archivedAssessment" => $archivedAssessment]);
     }
 
     public function restoreAssessment($program, $course, $assessment)
@@ -96,7 +96,7 @@ class AssessmentController extends Controller
 
         $restoredAssessment = $this->assessmentService->restoreAssessment($assessment);
 
-        return response()->json(["success" => "Assessment deleted successfully.", "restoredAssessment" => $restoredAssessment]);
+        return response()->json(["success" => "Assessment restored successfully.", "restoredAssessment" => $restoredAssessment]);
     }
 
     public function showAssessment($program, $course, Assessment $assessment)
@@ -110,7 +110,6 @@ class AssessmentController extends Controller
 
     public function showEditQuizForm()
     {
-
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/QuizForm');
     }
 }

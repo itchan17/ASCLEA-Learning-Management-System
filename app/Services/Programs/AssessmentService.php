@@ -97,6 +97,9 @@ class AssessmentService
     {
         $user = Auth::user();
 
+        // Query for getting all related data of the assessment
+        // also get soft deleted assessment but with conditon
+        // that it only displays assessment deleted by the user
         return Assessment::where('course_id', $courseId)->with('assessmentType')->with(['author' => function ($query) {
             $query->select('user_id', 'first_name', 'last_name');
         }])->with(['quiz' => function ($query) {
@@ -120,7 +123,7 @@ class AssessmentService
         return $assessment->refresh();
     }
 
-    // Get the data
+
     public function getAssessmentCompleteDetails(Assessment $assessment)
     {
         // Return all relevant data of assessment and hide unecessary data
@@ -155,7 +158,7 @@ class AssessmentService
         }
     }
 
-    public function deleteAssessment(Assessment $assessment)
+    public function archiveAssessment(Assessment $assessment)
     {
         $assessment->delete(); // Soft delete the assessment
 
@@ -164,6 +167,8 @@ class AssessmentService
 
     public function restoreAssessment(string $assessmentId)
     {
+        // Get the instace of model since model binding
+        // is not working for soft deleted data
         $assessment = Assessment::withTrashed()->findOrFail($assessmentId);
 
         $assessment->restore();

@@ -9,55 +9,27 @@ import { usePage, WhenVisible } from "@inertiajs/react";
 import Loader from "../../../../../Components/Loader";
 import axios from "axios";
 import { route } from "ziggy-js";
+import { displayToast } from "../../../../../Utils/displayToast";
+import DefaultCustomToast from "../../../../../Components/CustomToast/DefaultCustomToast";
 
 export default function Assessments() {
     const { course, program } = usePage().props;
 
-    // console.log(`COurrentPage: ${currentPage} LastPage: ${lastPage}`);
-    // Assessments Store
-    // const isFormOpen = useAssessmentsStore((state) => state.isFormOpen);
-    // const toggleAssessmentForm = useAssessmentsStore(
-    //     (state) => state.toggleAssessmentForm
-    // );
+    // Assessment Store
     const assessmentList = useAssessmentsStore((state) => state.assessmentList);
-    const setAssessmentList = useAssessmentsStore(
-        (state) => state.setAssessmentList
-    );
-
     const addToAssessmentList = useAssessmentsStore(
         (state) => state.addToAssessmentList
     );
-
     const page = useAssessmentsStore((state) => state.page);
     const hasMore = useAssessmentsStore((state) => state.hasMore);
     const setPagination = useAssessmentsStore((state) => state.setPagination);
 
     const [isAssessmentFormOpen, setIsAssessmentFormOpen] = useState(false);
-    // const [page, setPage] = useState(1);
-    // const [hasMore, setHasMore] = useState(true);
+
+    // States related for fetching data and inifnite scrolling
     const [isLoading, setIsLoading] = useState(false);
     const loaderRef = useRef(null);
-    const [initalLastPage, setInitalLastPage] = useState(null);
-
-    useEffect(() => {
-        console.log(`PAGE: ${page} HASMORE: ${hasMore}`);
-    }, [page, hasMore]);
-
-    // useEffect(() => {
-    //     if (currentPage === 1) {
-    //         setAssessmentList([...assessments]);
-    //     } else {
-    //         const assmnts = [...assessmentList, ...assessments];
-    //         // Map handle remove duplicate values based on the assessment id
-    //         const uniqueAssessments = [
-    //             ...new Map(assmnts.map((a) => [a.assessment_id, a])).values(),
-    //         ];
-
-    //         setAssessmentList(uniqueAssessments);
-    //     }
-    // }, [assessments]);
-
-    const targetForm = useRef(null);
+    const targetForm = useRef(null); // use to reference the loader
 
     // Scroll into the form once opened
     useEffect(() => {
@@ -69,11 +41,6 @@ export default function Assessments() {
     const toggleAssessmentForm = () => {
         setIsAssessmentFormOpen(!isAssessmentFormOpen);
     };
-
-    // useEffect(() => {
-    //     console.log(assessments);
-    //     console.log(assessmentList);
-    // }, [assessmentList]);
 
     const fetchAssessments = async () => {
         setIsLoading(true);
@@ -95,11 +62,21 @@ export default function Assessments() {
             const hasMoreAssessment =
                 response.data.current_page < response.data.last_page;
 
+            // Set the pagination using zustand
+            // so it wont get reset whenver user navigate to another page
+            // helps to preserve the state of loaded assessments
             setPagination(pageNum, hasMoreAssessment);
 
             setIsLoading(false);
         } catch (error) {
             console.error(error);
+
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. PLease reload the page."}
+                />,
+                "error"
+            );
             setIsLoading(false);
         }
     };
@@ -131,6 +108,8 @@ export default function Assessments() {
         };
     }, [handleObserver]);
 
+    // This will be used to intially fetch the assessments
+    // instead of using the observer
     useEffect(() => {
         fetchAssessments();
     }, []);
@@ -165,35 +144,20 @@ export default function Assessments() {
                     />
                 ))}
 
+            {/* Display only when assessmentList has value
+            preventing to be displayed in inital render of component */}
             {hasMore && assessmentList.length > 0 && (
                 <div ref={loaderRef} className=" w-full flex justify-center">
                     <Loader color="bg-ascend-blue" />
                 </div>
             )}
 
-            {assessmentList.length === 0 && !isLoading && (
+            {assessmentList.length === 0 && !hasMore && (
                 <EmptyState
                     imgSrc={"/images/illustrations/empty.svg"}
                     text={`“There’s a whole lot of nothing going on—time to make something happen!”`}
                 />
             )}
-            {/* {currentPage < lastPage && (
-                <WhenVisible
-                    params={{
-                        data: {
-                            page: currentPage + 1,
-                        },
-                        preserveUrl: true,
-                        preserveScroll: false,
-                        only: ["assessments"],
-                    }}
-                    always
-                >
-                    <div className=" w-full flex justify-center">
-                        <Loader color="bg-ascend-blue" />
-                    </div>
-                </WhenVisible>
-            )} */}
         </div>
     );
 }

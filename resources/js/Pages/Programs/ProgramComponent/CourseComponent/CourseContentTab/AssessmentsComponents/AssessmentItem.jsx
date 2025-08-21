@@ -114,19 +114,19 @@ export default function AssessmentItem({
         }
     };
 
-    const handleDeleteAsessment = async () => {
+    const handleArchiveAsessment = async () => {
         closeDropDown();
         console.log(assessmentDetails.assessment_id);
         try {
             const response = await axios.delete(
-                route("assessment.delete", {
+                route("assessment.archive", {
                     program: program.program_id,
                     course: course.course_id,
                     assessment: assessmentDetails.assessment_id,
                 })
             );
             console.log(response);
-            updateAssessmentInList(response.data.deletedAssessment);
+            updateAssessmentInList(response.data.archivedAssessment);
 
             displayToast(
                 <DefaultCustomToast message={response.data.success} />,
@@ -136,7 +136,7 @@ export default function AssessmentItem({
             console.error(error);
             displayToast(
                 <DefaultCustomToast
-                    message={"Something went wrong. Please try again"}
+                    message={"Something went wrong. Please try again."}
                 />,
                 "error"
             );
@@ -178,8 +178,8 @@ export default function AssessmentItem({
                 onClick={handleCardClick}
                 className="flex flex-col justify-between border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 cursor-pointer card-hover"
             >
-                <div className="flex items-center gap-2 md:gap-20">
-                    <div className="flex-1 min-w-0 flex gap-5">
+                <div className="flex items-start sm:items-center gap-2 md:gap-2">
+                    <div className="flex-1 min-w-0 flex flex-wrap gap-5">
                         <h1 className="text-size2 truncate font-bold">
                             {assessmentDetails.assessment_type
                                 .assessment_type === "quiz"
@@ -188,9 +188,14 @@ export default function AssessmentItem({
                         </h1>
 
                         {assessmentDetails.deleted_at ? (
-                            <div className={`px-2 bg-ascend-red`}>
-                                <span className="text-size1 font-bold text-ascend-white">
-                                    {"Deleted"}
+                            <div className="flex flex-wrap gap-2">
+                                <div className={`px-2 bg-ascend-red h-fit`}>
+                                    <span className="text-size1 font-bold text-ascend-white">
+                                        {"Archived"}
+                                    </span>
+                                </div>
+                                <span className="font-bold">
+                                    Permanently deleted in 30 days
                                 </span>
                             </div>
                         ) : (
@@ -212,7 +217,7 @@ export default function AssessmentItem({
 
                     {auth.user.user_id === assessmentDetails.created_by && (
                         <RoleGuard allowedRoles={["admin", "faculty"]}>
-                            <div className="h-8 flex items-center">
+                            <div className="flex items-center">
                                 <div
                                     onClick={stopPropagation}
                                     className="dropdown dropdown-end cursor-pointer"
@@ -263,11 +268,11 @@ export default function AssessmentItem({
                                                 )}
                                                 <li
                                                     onClick={
-                                                        handleDeleteAsessment
+                                                        handleArchiveAsessment
                                                     }
                                                 >
                                                     <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                        Delete assessment
+                                                        Archive assessment
                                                     </a>
                                                 </li>
                                             </>
@@ -283,7 +288,7 @@ export default function AssessmentItem({
                         {assessmentDetails.assessment_title}
                     </h1>
                     <span className="text-size1">
-                        {assessmentDetails.assessmentDueDateTime &&
+                        {assessmentDetails.due_datetime &&
                             `Due on ${formatDueDateTime(
                                 assessmentDetails.due_datetime
                             )}`}
@@ -319,7 +324,14 @@ export default function AssessmentItem({
 
                 <div className="flex flex-wrap-reverse justify-between items-baseline font-nunito-sans gap-2">
                     <span className="text-size1">
-                        Posted on {formatFullDate(assessmentDetails.created_at)}
+                        {assessmentDetails.created_at !==
+                        assessmentDetails.updated_at
+                            ? ` Updated on ${formatDueDateTime(
+                                  assessmentDetails.updated_at
+                              )}`
+                            : ` Posted on ${formatFullDate(
+                                  assessmentDetails.created_at
+                              )}`}
                     </span>
                     <span className="font-bold">
                         {`${capitalize(

@@ -29,7 +29,7 @@ Route::prefix('programs/{program}/courses/{course}')
         Route::put('/assessments/{assessment}/unpublish', [AssessmentController::class, 'unPublishAssessment'])->name('assessment.unpublish');
 
         // Delete assessment
-        Route::delete('/assessments/{assessment}/delete', [AssessmentController::class, 'deleteAssessment'])->name('assessment.delete');
+        Route::delete('/assessments/{assessment}/archive', [AssessmentController::class, 'archiveAssessment'])->name('assessment.archive');
 
         // Delete assessment
         Route::put('/assessments/{assessment}/restore', [AssessmentController::class, 'restoreAssessment'])->name('assessment.restore');

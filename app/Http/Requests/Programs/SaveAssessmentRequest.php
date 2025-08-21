@@ -30,7 +30,7 @@ class SaveAssessmentRequest extends FormRequest
             'status' => 'required|in:published,draft',
 
             // Files
-            'assessment_files' => 'nullable|array|max:20',
+            'assessment_files' => 'nullable|array|max:10',
             'assessment_files.*' => 'file|mimes:pdf,docx,pptx,png,jpg,jpeg|max:204800'
         ];
     }
@@ -39,7 +39,7 @@ class SaveAssessmentRequest extends FormRequest
     {
         // Change the error message for max file uploads
         return [
-            'assessment_files.max' => 'Maximum 20 files can be uploaded at once.',
+            'assessment_files.max' => 'Maximum 10 files can be uploaded at once.',
         ];
     }
 

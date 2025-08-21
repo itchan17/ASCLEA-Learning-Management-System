@@ -43,8 +43,6 @@ export default function AssessmentForm({
     const clearAssessmentDetails = useAssessmentsStore(
         (state) => state.clearAssessmentDetails
     );
-
-    const assessmentList = useAssessmentsStore((state) => state.assessmentList);
     const addNewAssessment = useAssessmentsStore(
         (state) => state.addNewAssessment
     );
@@ -59,8 +57,9 @@ export default function AssessmentForm({
     // to avoid persisting state
     useEffect(() => {
         if (!isEdit) {
-            // Reset the value to show all the assessments
-            clearAssessmentDetails(); // Clear the data first
+            // If note edit this means user will create a new assessment
+            // WE have to reset the value first
+            clearAssessmentDetails();
         }
     }, []);
 
@@ -86,85 +85,81 @@ export default function AssessmentForm({
         }
     };
 
+    // Handles axios request for adding assesment
     const addAssessment = async () => {
-        try {
-            const assessmentFormData = new FormData();
-            appendToFormData(assessmentFormData);
+        // Append the assessment details to form data since
+        // to enable file upaloading
+        const assessmentFormData = new FormData();
+        appendToFormData(assessmentFormData);
 
-            const response = await axios.post(
-                route("assessment.create", {
-                    program: program.program_id,
-                    course: course.course_id,
-                }),
-                assessmentFormData,
-                {
-                    headers: { "Content-Type": "multipart/form-data" },
-                }
-            );
-            console.log(response);
-
-            if (response.status === 200) {
-                // Set the updated data
-                addNewAssessment(response.data.data);
-
-                displayToast(
-                    <DefaultCustomToast message={response.data.success} />,
-                    "success"
-                );
-
-                setIsLoading(false);
-                toggleForm();
-                clearAssessmentDetails();
+        const response = await axios.post(
+            route("assessment.create", {
+                program: program.program_id,
+                course: course.course_id,
+            }),
+            assessmentFormData,
+            {
+                headers: { "Content-Type": "multipart/form-data" },
             }
-        } catch (error) {
-            console.error(error);
-            if (error.response.data.errors) {
-                setErrors(error.response.data.errors); // Set the validation error
-            } else {
-                displayToast(
-                    <DefaultCustomToast
-                        message={"Something went wrong. Please try again."}
-                    />,
-                    "error"
-                );
+        );
+
+        addNewAssessment(response.data.data);
+
+        displayToast(
+            <DefaultCustomToast message={response.data.success} />,
+            "success"
+        );
+    };
+    // Handles the axios request for updating
+    const updateAssessment = async () => {
+        // Append the assessment details to form data since
+        // to enable file upaloading
+        const assessmentFormData = new FormData();
+        appendToFormData(assessmentFormData);
+        assessmentFormData.append("_method", "PUT");
+
+        const response = await axios.post(
+            route("assessment.update", {
+                program: program.program_id,
+                course: course.course_id,
+                assessment: assessmentId,
+            }),
+            assessmentFormData,
+            {
+                headers: { "Content-Type": "multipart/form-data" },
             }
-            setIsLoading(false);
-        }
+        );
+
+        // Change the updated assessment data in the list
+        updateAssessmentInList(response.data.data);
+
+        displayToast(
+            <DefaultCustomToast message={response.data.success} />,
+            "success"
+        );
     };
 
-    const updateAssessment = async () => {
+    const handeSubmit = async () => {
+        setIsLoading(true);
+        setErrors(null);
+
         try {
-            const assessmentFormData = new FormData();
-            appendToFormData(assessmentFormData);
-            assessmentFormData.append("_method", "PUT");
-
-            const response = await axios.post(
-                route("assessment.update", {
-                    program: program.program_id,
-                    course: course.course_id,
-                    assessment: assessmentId,
-                }),
-                assessmentFormData,
-                {
-                    headers: { "Content-Type": "multipart/form-data" },
-                }
-            );
-
-            // Change the updated assessment data in the list
-            updateAssessmentInList(response.data.data);
-
-            displayToast(
-                <DefaultCustomToast message={response.data.success} />,
-                "success"
-            );
+            if (isEdit) {
+                await updateAssessment();
+            } else {
+                await addAssessment();
+            }
 
             setIsLoading(false);
             toggleForm();
             clearAssessmentDetails();
         } catch (error) {
             console.error(error);
+            // Check for value in response.data.errors
+            // This is where the valdiation errors located
+            // So we have to set it in the state that will display error
             if (error.response.data.errors) {
-                setErrors(error.response.data.errors); // Set the validation error
+                setErrors(error.response.data.errors);
             } else {
                 displayToast(
                     <DefaultCustomToast
@@ -174,47 +169,6 @@ export default function AssessmentForm({
                 );
             }
             setIsLoading(false);
-        }
-    };
-
-    const handeSubmit = () => {
-        setIsLoading(true);
-        setErrors(null);
-
-        if (isEdit) {
-            // Update assessment
-            updateAssessment();
-        } else {
-            // Add new assessment
-            // router.post(
-            //     route("assessment.create", {
-            //         program: program.program_id,
-            //         course: course.course_id,
-            //     }),
-            //     { ...assessmentDetails },
-            //     {
-            //         preserveScroll: true,
-            //         showProgress: false,
-            //         only: ["assessments", "flash"],
-            //         onError: (error) => {
-            //             setErrors(error);
-            //         },
-            //         onSuccess: (page) => {
-            //             toggleForm();
-            //             clearAssessmentDetails();
-            //             // Reeset the value to show all the assessments
-            //             displayToast(
-            //                 <DefaultCustomToast
-            //                     message={page.props.flash.success}
-            //                 />,
-            //                 "success"
-            //             );
-            //         },
-            //         onFinish: () => setIsLoading(false),
-            //     }
-            // );
-
-            addAssessment();
         }
     };
 
@@ -224,7 +178,7 @@ export default function AssessmentForm({
     };
 
     // Used for dropdown button to set the status of the assessment
-    const statusChange = (btnText, fieldName, status) => {
+    const statusChange = (fieldName, status) => {
         closeDropDown();
         handleAssessmentChange(fieldName, status);
     };
@@ -241,16 +195,11 @@ export default function AssessmentForm({
     };
 
     // Hanndles displaying of toast to inform user
-    // that assessment has to be save as draft first to enable
-    // quiz form editing
+    // that assessment has to be save as draft first to enable quiz form editing
     const handleClickQuizInform = () => {
         const message = "Please save as draft first to edit the quiz.";
         displayToast(<DefaultCustomToast message={message} />, "info");
     };
-
-    useEffect(() => {
-        console.log(assessmentDetails);
-    }, [assessmentDetails]);
 
     return (
         <form
