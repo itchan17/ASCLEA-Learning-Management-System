@@ -15,6 +15,7 @@ import DefaultCustomToast from "../../../../../../Components/CustomToast/Default
 import axios from "axios";
 import ModalContainer from "../../../../../../Components/ModalContainer";
 import File from "../File";
+import { getRemainingDays } from "../../../../../../Utils/getRemainingDays";
 
 export default function AssessmentItem({
     assessmentDetails,
@@ -195,7 +196,12 @@ export default function AssessmentItem({
                                     </span>
                                 </div>
                                 <span className="font-bold">
-                                    Permanently deleted in 30 days
+                                    {`Permanently deleted in
+                                   ${getRemainingDays(
+                                       assessmentDetails.deleted_at,
+                                       30
+                                   )}
+                                    days`}
                                 </span>
                             </div>
                         ) : (

@@ -145,14 +145,16 @@ class AssessmentService
         foreach ($removedFiles as $removedFileId) {
             $file = AssessmentFile::find($removedFileId);
 
-            // Check if file is not equal to original
-            // If not it means the files was converted and it also has to deleted the original file
-            if ($file->file_path !== $file->original_file_path) {
-                // Remove the two files
-                Storage::delete([$file->file_path, $file->original_file_path]);
-            }
+            if (Storage::disk('local')->exists($file->file_path)) {
+                // Check if file is not equal to original
+                // If not it means the files was converted and it also has to deleted the original file
+                if ($file->file_path !== $file->original_file_path) {
+                    // Remove the two files
+                    Storage::delete([$file->file_path, $file->original_file_path]);
+                }
 
-            Storage::delete($file->file_path);
+                Storage::delete($file->file_path);
+            }
 
             $file->delete();
         }
