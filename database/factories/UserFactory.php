@@ -16,12 +16,15 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $gender = $this->faker->randomElement(['male', 'female']);
+
         return [
-            'first_name' => $this->faker->firstName(),
+            'first_name' => $this->faker->firstName($gender),
             'last_name' => $this->faker->lastName(),
             'middle_name' => $this->faker->firstName(),
+            'profile_image' => $gender === 'male' ? "userProfileImages/male.png" : "userProfileImages/female.png",
             'birthdate' => $this->faker->date('Y-m-d', now()->subYears(18)), 
-            'gender' => $this->faker->randomElement(['male', 'female']),
+            'gender' => $gender,
             'contact_number' => $this->faker->phoneNumber(),
             'email' => $this->faker->unique()->safeEmail(),
             'house_no' => $this->faker->buildingNumber(),

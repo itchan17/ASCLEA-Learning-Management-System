@@ -20,11 +20,12 @@ class ProgramPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user): bool
+    public function view(User $user, Program $program): bool
     {
-        // Add more logic here to prevent users that are not member
-        $role = $user->role?->role_name;
-        return in_array($role, ['admin', 'faculty', 'student'], true);
+        // Check if user is an admin or a member of the program
+        $isAuthorized = $user->role->role_name === 'admin' || $program->learningMembers()->where('user_id', $user->user_id)->exists();
+
+        return $isAuthorized;
     }
 
     /**

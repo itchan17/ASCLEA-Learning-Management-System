@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class LearningMember extends Model
+class AssignedCourse extends Model
 {
-    use HasUuids;
+     use HasUuids;
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -30,25 +29,20 @@ class LearningMember extends Model
      *
      * @var string
      */
-    protected $primaryKey = 'learning_member_id';
+    protected $primaryKey = 'assigned_course_id';
 
     protected $fillable = [
-        'user_id',
-        'program_id',
+        'learning_member_id',
+        'course_id',
     ];
 
-    public function program(): BelongsTo 
+     public function member(): BelongsTo
     {
-        return $this->belongsTo(Program::class, 'program_id');
+        return $this->belongsTo(LearningMember::class, 'leaniing_member_id');
     }
 
-    public function user(): BelongsTo 
+    public function course(): BelongsTo 
     {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function courses(): HasMany
-    {
-        return $this->hasMany(AssignedCourse::class, 'learning_member_id');
+        return $this->belongsTo(Course::class, 'course_id');
     }
 }

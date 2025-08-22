@@ -7,7 +7,8 @@ import useProgramStore from "../../../Stores/Programs/programStore";
 import useCourseStore from "../../../Stores/Programs/courseStore";
 import { router, useForm } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
-import { update } from "lodash";
+import { displayToast } from "../../../Utils/displayToast";
+import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToast";
 
 export default function AddProgramForm({
     toggleModal,
@@ -54,6 +55,7 @@ export default function AddProgramForm({
         setIsValidating(true);
 
         router.post(route("validate.course"), course, {
+            showProgress: false,
             onError: (error) => {
                 setAddCourseError(error);
                 setIsValidating(false);
@@ -77,18 +79,32 @@ export default function AddProgramForm({
         if (!editProgram) {
             // Send a post request to server to create program
             post(route("program.create", []), {
-                onSuccess: () => {
+                showProgress: false,
+                onSuccess: (page) => {
                     reset();
                     toggleModal();
+                    displayToast(
+                        <DefaultCustomToast
+                            message={page.props.flash.success}
+                        />,
+                        "success"
+                    );
                 },
             });
         } else {
             // Send a put request to server to update program
             put(route("program.update", programDataToUpdate.program_id), {
-                onSuccess: () => {
+                showProgress: false,
+                onSuccess: (page) => {
                     reset();
                     toggleModal();
                     setEditProgram(false);
+                    displayToast(
+                        <DefaultCustomToast
+                            message={page.props.flash.success}
+                        />,
+                        "success"
+                    );
                 },
             });
         }

@@ -2,13 +2,14 @@ import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { IoSearch } from "react-icons/io5";
 import SecondaryButton from "../../../../Components/Button/SecondaryButton";
 import PrimaryButton from "../../../../Components/Button/PrimaryButton";
-import usePeopleStore from "../../../../Stores/Programs/peopleStore";
 import { router, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import axios from "axios";
 import Loader from "../../../../Components/Loader";
 import { capitalize } from "lodash";
 import debounce from "lodash.debounce";
+import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
+import { displayToast } from "../../../../Utils/displayToast";
 
 export default function AddMemberForm({ toggleModal }) {
     const { program } = usePage().props;
@@ -41,7 +42,21 @@ export default function AddMemberForm({ toggleModal }) {
                     },
                 })
             );
-            setUserList((prev) => [...prev, ...res.data.data]);
+            const users = [...userList, ...res.data.data];
+
+            // Prevent duplicate value to be set in the user list
+            setUserList(
+                users.reduce((acc, current) => {
+                    // Check if theres a duplicate in the acc
+                    // If not push the current user to acc
+                    // Else skip
+                    if (!acc.some((user) => user.user_id === current.user_id)) {
+                        acc.push(current);
+                    }
+                    return acc;
+                }, [])
+            );
+
             setIsLoading(false);
             setHasMore(res.data.current_page < res.data.last_page);
             setPage((prev) => prev + 1);
@@ -86,6 +101,9 @@ export default function AddMemberForm({ toggleModal }) {
     // Debounce on change handlers
     const handleOnChangeSearchQuery = (e) => {
         setUserList([]);
+        setUnSelectedUsers([]);
+        setSelectedUsers([]);
+        setSelectAll(false);
         setPage(1);
         setHasMore(true);
         setSearchQuery(e.target.value);
@@ -97,6 +115,9 @@ export default function AddMemberForm({ toggleModal }) {
 
     const handleOnChangeFilter = (e) => {
         setUserList([]);
+        setUnSelectedUsers([]);
+        setSelectedUsers([]);
+        setSelectAll(false);
         setPage(1);
         setHasMore(true);
         setFilter(e.target.value);
@@ -130,7 +151,14 @@ export default function AddMemberForm({ toggleModal }) {
                 ? unSelectedUsers.filter((id) => id !== userId)
                 : [...unSelectedUsers, userId];
 
-            setUnSelectedUsers(updatedUnselectedUsers);
+            if (updatedUsers.length > 0) {
+                setUnSelectedUsers(updatedUnselectedUsers);
+            } else {
+                // Reset state if theres no updatedUsers
+                // This means user clicked select all then unchecked all the user
+                setSelectAll(false);
+                setUnSelectedUsers([]);
+            }
         }
     };
 
@@ -147,7 +175,7 @@ export default function AddMemberForm({ toggleModal }) {
     };
 
     useEffect(() => {
-        // If selectAll is true update the selectedUsers to check the checkbox as the user srolls
+        // If selectAll is true update the selectedUsers to check the checkbox as the user scrolls
         if (selectAll) {
             const allUsers = userList.map((user) => user.user_id);
             setSelectedUsers(allUsers);
@@ -163,15 +191,24 @@ export default function AddMemberForm({ toggleModal }) {
                     is_select_all: selectAll,
                     selected_users: selectedUsers,
                     unselected_users: unSelectedUsers,
+                    filter: filter || null,
+                    search: searchQuery || null,
                 },
                 {
+                    showProgress: false,
                     except: ["courses", "program"],
                     onError: () => {
                         setIsAddLoading(false);
                     },
-                    onSuccess: () => {
+                    onSuccess: (page) => {
                         toggleModal();
                         setIsAddLoading(false);
+                        displayToast(
+                            <DefaultCustomToast
+                                message={page.props.flash.success}
+                            />,
+                            "success"
+                        );
                     },
                 }
             );
@@ -186,10 +223,10 @@ export default function AddMemberForm({ toggleModal }) {
         <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center text-ascend-black">
             <form
                 onSubmit={(e) => handleAdd(e)}
-                className="bg-ascend-white opacity-100 p-5 w-160 space-y-5  max-h-[calc(100vh-5rem)] overflow-y-auto my-10"
+                className="bg-ascend-white opacity-100 p-5 w-160 space-y-5 max-h-[calc(100vh-5rem)] overflow-y-auto my-10"
             >
                 <h1 className="text-size4 font-bold">Add Member</h1>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div className="relative col-span-1 sm:col-span-2">
                         <input
                             onChange={debouncedSearchChange}
@@ -212,6 +249,7 @@ export default function AddMemberForm({ toggleModal }) {
                     <div className="flex items-center mb-0 gap-2">
                         <input
                             type="checkbox"
+                            checked={selectAll}
                             className="accent-ascend-blue w-4 h-4"
                             onChange={handleSelectAll}
                         />
@@ -235,7 +273,15 @@ export default function AddMemberForm({ toggleModal }) {
                                         handleAddNewMemberChange(user.user_id)
                                     }
                                 />
-                                <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl ml-5 mr-3"></div>
+
+                                <img
+                                    src={
+                                        user.profile_image &&
+                                        `/storage/${user.profile_image}`
+                                    }
+                                    alt="Profile image"
+                                    className="w-12 h-12 shrink-0 bg-ascend-gray1/20 rounded-4xl ml-5 mr-3 object-cover"
+                                ></img>
                                 <div>
                                     <div className="flex flex-col">
                                         <span className="font-semibold">
@@ -271,7 +317,7 @@ export default function AddMemberForm({ toggleModal }) {
                         userList.length === 0 && (
                             <div className="flex items-center justify-center min-h-full">
                                 <h1 className="text-ascend-black font-nunito-sans text-size4">
-                                    No users
+                                    No users available
                                 </h1>
                             </div>
                         )
@@ -280,6 +326,7 @@ export default function AddMemberForm({ toggleModal }) {
                 <div className="flex justify-end space-x-2">
                     <SecondaryButton
                         doSomething={handleCancel}
+                        isDisabled={isAddLoading}
                         text={"Cancel"}
                     />
                     <PrimaryButton

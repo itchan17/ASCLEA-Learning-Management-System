@@ -5,20 +5,34 @@ namespace App\Http\Controllers\Programs;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Program;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 class ProgramController extends Controller
 {
+    public function listPrograms () {
+        
+        $query = Program::select('program_id', 'program_name', 'background_image');
+
+        // Check is user is not admin
+        if(Auth::user()->role->role_name !== 'admin'){
+            // Get the programs where the user is a member of
+             $query->whereHas('learningMembers', function($query) { $query->where('user_id', Auth::id()); })
+                ->latest()
+                ->get();
+        }
+
+        return  $query->latest()->get();
+    }
+    
     // Display the program page
     public function index() {
+        // Program::select('program_id', 'program_name', 'background_image')->latest()->get()
         return Inertia::render('Programs/Programs', [
-            'program_list' => Program::select('program_id', 'program_name', 'background_image')->latest()->get()
+            'program_list' => fn() => $this->listPrograms()
         ]);
     }
 
@@ -73,6 +87,32 @@ class ProgramController extends Controller
         return to_route('programs.index')->with('success', 'Program archived successfully.');
     }
 
+    public function listCourses ($program) {
+
+        $query = $program->courses();
+        
+        // Check if user is not admin return, get only courses assigned to the user
+        if (Auth::user()->role->role_name !== 'admin') {
+            // Check if the course is assigned to the suer
+             $query->whereHas('assignedTo', function ($query) use($program) {    
+                    $memberId = Auth::user()->programs->where('program_id', $program->program_id) 
+                        ->first()->learning_member_id;  // Get the learning member id
+                    
+                    $query->where('learning_member_id', $memberId); // Check if the course was assigned to the users learning member id
+                });
+        } 
+
+        return $query->latest()
+                        ->select([
+                            'course_id',
+                            'course_code',
+                            'course_name',
+                            'course_description',
+                            'updated_at'
+                        ])
+                        ->get();
+    }
+
     // Show the selected program
     public function showProgram(Program $program, Request $req) {
         // Return a prop containing the program data
@@ -81,14 +121,15 @@ class ProgramController extends Controller
             'program' => fn () => $program->only(['program_id', 'program_name', 'program_description', 'background_image']),
 
             // List of courses
-            'courses' => fn () => $program->courses()->latest()->select(['course_id', 'course_code', 'course_name', 
-            'course_description', 'updated_at'])->get(),
+            'courses' => fn () => $this->listCourses($program),
 
             // Members of the program
             // Return only if specifically requested / when people was rendered
             'members' => Inertia::optional(fn () => $this->getLearningMembers($program, $req->input('role'), $req->input('search'))),
         ]);
     }
+
+    
         
     public function getLearningMembers($program, $role, $search) {
 
@@ -100,7 +141,7 @@ class ProgramController extends Controller
             // Get user data from users table
             ->with([
                 'user' => fn ($query) => $query 
-                    ->select('user_id', 'role_id', 'first_name', 'last_name', 'email')
+                    ->select('user_id', 'role_id', 'first_name', 'last_name', 'email', 'profile_image')
                     ->with([
                         'role' => fn ($query) => $query->select('role_id', 'role_name') // Get the user role
                     ])
