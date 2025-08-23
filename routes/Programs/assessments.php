@@ -30,4 +30,12 @@ Route::prefix('programs/{program}/courses/{course}')
 
         // Delete assessment
         Route::put('/assessments/{assessment}/restore', [AssessmentController::class, 'restoreAssessment'])->name('assessment.restore');
+
+        // Route for viewing file
+        Route::get('/assessments/{assessment}/files/{file}', [AssessmentController::class, "viewFile"])->name('program.course.file.view');
+
+        // Route for displaying the file
+        Route::get('/assessments/{assessment}/files/{file}/stream', [AssessmentController::class, "streamAssessmentFile"])->middleware(['auth', 'verified', 'preventBack'])->name('program.course.file.stream');
+
+        Route::get('/assessments/{assessment}/files/{file}/download', [AssessmentController::class, "downloadAssessmentFile"])->middleware(['auth', 'verified', 'preventBack'])->name('program.course.file.download');
     });

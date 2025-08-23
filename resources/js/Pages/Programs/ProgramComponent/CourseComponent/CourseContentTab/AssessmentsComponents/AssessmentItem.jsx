@@ -174,6 +174,17 @@ export default function AssessmentItem({
         }
     };
 
+    const handleFileClick = (fileId) => {
+        router.get(
+            route("program.course.file.view", {
+                program: program.program_id,
+                course: course.course_id,
+                assessment: assessmentDetails.assessment_id,
+                file: fileId,
+            })
+        );
+    };
+
     return (
         <>
             <div
@@ -324,6 +335,9 @@ export default function AssessmentItem({
                             <File
                                 key={file.assessment_file_id}
                                 fileName={file.file_name}
+                                onClick={() =>
+                                    handleFileClick(file.assessment_file_id)
+                                }
                             ></File>
                         ))}
                     </div>

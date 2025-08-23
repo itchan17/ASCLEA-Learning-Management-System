@@ -102,7 +102,7 @@ class AssessmentService
         // that it only displays assessment deleted by the user
         return Assessment::where('course_id', $courseId)->with('assessmentType')->with(['author' => function ($query) {
             $query->select('user_id', 'first_name', 'last_name');
-        }])->with(['quiz' => function ($query) {
+        }])->where('created_by', $user->user_id)->orWhere('status', 'published')->with(['quiz' => function ($query) {
             $query->select('assessment_id', 'quiz_id', 'quiz_title');
         }])->with(['files' => function ($query) {
             $query->select('assessment_id', 'assessment_file_id', 'file_name', 'file_path');

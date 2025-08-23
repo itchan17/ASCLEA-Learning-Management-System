@@ -3,23 +3,15 @@ import { AiFillFile } from "react-icons/ai";
 import { router } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 
-export default function File({ fileName }) {
+export default function File({ fileName, onClick }) {
     const route = useRoute();
 
-    const handleFileClick = (e) => {
-        e.stopPropagation();
-
-        router.visit(
-            route("program.course.file.view", {
-                programId: 1,
-                courseId: 1,
-                fileId: 1,
-            })
-        );
-    };
     return (
         <div
-            onClick={(e) => handleFileClick(e)}
+            onClick={(e) => {
+                e.stopPropagation();
+                onClick();
+            }}
             className="flex h-15 items-center space-x-4 p-2 border border-ascend-gray1 bg-ascend-white cursor-pointer hover-change-bg-color shadow-shadow2 group"
         >
             <div className="w-full flex overflow-hidden font-semibold font-nunito-sans text-ascebd-black">

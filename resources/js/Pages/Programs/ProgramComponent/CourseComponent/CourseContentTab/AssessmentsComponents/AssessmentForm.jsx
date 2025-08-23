@@ -179,6 +179,7 @@ export default function AssessmentForm({
 
     // Used for dropdown button to set the status of the assessment
     const statusChange = (fieldName, status) => {
+        console.log("STATUS CHANGE");
         closeDropDown();
         handleAssessmentChange(fieldName, status);
     };
@@ -493,11 +494,7 @@ export default function AssessmentForm({
                                 >
                                     <li
                                         onClick={() =>
-                                            statusChange(
-                                                "Publsih",
-                                                "status",
-                                                "published"
-                                            )
+                                            statusChange("status", "published")
                                         }
                                     >
                                         <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
@@ -506,11 +503,7 @@ export default function AssessmentForm({
                                     </li>
                                     <li
                                         onClick={() =>
-                                            statusChange(
-                                                "Save as Draft",
-                                                "status",
-                                                "draft"
-                                            )
+                                            statusChange("status", "draft")
                                         }
                                     >
                                         <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">

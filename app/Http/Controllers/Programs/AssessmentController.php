@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Programs;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Programs\SaveAssessmentRequest;
 use App\Models\Programs\Assessment;
+use App\Models\Programs\AssessmentFile;
+use App\Services\HandlingPrivateFileService;
 use App\Services\Programs\AssessmentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 
@@ -134,5 +137,37 @@ class AssessmentController extends Controller
         Gate::authorize('viewAssessment',  $assessment);
 
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/QuizForm');
+    }
+
+    public function viewFile($program, $course, $assessment, AssessmentFile $file)
+    {
+        // Check if user is authorize to access the view file page
+        Gate::authorize('viewAssessmentFile', [Assessment::class, $course]);
+
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/MaterialsComponents/ViewFile', [
+            'fileName' => $file->file_name,
+            'programId' => $program,
+            'courseId' =>  $course,
+            'assessmentId' => $assessment,
+            'fileId' => $file->assessment_file_id
+        ]);
+    }
+
+    public function streamAssessmentFile($program, $course, $assessment, AssessmentFile $file)
+    {
+        // Checks if the use is authorize to access the file
+        Gate::authorize('viewAssessmentFile', [Assessment::class, $course]);
+
+        // Use a service classs that returns the path of the private file            
+        return   HandlingPrivateFileService::retrieveFile($file->file_path);
+    }
+
+    public function downloadAssessmentFile($program, $course, $assessment, AssessmentFile $file)
+    {
+        // Checks if the use user is authorize to downlaod teh file
+        Gate::authorize('downloadAssessmentFile', [Assessment::class, $course]);
+
+        // Use a service class that returns the file to be download
+        return HandlingPrivateFileService::downloadFile($file->original_file_path, $file->file_name);
     }
 }

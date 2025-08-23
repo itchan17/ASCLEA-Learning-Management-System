@@ -61,11 +61,18 @@ export default function ViewAssessment({
     //         elem?.blur();
     //     }
     // };
-    const backBtn = () => {
-        router.visit(route("program.course.show", { programId, courseId }), {
-            preserveScroll: false,
-        });
+
+    const handleFileClick = (fileId) => {
+        router.get(
+            route("program.course.file.view", {
+                program: programId,
+                course: courseId,
+                assessment: assessment.assessment_id,
+                file: fileId,
+            })
+        );
     };
+
     return (
         <div className="text-ascend-black space-y-5 font-nunito-sans">
             <div className="flex">
@@ -144,6 +151,9 @@ export default function ViewAssessment({
                         <File
                             key={file.assessment_file_id}
                             fileName={file.file_name}
+                            onClick={() =>
+                                handleFileClick(file.assessment_file_id)
+                            }
                         />
                     ))}
             </div>
