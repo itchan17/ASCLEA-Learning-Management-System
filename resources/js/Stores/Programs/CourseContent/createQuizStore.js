@@ -5,11 +5,14 @@ const useCreateQuizStore = create((set) => ({
     editForm: false,
 
     quizDetails: {
-        id: null,
-        quizTitle: "First quiz",
-        quizDescription: "",
-        quizDuration: 0,
+        quiz_title: "",
+        quiz_description: "",
+        duration: 0,
+        show_answers_after: false,
+        cheating_mitigation: false,
+        quiz_total_points: 0,
     },
+
     questionDetails: {
         id: null,
         questionType: "",
@@ -49,6 +52,19 @@ const useCreateQuizStore = create((set) => ({
             required: true,
         },
     ],
+
+    setQuizDetails: (quizDetails) => {
+        set({
+            quizDetails: {
+                quiz_title: quizDetails.quiz_title,
+                quiz_description: quizDetails.quiz_description,
+                duration: quizDetails.duration,
+                show_answers_after: quizDetails.show_answers_after,
+                cheating_mitigation: quizDetails.cheating_mitigation,
+                quiz_total_points: quizDetails.quiz_total_points,
+            },
+        });
+    },
 
     setQuestionList: (newOrder) => {
         set({

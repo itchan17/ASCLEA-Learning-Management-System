@@ -6,6 +6,9 @@ import useCreateQuizStore from "../../../../../../Stores/Programs/CourseContent/
 import Question from "./Question";
 import SecondaryButton from "../../../../../../Components/Button/SecondaryButton";
 import QuestionForm from "./QuestionFormComponents/QuestionForm";
+import BackButton from "../../../../../../Components/Button/BackButton";
+import { handleClickBackBtn } from "../../../../../../Utils/handleClickBackBtn";
+import QuizFormNav from "./QuizFormNav";
 import {
     SortableContext,
     verticalListSortingStrategy,
@@ -22,7 +25,7 @@ import {
     useSensor,
 } from "@dnd-kit/core";
 
-export default function QuizForm() {
+export default function QuizForm({ quiz }) {
     // Create Quiz Store
     const quizDetails = useCreateQuizStore((state) => state.quizDetails);
     const handleQuizDetailsChange = useCreateQuizStore(
@@ -38,6 +41,11 @@ export default function QuizForm() {
     const setQuestionList = useCreateQuizStore(
         (state) => state.setQuestionList
     );
+    const setQuizDetails = useCreateQuizStore((state) => state.setQuizDetails);
+
+    useEffect(() => {
+        setQuizDetails(quiz);
+    }, []);
 
     // Local States
     const [openQuestionForm, setOpenQuestionForm] = useState({
@@ -115,205 +123,178 @@ export default function QuizForm() {
             totalPoints += questionPoints;
         });
 
-        return totalPoints;
+        handleQuizDetailsChange("quiz_total_points", totalPoints);
     };
     useEffect(() => {
         console.log(quizDetails);
         console.log("QUESTION LIST:", questionList);
     }, [quizDetails, questionList]);
     return (
-        <SinglePage>
-            <div className="w-full max-w-235 space-y-5">
-                <div className="flex gap-5 items-center justify-between">
-                    <h1 className="text-size6 font-bold text-nowrap">
-                        Create Quiz
-                    </h1>
+        <div className="font-nunito-sans relative space-y-5 text-ascend-black">
+            <QuizFormNav />
+            <div className="w-full flex gap-5 items-center px-5 lg:px-[100px]">
+                <BackButton doSomething={handleClickBackBtn} />
+            </div>
+            <div className="flex justify-center px-5 pb-5 lg:px-[150px]">
+                <div className="w-full max-w-235 space-y-5">
+                    <div className="flex gap-5 items-center justify-between">
+                        <h1 className="text-size6 font-bold text-nowrap">
+                            Create Quiz
+                        </h1>
 
-                    <div className="flex justify-end items-center gap-2 w-full sm:w-auto">
-                        <div className="hidden md:flex gap-1">
-                            <input
-                                type="checkbox"
-                                defaultChecked={false}
-                                className="toggle toggle-md border-ascend-blue bg-ascend-white checked:border-ascend-blue checked:bg-ascend-blue checked:text-ascend-white"
-                            />
-                            <span className="text-ascend-black font-bold">
-                                Cheating mitigation
-                            </span>
-                        </div>
-                        <div className="hidden md:flex gap-1">
-                            <input
-                                type="checkbox"
-                                defaultChecked={false}
-                                className="toggle toggle-md border-ascend-blue bg-ascend-white checked:border-ascend-blue checked:bg-ascend-blue checked:text-ascend-white"
-                            />
-                            <span className="text-ascend-black font-bold">
-                                Show answers after
-                            </span>
-                        </div>
-
-                        <PrimaryButton text={"Save Quiz"} />
-                    </div>
-                </div>
-                <div className="md:hidden flex flex-col justify-end gap-2 ml-auto w-full sm:w-auto">
-                    <div className="flex gap-1">
-                        <input
-                            type="checkbox"
-                            defaultChecked={false}
-                            className="toggle toggle-md border-ascend-blue bg-ascend-white checked:border-ascend-blue checked:bg-ascend-blue checked:text-ascend-white"
-                        />
-                        <span className="text-ascend-black font-bold">
-                            Cheating mitigation
-                        </span>
-                    </div>
-                    <div className="flex gap-1">
-                        <input
-                            type="checkbox"
-                            defaultChecked={false}
-                            className="toggle toggle-md border-ascend-blue bg-ascend-white checked:border-ascend-blue checked:bg-ascend-blue checked:text-ascend-white"
-                        />
-                        <span className="text-ascend-black font-bold">
-                            Show answers after
-                        </span>
-                    </div>
-                </div>
-                <div className="w-full space-y-5">
-                    <div className="font-bold text-end">
-                        Total points: {calcTotalPoints()}
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 w-full">
-                        <div className="col-span-1 sm:col-span-3">
-                            <label className="font-bold">
-                                Title<span className="text-ascend-red">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                value={quizDetails.quizTitle}
-                                onChange={(e) =>
-                                    handleQuizDetailsChange(
-                                        "quizTitle",
-                                        e.target.value
-                                    )
-                                }
-                                className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
-                            />
-                        </div>
-                        <div className="w-full">
-                            <label>
-                                Duration
-                                <span className="text-size1"> (Minutes)</span>
-                            </label>
-                            <input
-                                type="number"
-                                value={quizDetails.quizDuration}
-                                onChange={(e) =>
-                                    handleQuizDetailsChange(
-                                        "quizDuration",
-                                        e.target.value
-                                    )
-                                }
-                                min={1}
-                                className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
-                            />
+                        <div className="font-bold text-end">
+                            Total points: {quizDetails.quiz_total_points || 0}
                         </div>
                     </div>
-                    <div>
-                        <label className="font-bold">Description</label>
-                        <TextEditor
-                            fieldName={"quizDescription"}
-                            value={quizDetails.quizDescription}
-                            setValue={handleQuizDetailsChange}
-                        />
-                    </div>
 
-                    {/* Question List */}
+                    <div className="w-full space-y-5">
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 w-full">
+                            <div className="col-span-1 sm:col-span-3">
+                                <label className="font-bold">
+                                    Title
+                                    <span className="text-ascend-red">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={quizDetails.quiz_title}
+                                    onChange={(e) =>
+                                        handleQuizDetailsChange(
+                                            "quiz_title",
+                                            e.target.value
+                                        )
+                                    }
+                                    className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
+                                />
+                            </div>
+                            <div className="w-full">
+                                <label>
+                                    Duration
+                                    <span className="text-size2">
+                                        {" "}
+                                        (Minutes)
+                                    </span>
+                                </label>
+                                <input
+                                    type="number"
+                                    value={quizDetails.duration}
+                                    onChange={(e) =>
+                                        handleQuizDetailsChange(
+                                            "duration",
+                                            e.target.value
+                                        )
+                                    }
+                                    min={1}
+                                    className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="font-bold">Description</label>
+                            <TextEditor
+                                fieldName={"quiz_description"}
+                                value={quizDetails.quiz_description}
+                                setValue={handleQuizDetailsChange}
+                            />
+                        </div>
 
-                    {questionList.length > 0 && (
-                        <div className="space-y-5">
-                            <h1 className="font-bold">Questions:</h1>
-                            <DndContext
-                                sensors={sensors}
-                                onDragEnd={handleDragEnd}
-                                collisionDetection={closestCorners}
-                            >
-                                <SortableContext
-                                    items={questionList}
-                                    strategy={verticalListSortingStrategy}
+                        {/* Question List */}
+
+                        {questionList.length > 0 && (
+                            <div className="space-y-5">
+                                <h1 className="font-bold">Questions:</h1>
+                                <DndContext
+                                    sensors={sensors}
+                                    onDragEnd={handleDragEnd}
+                                    collisionDetection={closestCorners}
                                 >
-                                    {questionList.map((question, i) => (
-                                        <Question
-                                            key={i}
-                                            questionDetails={question}
-                                            questionNumber={i + 1}
-                                            questionIndex={i}
-                                            onEdit={onEdit}
-                                            setOnEdit={setOnEdit}
-                                            selectedIndex={selectedIndex}
+                                    <SortableContext
+                                        items={questionList}
+                                        strategy={verticalListSortingStrategy}
+                                    >
+                                        {questionList.map((question, i) => (
+                                            <Question
+                                                key={i}
+                                                questionDetails={question}
+                                                questionNumber={i + 1}
+                                                questionIndex={i}
+                                                onEdit={onEdit}
+                                                setOnEdit={setOnEdit}
+                                                selectedIndex={selectedIndex}
+                                                setSelectedIndex={
+                                                    setSelectedIndex
+                                                }
+                                                disabled={false}
+                                            />
+                                        ))}
+                                    </SortableContext>
+                                </DndContext>
+                            </div>
+                        )}
+                        <div>
+                            {(activeForm === "multipleChoice" ||
+                                activeForm === "trueOrFalse" ||
+                                activeForm === "identification") &&
+                                !onEdit && (
+                                    <div ref={targetForm}>
+                                        <QuestionForm
+                                            activeForm={activeForm}
+                                            setActiveForm={setActiveForm}
                                             setSelectedIndex={setSelectedIndex}
-                                            disabled={false}
                                         />
-                                    ))}
-                                </SortableContext>
-                            </DndContext>
+                                    </div>
+                                )}
                         </div>
-                    )}
-                    <div>
-                        {(activeForm === "multipleChoice" ||
-                            activeForm === "trueOrFalse" ||
-                            activeForm === "identification") &&
-                            !onEdit && (
-                                <div ref={targetForm}>
-                                    <QuestionForm
-                                        activeForm={activeForm}
-                                        setActiveForm={setActiveForm}
-                                        setSelectedIndex={setSelectedIndex}
-                                    />
-                                </div>
-                            )}
-                    </div>
-                    <div className="space-y-5">
-                        <h1 className="font-bold">Select Type of Question</h1>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                            <SecondaryButton
-                                doSomething={() => {
-                                    clearQuestionDetails();
-                                    handleOpenQuestionForm("multipleChoice");
-                                    handleQuestionDetailsChange(
-                                        "questionType",
-                                        "multipleChoice"
-                                    );
-                                }}
-                                width={"w-full"}
-                                text={"Multiple Choice"}
-                            />
-                            <SecondaryButton
-                                doSomething={() => {
-                                    clearQuestionDetails();
-                                    handleOpenQuestionForm("trueOrFalse");
-                                    handleQuestionDetailsChange(
-                                        "questionType",
-                                        "trueOrFalse"
-                                    );
-                                }}
-                                width={"w-full"}
-                                text={"True or False"}
-                            />
-                            <SecondaryButton
-                                doSomething={() => {
-                                    clearQuestionDetails();
-                                    handleOpenQuestionForm("identification");
-                                    handleQuestionDetailsChange(
-                                        "questionType",
-                                        "identification"
-                                    );
-                                }}
-                                width={"w-full"}
-                                text={"Identification"}
-                            />
+                        <div className="space-y-5">
+                            <h1 className="font-bold">
+                                Select Type of Question
+                            </h1>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                                <SecondaryButton
+                                    doSomething={() => {
+                                        clearQuestionDetails();
+                                        handleOpenQuestionForm(
+                                            "multipleChoice"
+                                        );
+                                        handleQuestionDetailsChange(
+                                            "questionType",
+                                            "multipleChoice"
+                                        );
+                                    }}
+                                    width={"w-full"}
+                                    text={"Multiple Choice"}
+                                />
+                                <SecondaryButton
+                                    doSomething={() => {
+                                        clearQuestionDetails();
+                                        handleOpenQuestionForm("trueOrFalse");
+                                        handleQuestionDetailsChange(
+                                            "questionType",
+                                            "trueOrFalse"
+                                        );
+                                    }}
+                                    width={"w-full"}
+                                    text={"True or False"}
+                                />
+                                <SecondaryButton
+                                    doSomething={() => {
+                                        clearQuestionDetails();
+                                        handleOpenQuestionForm(
+                                            "identification"
+                                        );
+                                        handleQuestionDetailsChange(
+                                            "questionType",
+                                            "identification"
+                                        );
+                                    }}
+                                    width={"w-full"}
+                                    text={"Identification"}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </SinglePage>
+        </div>
     );
 }
 

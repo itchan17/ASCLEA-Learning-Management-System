@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Programs\SaveAssessmentRequest;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\AssessmentFile;
+use App\Models\Programs\Quiz;
 use App\Services\HandlingPrivateFileService;
 use App\Services\Programs\AssessmentService;
 use Illuminate\Http\Request;
@@ -131,12 +132,12 @@ class AssessmentController extends Controller
         ]);
     }
 
-    public function showEditQuizForm($program, $course, Assessment $assessment, $quiz)
+    public function showEditQuizForm($program, $course, Assessment $assessment, Quiz $quiz)
     {
         // Check if user an view edit quiz form page of teh assessment
         Gate::authorize('viewAssessment',  $assessment);
 
-        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/QuizForm');
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/QuizForm', ['quiz' => $quiz]);
     }
 
     public function viewFile($program, $course, $assessment, AssessmentFile $file)
