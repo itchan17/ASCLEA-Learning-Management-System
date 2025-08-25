@@ -20,7 +20,7 @@ Route::prefix('programs')
         Route::delete('/{program}/delete',  [ProgramController::class, 'archive'])->can('delete', Program::class)->name('program.archive');
 
         // Show the selected program
-        Route::get('/{program}', [ProgramController::class, 'showProgram'])->can('view', Program::class)->middleware(['checkRole:admin,faculty,student'])->name('program.show');
+        Route::get('/{program}', [ProgramController::class, 'showProgram'])->can('view', 'program')->middleware(['checkRole:admin,faculty,student'])->name('program.show');
 
         // Validate added course in add program form
         Route::post('/validate-course', [ProgramController::class, 'validateAddedCourse'])->name('validate.course');

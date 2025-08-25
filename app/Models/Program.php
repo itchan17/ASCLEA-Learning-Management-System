@@ -11,17 +11,17 @@ class Program extends Model
 {
     use HasUuids, SoftDeletes;
 
-    protected static function booted(): void
-    {
-        // Soft delete child courses when the Programm was soft deleted
-        static::deleting(function (Program $program) {
-            $program->courses()->chunk(100, function ($courses) { 
-                foreach ($courses as $course) {
-                    $course->delete(); 
-                }
-            });
-        });
-    }
+    // protected static function booted(): void
+    // {
+    //     // Soft delete child courses when the Programm was soft deleted
+    //     static::deleting(function (Program $program) {
+    //         $program->courses()->chunk(100, function ($courses) { 
+    //             foreach ($courses as $course) {
+    //                 $course->delete(); 
+    //             }
+    //         });
+    //     });
+    // }
 
     /**
      * Indicates if the IDs are auto-incrementing.

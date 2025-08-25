@@ -7,11 +7,14 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Inertia\Inertia;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        commands: __DIR__.'/../routes/console.php',
+        web: __DIR__ . '/../routes/web.php',
+        commands: __DIR__ . '/../routes/console.php',
         health: '/up',
         then: function () {
             Route::middleware('web')->group(function () {
@@ -28,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 require base_path('routes/Programs/programs.php');
                 require base_path('routes/Programs/courses.php');
                 require base_path('routes/Programs/people.php');
+                require base_path('routes/Programs/assessments.php');
                 require base_path('routes/Programs/otherRoutes.php');
             });
         },
@@ -42,7 +46,7 @@ return Application::configure(basePath: dirname(__DIR__))
             '/programs',
             'programs/*',
         ]);
-         // ------ END ------
+        // ------ END ------
         $middleware->web(append: [
             HandleInertiaRequests::class,
         ]);
@@ -52,5 +56,18 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
+            // Reverse the condition to ! in prod
+            if (!app()->environment(['local', 'testing']) && in_array($response->getStatusCode(), [500, 503, 404, 403])) {
+                return Inertia::render('Error/ErrorPage', ['status' => $response->getStatusCode()])
+                    ->toResponse($request)
+                    ->setStatusCode($response->getStatusCode());
+            } elseif ($response->getStatusCode() === 419) {
+                return back()->with([
+                    'message' => 'The page expired, please try again.',
+                ]);
+            }
+
+            return $response;
+        });
     })->create();

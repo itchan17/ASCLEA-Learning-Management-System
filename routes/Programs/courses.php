@@ -18,7 +18,7 @@ Route::prefix('programs/{program}')
         Route::delete('/courses/{course}/delete',  [CourseController::class, 'archive'])->can('delete', Course::class)->name('course.archive');
 
         // Route for showing selected course in the program
-        Route::get('/courses/{course}',  [CourseController::class, 'showCourse'])->can('view', Course::class)->name('program.course.show');
+        Route::get('/courses/{course}',  [CourseController::class, 'showCourse'])->can('viewCourse', 'course')->name('program.course.show');
 });
 
 

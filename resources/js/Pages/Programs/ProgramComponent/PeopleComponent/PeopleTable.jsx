@@ -1,8 +1,6 @@
 import { useMemo, useEffect, useState } from "react";
 import EmptyState from "../../../../Components/EmptyState/EmptyState";
-import usePeopleStore from "../../../../Stores/Programs/peopleStore";
 import { router } from "@inertiajs/react";
-import CustomSelect from "../../../../Components/CustomInputField/CustomSelect";
 import { IoSearch } from "react-icons/io5";
 import { route } from "ziggy-js";
 import RoleGuard from "../../../../Components/Auth/RoleGuard";
@@ -10,13 +8,11 @@ import { usePage } from "@inertiajs/react";
 import _ from "lodash";
 import Pagination from "../../../../Components/Pagination";
 import { debounce } from "lodash";
+import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
+import { displayToast } from "../../../../Utils/displayToast";
 
 export default function PeopleTable() {
     const { members, program, auth } = usePage().props;
-    console.log(members);
-
-    // People Store
-    const peopleList = usePeopleStore((state) => state.peopleList);
 
     const [filter, setFilter] = useState("");
     const [search, setSearch] = useState("");
@@ -64,12 +60,12 @@ export default function PeopleTable() {
         }
     }, [filter, search]);
 
-    const handleMemberClick = (userId) => {
-        if (auth.user.role_name !== "student") {
+    const handleMemberClick = (learningMemberId, userId) => {
+        if (auth.user.role_name !== "student" || auth.user.user_id === userId) {
             router.visit(
                 route("program.member.view", {
                     program: program.program_id,
-                    member: userId,
+                    member: learningMemberId,
                 })
             );
         }
@@ -85,6 +81,14 @@ export default function PeopleTable() {
             }),
             {
                 only: ["members", "flash"],
+                onSuccess: (page) => {
+                    displayToast(
+                        <DefaultCustomToast
+                            message={page.props.flash.success}
+                        />,
+                        "success"
+                    );
+                },
             }
         );
     };
@@ -112,8 +116,8 @@ export default function PeopleTable() {
             </div>
             <div className="overflow-x-auto overflow-y-hidden">
                 <table className="table">
-                    <thead className="">
-                        <tr className="border-b-2 text-ascend-black border-ascend-gray3">
+                    <thead className="text-ascend-black">
+                        <tr className="border-b-2 border-ascend-gray3">
                             <th>Name</th>
                             <th>Role</th>
                             <th>Email</th>
@@ -127,21 +131,47 @@ export default function PeopleTable() {
                                         key={member.user.user_id}
                                         onClick={() =>
                                             handleMemberClick(
-                                                member.learning_member_id
+                                                member.learning_member_id,
+                                                member.user.user_id
                                             )
                                         }
-                                        className={`${
-                                            auth.user.role_name !== "student"
-                                                ? "hover:bg-ascend-lightblue cursor-pointer"
+                                        className={`group hover:bg-ascend-lightblue transition-all duration-300 ${
+                                            auth.user.role_name !== "student" ||
+                                            auth.user.user_id ===
+                                                member.user.user_id
+                                                ? "cursor-pointer"
                                                 : ""
                                         }`}
                                     >
                                         <td>
                                             <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl shrink-0"></div>
+                                                <img
+                                                    src={
+                                                        member.user
+                                                            .profile_image &&
+                                                        `/storage/${member.user.profile_image}`
+                                                    }
+                                                    alt="Profile image"
+                                                    className="w-12 h-12 bg-ascend-gray1/20 rounded-4xl shrink-0"
+                                                ></img>
 
-                                                <div className="font-bold">
-                                                    {`${member.user.first_name} ${member.user.last_name}`}
+                                                <div
+                                                    className={`font-bold ${
+                                                        auth.user.role_name !==
+                                                            "student" ||
+                                                        auth.user.user_id ===
+                                                            member.user.user_id
+                                                            ? "group-hover:underline"
+                                                            : ""
+                                                    }`}
+                                                >
+                                                    {`${member.user.first_name} ${member.user.last_name}`}{" "}
+                                                    {auth.user.user_id ===
+                                                        member.user.user_id && (
+                                                        <span className="text-size1 font-normal">
+                                                            (You)
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </div>
                                         </td>

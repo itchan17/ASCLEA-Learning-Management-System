@@ -14,9 +14,13 @@ import RoleGuard from "../../../Components/Auth/RoleGuard";
 import { closeDropDown } from "../../../Utils/closeDropdown";
 import useProgramStore from "../../../Stores/Programs/programStore";
 import Loader from "../../../Components/Loader";
+import { ToastContainer } from "react-toastify";
+import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToast";
+import { displayToast } from "../../../Utils/displayToast";
+import AlertModal from "../../../Components/AlertModal";
 
 export default function Courses() {
-    const { flash, program: programDetails, courses } = usePage().props; // Get the the data of showed program from props
+    const { auth, program: programDetails, courses } = usePage().props; // Get the the data of showed program from props
     const route = useRoute();
 
     const props = usePage().props;
@@ -36,6 +40,10 @@ export default function Courses() {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [updateBgError, setUpdateBgError] = useState(null);
+
+    // States for alert modal
+    const [isArchiveLoading, setIsArchiveLoading] = useState(false);
+    const [openAlerModal, setOpenAlertModal] = useState(false);
 
     const toggleEditProgram = () => {
         setIsProgramFormOpen(!isProgramFormOpen);
@@ -63,9 +71,26 @@ export default function Courses() {
         }
     };
 
-    const handleArchiveClick = () => {
+    const archiveProgram = () => {
         // Send a delete request to server that will archiove program through soft delete
-        router.delete(route("program.archive", programDetails.program_id));
+        setIsArchiveLoading(true);
+        router.delete(route("program.archive", programDetails.program_id), {
+            showProgress: false,
+            onSuccess: (page) => {
+                displayToast(
+                    <DefaultCustomToast message={page.props.flash.success} />,
+                    "success"
+                );
+            },
+            onFinish: () => {
+                setIsArchiveLoading(false);
+                setOpenAlertModal(false);
+            },
+        });
+    };
+
+    const handleArchiveClick = () => {
+        setOpenAlertModal(true);
         closeDropDown(); // Close the dropdown after clicked
     };
 
@@ -81,7 +106,7 @@ export default function Courses() {
                         setUpdateBgError(error);
                         setIsLoading(false);
                     },
-                    onSuccess: () => setIsLoading(false),
+                    onFinish: () => setIsLoading(false),
                 }
             );
         }
@@ -89,6 +114,18 @@ export default function Courses() {
 
     return (
         <div className="w-full space-y-5 font-nunito-sans text-ascend-black">
+            {/* Display alert modal */}
+            {openAlerModal && (
+                <AlertModal
+                    title={"Archive Confirmation"}
+                    description={
+                        "This program can only be restored after restoring its associated courses. Are you sure you want to archive it?"
+                    }
+                    closeModal={() => setOpenAlertModal(false)}
+                    onConfirm={archiveProgram}
+                    isLoading={isArchiveLoading}
+                />
+            )}
             <div
                 className={`relative w-full group h-70 rounded-tl-xl rounded-br-xl bg-cover bg-center ${
                     !programDetails.background_image && "bg-ascend-gray1"
@@ -99,6 +136,8 @@ export default function Courses() {
                     }
                 }
             >
+                {" "}
+                {console.log(programDetails.background_image)}
                 {/* Loading indicator for updating background */}
                 {isLoading && (
                     <>
@@ -108,7 +147,6 @@ export default function Courses() {
                         </div>
                     </>
                 )}
-
                 <RoleGuard allowedRoles={["admin"]}>
                     <label
                         htmlFor="inputBg"
@@ -199,7 +237,11 @@ export default function Courses() {
                 ) : (
                     <EmptyState
                         imgSrc={"/images/illustrations/blank_canvas.svg"}
-                        text={`“Nothing to see here… yet! Add some content to get going.”`}
+                        text={
+                            auth.user.role_name == "admin"
+                                ? `Nothing to see here… yet! Add some content to get going.`
+                                : "No courses found at the moment. Please check back soon!"
+                        }
                     />
                 )}
             </div>

@@ -3,8 +3,32 @@ import BackButton from "../../../../../../Components/Button/BackButton";
 import { MdOutlineCloseFullscreen, MdOutlineFullscreen } from "react-icons/md";
 import DocumentViewer from "./DocumentViewer";
 import { handleClickBackBtn } from "../../../../../../Utils/handleClickBackBtn";
+import { MdOutlineFileDownload } from "react-icons/md";
+import { usePage } from "@inertiajs/react";
+import { route } from "ziggy-js";
 
-export default function ViewFile() {
+export default function ViewFile({
+    fileName,
+    programId,
+    courseId,
+    assessmentId,
+    fileId,
+}) {
+    // URLs where the file can be access and download
+    const fileUrl = route("program.course.file.stream", {
+        program: programId,
+        course: courseId,
+        assessment: assessmentId,
+        file: fileId,
+    });
+    const fileDownload = route("program.course.file.download", {
+        program: programId,
+        course: courseId,
+        assessment: assessmentId,
+        file: fileId,
+    });
+    const { auth } = usePage().props;
+
     const [isFullScreen, setIsFullScreen] = useState(false);
 
     const handleCLickFullscreen = () => {
@@ -20,25 +44,40 @@ export default function ViewFile() {
             }  font-nunito-sans text-ascend-black`}
         >
             {!isFullScreen ? (
-                <div className="bg-ascend-white w-full flex gap-5 items-center justify-between">
-                    <BackButton doSomething={handleClickBackBtn} />
+                <>
+                    <div className="bg-ascend-white w-full flex gap-5 items-center justify-between">
+                        <div className="flex items-center justify-start w-full gap-5">
+                            <BackButton doSomething={handleClickBackBtn} />
+                            <div className="flex items-center w-full"></div>
+                        </div>
 
-                    <div className="flex items-center justify-end w-full">
-                        <div className="flex items-center w-full">
-                            <h1 className="truncate text-size4 w-0 flex-grow text-end">
-                                sample.pasdddddddddddddddddddddddddddddddddddddddf
-                            </h1>
-                            <h1 className="text-size4 flex-shrink-0">.pdf</h1>
+                        <div className="flex items-center justify-end">
+                            {/* Only display the download button for admin and fcaulty */}
+                            {auth.user.role_name !== "student" && (
+                                <a
+                                    href={fileDownload}
+                                    title={`Download ${fileName}`}
+                                    className="cursor-pointer rounded-4xl  p-3 hover-change-bg-color"
+                                >
+                                    <MdOutlineFileDownload className="text-size7" />
+                                </a>
+                            )}
                             <div
                                 title="Fullscreen"
-                                className="cursor-pointer rounded-4xl ml-5 p-3 -mr-3 hover-change-bg-color"
+                                className="cursor-pointer rounded-4xl p-3 -mr-3 hover-change-bg-color"
                                 onClick={handleCLickFullscreen}
                             >
                                 <MdOutlineFullscreen className="text-size7" />
                             </div>
                         </div>
                     </div>
-                </div>
+                    <h1
+                        title={fileName}
+                        className="text-size4 text-start cursor-default"
+                    >
+                        {fileName}
+                    </h1>
+                </>
             ) : (
                 <div
                     title="Exit Fullscreen"
@@ -49,31 +88,7 @@ export default function ViewFile() {
                 </div>
             )}
 
-            <DocumentViewer isFullScreen={isFullScreen} />
+            <DocumentViewer fileUrl={fileUrl} isFullScreen={isFullScreen} />
         </div>
     );
-}
-
-{
-    /* <div className="bg-ascend-white w-full flex gap-5 items-center justify-between">
-    <BackButton doSomething={handleCLickBackBtn} />
-
-    <div className="flex items-center justify-end w-full">
-        <div className="flex items-center w-full">
-            <h1 className="truncate text-size4 w-0 flex-grow text-end">
-                sample.pasdddddddddddddddddddddddddddddddddddddddf
-            </h1>
-            <h1 className="text-size4 flex-shrink-0">.pdf</h1>
-        </div>
-    </div>
-</div>; */
-}
-{
-    /* <div
-    title="Fullscreen"
-    className="cursor-pointer rounded-4xl p-3 -mr-3 hover-change-bg-color"
-    onClick={handleCLickFullscreen}
->
-    <MdOutlineFullscreen className="text-size7" />
-</div>; */
 }

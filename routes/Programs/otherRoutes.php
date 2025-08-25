@@ -14,40 +14,13 @@ Route::prefix('programs')
                 'materialId' => $materialId,
             ]);
         })->name('program.course.material.view');
-
-        // Route for viewing file
-        Route::get('/{programId}/course/{courseId}/file/{fileId}', function ($programId, $courseId, $fileId) {
-            return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/MaterialsComponents/ViewFile', [
-                'programId' => $programId,
-                'courseId' => $courseId,
-                'fileId' => $fileId,
-            ]);
-        })->name('program.course.file.view');
-
-        // Route for viewing assessment
-        Route::get('/{programId}/course/{courseId}/assessment/{assessmentId}', function ($programId, $courseId, $assessmentId) {
-            return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/ViewAssessment', [
-                'programId' => $programId,
-                'courseId' => $courseId,
-                'assessmentId' => $assessmentId,
-            ]);
-        })->name('program.course.assessment.view');  
-});
+    });
 
 Route::prefix('programs')
     ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin,faculty'])
     ->group(function () {
 
-        // Route for editing quiz form
-        Route::get('/{programId}/course/{courseId}/quiz-form/{quizFormId}/edit', function ($programId, $courseId, $quizFormId) {
-            return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/QuizForm', [
-                'programId' => $programId,
-                'courseId' => $courseId,
-                'quizFormId' => $quizFormId,
-            ]);
-        })->name('program.course.quiz-form.edit');
-
-          // Route for viewing assessment responses
+        // Route for viewing assessment responses
         Route::get('/{programId}/course/{courseId}/assessment/{assessmentId}/responses', function ($programId, $courseId, $assessmentId) {
             return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/ViewResponses', [
                 'programId' => $programId,
@@ -55,6 +28,4 @@ Route::prefix('programs')
                 'assessmentId' => $assessmentId,
             ]);
         })->name('program.course.assessment.responses');
-});
-
-       
+    });

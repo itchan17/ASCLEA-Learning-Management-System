@@ -5,6 +5,9 @@ import SecondaryButton from "../../../../Components/Button/SecondaryButton";
 import useCourseStore from "../../../../Stores/Programs/courseStore";
 import { usePage, router } from "@inertiajs/react";
 import { route } from "ziggy-js";
+import { displayToast } from "../../../../Utils/displayToast";
+import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
+import ModalContainer from "../../../../Components/ModalContainer";
 
 export default function AddCourseForm({ toggleModal, isEdit = false }) {
     const { course, program } = usePage().props;
@@ -27,16 +30,23 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
                 route("course.create", program.program_id),
                 courseDetails,
                 {
+                    showProgress: false,
                     only: ["courses", "flash"],
                     onError: (errors) => {
                         console.log(errors);
                         setErrors(errors);
                         setIsLoading(false);
                     },
-                    onSuccess: () => {
+                    onSuccess: (page) => {
                         setIsLoading(false);
                         clearCourse();
                         toggleModal();
+                        displayToast(
+                            <DefaultCustomToast
+                                message={page.props.flash.success}
+                            />,
+                            "success"
+                        );
                     },
                 }
             );
@@ -48,16 +58,23 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
                 }),
                 courseDetails,
                 {
+                    showProgress: false,
                     only: ["course", "flash"],
                     onError: (errors) => {
                         console.log(errors);
                         setErrors(errors);
                         setIsLoading(false);
                     },
-                    onSuccess: () => {
+                    onSuccess: (page) => {
                         setIsLoading(false);
                         clearCourse();
                         toggleModal();
+                        displayToast(
+                            <DefaultCustomToast
+                                message={page.props.flash.success}
+                            />,
+                            "success"
+                        );
                     },
                 }
             );
@@ -70,8 +87,8 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
-            <form className="bg-ascend-white opacity-100 p-5 w-150 space-y-5  max-h-[calc(100vh-5rem)] overflow-y-auto my-10">
+        <ModalContainer>
+            <form className="bg-ascend-white opacity-100 p-5 w-150 space-y-5">
                 <h1 className="text-size4 font-bold">
                     {isEdit ? "Edit Course" : "Add Course"}
                 </h1>
@@ -91,6 +108,6 @@ export default function AddCourseForm({ toggleModal, isEdit = false }) {
                     />
                 </div>
             </form>
-        </div>
+        </ModalContainer>
     );
 }

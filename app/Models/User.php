@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Programs\Assessment;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -74,7 +75,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime', 
+        'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 
@@ -92,5 +93,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function student(): HasOne
     {
         return $this->hasOne(Student::class, 'user_id');
+    }
+
+    public function assessments(): HasMany
+    {
+        return $this->hasMany(Assessment::class, 'created_by', 'user_id');
     }
 }

@@ -16,12 +16,12 @@ export default function SidebarLink({
             className={`h-11 flex items-center text-ascend-black ${
                 url.includes(linkUrl) &&
                 "bg-ascend-lightblue border-l-8 text-ascend-blue border-ascend-blue font-bold"
-            } hover:bg-ascend-lightblue hover:border-l-8 hover:text-ascend-blue hover:font-bold transition-all duration-100 ${
-                expanded ? "mr-6" : "justify-center"
+            } hover:bg-ascend-lightblue hover:border-l-8 hover:text-ascend-blue hover:font-bold transition-all duration-100 pl-6 ${
+                expanded ? "mr-6" : "justify-start"
             }`}
             href={linkUrl}
         >
-            <Icon className={`text-size6 ${expanded && "ml-6"}`} />
+            <Icon className={"text-size6 shrink-0"} />
 
             <span
                 className={`block text-size3 truncate   ${

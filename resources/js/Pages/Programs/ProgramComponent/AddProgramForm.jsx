@@ -7,7 +7,9 @@ import useProgramStore from "../../../Stores/Programs/programStore";
 import useCourseStore from "../../../Stores/Programs/courseStore";
 import { router, useForm } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
-import { update } from "lodash";
+import { displayToast } from "../../../Utils/displayToast";
+import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToast";
+import ModalContainer from "../../../Components/ModalContainer";
 
 export default function AddProgramForm({
     toggleModal,
@@ -54,6 +56,7 @@ export default function AddProgramForm({
         setIsValidating(true);
 
         router.post(route("validate.course"), course, {
+            showProgress: false,
             onError: (error) => {
                 setAddCourseError(error);
                 setIsValidating(false);
@@ -77,18 +80,32 @@ export default function AddProgramForm({
         if (!editProgram) {
             // Send a post request to server to create program
             post(route("program.create", []), {
-                onSuccess: () => {
+                showProgress: false,
+                onSuccess: (page) => {
                     reset();
                     toggleModal();
+                    displayToast(
+                        <DefaultCustomToast
+                            message={page.props.flash.success}
+                        />,
+                        "success"
+                    );
                 },
             });
         } else {
             // Send a put request to server to update program
             put(route("program.update", programDataToUpdate.program_id), {
-                onSuccess: () => {
+                showProgress: false,
+                onSuccess: (page) => {
                     reset();
                     toggleModal();
                     setEditProgram(false);
+                    displayToast(
+                        <DefaultCustomToast
+                            message={page.props.flash.success}
+                        />,
+                        "success"
+                    );
                 },
             });
         }
@@ -107,7 +124,7 @@ export default function AddProgramForm({
     };
 
     return (
-        <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
+        <ModalContainer>
             <form
                 onKeyDown={(e) => {
                     // prevent enter from submiiting/closing the form
@@ -115,7 +132,7 @@ export default function AddProgramForm({
                         e.preventDefault();
                     }
                 }}
-                className="bg-ascend-white opacity-100 p-5 w-150 space-y-5  max-h-[calc(100vh-5rem)] overflow-y-auto my-10"
+                className="bg-ascend-white opacity-100 p-5 w-150 space-y-5 overflow-y-auto"
             >
                 <h1 className="text-size4 font-bold">
                     {editProgram ? "Edit" : "Add"} Program
@@ -221,6 +238,6 @@ export default function AddProgramForm({
                     />
                 </div>
             </form>
-        </div>
+        </ModalContainer>
     );
 }

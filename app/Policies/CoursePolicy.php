@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Course;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class CoursePolicy
 {
@@ -20,11 +19,28 @@ class CoursePolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user): bool
+    public function viewCourse(User $user, Course $course): bool
     {
-        // Add more logic here to prevent unassigned user from accessing the course
-       $role = $user->role?->role_name;
-       return in_array($role, ['admin', 'faculty', 'student'], true);
+        if($user->role->role_name === 'admin') {
+            return true;
+        }
+        else {
+
+            $programId = $course->program->program_id;
+
+            // Check if the user is member of the program
+            $learningMember = $user->programs->where('program_id', $programId)->first();
+
+            if($learningMember) {
+                $learningMemberId = $learningMember->learning_member_id; // Get the learning member id
+
+                // Check if course was assigned to the user
+                return $course->assignedTo()->where('learning_member_id',  $learningMemberId)->exists();
+            }
+
+            // If user is not a member of the profram return false
+            return false;
+        }    
     }
 
     /**
@@ -52,21 +68,5 @@ class CoursePolicy
     {
         // Check if the auth user has a role admin
         return $user->role->role_name === 'admin';
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Course $course): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Course $course): bool
-    {
-        return false;
     }
 }
