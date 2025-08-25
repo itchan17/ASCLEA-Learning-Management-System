@@ -136,6 +136,8 @@ export default function Courses() {
                     }
                 }
             >
+                {" "}
+                {console.log(programDetails.background_image)}
                 {/* Loading indicator for updating background */}
                 {isLoading && (
                     <>
@@ -145,7 +147,6 @@ export default function Courses() {
                         </div>
                     </>
                 )}
-
                 <RoleGuard allowedRoles={["admin"]}>
                     <label
                         htmlFor="inputBg"

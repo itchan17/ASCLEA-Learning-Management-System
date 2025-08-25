@@ -10,6 +10,7 @@ export default function PrimaryButton({
     btnType = "button",
     isDisabled = false,
     isLoading = false,
+    fontWeight = "font-semibold",
 }) {
     return (
         <button
@@ -24,7 +25,7 @@ export default function PrimaryButton({
             {isLoading ? (
                 <Loader />
             ) : (
-                <span className={`font-semibold ${textColor}`}>{text}</span>
+                <span className={`${fontWeight} ${textColor}`}>{text}</span>
             )}
         </button>
     );

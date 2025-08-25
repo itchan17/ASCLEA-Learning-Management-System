@@ -10,6 +10,7 @@ import { capitalize } from "lodash";
 import debounce from "lodash.debounce";
 import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
 import { displayToast } from "../../../../Utils/displayToast";
+import ModalContainer from "../../../../Components/ModalContainer";
 
 export default function AddMemberForm({ toggleModal }) {
     const { program } = usePage().props;
@@ -44,18 +45,12 @@ export default function AddMemberForm({ toggleModal }) {
             );
             const users = [...userList, ...res.data.data];
 
+            const uniqueUsers = [
+                ...new Map(users.map((user) => [user.user_id, user])).values(),
+            ];
+
             // Prevent duplicate value to be set in the user list
-            setUserList(
-                users.reduce((acc, current) => {
-                    // Check if theres a duplicate in the acc
-                    // If not push the current user to acc
-                    // Else skip
-                    if (!acc.some((user) => user.user_id === current.user_id)) {
-                        acc.push(current);
-                    }
-                    return acc;
-                }, [])
-            );
+            setUserList(uniqueUsers);
 
             setIsLoading(false);
             setHasMore(res.data.current_page < res.data.last_page);
@@ -220,10 +215,10 @@ export default function AddMemberForm({ toggleModal }) {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center text-ascend-black">
+        <ModalContainer>
             <form
                 onSubmit={(e) => handleAdd(e)}
-                className="bg-ascend-white opacity-100 p-5 w-160 space-y-5 max-h-[calc(100vh-5rem)] overflow-y-auto my-10"
+                className="bg-ascend-white opacity-100 p-5 w-160 space-y-5"
             >
                 <h1 className="text-size4 font-bold">Add Member</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -337,6 +332,6 @@ export default function AddMemberForm({ toggleModal }) {
                     />
                 </div>
             </form>
-        </div>
+        </ModalContainer>
     );
 }

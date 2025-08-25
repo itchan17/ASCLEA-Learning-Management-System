@@ -3,12 +3,12 @@ import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import "@cyntler/react-doc-viewer/dist/index.css";
 import "../../../../../../../css/docViewer.css";
 
-export default function DocumentViewer() {
+export default function DocumentViewer({ fileUrl }) {
     // Sample pdf in public folder
-    const docs = [{ uri: "/sample.pdf" }];
+    const docs = [{ uri: fileUrl }];
 
     return (
-        <div className="flex flex-col justify-center items-center -mx-6 sm:mx-0">
+        <div className="flex flex-col justify-center items-center -mx-6 sm:mx-0 border-ascend-gray1">
             <DocViewer
                 config={{
                     header: {

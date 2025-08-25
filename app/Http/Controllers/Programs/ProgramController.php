@@ -13,48 +13,53 @@ use Illuminate\Support\Facades\Storage;
 
 class ProgramController extends Controller
 {
-    public function listPrograms () {
-        
+    public function listPrograms()
+    {
+
         $query = Program::select('program_id', 'program_name', 'background_image');
 
         // Check is user is not admin
-        if(Auth::user()->role->role_name !== 'admin'){
+        if (Auth::user()->role->role_name !== 'admin') {
             // Get the programs where the user is a member of
-             $query->whereHas('learningMembers', function($query) { $query->where('user_id', Auth::id()); })
+            $query->whereHas('learningMembers', function ($query) {
+                $query->where('user_id', Auth::id());
+            })
                 ->latest()
                 ->get();
         }
 
         return  $query->latest()->get();
     }
-    
+
     // Display the program page
-    public function index() {
+    public function index()
+    {
         // Program::select('program_id', 'program_name', 'background_image')->latest()->get()
         return Inertia::render('Programs/Programs', [
             'program_list' => fn() => $this->listPrograms()
         ]);
     }
 
-    public function store(Request $req) {
+    public function store(Request $req)
+    {
 
         // Validate input
         $validated = $req->validate([
             'program_name' => 'required|unique:programs,program_name|max:255',
             'program_description' => 'string|nullable',
         ]);
-   
+
         // Create program
         $program = Program::create($validated);
-       
+
         $course_list = $req->all()['course_list'];
 
         // Check if course_list is array and has value
         if (is_array($course_list) && !empty($course_list)) {
-           foreach($course_list as $key => $course){
+            foreach ($course_list as $key => $course) {
                 $course['program_id'] = $program->program_id; // Add program_id FK
                 Course::create($course); // Store course in courses table
-           }
+            }
         }
 
         // Return a flash success 
@@ -62,7 +67,8 @@ class ProgramController extends Controller
     }
 
     // Handle updating the program details
-    public function update(Request $req, Program $program) {
+    public function update(Request $req, Program $program)
+    {
 
         $validated = $req->validate([
             'program_name'  => [
@@ -74,78 +80,82 @@ class ProgramController extends Controller
         ]);
 
         $program->update($validated);
-        
+
         // Return a flash success 
         return back()->with('success', 'Program updated successfully.');
     }
 
     // Handle archiving program through soft delete
-    public function archive(Program $program) {
-    
-        $program->delete(); 
+    public function archive(Program $program)
+    {
+
+        $program->delete();
 
         return to_route('programs.index')->with('success', 'Program archived successfully.');
     }
 
-    public function listCourses ($program) {
+    public function listCourses($program)
+    {
 
         $query = $program->courses();
-        
+
         // Check if user is not admin return, get only courses assigned to the user
         if (Auth::user()->role->role_name !== 'admin') {
             // Check if the course is assigned to the suer
-             $query->whereHas('assignedTo', function ($query) use($program) {    
-                    $memberId = Auth::user()->programs->where('program_id', $program->program_id) 
-                        ->first()->learning_member_id;  // Get the learning member id
-                    
-                    $query->where('learning_member_id', $memberId); // Check if the course was assigned to the users learning member id
-                });
-        } 
+            $query->whereHas('assignedTo', function ($query) use ($program) {
+                $memberId = Auth::user()->programs->where('program_id', $program->program_id)
+                    ->first()->learning_member_id;  // Get the learning member id
+
+                $query->where('learning_member_id', $memberId); // Check if the course was assigned to the users learning member id
+            });
+        }
 
         return $query->latest()
-                        ->select([
-                            'course_id',
-                            'course_code',
-                            'course_name',
-                            'course_description',
-                            'updated_at'
-                        ])
-                        ->get();
+            ->select([
+                'course_id',
+                'course_code',
+                'course_name',
+                'course_description',
+                'updated_at'
+            ])
+            ->get();
     }
 
     // Show the selected program
-    public function showProgram(Program $program, Request $req) {
+    public function showProgram(Program $program, Request $req)
+    {
         // Return a prop containing the program data
         return Inertia::render('Programs/ProgramComponent/ProgramContent', [
             // Program data
-            'program' => fn () => $program->only(['program_id', 'program_name', 'program_description', 'background_image']),
+            'program' => fn() => $program->only(['program_id', 'program_name', 'program_description', 'background_image']),
 
             // List of courses
-            'courses' => fn () => $this->listCourses($program),
+            'courses' => fn() => $this->listCourses($program),
 
             // Members of the program
             // Return only if specifically requested / when people was rendered
-            'members' => Inertia::optional(fn () => $this->getLearningMembers($program, $req->input('role'), $req->input('search'))),
+            'members' => Inertia::optional(fn() => $this->getLearningMembers($program, $req->input('role'), $req->input('search'))),
         ]);
     }
 
-    
-        
-    public function getLearningMembers($program, $role, $search) {
+
+
+    public function getLearningMembers($program, $role, $search)
+    {
 
         // Query for listing the users in the learning members table
         $members = $program->learningMembers()
             ->whereHas('user', function ($query) {
                 $query->whereNull('deleted_at'); // Exclude soft-deleted users
-            }) 
+            })
             // Get user data from users table
             ->with([
-                'user' => fn ($query) => $query 
+                'user' => fn($query) => $query
                     ->select('user_id', 'role_id', 'first_name', 'last_name', 'email', 'profile_image')
                     ->with([
-                        'role' => fn ($query) => $query->select('role_id', 'role_name') // Get the user role
+                        'role' => fn($query) => $query->select('role_id', 'role_name') // Get the user role
                     ])
-            ]); 
+            ]);
 
         // FIlter based on roles
         if ($role) {
@@ -155,7 +165,7 @@ class ProgramController extends Controller
         }
 
         // FIlter based on search
-        if($search) {
+        if ($search) {
             // Get suers based on search query
             $members->whereHas('user', function ($query) use ($search) {
                 $query->whereLike('first_name', "%$search%")
@@ -163,13 +173,14 @@ class ProgramController extends Controller
                     ->orWhereLike('email', "%$search%");
             });
         }
-     
-        return $members->orderBy('created_at', 'desc')->paginate(10, ['*'], 'members')->withQueryString();
+
+        return $members->orderBy('created_at', 'desc')->orderBy('learning_member_id', 'desc')->paginate(10, ['*'], 'members')->withQueryString();
     }
 
     // This function validates the added course in the program form
-    public function validateAddedCourse(Request $req){
-        $req->validate([ 
+    public function validateAddedCourse(Request $req)
+    {
+        $req->validate([
             'course_code' => "string|nullable",
             'course_name' => "required|string|max:255",
             'course_description' => "string|nullable",
@@ -181,23 +192,23 @@ class ProgramController extends Controller
         return back()->with('message', "Course validated successfully.");
     }
 
-    public function updateBackground(Program $program, Request $req) {
-        
-        if($req->hasFile('background_image')){
+    public function updateBackground(Program $program, Request $req)
+    {
+
+        if ($req->hasFile('background_image')) {
             $image = $req->background_image;
-            $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-            $path = $image->storeAs('programBackgroundImages', $filename, 'public');
+            $path = $image->store('programBackgroundImages', 'public');
 
             if ($program->background_image) {
                 Storage::disk('public')->delete($program->background_image);
             }
-            
+
             $program->background_image = $path;
             $program->save();
 
             return back()->with(['success' => 'Backgroung image updated successfully.']);
         }
-       
+
         return back()->withErrors(['background_image' => 'No file uploaded.']);
     }
 }
