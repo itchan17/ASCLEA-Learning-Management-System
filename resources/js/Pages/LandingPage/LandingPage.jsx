@@ -50,7 +50,7 @@ export default function LandingPage({ text }) {
                         hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
                     >
                         <span className="font-semibold text-2xl">
-                            Enroll Now
+                            Register Now
                         </span>
                     </button></Link>
                 </div>

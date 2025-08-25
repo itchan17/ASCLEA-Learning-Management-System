@@ -3,7 +3,7 @@ import PrimaryButton from "../../Components/Button/PrimaryButton";
 import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import useRegistrationStore from "../../Stores/Registration/registrationStore";
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { regions, provinces, cities, barangays } from "select-philippines-address";
 
 
@@ -223,73 +223,79 @@ const RegistrationFields = () => {
                     </div>
                 </div>
 
-<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-4">
-    {/* Region */}
-    <div>
-        <select
-            value={registration.region}
-            onChange={(e) => handleRegionChange(e.target.value)}
-            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
-        >
-            <option value="">Select Region</option>
-            {regionList.map((reg) => (
-                <option key={reg.region_code} value={reg.region_code}>
-                    {reg.region_name}
-                </option>
-            ))}
-        </select>
-    </div>
-    {/* Province */}
-    <div>
-        <select
-            value={registration.province}
-            onChange={(e) => handleProvinceChange(e.target.value)}
-            disabled={!provinceList.length}
-            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
-        >
-            <option value="">Select Province</option>
-            {provinceList.map((prov) => (
-                <option key={prov.province_code} value={prov.province_code}>
-                    {prov.province_name}
-                </option>
-            ))}
-        </select>
-    </div>
-    {/* City */}
-    <div>
-        <select
-            value={registration.city}
-            onChange={(e) => handleCityChange(e.target.value)}
-            disabled={!cityList.length}
-            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
-        >
-            <option value="">Select City</option>
-            {cityList.map((ct) => (
-                <option key={ct.city_code} value={ct.city_code}>
-                    {ct.city_name}
-                </option>
-            ))}
-        </select>
-    </div>
-    {/* Barangay */}
-    <div>
-        <select
-            value={registration.barangay}
-            onChange={(e) => handleBarangayChange(e.target.value)}
-            disabled={!barangayList.length}
-            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
-        >
-            <option value="">Select Barangay</option>
-            {barangayList.map((brgy) => (
-                <option key={brgy.brgy_code} value={brgy.brgy_code}>
-                    {brgy.brgy_name}
-                </option>
-            ))}
-        </select>
-    </div>
-</div>
-
-
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-4">
+                    {/* Region */}
+                    <div>
+                        <select
+                            value={registration.region}
+                            onChange={(e) => handleRegionChange(e.target.value)}
+                            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
+                        >
+                            <option value="">Select Region {" "} 
+                                <span className="text-ascend-red">*</span>
+                            </option> 
+                            {regionList.map((reg) => (
+                                <option key={reg.region_code} value={reg.region_code}>
+                                    {reg.region_name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    {/* Province */}
+                    <div>
+                        <select
+                            value={registration.province}
+                            onChange={(e) => handleProvinceChange(e.target.value)}
+                            disabled={!provinceList.length}
+                            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
+                        >
+                            <option value="">Select Province {" "} 
+                                <span className="text-ascend-red">*</span>
+                            </option>
+                            {provinceList.map((prov) => (
+                                <option key={prov.province_code} value={prov.province_code}>
+                                    {prov.province_name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    {/* City */}
+                    <div>
+                        <select
+                            value={registration.city}
+                            onChange={(e) => handleCityChange(e.target.value)}
+                            disabled={!cityList.length}
+                            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
+                        >
+                            <option value="">Select City {" "} 
+                                <span className="text-ascend-red">*</span>
+                            </option>
+                            {cityList.map((ct) => (
+                                <option key={ct.city_code} value={ct.city_code}>
+                                    {ct.city_name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    {/* Barangay */}
+                    <div>
+                        <select
+                            value={registration.barangay}
+                            onChange={(e) => handleBarangayChange(e.target.value)}
+                            disabled={!barangayList.length}
+                            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
+                        >
+                            <option value="">Select Barangay {" "} 
+                                <span className="text-ascend-red">*</span>
+                            </option>
+                            {barangayList.map((brgy) => (
+                                <option key={brgy.brgy_code} value={brgy.brgy_code}>
+                                    {brgy.brgy_name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-4">
                     <div class="relative">
                         <input
@@ -364,24 +370,12 @@ const RegistrationFields = () => {
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-3 top-2 text-gray-500"
-                            tabIndex={-1} // so tabbing skips the button
+                            tabIndex={-1}
                         >
                             {showPassword ? (
-                            // Eye Slash Icon
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5"
-                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                d="M13.875 18.825A10.05 10.05 0 0112 19c-4.418 0-8-4.418-8-8 0-.69.07-1.361.2-2m2.015-3.452A9.956 9.956 0 0112 5c4.418 0 8 4.418 8 8 0 1.337-.328 2.597-.91 3.704M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
+                                <AiOutlineEyeInvisible className="h-5 w-5" />
                             ) : (
-                            // Eye Icon
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5"
-                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
+                                <AiOutlineEye className="h-5 w-5" />
                             )}
                         </button>
                         <label
@@ -408,21 +402,9 @@ const RegistrationFields = () => {
                             className="absolute right-3 top-2 text-gray-500"
                         >
                             {showConfirmPassword ? (
-                                // Eye Slash Icon
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                        d="M13.875 18.825A10.05 10.05 0 0112 19c-4.418 0-8-4.418-8-8 0-.69.07-1.361.2-2m2.015-3.452A9.956 9.956 0 0112 5c4.418 0 8 4.418 8 8 0 1.337-.328 2.597-.91 3.704M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
+                                <AiOutlineEyeInvisible className="h-5 w-5" />
                             ) : (
-                                // Eye Icon
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
+                                <AiOutlineEye className="h-5 w-5" />
                             )}
                         </button>
                         <label
