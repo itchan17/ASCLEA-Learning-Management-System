@@ -82,12 +82,15 @@ class AssessmentService
         AssessmentFile::insert($uploadedFiles);
     }
 
+    // Quiz form will only be created when the user creates an assessment with a type of quiz,
+    // since we need the id of the created assessment to use it as reference in the quiz table
+    // other opretaions related to quiz will be handled in the QuizService
     public function createInitialQuizForm(Assessment $assessment)
     {
         // Create the inital quiz that will be used to start form editing with initial quiz title
         $initialQuizDta = [
             'assessment_id' => $assessment->assessment_id,
-            'quiz_title' => "New Quiz"
+            'quiz_title' => "Edit Quiz"
         ];
 
         Quiz::create($initialQuizDta);

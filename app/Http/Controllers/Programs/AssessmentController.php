@@ -132,14 +132,6 @@ class AssessmentController extends Controller
         ]);
     }
 
-    public function showEditQuizForm($program, $course, Assessment $assessment, Quiz $quiz)
-    {
-        // Check if user an view edit quiz form page of teh assessment
-        Gate::authorize('viewAssessment',  $assessment);
-
-        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/QuizForm', ['quiz' => $quiz]);
-    }
-
     public function viewFile($program, $course, $assessment, AssessmentFile $file)
     {
         // Check if user is authorize to access the view file page

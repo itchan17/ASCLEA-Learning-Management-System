@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import SinglePage from "../../../../../../Components/Layout/SInglePage";
 import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
 import TextEditor from "../../TextEditor";
@@ -9,6 +9,9 @@ import QuestionForm from "./QuestionFormComponents/QuestionForm";
 import BackButton from "../../../../../../Components/Button/BackButton";
 import { handleClickBackBtn } from "../../../../../../Utils/handleClickBackBtn";
 import QuizFormNav from "./QuizFormNav";
+import { debounce } from "lodash";
+import axios from "axios";
+import { usePage } from "@inertiajs/react";
 import {
     SortableContext,
     verticalListSortingStrategy,
@@ -25,7 +28,7 @@ import {
     useSensor,
 } from "@dnd-kit/core";
 
-export default function QuizForm({ quiz }) {
+export default function QuizForm({ programId, courseId, assessmentId, quiz }) {
     // Create Quiz Store
     const quizDetails = useCreateQuizStore((state) => state.quizDetails);
     const handleQuizDetailsChange = useCreateQuizStore(
@@ -42,12 +45,12 @@ export default function QuizForm({ quiz }) {
         (state) => state.setQuestionList
     );
     const setQuizDetails = useCreateQuizStore((state) => state.setQuizDetails);
-
-    useEffect(() => {
-        setQuizDetails(quiz);
-    }, []);
+    const isChanged = useCreateQuizStore((state) => state.isChanged);
+    const setIsChanged = useCreateQuizStore((state) => state.setIsChanged);
 
     // Local States
+    const [isLoading, setIsLoading] = useState(false);
+    const [savedLabel, setSavedLabel] = useState("");
     const [openQuestionForm, setOpenQuestionForm] = useState({
         multipleChoice: false,
         trueOrFalse: false,
@@ -57,6 +60,10 @@ export default function QuizForm({ quiz }) {
     const targetForm = useRef(null);
     const [onEdit, setOnEdit] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(null);
+    useEffect(() => {
+        setQuizDetails(quiz);
+        setIsChanged(false);
+    }, []);
 
     useEffect(() => {
         console.log("ON EDIT: " + onEdit);
@@ -125,13 +132,51 @@ export default function QuizForm({ quiz }) {
 
         handleQuizDetailsChange("quiz_total_points", totalPoints);
     };
+
+    const debounceAutoSave = useCallback(
+        debounce(async (data) => {
+            setIsLoading(true);
+            try {
+                const response = await axios.put(
+                    route("assessment.quiz-form.update", {
+                        program: programId,
+                        course: courseId,
+                        assessment: assessmentId,
+                        quiz: quiz.quiz_id,
+                    }),
+                    data
+                );
+                console.log(response);
+                setIsLoading(false);
+
+                // Used to display the label in navbar
+                // this truly indicates the the changes was saved
+                // instead of using a text in conditional statement in the navbar
+                // which causes an unwanted behaviour
+                setSavedLabel("Changes saved");
+            } catch (error) {
+                console.error(error);
+                setIsLoading(false);
+            }
+        }, 300),
+        []
+    );
+
     useEffect(() => {
+        // Only render wheneters a changes to the details
+        // not when the quizdetails was initally set
+        if (isChanged) {
+            if (quizDetails.quiz_title.trim() !== "") {
+                debounceAutoSave(quizDetails);
+            }
+        }
         console.log(quizDetails);
-        console.log("QUESTION LIST:", questionList);
-    }, [quizDetails, questionList]);
+        return () => debounceAutoSave.cancel();
+    }, [quizDetails, debounceAutoSave]);
+
     return (
         <div className="font-nunito-sans relative space-y-5 text-ascend-black">
-            <QuizFormNav />
+            <QuizFormNav isLoading={isLoading} savedLabel={savedLabel} />
             <div className="w-full flex gap-5 items-center px-5 lg:px-[100px]">
                 <BackButton doSomething={handleClickBackBtn} />
             </div>
@@ -155,6 +200,7 @@ export default function QuizForm({ quiz }) {
                                     <span className="text-ascend-red">*</span>
                                 </label>
                                 <input
+                                    maxLength={255}
                                     type="text"
                                     value={quizDetails.quiz_title}
                                     onChange={(e) =>
@@ -163,17 +209,12 @@ export default function QuizForm({ quiz }) {
                                             e.target.value
                                         )
                                     }
-                                    className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
+                                    className="px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue"
                                 />
                             </div>
                             <div className="w-full">
-                                <label>
-                                    Duration
-                                    <span className="text-size2">
-                                        {" "}
-                                        (Minutes)
-                                    </span>
-                                </label>
+                                <label className="font-bold">Duration</label>
+                                <label className="text-size2"> (Minutes)</label>
                                 <input
                                     type="number"
                                     value={quizDetails.duration}
@@ -183,8 +224,16 @@ export default function QuizForm({ quiz }) {
                                             e.target.value
                                         )
                                     }
-                                    min={1}
-                                    className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
+                                    min="0"
+                                    max="9999"
+                                    // Prevent user from typing "-"
+                                    onKeyDown={(e) => {
+                                        console.log(e.key);
+                                        if (e.key === "-") {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                    className="px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue"
                                 />
                             </div>
                         </div>

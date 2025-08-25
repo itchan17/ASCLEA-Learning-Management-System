@@ -3,12 +3,13 @@ import useCreateQuizStore from "../../../../../../Stores/Programs/CourseContent/
 import { MdSettings } from "react-icons/md";
 import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
 
-export default function QuizFormNav() {
+export default function QuizFormNav({ isLoading, savedLabel }) {
     // Create Quiz Store
     const quizDetails = useCreateQuizStore((state) => state.quizDetails);
     const handleQuizDetailsChange = useCreateQuizStore(
         (state) => state.handleQuizDetailsChange
     );
+    const isChanged = useCreateQuizStore((state) => state.isChanged);
 
     const [isOpen, setIsOpen] = useState(false);
 
@@ -17,9 +18,13 @@ export default function QuizFormNav() {
     };
     return (
         <nav className="relative sm:h-16 w-full flex gap-5 items-center justify-between px-5 lg:px-[100px]">
-            <div className="flex items-center gap-5">
+            <div className="flex items-end gap-5">
                 <img src="/images/ascend_logo.png" alt="" className="w-30" />
-                <span className="text-size3">Saved</span>
+                {isChanged && (
+                    <span className="text-size3 mb-1">
+                        {isLoading ? "Saving..." : savedLabel}
+                    </span>
+                )}
             </div>
 
             <menu className="hidden sm:flex items-center justify-end gap-5 w-full sm:w-fit">
@@ -42,7 +47,6 @@ export default function QuizFormNav() {
                         <div className="flex space-x-3">
                             <input
                                 type="checkbox"
-                                defaultChecked={false}
                                 checked={quizDetails.show_answers_after}
                                 onChange={(e) =>
                                     handleQuizDetailsChange(
@@ -62,7 +66,6 @@ export default function QuizFormNav() {
                             <div className="flex space-x-3">
                                 <input
                                     type="checkbox"
-                                    defaultChecked={false}
                                     checked={quizDetails.cheating_mitigation}
                                     onChange={(e) =>
                                         handleQuizDetailsChange(
@@ -90,6 +93,16 @@ export default function QuizFormNav() {
                                                 <input
                                                     type="checkbox"
                                                     className="accent-ascend-blue"
+                                                    checked={quizDetails.cv_options.some(
+                                                        (option) =>
+                                                            option === "book"
+                                                    )}
+                                                    onChange={() =>
+                                                        handleQuizDetailsChange(
+                                                            "cv_options",
+                                                            "book"
+                                                        )
+                                                    }
                                                 />
                                                 <span>Book</span>
                                             </div>
@@ -97,12 +110,33 @@ export default function QuizFormNav() {
                                                 <input
                                                     type="checkbox"
                                                     className="accent-ascend-blue"
+                                                    checked={quizDetails.cv_options.some(
+                                                        (option) =>
+                                                            option === "laptop"
+                                                    )}
+                                                    onChange={() =>
+                                                        handleQuizDetailsChange(
+                                                            "cv_options",
+                                                            "laptop"
+                                                        )
+                                                    }
                                                 />
                                                 <span>Laptop</span>
                                             </div>
                                             <div className="flex items-center space-x-1">
                                                 <input
                                                     type="checkbox"
+                                                    checked={quizDetails.cv_options.some(
+                                                        (option) =>
+                                                            option ===
+                                                            "cellphone"
+                                                    )}
+                                                    onChange={() =>
+                                                        handleQuizDetailsChange(
+                                                            "cv_options",
+                                                            "cellphone"
+                                                        )
+                                                    }
                                                     className="accent-ascend-blue"
                                                 />
                                                 <span>Cellphone</span>
@@ -118,6 +152,16 @@ export default function QuizFormNav() {
                                                 <input
                                                     type="checkbox"
                                                     className="accent-ascend-blue"
+                                                    checked={quizDetails.cv_options.some(
+                                                        (option) =>
+                                                            option === "up"
+                                                    )}
+                                                    onChange={() =>
+                                                        handleQuizDetailsChange(
+                                                            "cv_options",
+                                                            "up"
+                                                        )
+                                                    }
                                                 />
                                                 <span>Up</span>
                                             </div>
@@ -125,6 +169,16 @@ export default function QuizFormNav() {
                                                 <input
                                                     type="checkbox"
                                                     className="accent-ascend-blue"
+                                                    checked={quizDetails.cv_options.some(
+                                                        (option) =>
+                                                            option === "down"
+                                                    )}
+                                                    onChange={() =>
+                                                        handleQuizDetailsChange(
+                                                            "cv_options",
+                                                            "down"
+                                                        )
+                                                    }
                                                 />
                                                 <span>Down</span>
                                             </div>
@@ -132,6 +186,16 @@ export default function QuizFormNav() {
                                                 <input
                                                     type="checkbox"
                                                     className="accent-ascend-blue"
+                                                    checked={quizDetails.cv_options.some(
+                                                        (option) =>
+                                                            option === "left"
+                                                    )}
+                                                    onChange={() =>
+                                                        handleQuizDetailsChange(
+                                                            "cv_options",
+                                                            "left"
+                                                        )
+                                                    }
                                                 />
                                                 <span>Left</span>
                                             </div>
@@ -139,6 +203,16 @@ export default function QuizFormNav() {
                                                 <input
                                                     type="checkbox"
                                                     className="accent-ascend-blue"
+                                                    checked={quizDetails.cv_options.some(
+                                                        (option) =>
+                                                            option === "right"
+                                                    )}
+                                                    onChange={() =>
+                                                        handleQuizDetailsChange(
+                                                            "cv_options",
+                                                            "right"
+                                                        )
+                                                    }
                                                 />
                                                 <span>Right</span>
                                             </div>
@@ -192,7 +266,6 @@ export default function QuizFormNav() {
                     <li className="flex space-x-3">
                         <input
                             type="checkbox"
-                            defaultChecked={false}
                             checked={quizDetails.show_answers_after}
                             onChange={(e) =>
                                 handleQuizDetailsChange(
@@ -212,7 +285,6 @@ export default function QuizFormNav() {
                         <div className="flex space-x-3">
                             <input
                                 type="checkbox"
-                                defaultChecked={false}
                                 checked={quizDetails.cheating_mitigation}
                                 onChange={(e) =>
                                     handleQuizDetailsChange(
@@ -240,6 +312,16 @@ export default function QuizFormNav() {
                                             <input
                                                 type="checkbox"
                                                 className="accent-ascend-blue"
+                                                checked={quizDetails.cv_options.some(
+                                                    (option) =>
+                                                        option === "book"
+                                                )}
+                                                onChange={() =>
+                                                    handleQuizDetailsChange(
+                                                        "cv_options",
+                                                        "book"
+                                                    )
+                                                }
                                             />
                                             <span>Book</span>
                                         </div>
@@ -247,6 +329,16 @@ export default function QuizFormNav() {
                                             <input
                                                 type="checkbox"
                                                 className="accent-ascend-blue"
+                                                checked={quizDetails.cv_options.some(
+                                                    (option) =>
+                                                        option === "laptop"
+                                                )}
+                                                onChange={() =>
+                                                    handleQuizDetailsChange(
+                                                        "cv_options",
+                                                        "laptop"
+                                                    )
+                                                }
                                             />
                                             <span>Laptop</span>
                                         </div>
@@ -254,6 +346,16 @@ export default function QuizFormNav() {
                                             <input
                                                 type="checkbox"
                                                 className="accent-ascend-blue"
+                                                checked={quizDetails.cv_options.some(
+                                                    (option) =>
+                                                        option === "cellphone"
+                                                )}
+                                                onChange={() =>
+                                                    handleQuizDetailsChange(
+                                                        "cv_options",
+                                                        "cellphone"
+                                                    )
+                                                }
                                             />
                                             <span>Cellphone</span>
                                         </div>
@@ -268,6 +370,15 @@ export default function QuizFormNav() {
                                             <input
                                                 type="checkbox"
                                                 className="accent-ascend-blue"
+                                                checked={quizDetails.cv_options.some(
+                                                    (option) => option === "up"
+                                                )}
+                                                onChange={() =>
+                                                    handleQuizDetailsChange(
+                                                        "cv_options",
+                                                        "up"
+                                                    )
+                                                }
                                             />
                                             <span>Up</span>
                                         </div>
@@ -275,6 +386,16 @@ export default function QuizFormNav() {
                                             <input
                                                 type="checkbox"
                                                 className="accent-ascend-blue"
+                                                checked={quizDetails.cv_options.some(
+                                                    (option) =>
+                                                        option === "down"
+                                                )}
+                                                onChange={() =>
+                                                    handleQuizDetailsChange(
+                                                        "cv_options",
+                                                        "down"
+                                                    )
+                                                }
                                             />
                                             <span>Down</span>
                                         </div>
@@ -282,6 +403,16 @@ export default function QuizFormNav() {
                                             <input
                                                 type="checkbox"
                                                 className="accent-ascend-blue"
+                                                checked={quizDetails.cv_options.some(
+                                                    (option) =>
+                                                        option === "left"
+                                                )}
+                                                onChange={() =>
+                                                    handleQuizDetailsChange(
+                                                        "cv_options",
+                                                        "left"
+                                                    )
+                                                }
                                             />
                                             <span>Left</span>
                                         </div>
@@ -289,6 +420,16 @@ export default function QuizFormNav() {
                                             <input
                                                 type="checkbox"
                                                 className="accent-ascend-blue"
+                                                checked={quizDetails.cv_options.some(
+                                                    (option) =>
+                                                        option === "right"
+                                                )}
+                                                onChange={() =>
+                                                    handleQuizDetailsChange(
+                                                        "cv_options",
+                                                        "right"
+                                                    )
+                                                }
                                             />
                                             <span>Right</span>
                                         </div>
