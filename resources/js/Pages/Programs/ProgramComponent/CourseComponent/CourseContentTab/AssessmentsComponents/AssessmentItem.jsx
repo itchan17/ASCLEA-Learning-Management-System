@@ -65,9 +65,7 @@ export default function AssessmentItem({
     const handleQuizClick = () => {
         if (!assessmentDetails.deleted_at) {
             router.visit(
-                route("program.course.quiz-form.edit", {
-                    program: program.program_id,
-                    course: course.course_id,
+                route("assessment.quiz-form.edit", {
                     assessment: assessmentDetails.assessment_id,
                     quiz: assessmentDetails.quiz.quiz_id,
                 })

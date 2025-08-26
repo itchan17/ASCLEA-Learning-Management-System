@@ -46,8 +46,8 @@ export default function MultipleChoice({
     const handleAddOption = () => {
         console.log(option);
 
-        // pass the input option tot he function and add it to the questionChoices array
-        handleQuestionDetailsChange("questionChoices", option);
+        // pass the input option tot he function and add it to the question_choices array
+        handleQuestionDetailsChange("question_choices", option);
         setOption("");
         toggleAddOption();
     };
@@ -81,23 +81,8 @@ export default function MultipleChoice({
     return (
         <div className="space-y-5">
             <div>
-                <label className="font-bold">
-                    Question<span className="text-ascend-red">*</span>
-                </label>
-                <input
-                    type="text"
-                    className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
-                    placeholder="Type question"
-                    value={questionDetails.question}
-                    onChange={(e) =>
-                        handleQuestionDetailsChange("question", e.target.value)
-                    }
-                />
-            </div>
-
-            <div>
                 {/* List Options */}
-                {questionDetails.questionChoices.length > 0 && (
+                {questionDetails.question_choices.length > 0 && (
                     <label className="font-bold">
                         Options
                         <span className="text-size1">
@@ -108,22 +93,21 @@ export default function MultipleChoice({
                 )}
 
                 <div className="space-y-5">
-                    {questionDetails.questionChoices.length > 0 &&
-                        questionDetails.questionChoices.map((option, i) => {
-                            let isCorrect = false;
-                            isCorrect =
+                    {questionDetails.question_choices.length > 0 &&
+                        questionDetails.question_choices.map((option, i) => {
+                            let isCorrect =
                                 questionDetails.questionAnswer.includes(option);
-                            return (
-                                <div
-                                    key={i}
-                                    onClick={() => setCorrectAnswer(option)}
-                                    className={`flex items-center border border-ascend-gray1 cursor-pointer min-h-12 p-2 relative ${
-                                        isCorrect
-                                            ? "bg-ascend-lightgreen"
-                                            : "bg-ascend-white"
-                                    } transition-all duration-300`}
-                                >
-                                    <div className="flex items-center cursor-pointer w-full">
+                            console.log(optionToEdit);
+                            return optionToEdit && optionToEdit.index == i ? (
+                                <div className="flex gap-1 ">
+                                    <div
+                                        onClick={() => setCorrectAnswer(option)}
+                                        className={`flex items-center px-3 py-2 border border-ascend-gray1 cursor-pointer ${
+                                            isCorrect
+                                                ? "bg-ascend-lightgreen"
+                                                : "bg-ascend-white"
+                                        }`}
+                                    >
                                         <div
                                             className={`flex items-center justify-center bg-ascend-white rounded-full w-5 h-5 shrink-0 ${
                                                 isCorrect
@@ -139,11 +123,51 @@ export default function MultipleChoice({
                                                 } transition-all duration-300`}
                                             />
                                         </div>
+                                    </div>
+                                    <input
+                                        key={i}
+                                        type="text"
+                                        value={option}
+                                        className="w-full border border-ascend-gray1 focus:outline-ascend-blue px-3 py-2"
+                                        placeholder="Type option"
+                                        onChange={(e) =>
+                                            setOption(e.target.value)
+                                        }
+                                    />
+                                </div>
+                            ) : (
+                                <div
+                                    key={i}
+                                    onClick={() => setCorrectAnswer(option)}
+                                    className={`flex border border-ascend-gray1 cursor-pointer  relative ${
+                                        isCorrect
+                                            ? "bg-ascend-lightgreen"
+                                            : "bg-ascend-white"
+                                    } transition-all duration-300`}
+                                >
+                                    <div className="flex items-center px-3 py-2">
+                                        <div
+                                            className={`flex items-center justify-center bg-ascend-white rounded-full w-5 h-5 shrink-0 ${
+                                                isCorrect
+                                                    ? "border-ascend-green border-2"
+                                                    : "border-ascend-gray2 border"
+                                            } transition-all duration-300`}
+                                        >
+                                            <div
+                                                className={`rounded-full shrink-0 ${
+                                                    isCorrect
+                                                        ? "bg-ascend-green w-3 h-3"
+                                                        : "bg-ascend-white w-0 h-0 "
+                                                } transition-all duration-300`}
+                                            />
+                                        </div>
+                                    </div>
 
-                                        <p className="ml-3 flex-1 min-w-0 break-words">
+                                    <div className="flex items-center cursor-pointer w-full px-3 py-2">
+                                        <p className="flex-1 min-w-0 break-words">
                                             {option}
                                         </p>
-                                        <div className="flex ml-5 gap-2">
+                                        <div className="flex gap-2">
                                             <div
                                                 onClick={(e) => {
                                                     stopPropagation(e);
@@ -152,20 +176,20 @@ export default function MultipleChoice({
                                                         option,
                                                     });
                                                 }}
-                                                className={`p-1 rounded-3xl ${
+                                                className={` rounded-3xl ${
                                                     isCorrect
                                                         ? "hover:bg-ascend-green/15"
                                                         : "hover:bg-ascend-lightblue"
-                                                }  transition-all duration-300`}
+                                                } transition-all duration-300`}
                                             >
                                                 <AiFillEdit className="shrink-0 text-size4 text-ascend-yellow" />
                                             </div>
                                             <div
-                                                className={`group p-1 rounded-3xl ${
+                                                className={`group  rounded-3xl ${
                                                     isCorrect
                                                         ? "hover:bg-ascend-green/15"
                                                         : "hover:bg-ascend-lightblue"
-                                                }  transition-all duration-300`}
+                                                } transition-all duration-300`}
                                             >
                                                 <AiFillDelete
                                                     onClick={(e) => {
@@ -183,8 +207,12 @@ export default function MultipleChoice({
                                 </div>
                             );
                         })}
-
-                    {!isAddOption ? (
+                    <SecondaryButton
+                        doSomething={toggleAddOption}
+                        icon={<BiPlus />}
+                        text={"Add option"}
+                    />
+                    {/* {!isAddOption ? (
                         <SecondaryButton
                             doSomething={toggleAddOption}
                             icon={<BiPlus />}
@@ -225,7 +253,7 @@ export default function MultipleChoice({
                                 )}
                             </div>
                         </>
-                    )}
+                    )} */}
                 </div>
             </div>
         </div>

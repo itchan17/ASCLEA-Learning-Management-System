@@ -28,7 +28,7 @@ import {
     useSensor,
 } from "@dnd-kit/core";
 
-export default function QuizForm({ programId, courseId, assessmentId, quiz }) {
+export default function QuizForm({ assessmentId, quiz }) {
     // Create Quiz Store
     const quizDetails = useCreateQuizStore((state) => state.quizDetails);
     const handleQuizDetailsChange = useCreateQuizStore(
@@ -50,20 +50,69 @@ export default function QuizForm({ programId, courseId, assessmentId, quiz }) {
 
     // Local States
     const [isLoading, setIsLoading] = useState(false);
-    const [savedLabel, setSavedLabel] = useState("");
+    const [isCreatingQuestion, setIsCreatingQuestion] = useState(false);
+    const [savedLabel, setSavedLabel] = useState(""); // Saved label in the navbar
     const [openQuestionForm, setOpenQuestionForm] = useState({
         multipleChoice: false,
         trueOrFalse: false,
         identification: false,
     });
     const [activeForm, setActiveForm] = useState("");
-    const targetForm = useRef(null);
     const [onEdit, setOnEdit] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(null);
+    const [questionDetails, setQuestionDetails] = useState(null);
+
+    // Refs
+    const targetForm = useRef(null);
+    const multipleChoiceRef = useRef(null);
+    const truOrFalseRef = useRef(null);
+    const indentificationRef = useRef(null);
+
     useEffect(() => {
         setQuizDetails(quiz);
         setIsChanged(false);
     }, []);
+
+    // A debounced function that handles auto save
+    // used useCallback to prevent recreating of the function
+    const debounceAutoSave = useCallback(
+        debounce(async (data) => {
+            setIsLoading(true);
+            try {
+                const response = await axios.put(
+                    route("assessment.quiz-form.update", {
+                        assessment: assessmentId,
+                        quiz: quiz.quiz_id,
+                    }),
+                    data
+                );
+                console.log(response);
+                setIsLoading(false);
+
+                // Used to display the label in navbar
+                // this truly indicates the the changes was saved
+                // instead of using a text in conditional statement in the navbar
+                // which causes an unwanted behaviour
+                setSavedLabel("Changes saved");
+            } catch (error) {
+                console.error(error);
+                setIsLoading(false);
+            }
+        }, 300),
+        []
+    );
+
+    useEffect(() => {
+        // Only render when there's a changes to the details
+        // not when the quizdetails was initally set
+        if (isChanged) {
+            if (quizDetails.quiz_title.trim() !== "") {
+                debounceAutoSave(quizDetails);
+            }
+        }
+        console.log(quizDetails);
+        return () => debounceAutoSave.cancel();
+    }, [quizDetails, debounceAutoSave]);
 
     useEffect(() => {
         console.log("ON EDIT: " + onEdit);
@@ -71,14 +120,10 @@ export default function QuizForm({ programId, courseId, assessmentId, quiz }) {
 
     // Scroll into the form once opened
     useEffect(() => {
-        if (
-            activeForm === "multipleChoice" ||
-            activeForm === "trueOrFalse" ||
-            activeForm === "identification"
-        ) {
+        if (questionDetails) {
             targetForm.current?.scrollIntoView({ behavior: "smooth" });
         }
-    }, [activeForm]);
+    }, [questionDetails]);
 
     // Helper function for getting the index
     const getQuestionPos = (id) =>
@@ -133,46 +178,84 @@ export default function QuizForm({ programId, courseId, assessmentId, quiz }) {
         handleQuizDetailsChange("quiz_total_points", totalPoints);
     };
 
-    const debounceAutoSave = useCallback(
-        debounce(async (data) => {
-            setIsLoading(true);
-            try {
-                const response = await axios.put(
-                    route("assessment.quiz-form.update", {
-                        program: programId,
-                        course: courseId,
-                        assessment: assessmentId,
-                        quiz: quiz.quiz_id,
-                    }),
-                    data
-                );
-                console.log(response);
-                setIsLoading(false);
-
-                // Used to display the label in navbar
-                // this truly indicates the the changes was saved
-                // instead of using a text in conditional statement in the navbar
-                // which causes an unwanted behaviour
-                setSavedLabel("Changes saved");
-            } catch (error) {
-                console.error(error);
-                setIsLoading(false);
-            }
-        }, 300),
-        []
-    );
-
+    // Close the form when the user click outside the form
     useEffect(() => {
-        // Only render wheneters a changes to the details
-        // not when the quizdetails was initally set
-        if (isChanged) {
-            if (quizDetails.quiz_title.trim() !== "") {
-                debounceAutoSave(quizDetails);
+        const handleClickOutside = (event) => {
+            // If the click is outside the element referenced by `targetForm`
+            if (
+                targetForm.current &&
+                !targetForm.current.contains(event.target) &&
+                !multipleChoiceRef.current.contains(event.target) &&
+                !truOrFalseRef.current.contains(event.target) &&
+                !indentificationRef.current.contains(event.target) &&
+                !isCreatingQuestion
+            ) {
+                // Setting the state to null forces the form to close
+                setQuestionDetails(null);
+
+                // Add the question to the question list
+                // CODE HERE
             }
+        };
+
+        // Attach listener when component mounts
+        document.addEventListener("mousedown", handleClickOutside);
+
+        // Cleanup listener when component unmounts
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isCreatingQuestion, targetForm]);
+
+    // Handles creating of the inital question when the question type  button was clicked
+    const handleCreateQuestion = async (questionType, sortOrder) => {
+        // Check if theres questionDetails
+        // this means the question form is curently open
+        // if the user click another question type
+        // the previous question will be added to the list
+
+        try {
+            if (questionDetails) {
+                // Add the question to the question list
+                // CODE HERE
+            }
+
+            console.log("CREATING..");
+            setIsCreatingQuestion(true);
+            // Set the initial question details
+            // to immidiately open the form and not wait
+            // from the response of the back end
+            setQuestionDetails({
+                is_required: false,
+                question: "Question",
+                question_points: 0,
+                question_type: questionType,
+                sort_order: 1,
+            });
+
+            const response = await axios.post(
+                route("assessment.quiz-form.question.create", {
+                    assessment: assessmentId,
+                    quiz: quiz.quiz_id,
+                }),
+                {
+                    question_type: questionType,
+                    sort_order: sortOrder,
+                }
+            );
+
+            // Set the data from backend
+            // this also contains the Id
+            setQuestionDetails(response.data.data);
+            setIsCreatingQuestion(false);
+        } catch (error) {
+            console.error(error);
+            // Clear the question details
+            // this also forces the form to close immediately
+            setQuestionDetails(null);
+            setIsCreatingQuestion(false);
         }
-        console.log(quizDetails);
-        return () => debounceAutoSave.cancel();
-    }, [quizDetails, debounceAutoSave]);
+    };
 
     return (
         <div className="font-nunito-sans relative space-y-5 text-ascend-black">
@@ -279,65 +362,71 @@ export default function QuizForm({ programId, courseId, assessmentId, quiz }) {
                                 </DndContext>
                             </div>
                         )}
-                        <div>
-                            {(activeForm === "multipleChoice" ||
-                                activeForm === "trueOrFalse" ||
-                                activeForm === "identification") &&
-                                !onEdit && (
-                                    <div ref={targetForm}>
-                                        <QuestionForm
-                                            activeForm={activeForm}
-                                            setActiveForm={setActiveForm}
-                                            setSelectedIndex={setSelectedIndex}
-                                        />
-                                    </div>
-                                )}
-                        </div>
+
+                        {/* Display the question form */}
+                        {questionDetails && (
+                            <div ref={targetForm}>
+                                <QuestionForm
+                                    questionDetails={questionDetails}
+                                    setQuestionDetails={setQuestionDetails}
+                                    activeForm={activeForm}
+                                    setActiveForm={setActiveForm}
+                                    setSelectedIndex={setSelectedIndex}
+                                />
+                            </div>
+                        )}
+
                         <div className="space-y-5">
                             <h1 className="font-bold">
                                 Select Type of Question
                             </h1>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                                <SecondaryButton
-                                    doSomething={() => {
-                                        clearQuestionDetails();
-                                        handleOpenQuestionForm(
-                                            "multipleChoice"
-                                        );
-                                        handleQuestionDetailsChange(
-                                            "questionType",
-                                            "multipleChoice"
-                                        );
-                                    }}
-                                    width={"w-full"}
-                                    text={"Multiple Choice"}
-                                />
-                                <SecondaryButton
-                                    doSomething={() => {
-                                        clearQuestionDetails();
-                                        handleOpenQuestionForm("trueOrFalse");
-                                        handleQuestionDetailsChange(
-                                            "questionType",
-                                            "trueOrFalse"
-                                        );
-                                    }}
-                                    width={"w-full"}
-                                    text={"True or False"}
-                                />
-                                <SecondaryButton
-                                    doSomething={() => {
-                                        clearQuestionDetails();
-                                        handleOpenQuestionForm(
-                                            "identification"
-                                        );
-                                        handleQuestionDetailsChange(
-                                            "questionType",
-                                            "identification"
-                                        );
-                                    }}
-                                    width={"w-full"}
-                                    text={"Identification"}
-                                />
+                                <div ref={multipleChoiceRef}>
+                                    <SecondaryButton
+                                        doSomething={() =>
+                                            handleCreateQuestion(
+                                                "multiple_choice",
+                                                1
+                                            )
+                                        }
+                                        width={"w-full"}
+                                        text={"Multiple Choice"}
+                                    />
+                                </div>
+
+                                <div ref={truOrFalseRef}>
+                                    <SecondaryButton
+                                        doSomething={() => {
+                                            clearQuestionDetails();
+                                            handleOpenQuestionForm(
+                                                "trueOrFalse"
+                                            );
+                                            handleQuestionDetailsChange(
+                                                "questionType",
+                                                "trueOrFalse"
+                                            );
+                                        }}
+                                        width={"w-full"}
+                                        text={"True or False"}
+                                    />
+                                </div>
+
+                                <div ref={indentificationRef}>
+                                    <SecondaryButton
+                                        doSomething={() => {
+                                            clearQuestionDetails();
+                                            handleOpenQuestionForm(
+                                                "identification"
+                                            );
+                                            handleQuestionDetailsChange(
+                                                "questionType",
+                                                "identification"
+                                            );
+                                        }}
+                                        width={"w-full"}
+                                        text={"Identification"}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>

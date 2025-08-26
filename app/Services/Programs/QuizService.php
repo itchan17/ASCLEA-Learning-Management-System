@@ -3,6 +3,7 @@
 namespace App\Services\Programs;
 
 use App\Models\Programs\CvOption;
+use App\Models\Programs\Question;
 use App\Models\Programs\Quiz;
 use Illuminate\Support\Str;
 
@@ -58,5 +59,21 @@ class QuizService
                 }
             }
         }
+    }
+
+    public function createInitalQuestion(string $quizId, array $otherDetails)
+    {
+        $questiondetails =  [
+            'quiz_id' => $quizId,
+            'question' => "Question",
+            'question_type' => $otherDetails['question_type'],
+            'question_points' => 0,
+            'sort_order' => $otherDetails['sort_order'],
+            'is_required' => false,
+        ];
+
+        $question = Question::create($questiondetails)->makeHidden(['created_at', 'updated_at']);;
+
+        return $question;
     }
 }

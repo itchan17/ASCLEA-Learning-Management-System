@@ -20,21 +20,19 @@ class QuizController extends Controller
         $this->quizService = $service;
     }
 
-    public function showEditQuizForm($program, $course, Assessment $assessment, Quiz $quiz)
+    public function showEditQuizForm(Assessment $assessment, Quiz $quiz)
     {
         // Check if user an view edit quiz form page of teh assessment
         Gate::authorize('viewEditQuizForm',  [Quiz::class, $assessment]);
 
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/QuizForm', [
-            'programId' => $program,
-            'courseId' => $course,
-            'assessmentId' => $assessment,
+            'assessmentId' => $assessment->assessment_id,
             'quiz' => $this->quizService->getQuizCompleteDetails($quiz),
 
         ]);
     }
 
-    public function updateQuizDetails(SaveQuizRequest $req, $program, $course, Assessment $assessment, Quiz $quiz)
+    public function updateQuizDetails(SaveQuizRequest $req, Assessment $assessment, Quiz $quiz)
     {
         $validatedQuizDetails = $req->validated();
         $this->quizService->saveUpdatedQuizDetails($validatedQuizDetails, $quiz);

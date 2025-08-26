@@ -21,13 +21,12 @@ const useCreateQuizStore = create((set) => ({
     },
 
     questionDetails: {
-        id: null,
-        questionType: "",
         question: "",
-        questionChoices: [],
-        questionAnswer: [],
-        questionPoints: 0,
-        required: false,
+        question_type: "",
+        question_choices: [],
+        correct_answers: [],
+        question_points: 0,
+        is_required: false,
     },
 
     questionList: [
