@@ -34,16 +34,16 @@ export default function QuizForm({ assessmentId, quiz }) {
     const handleQuizDetailsChange = useCreateQuizStore(
         (state) => state.handleQuizDetailsChange
     );
-    const questionList = useCreateQuizStore((state) => state.questionList);
+    // const questionList = useCreateQuizStore((state) => state.questionList);
     const handleQuestionDetailsChange = useCreateQuizStore(
         (state) => state.handleQuestionDetailsChange
     );
     const clearQuestionDetails = useCreateQuizStore(
         (state) => state.clearQuestionDetails
     );
-    const setQuestionList = useCreateQuizStore(
-        (state) => state.setQuestionList
-    );
+    // const setQuestionList = useCreateQuizStore(
+    //     (state) => state.setQuestionList
+    // );
     const setQuizDetails = useCreateQuizStore((state) => state.setQuizDetails);
     const isChanged = useCreateQuizStore((state) => state.isChanged);
     const setIsChanged = useCreateQuizStore((state) => state.setIsChanged);
@@ -61,6 +61,9 @@ export default function QuizForm({ assessmentId, quiz }) {
     const [onEdit, setOnEdit] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [questionDetails, setQuestionDetails] = useState(null);
+    const [isQuestioNDetailsChanged, setIsQuestioNDetailsChanged] =
+        useState(false);
+    const [questionList, setQuestionList] = useState([]);
 
     // Refs
     const targetForm = useRef(null);
@@ -190,11 +193,17 @@ export default function QuizForm({ assessmentId, quiz }) {
                 !indentificationRef.current.contains(event.target) &&
                 !isCreatingQuestion
             ) {
-                // Setting the state to null forces the form to close
-                setQuestionDetails(null);
-
-                // Add the question to the question list
-                // CODE HERE
+                if (
+                    questionDetails &&
+                    questionDetails.quiz_id &&
+                    questionDetails.question_id
+                ) {
+                    // Add the question to the question list
+                    // CODE HERE
+                    setQuestionList((prev) => [...prev, questionDetails]);
+                    setQuestionDetails(null);
+                    setIsQuestioNDetailsChanged(false);
+                }
             }
         };
 
@@ -209,53 +218,68 @@ export default function QuizForm({ assessmentId, quiz }) {
 
     // Handles creating of the inital question when the question type  button was clicked
     const handleCreateQuestion = async (questionType, sortOrder) => {
-        // Check if theres questionDetails
-        // this means the question form is curently open
-        // if the user click another question type
-        // the previous question will be added to the list
-
-        try {
-            if (questionDetails) {
-                // Add the question to the question list
-                // CODE HERE
-            }
-
-            console.log("CREATING..");
-            setIsCreatingQuestion(true);
-            // Set the initial question details
-            // to immidiately open the form and not wait
-            // from the response of the back end
-            setQuestionDetails({
-                is_required: false,
-                question: "Question",
-                question_points: 0,
-                question_type: questionType,
-                sort_order: 1,
-            });
-
-            const response = await axios.post(
-                route("assessment.quiz-form.question.create", {
-                    assessment: assessmentId,
-                    quiz: quiz.quiz_id,
-                }),
-                {
-                    question_type: questionType,
-                    sort_order: sortOrder,
+        if (!isCreatingQuestion) {
+            try {
+                // Check if theres questionDetails
+                // this means the question form is curently open
+                // if the user click another question type
+                // the previous question will be added to the list
+                // Ensures only question details with merged IDs from the
+                // backend will be pushed in the list
+                if (
+                    questionDetails &&
+                    questionDetails.quiz_id &&
+                    questionDetails.question_id
+                ) {
+                    // Add the question to the question list
+                    // CODE HERE
+                    setQuestionList((prev) => [...prev, questionDetails]);
+                    setQuestionDetails(null);
+                    setIsQuestioNDetailsChanged(false);
                 }
-            );
 
-            // Set the data from backend
-            // this also contains the Id
-            setQuestionDetails(response.data.data);
-            setIsCreatingQuestion(false);
-        } catch (error) {
-            console.error(error);
-            // Clear the question details
-            // this also forces the form to close immediately
-            setQuestionDetails(null);
-            setIsCreatingQuestion(false);
+                console.log("CREATING..");
+                setIsCreatingQuestion(true);
+                // Set the initial question details
+                // to immidiately open the form and not wait
+                // from the response of the back end
+                setQuestionDetails({
+                    is_required: false,
+                    question: "Question",
+                    question_points: 0,
+                    question_type: questionType,
+                    sort_order: 1,
+                });
+
+                const response = await axios.post(
+                    route("assessment.quiz-form.question.create", {
+                        assessment: assessmentId,
+                        quiz: quiz.quiz_id,
+                    }),
+                    {
+                        question_type: questionType,
+                        sort_order: sortOrder,
+                    }
+                );
+
+                // Merge the id from backend to the question details
+                setQuestionDetails((prev) => ({
+                    ...prev,
+                    quiz_id: response.data.data.quiz_id,
+                    question_id: response.data.data.question_id,
+                }));
+                setIsCreatingQuestion(false);
+            } catch (error) {
+                console.error(error);
+                // Clear the question details
+                // this also forces the form to close immediately
+                setQuestionDetails(null);
+                setIsCreatingQuestion(false);
+            }
         }
     };
+
+    useEffect(() => console.log(questionList), [questionList]);
 
     return (
         <div className="font-nunito-sans relative space-y-5 text-ascend-black">
@@ -343,7 +367,7 @@ export default function QuizForm({ assessmentId, quiz }) {
                                         items={questionList}
                                         strategy={verticalListSortingStrategy}
                                     >
-                                        {questionList.map((question, i) => (
+                                        {/* {questionList.map((question, i) => (
                                             <Question
                                                 key={i}
                                                 questionDetails={question}
@@ -357,7 +381,7 @@ export default function QuizForm({ assessmentId, quiz }) {
                                                 }
                                                 disabled={false}
                                             />
-                                        ))}
+                                        ))} */}
                                     </SortableContext>
                                 </DndContext>
                             </div>
@@ -369,6 +393,8 @@ export default function QuizForm({ assessmentId, quiz }) {
                                 <QuestionForm
                                     questionDetails={questionDetails}
                                     setQuestionDetails={setQuestionDetails}
+                                    isChanged={isQuestioNDetailsChanged}
+                                    setIsChanged={setIsQuestioNDetailsChanged}
                                     activeForm={activeForm}
                                     setActiveForm={setActiveForm}
                                     setSelectedIndex={setSelectedIndex}

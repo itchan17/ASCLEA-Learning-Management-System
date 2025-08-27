@@ -18,7 +18,7 @@ class QuestionService
             'is_required' => false,
         ];
 
-        $question = Question::create($questiondetails)->makeHidden(['created_at', 'updated_at']);;
+        $question = Question::create($questiondetails)->only(['quiz_id', 'question_id']);;
 
         return $question;
     }

@@ -16,6 +16,8 @@ export default function QuestionForm({
     questionIndex,
     onEdit,
     setSelectedIndex,
+    isChanged,
+    setIsChanged,
 }) {
     const { assessmentId, quiz } = usePage().props;
 
@@ -40,7 +42,6 @@ export default function QuestionForm({
     const [isAddOption, setIsAddOption] = useState(false);
     const [option, setOption] = useState("");
     const [timeoutId, setTimeoutId] = useState(null);
-    const [isChanged, setIsChanged] = useState(false);
 
     // set the form title depending on the seleced question type
     const [formTitle, setFormTitle] = useState("");
@@ -108,7 +109,7 @@ export default function QuestionForm({
         }
     };
 
-    // Debounce the function tha save the question updates
+    // Debounce the function that autosave the question updates
     const debounceUpdateQuestion = useCallback(
         debounce(async (data) => {
             try {
@@ -130,10 +131,10 @@ export default function QuestionForm({
 
     // Handles autosave of question details here
     useEffect(() => {
-        console.log(questionDetails);
-        console.log("THIS IS RUNNING");
         // Only run when details was truly changed by the user
-        if (isChanged) {
+        if (isChanged && questionDetails.question_id) {
+            console.log(questionDetails);
+            console.log("THIS IS RUNNING");
             if (questionDetails.question.trim() !== "") {
                 debounceUpdateQuestion(questionDetails);
             }
