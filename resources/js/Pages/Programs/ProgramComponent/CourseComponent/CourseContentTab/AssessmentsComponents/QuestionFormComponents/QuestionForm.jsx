@@ -9,15 +9,18 @@ import { debounce } from "lodash";
 import { usePage } from "@inertiajs/react";
 
 export default function QuestionForm({
+    isChanged,
+    setIsChanged,
     questionDetails,
     setQuestionDetails,
+    questionOptions,
+    setQuestionOptions,
+
     activeForm,
     setActiveForm,
     questionIndex,
     onEdit,
     setSelectedIndex,
-    isChanged,
-    setIsChanged,
 }) {
     const { assessmentId, quiz } = usePage().props;
 
@@ -41,7 +44,6 @@ export default function QuestionForm({
     // Local States
     const [isAddOption, setIsAddOption] = useState(false);
     const [option, setOption] = useState("");
-    const [timeoutId, setTimeoutId] = useState(null);
 
     // set the form title depending on the seleced question type
     const [formTitle, setFormTitle] = useState("");
@@ -74,29 +76,7 @@ export default function QuestionForm({
 
     const handleQuestionDetailsChange = (field, value) => {
         setIsChanged(true);
-        if (field === "question") {
-            setQuestionDetails((prev) => ({
-                ...prev,
-                [field]: value,
-            }));
-
-            // Clear the timeout if has value
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-
-            // Add value if user try to remove the questio
-            if (value.trim() === "") {
-                const newTimeout = setTimeout(() => {
-                    setQuestionDetails((prev) => ({
-                        ...prev,
-                        question: "Question",
-                    }));
-                }, 1000);
-
-                setTimeoutId(newTimeout);
-            }
-        } else if (field === "question_points") {
+        if (field === "question_points") {
             setQuestionDetails((prev) => ({
                 ...prev,
                 [field]: value.length > 3 ? value.slice(0, 3) : value, // Limit the input to 3 char,
@@ -135,9 +115,13 @@ export default function QuestionForm({
         if (isChanged && questionDetails.question_id) {
             console.log(questionDetails);
             console.log("THIS IS RUNNING");
-            if (questionDetails.question.trim() !== "") {
-                debounceUpdateQuestion(questionDetails);
-            }
+
+            // If the question is empty update it with the default value
+            debounceUpdateQuestion(
+                questionDetails.question.trim() !== ""
+                    ? questionDetails
+                    : { ...questionDetails, question: "Question" }
+            );
         }
     }, [questionDetails]);
 
@@ -184,12 +168,22 @@ export default function QuestionForm({
                     onChange={(e) =>
                         handleQuestionDetailsChange("question", e.target.value)
                     }
+                    onBlur={(e) => {
+                        if (e.target.value.trim() === "") {
+                            handleQuestionDetailsChange("question", "Question");
+                        }
+                    }}
                 />
             </div>
 
             {/* Display the form based on the question type */}
             {questionDetails.question_type === "multiple_choice" ? (
-                <MultipleChoice />
+                <MultipleChoice
+                    questionDetails={questionDetails}
+                    setQuestionDetails={setQuestionDetails}
+                    options={questionOptions}
+                    setOptions={setQuestionOptions}
+                />
             ) : questionDetails.question_type === "true_or_false" ? (
                 <TrueOrFalse />
             ) : (

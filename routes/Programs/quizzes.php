@@ -19,4 +19,6 @@ Route::prefix('assessments/{assessment}/')
 
         // Route for display the edit page of quiz
         Route::put('quiz-form/{quiz}/questions/{question}/update', [QuestionController::class, 'updateQuestion'])->name('assessment.quiz-form.question.update');
+
+        Route::put('quiz-form/{quiz}/questions/{question}/options/{option}update', [QuestionController::class, 'updateOption'])->name('assessment.quiz-form.question.option.update');
     });

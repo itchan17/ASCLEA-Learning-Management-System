@@ -1,21 +1,27 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import useCreateQuizStore from "../../../../../../../Stores/Programs/CourseContent/createQuizStore";
 import SecondaryButton from "../../../../../../../Components/Button/SecondaryButton";
 import PrimaryButton from "../../../../../../../Components/Button/PrimaryButton";
 import { BiPlus } from "react-icons/bi";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { AiFillEdit, AiFillDelete } from "react-icons/ai";
+import { SlOptions } from "react-icons/sl";
+import { debounce } from "lodash";
+import { usePage } from "@inertiajs/react";
 
 export default function MultipleChoice({
-    option,
-    setOption,
+    options,
+    setOptions,
     isAddOption,
     setIsAddOption,
+    questionDetails,
+    setQuestionDetails,
 }) {
+    const { assessmentId, quiz } = usePage().props;
     // Create Quiz Store
-    const questionDetails = useCreateQuizStore(
-        (state) => state.questionDetails
-    );
+    // const questionDetails = useCreateQuizStore(
+    //     (state) => state.questionDetails
+    // );
     const handleQuestionDetailsChange = useCreateQuizStore(
         (state) => state.handleQuestionDetailsChange
     );
@@ -44,10 +50,10 @@ export default function MultipleChoice({
     };
 
     const handleAddOption = () => {
-        console.log(option);
+        console.log(SlOptions);
 
         // pass the input option tot he function and add it to the question_choices array
-        handleQuestionDetailsChange("question_choices", option);
+        handleQuestionDetailsChange("question_choices", options);
         setOption("");
         toggleAddOption();
     };
@@ -68,21 +74,80 @@ export default function MultipleChoice({
     };
 
     // this will run every time option was clicked to edit
-    useEffect(() => {
-        if (optionToEdit) {
-            // this will display the option input field
-            setIsAddOption(true);
+    // useEffect(() => {
+    //     if (optionToEdit) {
+    //         // this will display the option input field
+    //         setIsAddOption(true);
 
-            // this will set the value of the option input field
-            setOption(optionToEdit.option);
-        }
-    }, [optionToEdit]);
+    //         // this will set the value of the option input field
+    //         setOption(optionToEdit.option);
+    //     }
+    // }, [optionToEdit]);
+
+    const debounceUpdateOption = useCallback(
+        debounce(async (data) => {
+            try {
+                console.log(data);
+                const response = await axios.put(
+                    route("assessment.quiz-form.question.option.update", {
+                        assessment: assessmentId,
+                        quiz: quiz.quiz_id,
+                        question: data.question_id,
+                        option: data.question_option_id,
+                    }),
+                    data
+                );
+            } catch (error) {
+                console.error(error);
+            }
+        }, 300),
+        []
+    );
+
+    const handleOptionChange = (optionId, value, index) => {
+        console.log("ONBLUR IS WORKING");
+        setOptions((prev) => {
+            const newOptions = prev.map((option) =>
+                option.question_option_id === optionId
+                    ? { ...option, option_name: value }
+                    : option
+            );
+
+            const updatedOption = newOptions.find(
+                (o) => o.question_option_id === optionId
+            );
+
+            // Check first for id
+            // this verifies that the data from backend was verfied
+            if (updatedOption.question_option_id) {
+                // If the option name is empty update it with the default value
+                debounceUpdateOption(
+                    updatedOption.option_name.trim() !== ""
+                        ? updatedOption
+                        : {
+                              ...updatedOption,
+                              option_name: `Option ${index + 1}`,
+                          }
+                );
+            }
+
+            return newOptions;
+        });
+    };
+
+    useEffect(() => {
+        return () => {
+            debounceUpdateOption.cancel(); // cancels any pending API call
+        };
+    }, [debounceUpdateOption]);
+
+    useEffect(() => console.log(options), [options]);
 
     return (
         <div className="space-y-5">
             <div>
                 {/* List Options */}
-                {questionDetails.question_choices.length > 0 && (
+                {options.length > 0 && (
                     <label className="font-bold">
                         Options
                         <span className="text-size1">
@@ -93,16 +158,24 @@ export default function MultipleChoice({
                 )}
 
                 <div className="space-y-5">
-                    {questionDetails.question_choices.length > 0 &&
-                        questionDetails.question_choices.map((option, i) => {
-                            let isCorrect =
-                                questionDetails.questionAnswer.includes(option);
-                            console.log(optionToEdit);
-                            return optionToEdit && optionToEdit.index == i ? (
-                                <div className="flex gap-1 ">
+                    {options &&
+                        options.length > 0 &&
+                        options.map((option, i) => {
+                            let isCorrect = false;
+                            // questionDetails.questionAnswer.includes(option);
+
+                            return optionToEdit &&
+                                optionToEdit.question_option_id &&
+                                optionToEdit.question_option_id ==
+                                    option.question_option_id ? (
+                                // Input field for edit option
+                                <div
+                                    key={option.question_option_id || i}
+                                    className="relative"
+                                >
                                     <div
                                         onClick={() => setCorrectAnswer(option)}
-                                        className={`flex items-center px-3 py-2 border border-ascend-gray1 cursor-pointer ${
+                                        className={`absolute left-1 top-1/2 -translate-y-1/2 flex items-center px-3 py-2 border border-ascend-gray1 cursor-pointer ${
                                             isCorrect
                                                 ? "bg-ascend-lightgreen"
                                                 : "bg-ascend-white"
@@ -125,19 +198,35 @@ export default function MultipleChoice({
                                         </div>
                                     </div>
                                     <input
+                                        autoFocus
                                         key={i}
                                         type="text"
-                                        value={option}
-                                        className="w-full border border-ascend-gray1 focus:outline-ascend-blue px-3 py-2"
+                                        value={option.option_name}
+                                        className="w-full border border-ascend-gray1 focus:outline-ascend-blue pl-14 pr-3 py-2"
                                         placeholder="Type option"
                                         onChange={(e) =>
-                                            setOption(e.target.value)
+                                            handleOptionChange(
+                                                optionToEdit.question_option_id,
+                                                e.target.value,
+                                                i
+                                            )
                                         }
+                                        onBlur={(e) => {
+                                            setOptionToEdit(null);
+                                            if (e.target.value.trim() === "") {
+                                                handleOptionChange(
+                                                    optionToEdit.question_option_id,
+                                                    `Option ${i + 1}`,
+                                                    i
+                                                );
+                                            }
+                                        }}
                                     />
                                 </div>
                             ) : (
+                                // Option
                                 <div
-                                    key={i}
+                                    key={option.question_option_id || i}
                                     onClick={() => setCorrectAnswer(option)}
                                     className={`flex border border-ascend-gray1 cursor-pointer  relative ${
                                         isCorrect
@@ -145,7 +234,7 @@ export default function MultipleChoice({
                                             : "bg-ascend-white"
                                     } transition-all duration-300`}
                                 >
-                                    <div className="flex items-center px-3 py-2">
+                                    <div className="flex items-center pl-4 pr-3 py-2">
                                         <div
                                             className={`flex items-center justify-center bg-ascend-white rounded-full w-5 h-5 shrink-0 ${
                                                 isCorrect
@@ -165,16 +254,13 @@ export default function MultipleChoice({
 
                                     <div className="flex items-center cursor-pointer w-full px-3 py-2">
                                         <p className="flex-1 min-w-0 break-words">
-                                            {option}
+                                            {option.option_name}
                                         </p>
                                         <div className="flex gap-2">
                                             <div
                                                 onClick={(e) => {
                                                     stopPropagation(e);
-                                                    setOptionToEdit({
-                                                        index: i,
-                                                        option,
-                                                    });
+                                                    setOptionToEdit(option);
                                                 }}
                                                 className={` rounded-3xl ${
                                                     isCorrect

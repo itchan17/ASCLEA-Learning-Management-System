@@ -61,6 +61,7 @@ export default function QuizForm({ assessmentId, quiz }) {
     const [onEdit, setOnEdit] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(null);
     const [questionDetails, setQuestionDetails] = useState(null);
+    const [questionOptions, setQuestionOptions] = useState([]);
     const [isQuestioNDetailsChanged, setIsQuestioNDetailsChanged] =
         useState(false);
     const [questionList, setQuestionList] = useState([]);
@@ -198,10 +199,30 @@ export default function QuizForm({ assessmentId, quiz }) {
                     questionDetails.quiz_id &&
                     questionDetails.question_id
                 ) {
-                    // Add the question to the question list
-                    // CODE HERE
-                    setQuestionList((prev) => [...prev, questionDetails]);
+                    //These updated data was made because onBlur dont get triggered when
+                    // the form was closed
+                    // so we have to ensure no field are empty that will be displayed
+
+                    // Ensures no empty option
+                    const updatedOptions = questionOptions.map((option, i) =>
+                        option.option_name.trim() === ""
+                            ? { ...option, option_name: `Option ${i + 1}` }
+                            : option
+                    );
+
+                    // Enusre question is not empty
+                    const updatedQuestionDetails =
+                        questionDetails.question.trim() === ""
+                            ? { ...questionDetails, question: "Question" }
+                            : questionDetails;
+
+                    setQuestionList((prev) => [
+                        ...prev,
+                        { ...updatedQuestionDetails, option: updatedOptions },
+                    ]);
+
                     setQuestionDetails(null);
+                    setQuestionOptions([]);
                     setIsQuestioNDetailsChanged(false);
                 }
             }
@@ -214,7 +235,7 @@ export default function QuizForm({ assessmentId, quiz }) {
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [isCreatingQuestion, targetForm]);
+    }, [isCreatingQuestion, targetForm, questionDetails, questionOptions]);
 
     // Handles creating of the inital question when the question type  button was clicked
     const handleCreateQuestion = async (questionType, sortOrder) => {
@@ -233,13 +254,18 @@ export default function QuizForm({ assessmentId, quiz }) {
                 ) {
                     // Add the question to the question list
                     // CODE HERE
-                    setQuestionList((prev) => [...prev, questionDetails]);
+                    setQuestionList((prev) => [
+                        ...prev,
+                        { ...questionDetails, option: questionOptions },
+                    ]);
                     setQuestionDetails(null);
+                    setQuestionOptions([]);
                     setIsQuestioNDetailsChanged(false);
                 }
 
                 console.log("CREATING..");
                 setIsCreatingQuestion(true);
+
                 // Set the initial question details
                 // to immidiately open the form and not wait
                 // from the response of the back end
@@ -251,6 +277,16 @@ export default function QuizForm({ assessmentId, quiz }) {
                     sort_order: 1,
                 });
 
+                // Create he intial option with temporary id
+                const newOption = {
+                    option_temp_id: `${Date.now()}-${Math.random()
+                        .toString(36)
+                        .substr(2, 9)}`,
+                    option_name: "Option 1",
+                };
+                // Set the inital to imeediately dispaly in the front end
+                setQuestionOptions([newOption]);
+
                 const response = await axios.post(
                     route("assessment.quiz-form.question.create", {
                         assessment: assessmentId,
@@ -261,13 +297,32 @@ export default function QuizForm({ assessmentId, quiz }) {
                         sort_order: sortOrder,
                     }
                 );
-
-                // Merge the id from backend to the question details
+                console.log(response);
+                // Merge the IDs from backend to the question details
                 setQuestionDetails((prev) => ({
                     ...prev,
-                    quiz_id: response.data.data.quiz_id,
-                    question_id: response.data.data.question_id,
+                    quiz_id: response.data.data.question.quiz_id,
+                    question_id: response.data.data.question.question_id,
                 }));
+
+                // Merge the IDs of the craeted option in the backend to
+                setQuestionOptions((prev) =>
+                    prev.map((opt) =>
+                        opt.option_temp_id === newOption.option_temp_id
+                            ? {
+                                  ...opt,
+                                  question_option_id:
+                                      response.data.data.options
+                                          .question_option_id,
+                                  question_id:
+                                      response.data.data.options.question_id,
+                              }
+                            : opt
+                    )
+                );
+
+                // This reset the state which is use to determine if the user updates the
+                // details of the question
                 setIsCreatingQuestion(false);
             } catch (error) {
                 console.error(error);
@@ -280,6 +335,8 @@ export default function QuizForm({ assessmentId, quiz }) {
     };
 
     useEffect(() => console.log(questionList), [questionList]);
+
+    useEffect(() => console.log(questionOptions), [questionOptions]);
 
     return (
         <div className="font-nunito-sans relative space-y-5 text-ascend-black">
@@ -391,10 +448,12 @@ export default function QuizForm({ assessmentId, quiz }) {
                         {questionDetails && (
                             <div ref={targetForm}>
                                 <QuestionForm
-                                    questionDetails={questionDetails}
-                                    setQuestionDetails={setQuestionDetails}
                                     isChanged={isQuestioNDetailsChanged}
                                     setIsChanged={setIsQuestioNDetailsChanged}
+                                    questionDetails={questionDetails}
+                                    setQuestionDetails={setQuestionDetails}
+                                    questionOptions={questionOptions}
+                                    setQuestionOptions={setQuestionOptions}
                                     activeForm={activeForm}
                                     setActiveForm={setActiveForm}
                                     setSelectedIndex={setSelectedIndex}
