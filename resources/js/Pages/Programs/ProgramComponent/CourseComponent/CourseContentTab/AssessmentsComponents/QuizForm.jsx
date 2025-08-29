@@ -65,6 +65,7 @@ export default function QuizForm({ assessmentId, quiz }) {
     const [isQuestioNDetailsChanged, setIsQuestioNDetailsChanged] =
         useState(false);
     const [questionList, setQuestionList] = useState([]);
+    const [quizTotalPoints, setQuizTotalPoints] = useState(0);
 
     // Refs
     const targetForm = useRef(null);
@@ -74,6 +75,7 @@ export default function QuizForm({ assessmentId, quiz }) {
 
     useEffect(() => {
         setQuizDetails(quiz);
+        setQuestionList(quiz.questions);
         setIsChanged(false);
     }, []);
 
@@ -131,7 +133,7 @@ export default function QuizForm({ assessmentId, quiz }) {
 
     // Helper function for getting the index
     const getQuestionPos = (id) =>
-        questionList.findIndex((question) => question.id === id);
+        questionList.findIndex((question) => question.question_id === id);
 
     // Function for sorting the array
     const handleDragEnd = (event) => {
@@ -144,7 +146,7 @@ export default function QuizForm({ assessmentId, quiz }) {
         const updatedOrder = arrayMove(questionList, originalPos, newPos).map(
             (item, index) => ({
                 ...item,
-                sortOrder: index + 1,
+                sort_order: index + 1,
             })
         );
         console.log(updatedOrder);
@@ -173,14 +175,20 @@ export default function QuizForm({ assessmentId, quiz }) {
         setActiveForm(questionType);
     };
 
-    const calcTotalPoints = () => {
+    // Calculate the total points of the quiz
+    useEffect(() => {
         let totalPoints = 0;
-        questionList.forEach(({ questionPoints }) => {
-            totalPoints += questionPoints;
+        questionList.forEach((question) => {
+            totalPoints += question.question_points;
         });
 
+        // Set the intial total points
+        // when the user create new question this will be used
+        // everytime the user makes chanegs to the question points
+        setQuizTotalPoints(totalPoints);
+
         handleQuizDetailsChange("quiz_total_points", totalPoints);
-    };
+    }, [questionList]);
 
     // Close the form when the user click outside the form
     useEffect(() => {
@@ -316,7 +324,7 @@ export default function QuizForm({ assessmentId, quiz }) {
 
             setQuestionList((prev) => [
                 ...prev,
-                { ...updatedQuestionDetails, option: updatedOptions },
+                { ...updatedQuestionDetails, options: updatedOptions },
             ]);
 
             setQuestionDetails(null);
@@ -327,7 +335,7 @@ export default function QuizForm({ assessmentId, quiz }) {
 
     useEffect(() => console.log(questionList), [questionList]);
 
-    useEffect(() => console.log(questionOptions), [questionOptions]);
+    useEffect(() => console.log(quizDetails), [quizDetails]);
 
     return (
         <div className="font-nunito-sans relative space-y-5 text-ascend-black">
@@ -412,12 +420,14 @@ export default function QuizForm({ assessmentId, quiz }) {
                                     collisionDetection={closestCorners}
                                 >
                                     <SortableContext
-                                        items={questionList}
+                                        items={questionList.map(
+                                            (q) => q.question_id
+                                        )}
                                         strategy={verticalListSortingStrategy}
                                     >
-                                        {/* {questionList.map((question, i) => (
+                                        {questionList.map((question, i) => (
                                             <Question
-                                                key={i}
+                                                key={question.question_id}
                                                 questionDetails={question}
                                                 questionNumber={i + 1}
                                                 questionIndex={i}
@@ -429,7 +439,7 @@ export default function QuizForm({ assessmentId, quiz }) {
                                                 }
                                                 disabled={false}
                                             />
-                                        ))} */}
+                                        ))}
                                     </SortableContext>
                                 </DndContext>
                             </div>
@@ -446,6 +456,7 @@ export default function QuizForm({ assessmentId, quiz }) {
                                     setQuestionDetails={setQuestionDetails}
                                     questionOptions={questionOptions}
                                     setQuestionOptions={setQuestionOptions}
+                                    quizTotalPoints={quizTotalPoints}
                                     activeForm={activeForm}
                                     setActiveForm={setActiveForm}
                                     setSelectedIndex={setSelectedIndex}

@@ -176,35 +176,35 @@ const useCreateQuizStore = create((set) => ({
         });
     },
 
-    handleQuestionDetailsChange: (field, value) => {
-        const { questionDetails } = useCreateQuizStore.getState();
+    // handleQuestionDetailsChange: (field, value) => {
+    //     const { questionDetails } = useCreateQuizStore.getState();
 
-        if (field === "questionChoices" || field === "questionAnswer") {
-            if (Array.isArray(value)) {
-                console.log(value);
-                set({
-                    questionDetails: {
-                        ...questionDetails,
-                        [field]: [...value],
-                    },
-                });
-            } else {
-                set({
-                    questionDetails: {
-                        ...questionDetails,
-                        [field]: [...questionDetails[field], value],
-                    },
-                });
-            }
-        } else {
-            set({
-                questionDetails: {
-                    ...questionDetails,
-                    [field]: value,
-                },
-            });
-        }
-    },
+    //     if (field === "questionChoices" || field === "questionAnswer") {
+    //         if (Array.isArray(value)) {
+    //             console.log(value);
+    //             set({
+    //                 questionDetails: {
+    //                     ...questionDetails,
+    //                     [field]: [...value],
+    //                 },
+    //             });
+    //         } else {
+    //             set({
+    //                 questionDetails: {
+    //                     ...questionDetails,
+    //                     [field]: [...questionDetails[field], value],
+    //                 },
+    //             });
+    //         }
+    //     } else {
+    //         set({
+    //             questionDetails: {
+    //                 ...questionDetails,
+    //                 [field]: value,
+    //             },
+    //         });
+    //     }
+    // },
 
     clearQuestionDetails: () => {
         set({

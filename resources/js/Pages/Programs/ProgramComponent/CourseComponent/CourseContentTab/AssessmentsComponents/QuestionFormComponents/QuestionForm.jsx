@@ -15,6 +15,7 @@ export default function QuestionForm({
     setQuestionDetails,
     questionOptions,
     setQuestionOptions,
+    quizTotalPoints,
 
     activeForm,
     setActiveForm,
@@ -31,8 +32,8 @@ export default function QuestionForm({
     // const handleQuestionDetailsChange = useCreateQuizStore(
     //     (state) => state.handleQuestionDetailsChange
     // );
-    const handleAddQuestion = useCreateQuizStore(
-        (state) => state.handleAddQuestion
+    const handleQuizDetailsChange = useCreateQuizStore(
+        (state) => state.handleQuizDetailsChange
     );
     const clearQuestionDetails = useCreateQuizStore(
         (state) => state.clearQuestionDetails
@@ -40,13 +41,16 @@ export default function QuestionForm({
     const handleEditQuestion = useCreateQuizStore(
         (state) => state.handleEditQuestion
     );
-
+    console.log(questionDetails.options);
     // Local States
     const [isAddOption, setIsAddOption] = useState(false);
     const [option, setOption] = useState("");
 
     // set the form title depending on the seleced question type
     const [formTitle, setFormTitle] = useState("");
+    const [initalQuestionPoints, setInitalQuestionPOints] = useState(
+        questionDetails.question_points
+    );
 
     useEffect(() => {
         // set the form title basec on the currently active form
@@ -77,10 +81,23 @@ export default function QuestionForm({
     const handleQuestionDetailsChange = (field, value) => {
         setIsChanged(true);
         if (field === "question_points") {
+            const questionPoints = parseInt(
+                value.length > 3 ? value.slice(0, 3) : value
+            );
+
             setQuestionDetails((prev) => ({
                 ...prev,
-                [field]: value.length > 3 ? value.slice(0, 3) : value, // Limit the input to 3 char,
+                [field]: questionPoints, // Limit the input to 3 char,
             }));
+
+            // Update the question points
+            // Initial question points was used for editing the question
+            // since the question that will be editied is already part of the list
+            // and it needs to be reduce first before updating the question points
+            handleQuizDetailsChange(
+                "quiz_total_points",
+                quizTotalPoints - initalQuestionPoints + questionPoints
+            );
         } else {
             setQuestionDetails((prev) => ({
                 ...prev,

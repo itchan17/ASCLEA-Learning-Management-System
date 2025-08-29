@@ -14,6 +14,7 @@ class QuizService
         return $quiz
             ->load([
                 'options',
+                'questions' => fn($query) => $query->with('options')
             ]);
     }
 

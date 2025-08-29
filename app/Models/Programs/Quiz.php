@@ -38,4 +38,9 @@ class Quiz extends Model
     {
         return $this->hasMany(CvOption::class, 'quiz_id');
     }
+
+    public function questions(): HasMany
+    {
+        return $this->hasMany(Question::class, 'quiz_id');
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Models\Programs;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class QuestionOption extends Model
 {
@@ -20,4 +21,10 @@ class QuestionOption extends Model
         'option_text',
         'is_correct'
     ];
+
+
+    public function question(): BelongsTo
+    {
+        return $this->belongsTo(Question::class, 'question_id');
+    }
 }
