@@ -165,6 +165,7 @@ export default function QuestionForm({
                     className="px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue"
                     placeholder="Type question"
                     value={questionDetails.question}
+                    autoFocus
                     onChange={(e) =>
                         handleQuestionDetailsChange("question", e.target.value)
                     }

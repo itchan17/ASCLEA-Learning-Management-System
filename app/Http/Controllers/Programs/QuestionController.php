@@ -25,7 +25,23 @@ class QuestionController extends Controller
 
         $newQuestion = $this->questionService->createInitalQuestion($quiz, $validated);
 
-        return response()->json(['success' => 'New question created successfully.', 'data' => $newQuestion]);
+        // Creates the inital option of the question
+        $initialOption = $this->questionService->createOption($validated['question_type'], $newQuestion['question_id']);
+
+        // Merge the IDs of the question and the option and send to client
+        $data = [
+            'question' => $newQuestion,
+            'options' => $initialOption
+        ];
+
+        return response()->json(['success' => 'New question created successfully.', 'data' => $data]);
+    }
+
+    public function createOption($assessment, $quiz, Question $question)
+    {
+        $newOption = $this->questionService->createOption($question->question_type, $question->question_id);
+
+        return response()->json(['success' => 'New option created successfully.', 'option' => $newOption]);
     }
 
     public function updateQuestion(QuestionRequest $req, $assessment, $quiz, Question $question)
@@ -44,5 +60,12 @@ class QuestionController extends Controller
         $this->questionService->updateOptionName($option,  $validated);
 
         return response()->json("Option udpated successfully");
+    }
+
+    public function deleteOption($assessment, $quiz, $question, QuestionOption $option)
+    {
+        $this->questionService->deleteOption($option);
+
+        return response()->json("Option deleted successfully");
     }
 }

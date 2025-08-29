@@ -38,9 +38,9 @@ export default function QuizForm({ assessmentId, quiz }) {
     const handleQuestionDetailsChange = useCreateQuizStore(
         (state) => state.handleQuestionDetailsChange
     );
-    const clearQuestionDetails = useCreateQuizStore(
-        (state) => state.clearQuestionDetails
-    );
+    // const clearQuestionDetails = useCreateQuizStore(
+    //     (state) => state.clearQuestionDetails
+    // );
     // const setQuestionList = useCreateQuizStore(
     //     (state) => state.setQuestionList
     // );
@@ -194,37 +194,7 @@ export default function QuizForm({ assessmentId, quiz }) {
                 !indentificationRef.current.contains(event.target) &&
                 !isCreatingQuestion
             ) {
-                if (
-                    questionDetails &&
-                    questionDetails.quiz_id &&
-                    questionDetails.question_id
-                ) {
-                    //These updated data was made because onBlur dont get triggered when
-                    // the form was closed
-                    // so we have to ensure no field are empty that will be displayed
-
-                    // Ensures no empty option
-                    const updatedOptions = questionOptions.map((option, i) =>
-                        option.option_name.trim() === ""
-                            ? { ...option, option_name: `Option ${i + 1}` }
-                            : option
-                    );
-
-                    // Enusre question is not empty
-                    const updatedQuestionDetails =
-                        questionDetails.question.trim() === ""
-                            ? { ...questionDetails, question: "Question" }
-                            : questionDetails;
-
-                    setQuestionList((prev) => [
-                        ...prev,
-                        { ...updatedQuestionDetails, option: updatedOptions },
-                    ]);
-
-                    setQuestionDetails(null);
-                    setQuestionOptions([]);
-                    setIsQuestioNDetailsChanged(false);
-                }
+                clearQuestionDetails();
             }
         };
 
@@ -241,27 +211,7 @@ export default function QuizForm({ assessmentId, quiz }) {
     const handleCreateQuestion = async (questionType, sortOrder) => {
         if (!isCreatingQuestion) {
             try {
-                // Check if theres questionDetails
-                // this means the question form is curently open
-                // if the user click another question type
-                // the previous question will be added to the list
-                // Ensures only question details with merged IDs from the
-                // backend will be pushed in the list
-                if (
-                    questionDetails &&
-                    questionDetails.quiz_id &&
-                    questionDetails.question_id
-                ) {
-                    // Add the question to the question list
-                    // CODE HERE
-                    setQuestionList((prev) => [
-                        ...prev,
-                        { ...questionDetails, option: questionOptions },
-                    ]);
-                    setQuestionDetails(null);
-                    setQuestionOptions([]);
-                    setIsQuestioNDetailsChanged(false);
-                }
+                clearQuestionDetails();
 
                 console.log("CREATING..");
                 setIsCreatingQuestion(true);
@@ -331,6 +281,46 @@ export default function QuizForm({ assessmentId, quiz }) {
                 setQuestionDetails(null);
                 setIsCreatingQuestion(false);
             }
+        }
+    };
+
+    const clearQuestionDetails = () => {
+        // Check if theres questionDetails
+        // this means the question form is curently open
+        // if the user click another question type
+        // the previous question will be added to the list
+        // Ensures only question details with merged IDs from the
+        // backend will be pushed in the list
+        if (
+            questionDetails &&
+            questionDetails.quiz_id &&
+            questionDetails.question_id
+        ) {
+            //These updated data was made because onBlur dont get triggered when
+            // the form was closed through outside with ref
+            // so we have to ensure no field are empty that will be displayed
+
+            // Ensures no empty option
+            const updatedOptions = questionOptions.map((option, i) =>
+                option.option_name.trim() === ""
+                    ? { ...option, option_name: `Option ${i + 1}` }
+                    : option
+            );
+
+            // Enusres question is not empty
+            const updatedQuestionDetails =
+                questionDetails.question.trim() === ""
+                    ? { ...questionDetails, question: "Question" }
+                    : questionDetails;
+
+            setQuestionList((prev) => [
+                ...prev,
+                { ...updatedQuestionDetails, option: updatedOptions },
+            ]);
+
+            setQuestionDetails(null);
+            setQuestionOptions([]);
+            setIsQuestioNDetailsChanged(false);
         }
     };
 
@@ -448,6 +438,7 @@ export default function QuizForm({ assessmentId, quiz }) {
                         {questionDetails && (
                             <div ref={targetForm}>
                                 <QuestionForm
+                                    key={questionList.length}
                                     isChanged={isQuestioNDetailsChanged}
                                     setIsChanged={setIsQuestioNDetailsChanged}
                                     questionDetails={questionDetails}
@@ -471,7 +462,7 @@ export default function QuizForm({ assessmentId, quiz }) {
                                         doSomething={() =>
                                             handleCreateQuestion(
                                                 "multiple_choice",
-                                                1
+                                                questionList.length + 1
                                             )
                                         }
                                         width={"w-full"}

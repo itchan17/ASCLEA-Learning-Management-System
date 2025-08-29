@@ -8,6 +8,8 @@ import { AiFillEdit, AiFillDelete } from "react-icons/ai";
 import { SlOptions } from "react-icons/sl";
 import { debounce } from "lodash";
 import { usePage } from "@inertiajs/react";
+import { route } from "ziggy-js";
+import axios from "axios";
 
 export default function MultipleChoice({
     options,
@@ -28,9 +30,9 @@ export default function MultipleChoice({
     const handleEditOption = useCreateQuizStore(
         (state) => state.handleEditOption
     );
-    const handleDeleteOption = useCreateQuizStore(
-        (state) => state.handleDeleteOption
-    );
+    // const handleDeleteOption = useCreateQuizStore(
+    //     (state) => state.handleDeleteOption
+    // );
 
     // Local State
     const [optionToEdit, setOptionToEdit] = useState(null);
@@ -49,14 +51,14 @@ export default function MultipleChoice({
         setOptionToEdit(null);
     };
 
-    const handleAddOption = () => {
-        console.log(SlOptions);
+    // const handleAddOption = () => {
+    //     console.log(SlOptions);
 
-        // pass the input option tot he function and add it to the question_choices array
-        handleQuestionDetailsChange("question_choices", options);
-        setOption("");
-        toggleAddOption();
-    };
+    //     // pass the input option tot he function and add it to the question_choices array
+    //     handleQuestionDetailsChange("question_choices", options);
+    //     setOption("");
+    //     toggleAddOption();
+    // };
 
     const setCorrectAnswer = (option) => {
         console.log(option);
@@ -83,6 +85,53 @@ export default function MultipleChoice({
     //         setOption(optionToEdit.option);
     //     }
     // }, [optionToEdit]);
+
+    const handleAddOption = async () => {
+        try {
+            // Create he intial option with temporary id
+            const newOption = {
+                option_temp_id: `${Date.now()}-${Math.random()
+                    .toString(36)
+                    .substr(2, 9)}`,
+                option_name: `Option ${options.length + 1}`,
+            };
+
+            setOptions((prev) => [...prev, newOption]);
+
+            const response = await axios.post(
+                route("assessment.quiz-form.question.option.create", {
+                    assessment: assessmentId,
+                    quiz: quiz.quiz_id,
+                    question: questionDetails.question_id,
+                })
+            );
+
+            // Merge the IDs of the craeted option in the backend to
+            setOptions((prev) =>
+                prev.map((opt) => {
+                    // Find the initially created option
+                    if (opt.option_temp_id === newOption.option_temp_id) {
+                        // Merge the IDs to the option from backend
+                        const updatedOption = {
+                            ...opt,
+                            question_option_id:
+                                response.data.option.question_option_id,
+                            question_id: response.data.option.question_id,
+                        };
+
+                        // Set it as option to edit
+                        setOptionToEdit(updatedOption);
+
+                        return updatedOption;
+                    }
+
+                    return opt;
+                })
+            );
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     const debounceUpdateOption = useCallback(
         debounce(async (data) => {
@@ -141,6 +190,30 @@ export default function MultipleChoice({
         };
     }, [debounceUpdateOption]);
 
+    const handleDeleteOption = async (option) => {
+        try {
+            // Remove first the option in the list before making a request
+            // to make it more responsive
+            setOptions((prev) =>
+                prev.filter(
+                    (opt) =>
+                        opt.question_option_id !== option.question_option_id
+                )
+            );
+
+            const response = await axios.delete(
+                route("assessment.quiz-form.question.option.delete", {
+                    assessment: assessmentId,
+                    quiz: quiz.quiz_id,
+                    question: questionDetails.question_id,
+                    option: option.question_option_id,
+                })
+            );
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     useEffect(() => console.log(options), [options]);
 
     return (
@@ -149,7 +222,7 @@ export default function MultipleChoice({
                 {/* List Options */}
                 {options.length > 0 && (
                     <label className="font-bold">
-                        Options
+                        Options{" "}
                         <span className="text-size1">
                             (Click option/s to set correct asnwer)
                         </span>
@@ -281,7 +354,6 @@ export default function MultipleChoice({
                                                     onClick={(e) => {
                                                         stopPropagation(e);
                                                         handleDeleteOption(
-                                                            i,
                                                             option
                                                         );
                                                     }}
@@ -294,7 +366,7 @@ export default function MultipleChoice({
                             );
                         })}
                     <SecondaryButton
-                        doSomething={toggleAddOption}
+                        doSomething={handleAddOption}
                         icon={<BiPlus />}
                         text={"Add option"}
                     />
