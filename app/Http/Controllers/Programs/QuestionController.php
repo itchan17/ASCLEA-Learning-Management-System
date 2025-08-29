@@ -55,7 +55,7 @@ class QuestionController extends Controller
 
     public function updateOption(Request $req, $assessment, $quiz, $question, QuestionOption $option)
     {
-        $validated = $req->validate(['option_name' => 'required|string']);
+        $validated = $req->validate(['option_text' => 'required|string', 'is_correct' => 'required|boolean']);
 
         $this->questionService->updateOptionName($option,  $validated);
 

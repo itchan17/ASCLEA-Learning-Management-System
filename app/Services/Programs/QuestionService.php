@@ -37,7 +37,7 @@ class QuestionService
             // Initially create the option for a multiple choice
             return QuestionOption::create([
                 'question_id' => $questionId,
-                'option_name' => 'Option ' . $optionCount + 1 // Dynamically add the options number based on the option count
+                'option_text' => 'Option ' . $optionCount + 1 // Dynamically add the options number based on the option count
             ])->only(['question_option_id', 'question_id']);
         }
     }

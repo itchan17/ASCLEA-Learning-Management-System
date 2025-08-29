@@ -227,12 +227,13 @@ export default function QuizForm({ assessmentId, quiz }) {
                     sort_order: 1,
                 });
 
-                // Create he intial option with temporary id
+                // Create he intial option with temporary id for multiple choice type of question
                 const newOption = {
                     option_temp_id: `${Date.now()}-${Math.random()
                         .toString(36)
                         .substr(2, 9)}`,
-                    option_name: "Option 1",
+                    option_text: "Option 1",
+                    is_correct: false,
                 };
                 // Set the inital to imeediately dispaly in the front end
                 setQuestionOptions([newOption]);
@@ -302,8 +303,8 @@ export default function QuizForm({ assessmentId, quiz }) {
 
             // Ensures no empty option
             const updatedOptions = questionOptions.map((option, i) =>
-                option.option_name.trim() === ""
-                    ? { ...option, option_name: `Option ${i + 1}` }
+                option.option_text.trim() === ""
+                    ? { ...option, option_text: `Option ${i + 1}` }
                     : option
             );
 

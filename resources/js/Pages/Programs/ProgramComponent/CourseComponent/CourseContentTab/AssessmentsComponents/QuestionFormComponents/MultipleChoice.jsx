@@ -93,7 +93,7 @@ export default function MultipleChoice({
                 option_temp_id: `${Date.now()}-${Math.random()
                     .toString(36)
                     .substr(2, 9)}`,
-                option_name: `Option ${options.length + 1}`,
+                option_text: `Option ${options.length + 1}`,
             };
 
             setOptions((prev) => [...prev, newOption]);
@@ -153,17 +153,24 @@ export default function MultipleChoice({
         []
     );
 
-    const handleOptionChange = (optionId, value, index) => {
-        console.log("ONBLUR IS WORKING");
+    // Handle the udpate of option text and setting as correct answer
+    // has optionToUpdate which contains the updated option data
+    const handleOptionChange = (optionToUpdate, index) => {
         setOptions((prev) => {
+            // List of updated option
             const newOptions = prev.map((option) =>
-                option.question_option_id === optionId
-                    ? { ...option, option_name: value }
+                option.question_option_id === optionToUpdate.question_option_id
+                    ? {
+                          ...option,
+                          option_text: optionToUpdate.option_text,
+                          is_correct: optionToUpdate.is_correct,
+                      }
                     : option
             );
 
             const updatedOption = newOptions.find(
-                (o) => o.question_option_id === optionId
+                (o) =>
+                    o.question_option_id === optionToUpdate.question_option_id
             );
 
             // Check first for id
@@ -171,11 +178,11 @@ export default function MultipleChoice({
             if (updatedOption.question_option_id) {
                 // If the option name is empty update it with the default value
                 debounceUpdateOption(
-                    updatedOption.option_name.trim() !== ""
+                    updatedOption.option_text.trim() !== ""
                         ? updatedOption
                         : {
                               ...updatedOption,
-                              option_name: `Option ${index + 1}`,
+                              option_text: `Option ${index + 1}`,
                           }
                 );
             }
@@ -226,7 +233,6 @@ export default function MultipleChoice({
                         <span className="text-size1">
                             (Click option/s to set correct asnwer)
                         </span>
-                        <span className="text-ascend-red ml-1">*</span>
                     </label>
                 )}
 
@@ -234,9 +240,6 @@ export default function MultipleChoice({
                     {options &&
                         options.length > 0 &&
                         options.map((option, i) => {
-                            let isCorrect = false;
-                            // questionDetails.questionAnswer.includes(option);
-
                             return optionToEdit &&
                                 optionToEdit.question_option_id &&
                                 optionToEdit.question_option_id ==
@@ -247,23 +250,32 @@ export default function MultipleChoice({
                                     className="relative"
                                 >
                                     <div
-                                        onClick={() => setCorrectAnswer(option)}
-                                        className={`absolute left-1 top-1/2 -translate-y-1/2 flex items-center px-3 py-2 border border-ascend-gray1 cursor-pointer ${
-                                            isCorrect
+                                        onClick={() =>
+                                            handleOptionChange(
+                                                {
+                                                    ...optionToEdit,
+                                                    is_correct:
+                                                        !optionToEdit.is_correct,
+                                                },
+                                                i
+                                            )
+                                        }
+                                        className={`absolute border-l-2 border-y-2 rounded-bl-[3px] rounded-tl-[3px] border-ascend-blue top-1/2 -translate-y-1/2 flex items-center px-4 h-full cursor-pointer ${
+                                            option.is_correct
                                                 ? "bg-ascend-lightgreen"
                                                 : "bg-ascend-white"
                                         }`}
                                     >
                                         <div
                                             className={`flex items-center justify-center bg-ascend-white rounded-full w-5 h-5 shrink-0 ${
-                                                isCorrect
+                                                option.is_correct
                                                     ? "border-ascend-green border-2"
                                                     : "border-ascend-gray2 border"
                                             } transition-all duration-300`}
                                         >
                                             <div
                                                 className={`rounded-full shrink-0 ${
-                                                    isCorrect
+                                                    option.is_correct
                                                         ? "bg-ascend-green w-3 h-3"
                                                         : "bg-ascend-white w-0 h-0 "
                                                 } transition-all duration-300`}
@@ -274,13 +286,15 @@ export default function MultipleChoice({
                                         autoFocus
                                         key={i}
                                         type="text"
-                                        value={option.option_name}
-                                        className="w-full border border-ascend-gray1 focus:outline-ascend-blue pl-14 pr-3 py-2"
+                                        value={option.option_text}
+                                        className="w-full border border-ascend-gray1 focus:outline-ascend-blue pl-15 pr-3 py-2"
                                         placeholder="Type option"
                                         onChange={(e) =>
                                             handleOptionChange(
-                                                optionToEdit.question_option_id,
-                                                e.target.value,
+                                                {
+                                                    ...optionToEdit,
+                                                    option_text: e.target.value,
+                                                },
                                                 i
                                             )
                                         }
@@ -288,8 +302,12 @@ export default function MultipleChoice({
                                             setOptionToEdit(null);
                                             if (e.target.value.trim() === "") {
                                                 handleOptionChange(
-                                                    optionToEdit.question_option_id,
-                                                    `Option ${i + 1}`,
+                                                    {
+                                                        ...optionToEdit,
+                                                        option_text: `Option ${
+                                                            i + 1
+                                                        }`,
+                                                    },
                                                     i
                                                 );
                                             }
@@ -300,9 +318,17 @@ export default function MultipleChoice({
                                 // Option
                                 <div
                                     key={option.question_option_id || i}
-                                    onClick={() => setCorrectAnswer(option)}
+                                    onClick={() =>
+                                        handleOptionChange(
+                                            {
+                                                ...option,
+                                                is_correct: !option.is_correct,
+                                            },
+                                            i
+                                        )
+                                    }
                                     className={`flex border border-ascend-gray1 cursor-pointer  relative ${
-                                        isCorrect
+                                        option.is_correct
                                             ? "bg-ascend-lightgreen"
                                             : "bg-ascend-white"
                                     } transition-all duration-300`}
@@ -310,14 +336,14 @@ export default function MultipleChoice({
                                     <div className="flex items-center pl-4 pr-3 py-2">
                                         <div
                                             className={`flex items-center justify-center bg-ascend-white rounded-full w-5 h-5 shrink-0 ${
-                                                isCorrect
+                                                option.is_correct
                                                     ? "border-ascend-green border-2"
                                                     : "border-ascend-gray2 border"
                                             } transition-all duration-300`}
                                         >
                                             <div
                                                 className={`rounded-full shrink-0 ${
-                                                    isCorrect
+                                                    option.is_correct
                                                         ? "bg-ascend-green w-3 h-3"
                                                         : "bg-ascend-white w-0 h-0 "
                                                 } transition-all duration-300`}
@@ -327,7 +353,7 @@ export default function MultipleChoice({
 
                                     <div className="flex items-center cursor-pointer w-full px-3 py-2">
                                         <p className="flex-1 min-w-0 break-words">
-                                            {option.option_name}
+                                            {option.option_text}
                                         </p>
                                         <div className="flex gap-2">
                                             <div
@@ -336,7 +362,7 @@ export default function MultipleChoice({
                                                     setOptionToEdit(option);
                                                 }}
                                                 className={` rounded-3xl ${
-                                                    isCorrect
+                                                    option.is_correct
                                                         ? "hover:bg-ascend-green/15"
                                                         : "hover:bg-ascend-lightblue"
                                                 } transition-all duration-300`}
@@ -345,7 +371,7 @@ export default function MultipleChoice({
                                             </div>
                                             <div
                                                 className={`group  rounded-3xl ${
-                                                    isCorrect
+                                                    option.is_correct
                                                         ? "hover:bg-ascend-green/15"
                                                         : "hover:bg-ascend-lightblue"
                                                 } transition-all duration-300`}

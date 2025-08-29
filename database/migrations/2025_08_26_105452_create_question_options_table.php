@@ -15,7 +15,8 @@ return new class extends Migration
             $table->uuid("question_option_id")->primary();
             $table->uuid("question_id");
             $table->foreign("question_id")->references("question_id")->on("questions")->onDelete("cascade");
-            $table->text("option_name");
+            $table->text("option_text");
+            $table->boolean('is_correct')->default(false);
             $table->timestamps();
         });
     }

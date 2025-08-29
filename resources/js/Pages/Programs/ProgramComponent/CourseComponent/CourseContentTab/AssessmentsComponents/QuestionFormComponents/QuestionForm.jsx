@@ -126,14 +126,14 @@ export default function QuestionForm({
     }, [questionDetails]);
 
     return (
-        <div className="border border-ascend-gray1 p-5 gap-5 space-y-5 shadow-shadow2">
+        <div className="border border-ascend-gray1 p-5 gap-5 space-y-5 shadow-shadow1">
             <div className="flex justify-between items-center gap-2 text-ascend-black">
                 <h1 className="text-ascend-black font-bold">{formTitle}</h1>
                 <div className="flex justify-end items-center gap-2 text-ascend-black">
                     <div className="space-x-2">
                         <input
                             type="number"
-                            className="border p-1 h-8 border-ascend-gray1 w-14"
+                            className="border pl-3 py-2 border-ascend-gray1 w-14"
                             min="0"
                             max="999"
                             onKeyDown={(e) => {
@@ -157,9 +157,7 @@ export default function QuestionForm({
 
             {/* Question field */}
             <div>
-                <label className="font-bold">
-                    Question<span className="text-ascend-red">*</span>
-                </label>
+                <label className="font-bold">Question</label>
                 <input
                     type="text"
                     className="px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue"
