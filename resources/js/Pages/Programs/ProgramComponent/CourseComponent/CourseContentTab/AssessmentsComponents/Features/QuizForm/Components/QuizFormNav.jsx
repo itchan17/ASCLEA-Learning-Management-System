@@ -1,7 +1,7 @@
 import { useState } from "react";
-import useCreateQuizStore from "../../../../../../Stores/Programs/CourseContent/createQuizStore";
+import useCreateQuizStore from "../../../../../../../../../Stores/Programs/CourseContent/createQuizStore";
 import { MdSettings } from "react-icons/md";
-import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
+import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
 
 export default function QuizFormNav({ isLoading, savedLabel }) {
     // Create Quiz Store

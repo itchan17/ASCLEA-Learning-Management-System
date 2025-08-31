@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import useCreateQuizStore from "../../../../../../../Stores/Programs/CourseContent/createQuizStore";
+import useCreateQuizStore from "../../../../../../../../../../../Stores/Programs/CourseContent/createQuizStore";
 
 export default function TrueOrFalse() {
     // Create quiz store

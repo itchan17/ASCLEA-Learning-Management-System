@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import { AiFillEdit, AiFillDelete, AiOutlineArrowDown } from "react-icons/ai";
 import { MdOutlineDragIndicator } from "react-icons/md";
-import QuestionForm from "./QuestionFormComponents/QuestionForm";
-import useCreateQuizStore from "../../../../../../Stores/Programs/CourseContent/createQuizStore";
+import QuestionForm from "./QuestionForm";
+import useCreateQuizStore from "../../../../../../../../../Stores/Programs/CourseContent/createQuizStore";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 

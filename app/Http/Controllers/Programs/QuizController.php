@@ -25,7 +25,7 @@ class QuizController extends Controller
         // Check if user an view edit quiz form page of teh assessment
         Gate::authorize('viewEditQuizForm',  [Quiz::class, $assessment]);
 
-        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/QuizForm', [
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizForm/QuizForm', [
             'assessmentId' => $assessment->assessment_id,
             'quiz' => $this->quizService->getQuizCompleteDetails($quiz),
 

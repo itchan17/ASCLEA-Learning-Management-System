@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
-import SecondaryButton from "../../../../../../../Components/Button/SecondaryButton";
-import PrimaryButton from "../../../../../../../Components/Button/PrimaryButton";
-import useCreateQuizStore from "../../../../../../../Stores/Programs/CourseContent/createQuizStore";
-import MultipleChoice from "./MultipleChoice";
-import TrueOrFalse from "./TrueOrFalse";
-import Identification from "./Identification";
+import useCreateQuizStore from "../../../../../../../../../Stores/Programs/CourseContent/createQuizStore";
+import MultipleChoice from "./Types/MultipleChoice/MultipleChoice";
+import TrueOrFalse from "./Types/TrueOrFalse/TrueOrFalse";
+import Identification from "./Types/Identification/Identification";
 import { debounce } from "lodash";
 import { usePage } from "@inertiajs/react";
 

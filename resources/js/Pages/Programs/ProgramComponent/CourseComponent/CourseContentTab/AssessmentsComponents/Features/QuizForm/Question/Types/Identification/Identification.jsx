@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import useCreateQuizStore from "../../../../../../../Stores/Programs/CourseContent/createQuizStore";
-import SecondaryButton from "../../../../../../../Components/Button/SecondaryButton";
-import PrimaryButton from "../../../../../../../Components/Button/PrimaryButton";
+import useCreateQuizStore from "../../../../../../../../../../../Stores/Programs/CourseContent/createQuizStore";
+import SecondaryButton from "../../../../../../../../../../../Components/Button/SecondaryButton";
+import PrimaryButton from "../../../../../../../../../../../Components/Button/PrimaryButton";
 import { BiPlus } from "react-icons/bi";
 import { AiFillEdit, AiFillDelete } from "react-icons/ai";
 
