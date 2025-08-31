@@ -27,9 +27,11 @@ const useQuizStore = create((set) => ({
         });
     },
 
-    setQuizDetails: (quizDetails) => {
+    setQuizDetails: (updatedDetails) => {
+        const { quizDetails } = useQuizStore.getState();
+        console.log(updatedDetails);
         set({
-            quizDetails: quizDetails,
+            quizDetails: { ...quizDetails, ...updatedDetails },
         });
     },
 

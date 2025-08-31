@@ -20,22 +20,19 @@ export default function useQuizDetails() {
                 ? quizDetails.cv_options.filter((option) => option != value) // Filter out the options from the list/uncheck the option
                 : [...quizDetails.cv_options, value]; // Add the new option to list
 
-            setQuizDetails({ ...quizDetails, [field]: updatedCvOptions });
+            setQuizDetails({ [field]: updatedCvOptions });
         } else if (field === "duration") {
             setQuizDetails({
-                ...quizDetails,
                 [field]: value.length > 4 ? value.slice(0, 4) : value, // Limit the input to 4 char
             });
         } else if (field === "cheating_mitigation" && !value) {
             // Reset the value of cv_opions if cheating_mitigation is off
             setQuizDetails({
-                ...quizDetails,
                 [field]: value,
                 ["cv_options"]: [],
             });
         } else if (field === "quiz_title") {
             setQuizDetails({
-                ...quizDetails,
                 [field]: value,
             });
 
@@ -46,7 +43,6 @@ export default function useQuizDetails() {
             if (value.trim() === "") {
                 const newTimeout = setTimeout(() => {
                     setQuizDetails({
-                        ...quizDetails,
                         [field]: "Edit Quiz",
                     });
                 }, 1000);
@@ -55,7 +51,6 @@ export default function useQuizDetails() {
             }
         } else {
             setQuizDetails({
-                ...quizDetails,
                 [field]: value,
             });
         }

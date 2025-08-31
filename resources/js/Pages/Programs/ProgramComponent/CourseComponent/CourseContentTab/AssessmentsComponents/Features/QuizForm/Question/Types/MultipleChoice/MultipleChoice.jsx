@@ -10,6 +10,7 @@ import { debounce } from "lodash";
 import { usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import axios from "axios";
+import useQuestionStore from "../../Stores/questionStore";
 
 export default function MultipleChoice({
     options,
@@ -20,6 +21,8 @@ export default function MultipleChoice({
     setQuestionDetails,
 }) {
     const { assessmentId, quiz } = usePage().props;
+
+    const questionOptions = useQuestionStore((state) => state.questionOptions);
     // Create Quiz Store
     // const questionDetails = useCreateQuizStore(
     //     (state) => state.questionDetails
@@ -93,7 +96,7 @@ export default function MultipleChoice({
                 option_temp_id: `${Date.now()}-${Math.random()
                     .toString(36)
                     .substr(2, 9)}`,
-                option_text: `Option ${options.length + 1}`,
+                option_text: `Option ${questionOptions.length + 1}`,
             };
 
             setOptions((prev) => [...prev, newOption]);
@@ -225,9 +228,10 @@ export default function MultipleChoice({
 
     return (
         <div className="space-y-5">
+            {console.log(questionOptions)}
             <div>
                 {/* List Options */}
-                {options.length > 0 && (
+                {questionOptions.length > 0 && (
                     <label className="font-bold">
                         Options{" "}
                         <span className="text-size1">
@@ -237,9 +241,9 @@ export default function MultipleChoice({
                 )}
 
                 <div className="space-y-5">
-                    {options &&
-                        options.length > 0 &&
-                        options.map((option, i) => {
+                    {questionOptions &&
+                        questionOptions.length > 0 &&
+                        questionOptions.map((option, i) => {
                             return optionToEdit &&
                                 optionToEdit.question_option_id &&
                                 optionToEdit.question_option_id ==

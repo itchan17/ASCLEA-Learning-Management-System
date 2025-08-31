@@ -15,6 +15,8 @@ import { usePage } from "@inertiajs/react";
 import useQuizAutosave from "./Hooks/UseQuizAutosave";
 import useQuizDetails from "./Hooks/useQuizDetails";
 import useQuizStore from "./Stores/quizStore";
+import useQuestion from "./Question/Hooks/useQuestion";
+import useQuestionStore from "./Question/Stores/questionStore";
 import {
     SortableContext,
     verticalListSortingStrategy,
@@ -45,6 +47,10 @@ export default function QuizForm({ assessmentId, quiz }) {
         quizId: quiz.quiz_id,
     });
     const { initializeQuizDetails, handleQuizDetailsChange } = useQuizDetails();
+    const { handleCreateInitialQuestion, clearQuestionDetails } = useQuestion({
+        assessmentId,
+        quizId: quiz.quiz_id,
+    });
 
     // Quiz store
     const resetQuizStore = useQuizStore((state) => state.resetQuizStore);
@@ -52,6 +58,9 @@ export default function QuizForm({ assessmentId, quiz }) {
     const isQuizDetailsChanged = useQuizStore(
         (state) => state.isQuizDetailsChanged
     );
+
+    // Question store
+    const questionDetails = useQuestionStore((state) => state.questionDetails);
 
     // Create Quiz Store
     const handleQuestionDetailsChange = useCreateQuizStore(
@@ -83,7 +92,7 @@ export default function QuizForm({ assessmentId, quiz }) {
     const [activeForm, setActiveForm] = useState("");
     const [onEdit, setOnEdit] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(null);
-    const [questionDetails, setQuestionDetails] = useState(null);
+    // const [questionDetails, setQuestionDetails] = useState(null);
     const [questionOptions, setQuestionOptions] = useState([]);
     const [isQuestioNDetailsChanged, setIsQuestioNDetailsChanged] =
         useState(false);
@@ -219,122 +228,122 @@ export default function QuizForm({ assessmentId, quiz }) {
     }, [isCreatingQuestion, targetForm, questionDetails, questionOptions]);
 
     // Handles creating of the inital question when the question type  button was clicked
-    const handleCreateQuestion = async (questionType, sortOrder) => {
-        if (!isCreatingQuestion) {
-            try {
-                clearQuestionDetails();
+    // const handleCreateQuestion = async (questionType, sortOrder) => {
+    //     if (!isCreatingQuestion) {
+    //         try {
+    //             clearQuestionDetails();
 
-                console.log("CREATING..");
-                setIsCreatingQuestion(true);
+    //             console.log("CREATING..");
+    //             setIsCreatingQuestion(true);
 
-                // Set the initial question details
-                // to immidiately open the form and not wait
-                // from the response of the back end
-                setQuestionDetails({
-                    is_required: false,
-                    question: "Question",
-                    question_points: 0,
-                    question_type: questionType,
-                    sort_order: 1,
-                });
+    //             // Set the initial question details
+    //             // to immidiately open the form and not wait
+    //             // from the response of the back end
+    //             setQuestionDetails({
+    //                 is_required: false,
+    //                 question: "Question",
+    //                 question_points: 0,
+    //                 question_type: questionType,
+    //                 sort_order: 1,
+    //             });
 
-                // Create he intial option with temporary id for multiple choice type of question
-                const newOption = {
-                    option_temp_id: `${Date.now()}-${Math.random()
-                        .toString(36)
-                        .substr(2, 9)}`,
-                    option_text: "Option 1",
-                    is_correct: false,
-                };
-                // Set the inital to imeediately dispaly in the front end
-                setQuestionOptions([newOption]);
+    //             // Create he intial option with temporary id for multiple choice type of question
+    //             const newOption = {
+    //                 option_temp_id: `${Date.now()}-${Math.random()
+    //                     .toString(36)
+    //                     .substr(2, 9)}`,
+    //                 option_text: "Option 1",
+    //                 is_correct: false,
+    //             };
+    //             // Set the inital to imeediately dispaly in the front end
+    //             setQuestionOptions([newOption]);
 
-                const response = await axios.post(
-                    route("assessment.quiz-form.question.create", {
-                        assessment: assessmentId,
-                        quiz: quiz.quiz_id,
-                    }),
-                    {
-                        question_type: questionType,
-                        sort_order: sortOrder,
-                    }
-                );
-                console.log(response);
-                // Merge the IDs from backend to the question details
-                setQuestionDetails((prev) => ({
-                    ...prev,
-                    quiz_id: response.data.data.question.quiz_id,
-                    question_id: response.data.data.question.question_id,
-                }));
+    //             const response = await axios.post(
+    //                 route("assessment.quiz-form.question.create", {
+    //                     assessment: assessmentId,
+    //                     quiz: quiz.quiz_id,
+    //                 }),
+    //                 {
+    //                     question_type: questionType,
+    //                     sort_order: sortOrder,
+    //                 }
+    //             );
+    //             console.log(response);
+    //             // Merge the IDs from backend to the question details
+    //             setQuestionDetails((prev) => ({
+    //                 ...prev,
+    //                 quiz_id: response.data.data.question.quiz_id,
+    //                 question_id: response.data.data.question.question_id,
+    //             }));
 
-                // Merge the IDs of the craeted option in the backend to
-                setQuestionOptions((prev) =>
-                    prev.map((opt) =>
-                        opt.option_temp_id === newOption.option_temp_id
-                            ? {
-                                  ...opt,
-                                  question_option_id:
-                                      response.data.data.options
-                                          .question_option_id,
-                                  question_id:
-                                      response.data.data.options.question_id,
-                              }
-                            : opt
-                    )
-                );
+    //             // Merge the IDs of the craeted option in the backend to
+    //             setQuestionOptions((prev) =>
+    //                 prev.map((opt) =>
+    //                     opt.option_temp_id === newOption.option_temp_id
+    //                         ? {
+    //                               ...opt,
+    //                               question_option_id:
+    //                                   response.data.data.options
+    //                                       .question_option_id,
+    //                               question_id:
+    //                                   response.data.data.options.question_id,
+    //                           }
+    //                         : opt
+    //                 )
+    //             );
 
-                // This reset the state which is use to determine if the user updates the
-                // details of the question
-                setIsCreatingQuestion(false);
-            } catch (error) {
-                console.error(error);
-                // Clear the question details
-                // this also forces the form to close immediately
-                setQuestionDetails(null);
-                setIsCreatingQuestion(false);
-            }
-        }
-    };
+    //             // This reset the state which is use to determine if the user updates the
+    //             // details of the question
+    //             setIsCreatingQuestion(false);
+    //         } catch (error) {
+    //             console.error(error);
+    //             // Clear the question details
+    //             // this also forces the form to close immediately
+    //             setQuestionDetails(null);
+    //             setIsCreatingQuestion(false);
+    //         }
+    //     }
+    // };
 
-    const clearQuestionDetails = () => {
-        // Check if theres questionDetails
-        // this means the question form is curently open
-        // if the user click another question type
-        // the previous question will be added to the list
-        // Ensures only question details with merged IDs from the
-        // backend will be pushed in the list
-        if (
-            questionDetails &&
-            questionDetails.quiz_id &&
-            questionDetails.question_id
-        ) {
-            //These updated data was made because onBlur dont get triggered when
-            // the form was closed through outside with ref
-            // so we have to ensure no field are empty that will be displayed
+    // const clearQuestionDetails = () => {
+    //     // Check if theres questionDetails
+    //     // this means the question form is curently open
+    //     // if the user click another question type
+    //     // the previous question will be added to the list
+    //     // Ensures only question details with merged IDs from the
+    //     // backend will be pushed in the list
+    //     if (
+    //         questionDetails &&
+    //         questionDetails.quiz_id &&
+    //         questionDetails.question_id
+    //     ) {
+    //         //These updated data was made because onBlur dont get triggered when
+    //         // the form was closed through outside with ref
+    //         // so we have to ensure no field are empty that will be displayed
 
-            // Ensures no empty option
-            const updatedOptions = questionOptions.map((option, i) =>
-                option.option_text.trim() === ""
-                    ? { ...option, option_text: `Option ${i + 1}` }
-                    : option
-            );
+    //         // Ensures no empty option
+    //         const updatedOptions = questionOptions.map((option, i) =>
+    //             option.option_text.trim() === ""
+    //                 ? { ...option, option_text: `Option ${i + 1}` }
+    //                 : option
+    //         );
 
-            // Enusres question is not empty
-            const updatedQuestionDetails =
-                questionDetails.question.trim() === ""
-                    ? { ...questionDetails, question: "Question" }
-                    : questionDetails;
+    //         // Enusres question is not empty
+    //         const updatedQuestionDetails =
+    //             questionDetails.question.trim() === ""
+    //                 ? { ...questionDetails, question: "Question" }
+    //                 : questionDetails;
 
-            setQuestionList((prev) => [
-                ...prev,
-                { ...updatedQuestionDetails, options: updatedOptions },
-            ]);
+    //         setQuestionList((prev) => [
+    //             ...prev,
+    //             { ...updatedQuestionDetails, options: updatedOptions },
+    //         ]);
 
-            setQuestionDetails(null);
-            setQuestionOptions([]);
-            setIsQuestioNDetailsChanged(false);
-        }
-    };
+    //         // setQuestionDetails(null);
+    //         setQuestionOptions([]);
+    //         setIsQuestioNDetailsChanged(false);
+    //     }
+    // };
 
     useEffect(() => console.log(questionList), [questionList]);
 
@@ -449,14 +458,15 @@ export default function QuizForm({ assessmentId, quiz }) {
                         )}
 
                         {/* Display the question form */}
+                        {console.log(questionDetails)}
                         {questionDetails && (
                             <div ref={targetForm}>
                                 <QuestionForm
                                     key={questionList.length}
                                     isChanged={isQuestioNDetailsChanged}
                                     setIsChanged={setIsQuestioNDetailsChanged}
-                                    questionDetails={questionDetails}
-                                    setQuestionDetails={setQuestionDetails}
+                                    // questionDetails={questionDetails}
+                                    // setQuestionDetails={setQuestionDetails}
                                     questionOptions={questionOptions}
                                     setQuestionOptions={setQuestionOptions}
                                     quizTotalPoints={quizTotalPoints}
@@ -475,7 +485,7 @@ export default function QuizForm({ assessmentId, quiz }) {
                                 <div ref={multipleChoiceRef}>
                                     <SecondaryButton
                                         doSomething={() =>
-                                            handleCreateQuestion(
+                                            handleCreateInitialQuestion(
                                                 "multiple_choice",
                                                 questionList.length + 1
                                             )

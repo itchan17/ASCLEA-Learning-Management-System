@@ -5,11 +5,13 @@ import TrueOrFalse from "./Types/TrueOrFalse/TrueOrFalse";
 import Identification from "./Types/Identification/Identification";
 import { debounce } from "lodash";
 import { usePage } from "@inertiajs/react";
+import axios from "axios";
+import useQuestionStore from "./Stores/questionStore";
 
 export default function QuestionForm({
     isChanged,
     setIsChanged,
-    questionDetails,
+    // questionDetails,
     setQuestionDetails,
     questionOptions,
     setQuestionOptions,
@@ -27,9 +29,7 @@ export default function QuestionForm({
     // const questionDetails = useCreateQuizStore(
     //     (state) => state.questionDetails
     // );
-    // const handleQuestionDetailsChange = useCreateQuizStore(
-    //     (state) => state.handleQuestionDetailsChange
-    // );
+    const questionDetails = useQuestionStore((state) => state.questionDetails);
     const handleQuizDetailsChange = useCreateQuizStore(
         (state) => state.handleQuizDetailsChange
     );
@@ -39,7 +39,7 @@ export default function QuestionForm({
     const handleEditQuestion = useCreateQuizStore(
         (state) => state.handleEditQuestion
     );
-    console.log(questionDetails.options);
+
     // Local States
     const [isAddOption, setIsAddOption] = useState(false);
     const [option, setOption] = useState("");
