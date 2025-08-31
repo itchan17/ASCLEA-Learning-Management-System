@@ -95,6 +95,9 @@ const RegistrationFields = () => {
     return (
         <>
             <div className="mx-auto max-w-4xl bg-white">
+                <p className="text-xs text-red-500 font-nunito-sans mb-3">
+                        * All Fields are Required.
+                </p>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <div class="relative">
                         <input
@@ -107,14 +110,14 @@ const RegistrationFields = () => {
                                 )
                             }
                             id="LastNameOutlined"
-                            class="block px-3 py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
+                            class="block px-3 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
                         <label
                             for="LastNameOutlined"
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
-                            Last Name <span className="text-ascend-red">*</span>
+                            Last Name 
                         </label>
                     </div>
                     <div class="relative">
@@ -128,7 +131,7 @@ const RegistrationFields = () => {
                                 )
                             }
                             id="FirstNameOutlined"
-                            class="block px-3 py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
+                            class="block px-3 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
                         <label
@@ -136,7 +139,7 @@ const RegistrationFields = () => {
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
                             First Name{" "}
-                            <span className="text-ascend-red">*</span>
+                            
                         </label>
                     </div>
                     <div class="relative">
@@ -150,7 +153,7 @@ const RegistrationFields = () => {
                                 )
                             }
                             id="MiddleNameOutlined"
-                            class="block px-3 py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
+                            class="block px-3 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
                         <label
@@ -158,7 +161,7 @@ const RegistrationFields = () => {
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
                             Middle Name{" "}
-                            <span className="text-ascend-red">*</span>
+                            
                         </label>
                     </div>
                 </div>
@@ -174,7 +177,7 @@ const RegistrationFields = () => {
                                     e.target.value
                                 )
                             }
-                            className="w-full border border-ascend-gray1 px-3 py-2 text-sm  focus:outline-ascend-blue"
+                            className="w-full border border-ascend-gray1 px-3 py-3 text-sm  focus:outline-ascend-blue"
                         />
                     </div>
                     <div>
@@ -186,11 +189,11 @@ const RegistrationFields = () => {
                                     e.target.value
                                 )
                             }
-                            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
+                            className="textField w-full border border-ascend-gray1 px-3 py-3 text-sm focus:outline-ascend-blue"
                         >
                             <option value="">
                                 Select sex{" "}
-                                <span className="text-ascend-red">*</span>
+                                
                             </option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
@@ -210,7 +213,7 @@ const RegistrationFields = () => {
                                 )
                             }
                             id="HouseStreetOutlined"
-                            class="block px-3 py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
+                            class="block px-3 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
                         <label
@@ -218,7 +221,7 @@ const RegistrationFields = () => {
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
                             House no., Street{" "}
-                            <span className="text-ascend-red">*</span>
+                            
                         </label>
                     </div>
                 </div>
@@ -229,10 +232,10 @@ const RegistrationFields = () => {
                         <select
                             value={registration.region}
                             onChange={(e) => handleRegionChange(e.target.value)}
-                            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
+                            className="textField w-full border border-ascend-gray1 px-3 py-3 text-sm focus:outline-ascend-blue"
                         >
                             <option value="">Select Region {" "} 
-                                <span className="text-ascend-red">*</span>
+                                
                             </option> 
                             {regionList.map((reg) => (
                                 <option key={reg.region_code} value={reg.region_code}>
@@ -247,10 +250,10 @@ const RegistrationFields = () => {
                             value={registration.province}
                             onChange={(e) => handleProvinceChange(e.target.value)}
                             disabled={!provinceList.length}
-                            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
+                            className="textField w-full border border-ascend-gray1 px-3 py-3 text-sm focus:outline-ascend-blue"
                         >
                             <option value="">Select Province {" "} 
-                                <span className="text-ascend-red">*</span>
+                                
                             </option>
                             {provinceList.map((prov) => (
                                 <option key={prov.province_code} value={prov.province_code}>
@@ -265,10 +268,10 @@ const RegistrationFields = () => {
                             value={registration.city}
                             onChange={(e) => handleCityChange(e.target.value)}
                             disabled={!cityList.length}
-                            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
+                            className="textField w-full border border-ascend-gray1 px-3 py-3 text-sm focus:outline-ascend-blue"
                         >
                             <option value="">Select City {" "} 
-                                <span className="text-ascend-red">*</span>
+                                
                             </option>
                             {cityList.map((ct) => (
                                 <option key={ct.city_code} value={ct.city_code}>
@@ -283,10 +286,10 @@ const RegistrationFields = () => {
                             value={registration.barangay}
                             onChange={(e) => handleBarangayChange(e.target.value)}
                             disabled={!barangayList.length}
-                            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
+                            className="textField w-full border border-ascend-gray1 px-3 py-3 text-sm focus:outline-ascend-blue"
                         >
                             <option value="">Select Barangay {" "} 
-                                <span className="text-ascend-red">*</span>
+                                
                             </option>
                             {barangayList.map((brgy) => (
                                 <option key={brgy.brgy_code} value={brgy.brgy_code}>
@@ -306,14 +309,14 @@ const RegistrationFields = () => {
                                 handleRegistrationChange("contact_number", onlyNumbers);
                                 }}
                             id="ContactOutlined"
-                            class="block px-3 py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
+                            class="block px-3 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
                         <label
                             for="ContactOutlined"
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
-                            Contact Number <span className="text-ascend-red">*</span>
+                            Contact Number 
                         </label>
                     </div>
                     <div class="relative">
@@ -327,7 +330,7 @@ const RegistrationFields = () => {
                                 )
                             }
                             id="EmailAddressOutlined"
-                            class="block px-3 py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
+                            class="block px-3 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
                         <label
@@ -335,24 +338,9 @@ const RegistrationFields = () => {
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
                             Email Address{" "}
-                            <span className="text-ascend-red">*</span>
+                            
                         </label>
                     </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 pt-4">
-                    <select
-                        onChange={(e) =>
-                            handleRegistrationChange("program", e.target.value)
-                        }
-                        className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
-                    >
-                        <option value="">
-                            Program <span className="text-ascend-red">*</span>
-                        </option>
-                        <option>LET</option>
-                        <option>CPT</option>
-                    </select>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-4">
@@ -362,14 +350,14 @@ const RegistrationFields = () => {
                             value={registration.password}
                             onChange={(e) => handleRegistrationChange("password", e.target.value)}
                             id="PasswordOutlined"
-                            className="block px-3 py-2 w-full text-sm bg-transparent border border-ascend-gray1 focus:outline-ascend-blue peer"
+                            className="block px-3 py-3 w-full text-sm bg-transparent border border-ascend-gray1 focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
 
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-2 text-gray-500"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                             tabIndex={-1}
                         >
                             {showPassword ? (
@@ -382,7 +370,7 @@ const RegistrationFields = () => {
                             for="PasswordOutlined"
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
-                            Password <span className="text-ascend-red">*</span>
+                            Password 
                         </label>
                     </div>
                     <div class="relative">
@@ -393,13 +381,13 @@ const RegistrationFields = () => {
                                 handleRegistrationChange("password_confirmation", e.target.value)
                             }
                             id="CPasswordOutlined"
-                            className="block px-3 py-2 w-full text-sm bg-transparent border border-ascend-gray1 focus:outline-ascend-blue peer"
+                            className="block px-3 py-3 w-full text-sm bg-transparent border border-ascend-gray1 focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
                         <button
                             type="button"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-3 top-2 text-gray-500"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                         >
                             {showConfirmPassword ? (
                                 <AiOutlineEyeInvisible className="h-5 w-5" />
@@ -412,7 +400,7 @@ const RegistrationFields = () => {
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
                             Confirm Password{" "}
-                            <span className="text-ascend-red">*</span>
+                            
                         </label>
                     </div>
                 </div>
