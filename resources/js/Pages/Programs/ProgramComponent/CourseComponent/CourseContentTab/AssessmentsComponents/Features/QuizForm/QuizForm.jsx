@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import SinglePage from "../../../../../../../../Components/Layout/SInglePage";
 import PrimaryButton from "../../../../../../../../Components/Button/PrimaryButton";
 import TextEditor from "../../../../TextEditor";
@@ -12,6 +12,9 @@ import QuizFormNav from "./Components/QuizFormNav";
 import { debounce } from "lodash";
 import axios from "axios";
 import { usePage } from "@inertiajs/react";
+import useQuizAutosave from "./Hooks/UseQuizAutosave";
+import useQuizDetails from "./Hooks/useQuizDetails";
+import useQuizStore from "./Stores/quizStore";
 import {
     SortableContext,
     verticalListSortingStrategy,
@@ -28,35 +31,55 @@ import {
     useSensor,
 } from "@dnd-kit/core";
 
+export function useQuiz() {
+    return useContext(QuizContext);
+}
+
 export default function QuizForm({ assessmentId, quiz }) {
-    // Create Quiz Store
-    const quizDetails = useCreateQuizStore((state) => state.quizDetails);
-    const handleQuizDetailsChange = useCreateQuizStore(
-        (state) => state.handleQuizDetailsChange
+    // Local States
+    const [initalRender, setInitialRender] = useState(true);
+
+    // Custom hooks
+    const { debounceAutoSave } = useQuizAutosave({
+        assessmentId,
+        quizId: quiz.quiz_id,
+    });
+    const { initializeQuizDetails, handleQuizDetailsChange } = useQuizDetails();
+
+    // Quiz store
+    const resetQuizStore = useQuizStore((state) => state.resetQuizStore);
+    const quizDetails = useQuizStore((state) => state.quizDetails);
+    const isQuizDetailsChanged = useQuizStore(
+        (state) => state.isQuizDetailsChanged
     );
-    // const questionList = useCreateQuizStore((state) => state.questionList);
+
+    // Create Quiz Store
     const handleQuestionDetailsChange = useCreateQuizStore(
         (state) => state.handleQuestionDetailsChange
     );
+    // const quizDetails = useCreateQuizStore((state) => state.quizDetails);
+    // const handleQuizDetailsChange = useCreateQuizStore(
+    //     (state) => state.handleQuizDetailsChange
+    // );
+    // const questionList = useCreateQuizStore((state) => state.questionList);
     // const clearQuestionDetails = useCreateQuizStore(
     //     (state) => state.clearQuestionDetails
     // );
     // const setQuestionList = useCreateQuizStore(
     //     (state) => state.setQuestionList
     // );
-    const setQuizDetails = useCreateQuizStore((state) => state.setQuizDetails);
-    const isChanged = useCreateQuizStore((state) => state.isChanged);
-    const setIsChanged = useCreateQuizStore((state) => state.setIsChanged);
+    // const setQuizDetails = useCreateQuizStore((state) => state.setQuizDetails);
+    // const isChanged = useCreateQuizStore((state) => state.isChanged);
+    // const setIsChanged = useCreateQuizStore((state) => state.setIsChanged);
+    // const [isLoading, setIsLoading] = useState(false);
 
-    // Local States
-    const [isLoading, setIsLoading] = useState(false);
+    // const [openQuestionForm, setOpenQuestionForm] = useState({
+    //     multipleChoice: false,
+    //     trueOrFalse: false,
+    //     identification: false,
+    // });
+
     const [isCreatingQuestion, setIsCreatingQuestion] = useState(false);
-    const [savedLabel, setSavedLabel] = useState(""); // Saved label in the navbar
-    const [openQuestionForm, setOpenQuestionForm] = useState({
-        multipleChoice: false,
-        trueOrFalse: false,
-        identification: false,
-    });
     const [activeForm, setActiveForm] = useState("");
     const [onEdit, setOnEdit] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(null);
@@ -64,7 +87,7 @@ export default function QuizForm({ assessmentId, quiz }) {
     const [questionOptions, setQuestionOptions] = useState([]);
     const [isQuestioNDetailsChanged, setIsQuestioNDetailsChanged] =
         useState(false);
-    const [questionList, setQuestionList] = useState([]);
+    const [questionList, setQuestionList] = useState(quiz.questions);
     const [quizTotalPoints, setQuizTotalPoints] = useState(0);
 
     // Refs
@@ -74,55 +97,29 @@ export default function QuizForm({ assessmentId, quiz }) {
     const indentificationRef = useRef(null);
 
     useEffect(() => {
-        setQuizDetails(quiz);
-        setQuestionList(quiz.questions);
-        setIsChanged(false);
+        initializeQuizDetails(quiz);
+        resetQuizStore();
+        // setQuizDetails(quiz);
+        // setQuestionList(quiz.questions);
+        // setIsChanged(false);
     }, []);
 
-    // A debounced function that handles auto save
-    // used useCallback to prevent recreating of the function
-    const debounceAutoSave = useCallback(
-        debounce(async (data) => {
-            setIsLoading(true);
-            try {
-                const response = await axios.put(
-                    route("assessment.quiz-form.update", {
-                        assessment: assessmentId,
-                        quiz: quiz.quiz_id,
-                    }),
-                    data
-                );
-                console.log(response);
-                setIsLoading(false);
-
-                // Used to display the label in navbar
-                // this truly indicates the the changes was saved
-                // instead of using a text in conditional statement in the navbar
-                // which causes an unwanted behaviour
-                setSavedLabel("Changes saved");
-            } catch (error) {
-                console.error(error);
-                setIsLoading(false);
-            }
-        }, 300),
-        []
-    );
-
+    // Handles update of quiz details changes in backend
     useEffect(() => {
         // Only render when there's a changes to the details
         // not when the quizdetails was initally set
-        if (isChanged) {
+        if (isQuizDetailsChanged) {
             if (quizDetails.quiz_title.trim() !== "") {
                 debounceAutoSave(quizDetails);
             }
         }
-        console.log(quizDetails);
+
         return () => debounceAutoSave.cancel();
     }, [quizDetails, debounceAutoSave]);
 
-    useEffect(() => {
-        console.log("ON EDIT: " + onEdit);
-    }, [onEdit]);
+    // useEffect(() => {
+    //     console.log("ON EDIT: " + onEdit);
+    // }, [onEdit]);
 
     // Scroll into the form once opened
     useEffect(() => {
@@ -138,7 +135,7 @@ export default function QuizForm({ assessmentId, quiz }) {
     // Function for sorting the array
     const handleDragEnd = (event) => {
         const { active, over } = event;
-        console.log(active);
+        // console.log(active);
         if (active.id === over.id) return;
         const originalPos = getQuestionPos(active.id);
         const newPos = getQuestionPos(over.id);
@@ -149,7 +146,7 @@ export default function QuizForm({ assessmentId, quiz }) {
                 sort_order: index + 1,
             })
         );
-        console.log(updatedOrder);
+        // console.log(updatedOrder);
         setQuestionList(updatedOrder);
     };
 
@@ -177,17 +174,23 @@ export default function QuizForm({ assessmentId, quiz }) {
 
     // Calculate the total points of the quiz
     useEffect(() => {
-        let totalPoints = 0;
-        questionList.forEach((question) => {
-            totalPoints += question.question_points;
-        });
+        if (!initalRender) {
+            let totalPoints = 0;
+            questionList.forEach((question) => {
+                totalPoints += question.question_points;
+            });
 
-        // Set the intial total points
-        // when the user create new question this will be used
-        // everytime the user makes chanegs to the question points
-        setQuizTotalPoints(totalPoints);
+            // Set the intial total points
+            // when the user create new question this will be used
+            // everytime the user makes chanegs to the question points
+            setQuizTotalPoints(totalPoints);
 
-        handleQuizDetailsChange("quiz_total_points", totalPoints);
+            // Calling this in intial render set the isQuizDetailsChanegd to true
+            // Displaying the label in the navbar to prevent this initialRendet state was used
+            handleQuizDetailsChange("quiz_total_points", totalPoints);
+        }
+
+        setInitialRender(false);
     }, [questionList]);
 
     // Close the form when the user click outside the form
@@ -339,7 +342,7 @@ export default function QuizForm({ assessmentId, quiz }) {
 
     return (
         <div className="font-nunito-sans relative space-y-5 text-ascend-black">
-            <QuizFormNav isLoading={isLoading} savedLabel={savedLabel} />
+            <QuizFormNav />
             <div className="w-full flex gap-5 items-center px-5 lg:px-[100px]">
                 <BackButton doSomething={handleClickBackBtn} />
             </div>

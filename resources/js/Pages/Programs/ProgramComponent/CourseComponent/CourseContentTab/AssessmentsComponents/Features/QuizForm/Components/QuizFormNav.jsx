@@ -1,28 +1,35 @@
 import { useState } from "react";
-import useCreateQuizStore from "../../../../../../../../../Stores/Programs/CourseContent/createQuizStore";
 import { MdSettings } from "react-icons/md";
 import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
+import useQuizStore from "../Stores/quizStore";
+import useQuizDetails from "../Hooks/useQuizDetails";
 
-export default function QuizFormNav({ isLoading, savedLabel }) {
-    // Create Quiz Store
-    const quizDetails = useCreateQuizStore((state) => state.quizDetails);
-    const handleQuizDetailsChange = useCreateQuizStore(
-        (state) => state.handleQuizDetailsChange
+export default function QuizFormNav() {
+    // QUiz store
+    const quizDetails = useQuizStore((state) => state.quizDetails);
+    const isFormSaving = useQuizStore((state) => state.isFormSaving);
+    const isQuizDetailsChanged = useQuizStore(
+        (state) => state.isQuizDetailsChanged
     );
-    const isChanged = useCreateQuizStore((state) => state.isChanged);
+    const savedLabel = useQuizStore((state) => state.savedLabel);
 
+    // Custom hooks
+    const { handleQuizDetailsChange } = useQuizDetails();
+
+    // Local state
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
     };
+
     return (
         <nav className="relative sm:h-16 w-full flex gap-5 items-center justify-between px-5 lg:px-[100px]">
             <div className="flex items-end gap-5">
                 <img src="/images/ascend_logo.png" alt="" className="w-30" />
-                {isChanged && (
+                {isQuizDetailsChanged && (
                     <span className="text-size3 mb-1">
-                        {isLoading ? "Saving..." : savedLabel}
+                        {isFormSaving ? "Saving..." : savedLabel}
                     </span>
                 )}
             </div>
