@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { debounce } from "lodash";
 import useQuizStore from "../../Stores/quizStore";
 import { displayToast } from "../../../../../../../../../../Utils/displayToast";
@@ -35,8 +35,14 @@ export default function useQuestionAutoSave({ assessmentId, quizId }) {
                 setIsFormSaving(false);
             }
         }, 300),
-        []
+        [updateQuestion, setIsFormSaving, setSavedLabel]
     );
+
+    useEffect(() => {
+        return () => {
+            debounceUpdateQuestion.cancel();
+        };
+    }, [debounceUpdateQuestion]);
 
     return { debounceUpdateQuestion };
 }

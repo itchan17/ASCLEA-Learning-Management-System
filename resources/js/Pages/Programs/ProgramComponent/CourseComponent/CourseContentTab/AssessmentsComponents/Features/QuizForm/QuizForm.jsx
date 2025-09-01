@@ -136,8 +136,6 @@ export default function QuizForm({ assessmentId, quiz }) {
                 debounceAutoSave(quizDetails);
             }
         }
-
-        return () => debounceAutoSave.cancel();
     }, [quizDetails, debounceAutoSave]);
 
     // useEffect(() => {

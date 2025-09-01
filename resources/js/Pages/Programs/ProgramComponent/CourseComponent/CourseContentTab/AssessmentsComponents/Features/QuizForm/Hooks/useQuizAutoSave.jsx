@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { debounce } from "lodash";
 import saveQuizDetails from "../Services/quizService";
 import useQuizStore from "../Stores/quizStore";
@@ -38,6 +38,12 @@ export default function useQuizAutosave({ assessmentId, quizId }) {
         }, 300),
         [assessmentId, quizId]
     );
+
+    useEffect(() => {
+        return () => {
+            debounceAutoSave.cancel();
+        };
+    }, [debounceAutoSave]);
 
     return { debounceAutoSave };
 }

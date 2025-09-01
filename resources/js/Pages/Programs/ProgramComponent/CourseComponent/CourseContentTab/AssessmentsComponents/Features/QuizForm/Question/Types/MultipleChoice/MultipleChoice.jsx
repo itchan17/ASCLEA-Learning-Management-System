@@ -11,6 +11,7 @@ import { usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import axios from "axios";
 import useQuestionStore from "../../Stores/questionStore";
+import useOption from "../../Hooks/useOption";
 
 export default function MultipleChoice({
     options,
@@ -22,7 +23,15 @@ export default function MultipleChoice({
 }) {
     const { assessmentId, quiz } = usePage().props;
 
+    // Question store
     const questionOptions = useQuestionStore((state) => state.questionOptions);
+
+    // Custom hooks
+    const { handleAddOption, optionToEdit, setOptionToEdit } = useOption({
+        assessmentId,
+        quizId: quiz.quiz_id,
+        questionId: questionDetails.question_id,
+    });
     // Create Quiz Store
     // const questionDetails = useCreateQuizStore(
     //     (state) => state.questionDetails
@@ -38,21 +47,21 @@ export default function MultipleChoice({
     // );
 
     // Local State
-    const [optionToEdit, setOptionToEdit] = useState(null);
+    // const [optionToEdit, setOptionToEdit] = useState(null);
 
     // Functions
     const stopPropagation = (e) => {
         e.stopPropagation();
     };
 
-    const toggleAddOption = () => {
-        console.log("Clicked");
-        // display the input field for option
-        // clear the option state everytime it is toggle
-        setIsAddOption(!isAddOption);
-        setOption("");
-        setOptionToEdit(null);
-    };
+    // const toggleAddOption = () => {
+    //     console.log("Clicked");
+    //     // display the input field for option
+    //     // clear the option state everytime it is toggle
+    //     setIsAddOption(!isAddOption);
+    //     setOption("");
+    //     setOptionToEdit(null);
+    // };
 
     // const handleAddOption = () => {
     //     console.log(SlOptions);
@@ -63,20 +72,20 @@ export default function MultipleChoice({
     //     toggleAddOption();
     // };
 
-    const setCorrectAnswer = (option) => {
-        console.log(option);
-        console.log(questionDetails.questionAnswer.includes(option));
-        // check first if the selected option is already set as correct if not unset the option as inncorrect
-        if (questionDetails.questionAnswer.includes(option)) {
-            let newQuestionAnswer = questionDetails.questionAnswer.filter(
-                (ans) => ans !== option
-            );
-            handleQuestionDetailsChange("questionAnswer", newQuestionAnswer);
-        } else {
-            // add the selected option to the array of questionAnswer
-            handleQuestionDetailsChange("questionAnswer", option);
-        }
-    };
+    // const setCorrectAnswer = (option) => {
+    //     console.log(option);
+    //     console.log(questionDetails.questionAnswer.includes(option));
+    //     // check first if the selected option is already set as correct if not unset the option as inncorrect
+    //     if (questionDetails.questionAnswer.includes(option)) {
+    //         let newQuestionAnswer = questionDetails.questionAnswer.filter(
+    //             (ans) => ans !== option
+    //         );
+    //         handleQuestionDetailsChange("questionAnswer", newQuestionAnswer);
+    //     } else {
+    //         // add the selected option to the array of questionAnswer
+    //         handleQuestionDetailsChange("questionAnswer", option);
+    //     }
+    // };
 
     // this will run every time option was clicked to edit
     // useEffect(() => {
@@ -89,52 +98,52 @@ export default function MultipleChoice({
     //     }
     // }, [optionToEdit]);
 
-    const handleAddOption = async () => {
-        try {
-            // Create he intial option with temporary id
-            const newOption = {
-                option_temp_id: `${Date.now()}-${Math.random()
-                    .toString(36)
-                    .substr(2, 9)}`,
-                option_text: `Option ${questionOptions.length + 1}`,
-            };
+    // const handleAddOption = async () => {
+    //     try {
+    //         // Create he intial option with temporary id
+    //         const newOption = {
+    //             option_temp_id: `${Date.now()}-${Math.random()
+    //                 .toString(36)
+    //                 .substr(2, 9)}`,
+    //             option_text: `Option ${questionOptions.length + 1}`,
+    //         };
 
-            setOptions((prev) => [...prev, newOption]);
+    //         setOptions((prev) => [...prev, newOption]);
 
-            const response = await axios.post(
-                route("assessment.quiz-form.question.option.create", {
-                    assessment: assessmentId,
-                    quiz: quiz.quiz_id,
-                    question: questionDetails.question_id,
-                })
-            );
+    //         const response = await axios.post(
+    //             route("assessment.quiz-form.question.option.create", {
+    //                 assessment: assessmentId,
+    //                 quiz: quiz.quiz_id,
+    //                 question: questionDetails.question_id,
+    //             })
+    //         );
 
-            // Merge the IDs of the craeted option in the backend to
-            setOptions((prev) =>
-                prev.map((opt) => {
-                    // Find the initially created option
-                    if (opt.option_temp_id === newOption.option_temp_id) {
-                        // Merge the IDs to the option from backend
-                        const updatedOption = {
-                            ...opt,
-                            question_option_id:
-                                response.data.option.question_option_id,
-                            question_id: response.data.option.question_id,
-                        };
+    //         // Merge the IDs of the craeted option in the backend to
+    //         setOptions((prev) =>
+    //             prev.map((opt) => {
+    //                 // Find the initially created option
+    //                 if (opt.option_temp_id === newOption.option_temp_id) {
+    //                     // Merge the IDs to the option from backend
+    //                     const updatedOption = {
+    //                         ...opt,
+    //                         question_option_id:
+    //                             response.data.option.question_option_id,
+    //                         question_id: response.data.option.question_id,
+    //                     };
 
-                        // Set it as option to edit
-                        setOptionToEdit(updatedOption);
+    //                     // Set it as option to edit
+    //                     setOptionToEdit(updatedOption);
 
-                        return updatedOption;
-                    }
+    //                     return updatedOption;
+    //                 }
 
-                    return opt;
-                })
-            );
-        } catch (error) {
-            console.error(error);
-        }
-    };
+    //                 return opt;
+    //             })
+    //         );
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
 
     const debounceUpdateOption = useCallback(
         debounce(async (data) => {
@@ -244,6 +253,7 @@ export default function MultipleChoice({
                     {questionOptions &&
                         questionOptions.length > 0 &&
                         questionOptions.map((option, i) => {
+                            console.log(optionToEdit);
                             return optionToEdit &&
                                 optionToEdit.question_option_id &&
                                 optionToEdit.question_option_id ==
