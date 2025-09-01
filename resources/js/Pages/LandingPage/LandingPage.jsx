@@ -40,7 +40,7 @@ export default function LandingPage({ text }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         // Basic validation
         if (!formData.name || !formData.email || !formData.message) {
             setSubmitStatus({
@@ -71,12 +71,12 @@ export default function LandingPage({ text }) {
                     'X-Requested-With': 'XMLHttpRequest'
                 }
             });
-            
+
             setSubmitStatus({
                 success: response.data.success,
                 message: response.data.message || 'Thank you for your message! We will get back to you soon.'
             });
-            
+
             // Reset form if successful
             if (response.data.success) {
                 setFormData({
@@ -245,7 +245,7 @@ export default function LandingPage({ text }) {
                         <p className="text-size4">
                             Teacher Certification in just one term. Your gateway
                             in teaching profession. Take the certification just
-                            one semester and be qualified in taking the LET. 
+                            one semester and be qualified in taking the LET.
                         </p>
                     </div>
 
@@ -264,7 +264,7 @@ export default function LandingPage({ text }) {
                         <p className="text-size4">
                             Teacher Certification in just one term. Your gateway
                             in teaching profession. Take the certification just
-                            one semester and be qualified in taking the LET. 
+                            one semester and be qualified in taking the LET.
                         </p>
                     </div>
                 </div>
@@ -382,7 +382,7 @@ export default function LandingPage({ text }) {
                                     onChange={handleInputChange}
                                     disabled={isSubmitting}
                                 ></textarea>
-                                
+
                                 {submitStatus.message && (
                                     <div className={`p-3 rounded-md ${submitStatus.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} flex items-center space-x-2`}>
                                         {submitStatus.success ? (
@@ -393,8 +393,8 @@ export default function LandingPage({ text }) {
                                         <span>{submitStatus.message}</span>
                                     </div>
                                 )}
-                                
-                                <PrimaryButton 
+
+                                <PrimaryButton
                                     type="submit"
                                     disabled={isSubmitting}
                                     className={`${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
