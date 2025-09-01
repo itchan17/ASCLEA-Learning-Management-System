@@ -1,20 +1,100 @@
 import AOS from "aos";
 import "aos/dist/aos.css";
 import "../../../css/animation.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
 import LandingpageNav from "./LandingpageNav";
 import {
     AiOutlinePhone,
     AiOutlineMail,
     AiOutlineFacebook,
+    AiOutlineCheckCircle,
+    AiOutlineCloseCircle
 } from "react-icons/ai";
 import { Link as ReactScrollLink } from "react-scroll";
+import axios from 'axios';
 
 export default function LandingPage({ text }) {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        message: ''
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState({
+        success: null,
+        message: ''
+    });
+
     useEffect(() => {
         AOS.init({ duration: 1000 });
     }, []);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        
+        // Basic validation
+        if (!formData.name || !formData.email || !formData.message) {
+            setSubmitStatus({
+                success: false,
+                message: 'Please fill in all fields.'
+            });
+            return;
+        }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            setSubmitStatus({
+                success: false,
+                message: 'Please enter a valid email address.'
+            });
+            return;
+        }
+
+        setIsSubmitting(true);
+        setSubmitStatus({ success: null, message: '' });
+
+        try {
+            const response = await axios.post('/contact', formData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            setSubmitStatus({
+                success: response.data.success,
+                message: response.data.message || 'Thank you for your message! We will get back to you soon.'
+            });
+            
+            // Reset form if successful
+            if (response.data.success) {
+                setFormData({
+                    name: '',
+                    email: '',
+                    message: ''
+                });
+            }
+        } catch (error) {
+            console.error('Error submitting form:', error);
+            setSubmitStatus({
+                success: false,
+                message: 'Failed to send message. Please try again later.'
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
     return (
         <div className="landing-page overflow-x-hidden">
             <LandingpageNav />
@@ -274,26 +354,54 @@ export default function LandingPage({ text }) {
                             </div>
                         </div>
                         <div className="w-full md:w-1/2 space-y-6">
-                            <form className="flex flex-col space-y-4">
+                            <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
                                 <input
                                     type="text"
+                                    name="name"
                                     placeholder="Your name"
                                     className="border border-ascend-black py-3 px-5 focus:outline-ascend-blue"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    disabled={isSubmitting}
                                 />
                                 <input
                                     type="email"
+                                    name="email"
                                     placeholder="Your email"
                                     className="border border-ascend-black py-3 px-5 focus:outline-ascend-blue"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    disabled={isSubmitting}
                                 />
                                 <textarea
-                                    name=""
-                                    id=""
+                                    name="message"
                                     placeholder="Write a message"
                                     className="border border-ascend-black py-3 px-5 focus:outline-ascend-blue"
                                     rows={6}
+                                    value={formData.message}
+                                    onChange={handleInputChange}
+                                    disabled={isSubmitting}
                                 ></textarea>
+                                
+                                {submitStatus.message && (
+                                    <div className={`p-3 rounded-md ${submitStatus.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} flex items-center space-x-2`}>
+                                        {submitStatus.success ? (
+                                            <AiOutlineCheckCircle className="text-xl" />
+                                        ) : (
+                                            <AiOutlineCloseCircle className="text-xl" />
+                                        )}
+                                        <span>{submitStatus.message}</span>
+                                    </div>
+                                )}
+                                
+                                <PrimaryButton 
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className={`${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                                >
+                                    {isSubmitting ? 'Sending...' : 'Submit'}
+                                </PrimaryButton>
                             </form>
-                            <PrimaryButton text={"Submit"} />
                         </div>
                     </div>
                 </div>
