@@ -1,9 +1,15 @@
 import { useState } from "react";
-import createInitalQuestion from "../Services/questionService";
+import useQuestionService from "../Services/useQuestionService";
 import useQuestionStore from "../Stores/questionStore";
+import useQuizStore from "../../Stores/quizStore";
+import useQuizDetails from "../../Hooks/useQuizDetails";
 
 export default function useQuestion({ assessmentId, quizId }) {
-    const [isCreatingQuestion, setIsCreatingQuestion] = useState(false);
+    // Quiz store
+    const setIsQuizDetailsChanged = useQuizStore(
+        (state) => state.setIsQuizDetailsChanged
+    );
+    const quizDetails = useQuizStore((state) => state.quizDetails);
 
     // Question store
     const questionDetails = useQuestionStore((state) => state.questionDetails);
@@ -13,6 +19,19 @@ export default function useQuestion({ assessmentId, quizId }) {
     const setQuestionOptions = useQuestionStore(
         (state) => state.setQuestionOptions
     );
+
+    // Local state
+    const [isCreatingQuestion, setIsCreatingQuestion] = useState(false);
+    const [initalQuestionPoints, setInitalQuestionPoints] = useState(
+        questionDetails?.question_points || 0
+    );
+
+    // Custom hooks
+    const { createInitalQuestion, updateQuestion } = useQuestionService({
+        assessmentId,
+        quizId,
+    });
+    const { handleQuizDetailsChange } = useQuizDetails();
 
     const handleCreateInitialQuestion = async (questionType, sortOrder) => {
         const newQuestion = {
@@ -45,8 +64,6 @@ export default function useQuestion({ assessmentId, quizId }) {
             setQuestionOptions([newOption]);
 
             const response = await createInitalQuestion(
-                assessmentId,
-                quizId,
                 questionType,
                 sortOrder
             );
@@ -76,6 +93,37 @@ export default function useQuestion({ assessmentId, quizId }) {
             console.error(error);
         } finally {
             setIsCreatingQuestion(false);
+        }
+    };
+
+    const handleQuestionDetailsChange = (field, value) => {
+        setIsQuizDetailsChanged(true);
+        if (field === "question_points") {
+            const questionPoints = parseInt(
+                value.length > 3 ? value.slice(0, 3) : value
+            );
+
+            setQuestionDetails((prev) => ({
+                ...prev,
+                [field]: questionPoints, // Limit the input to 3 char,
+            }));
+
+            // Update the question points
+            // Initial question points was used for editing the question
+            // since the question that will be editied is already part of the list
+            // and it needs to be reduce first before updating the question points
+            handleQuizDetailsChange(
+                "quiz_total_points",
+                quizDetails.quiz_total_points -
+                    initalQuestionPoints +
+                    questionPoints
+            );
+            setInitalQuestionPoints(questionPoints);
+        } else {
+            setQuestionDetails((prev) => ({
+                ...prev,
+                [field]: value,
+            }));
         }
     };
 
@@ -119,5 +167,9 @@ export default function useQuestion({ assessmentId, quizId }) {
         }
     };
 
-    return { handleCreateInitialQuestion, clearQuestionDetails };
+    return {
+        handleCreateInitialQuestion,
+        clearQuestionDetails,
+        handleQuestionDetailsChange,
+    };
 }

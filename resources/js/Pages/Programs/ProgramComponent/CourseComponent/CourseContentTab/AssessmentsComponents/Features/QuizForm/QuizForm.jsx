@@ -107,10 +107,15 @@ export default function QuizForm({ assessmentId, quiz }) {
 
     useEffect(() => {
         initializeQuizDetails(quiz);
-        resetQuizStore();
         // setQuizDetails(quiz);
         // setQuestionList(quiz.questions);
         // setIsChanged(false);
+    }, []);
+
+    useEffect(() => {
+        return () => {
+            resetQuizStore();
+        };
     }, []);
 
     // Handles update of quiz details changes in backend
@@ -182,25 +187,25 @@ export default function QuizForm({ assessmentId, quiz }) {
     };
 
     // Calculate the total points of the quiz
-    useEffect(() => {
-        if (!initalRender) {
-            let totalPoints = 0;
-            questionList.forEach((question) => {
-                totalPoints += question.question_points;
-            });
+    // useEffect(() => {
+    //     if (!initalRender) {
+    //         let totalPoints = 0;
+    //         questionList.forEach((question) => {
+    //             totalPoints += question.question_points;
+    //         });
 
-            // Set the intial total points
-            // when the user create new question this will be used
-            // everytime the user makes chanegs to the question points
-            setQuizTotalPoints(totalPoints);
+    //         // Set the intial total points
+    //         // when the user create new question this will be used
+    //         // everytime the user makes chanegs to the question points
+    //         setQuizTotalPoints(totalPoints);
 
-            // Calling this in intial render set the isQuizDetailsChanegd to true
-            // Displaying the label in the navbar to prevent this initialRendet state was used
-            handleQuizDetailsChange("quiz_total_points", totalPoints);
-        }
+    //         // Calling this in intial render set the isQuizDetailsChanegd to true
+    //         // Displaying the label in the navbar to prevent this initialRendet state was used
+    //         handleQuizDetailsChange("quiz_total_points", totalPoints);
+    //     }
 
-        setInitialRender(false);
-    }, [questionList]);
+    //     setInitialRender(false);
+    // }, [questionList]);
 
     // Close the form when the user click outside the form
     useEffect(() => {
@@ -403,7 +408,6 @@ export default function QuizForm({ assessmentId, quiz }) {
                                     max="9999"
                                     // Prevent user from typing "-"
                                     onKeyDown={(e) => {
-                                        console.log(e.key);
                                         if (e.key === "-") {
                                             e.preventDefault();
                                         }
@@ -458,7 +462,6 @@ export default function QuizForm({ assessmentId, quiz }) {
                         )}
 
                         {/* Display the question form */}
-                        {console.log(questionDetails)}
                         {questionDetails && (
                             <div ref={targetForm}>
                                 <QuestionForm

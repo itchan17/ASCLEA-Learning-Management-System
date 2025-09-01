@@ -14,10 +14,10 @@ export default function useQuizAutosave({ assessmentId, quizId }) {
     // used useCallback to prevent recreating of the function
     const debounceAutoSave = useCallback(
         debounce(async (quizDetails) => {
-            setIsFormSaving(true);
             try {
+                setIsFormSaving(true);
+                console.log(quizDetails);
                 await saveQuizDetails(assessmentId, quizId, quizDetails);
-                setIsFormSaving(false);
 
                 // Used to display the label in navbar
                 // this truly indicates the the changes was saved
@@ -26,13 +26,14 @@ export default function useQuizAutosave({ assessmentId, quizId }) {
                 setSavedLabel("Changes saved");
             } catch (error) {
                 console.error(error);
-                setIsFormSaving(false);
                 displayToast(
                     <DefaultCustomToast
                         message={"Something went wrong. Please try again."}
                     />,
                     "error"
                 );
+            } finally {
+                setIsFormSaving(false);
             }
         }, 300),
         [assessmentId, quizId]
