@@ -46,6 +46,16 @@ const useQuizStore = create((set) => ({
             isFormSaving: false,
             isQuizDetailsChanged: false,
             savedLabel: "",
+            quizDetails: {
+                quiz_title: "",
+                quiz_description: null,
+                quiz_total_points: 0,
+                duration: "",
+                show_answers_after: false,
+                cheating_mitigation: false,
+                quiz_total_points: 0,
+                cv_options: [],
+            },
         });
     },
 }));

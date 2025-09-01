@@ -47,7 +47,11 @@ export default function QuizForm({ assessmentId, quiz }) {
         quizId: quiz.quiz_id,
     });
     const { initializeQuizDetails, handleQuizDetailsChange } = useQuizDetails();
-    const { handleCreateInitialQuestion, clearQuestionDetails } = useQuestion({
+    const {
+        handleCreateInitialQuestion,
+        clearQuestionDetails,
+        isCreatingQuestion,
+    } = useQuestion({
         assessmentId,
         quizId: quiz.quiz_id,
     });
@@ -61,6 +65,11 @@ export default function QuizForm({ assessmentId, quiz }) {
 
     // Question store
     const questionDetails = useQuestionStore((state) => state.questionDetails);
+    const resetQuestionStore = useQuestionStore(
+        (state) => state.resetQuestionStore
+    );
+    const questionList = useQuestionStore((state) => state.questionList);
+    const setQuestionList = useQuestionStore((state) => state.setQuestionList);
 
     // Create Quiz Store
     const handleQuestionDetailsChange = useCreateQuizStore(
@@ -88,7 +97,7 @@ export default function QuizForm({ assessmentId, quiz }) {
     //     identification: false,
     // });
 
-    const [isCreatingQuestion, setIsCreatingQuestion] = useState(false);
+    // const [isCreatingQuestion, setIsCreatingQuestion] = useState(false);
     const [activeForm, setActiveForm] = useState("");
     const [onEdit, setOnEdit] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(null);
@@ -96,7 +105,7 @@ export default function QuizForm({ assessmentId, quiz }) {
     const [questionOptions, setQuestionOptions] = useState([]);
     const [isQuestioNDetailsChanged, setIsQuestioNDetailsChanged] =
         useState(false);
-    const [questionList, setQuestionList] = useState(quiz.questions);
+    // const [questionList, setQuestionList] = useState(quiz.questions);
     const [quizTotalPoints, setQuizTotalPoints] = useState(0);
 
     // Refs
@@ -107,14 +116,14 @@ export default function QuizForm({ assessmentId, quiz }) {
 
     useEffect(() => {
         initializeQuizDetails(quiz);
-        // setQuizDetails(quiz);
-        // setQuestionList(quiz.questions);
-        // setIsChanged(false);
+        setQuestionList(quiz.questions);
     }, []);
 
+    // Reset the store when component was unmounted
     useEffect(() => {
         return () => {
             resetQuizStore();
+            resetQuestionStore();
         };
     }, []);
 
