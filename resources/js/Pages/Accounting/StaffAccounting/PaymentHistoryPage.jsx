@@ -4,6 +4,7 @@ import { useRoute } from 'ziggy-js';
 import useAccountingStore from "../../../Stores/Accounting/AccountingStore";
 import usePaymentStore from "../../../Stores/Accounting/PaymentStore";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
+import AddPaymentModal from './AddPaymentModal';
 
 const PaymentHistoryPage = () => {
     const { props } = usePage();
@@ -13,21 +14,31 @@ const PaymentHistoryPage = () => {
 
     const student = AccountingList.find((item) => item.id === Number(studentId));
 
-  const PaymentList = usePaymentStore((state) => state.PaymentList);
-  const route = useRoute();
+    const PaymentList = usePaymentStore((state) => state.PaymentList);
+    const route = useRoute();
 
-  const handleRowClick = (paymentId) => {
-  router.visit(route("accounting.payment.view", {
-    paymentId,
-    studentId, 
-  }));
-};
+    const handleRowClick = (paymentId) => {
+    router.visit(route("accounting.payment.view", {
+      paymentId,
+      studentId, 
+    }));
+  };
+
+  const [showAddPaymentModal, setShowAddPaymentModal] = React.useState(false);
+
+  const toggleAddPayment = () => {
+      setShowAddPaymentModal(!showAddPaymentModal);
+  };
 
   return (
     <>
+      
     <div className='flex items-center justify-between'>
             <div className='font-nunito-sans text-size6 font-bold mt-5'>{student.name}</div>
-            <PrimaryButton text ="Add Payment"/>
+            <PrimaryButton 
+              text="Add Payment"
+              doSomething={toggleAddPayment}
+            />
     </div>
     <div className='flex items-center justify-between mt-5'>
             <PrimaryButton text ="Download"/>
@@ -67,6 +78,8 @@ const PaymentHistoryPage = () => {
         )}
       </table>
     </div>
+
+    {showAddPaymentModal && <AddPaymentModal togglePaymentForm={toggleAddPayment} />}
 
     </>
   )

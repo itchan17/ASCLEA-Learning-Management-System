@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\AccountingController;
 
+// Group for payment history (student only)
 Route::prefix('payment-history')
     ->middleware(['auth', 'verified', 'preventBack', 'checkRole:student'])
     ->group(function () {
@@ -17,4 +19,9 @@ Route::prefix('payment-history')
                 'paymentId' => $paymentId,
             ]);
         })->name('accounting.paymentInfo.view');
-});
+    });
+
+
+Route::get('/accounting/paid-students', [AccountingController::class, 'paidStudents'])
+    ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin']) 
+    ->name('accounting.paid.students');

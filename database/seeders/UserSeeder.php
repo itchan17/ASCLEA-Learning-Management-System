@@ -31,7 +31,8 @@ class UserSeeder extends Seeder
                     ->state(function (array $attributes, User $user) {
                         return [
                             'user_id' => $user->user_id,
-                            'enrollment_status' => 'enrolled'
+                            'enrollment_status' => 'enrolled',
+                            'payment' => 'paid'
                         ];
                     })
             )

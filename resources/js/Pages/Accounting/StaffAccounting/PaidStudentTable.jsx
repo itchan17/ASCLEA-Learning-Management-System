@@ -1,11 +1,18 @@
-import React from 'react';
+import React from 'react'; 
+import { useEffect } from "react";
 import { router } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import useAccountingStore from "../../../Stores/Accounting/AccountingStore";
+import ModalContainer from "../../../Components/ModalContainer";
 
 const PaidStudentTable = () => {
   const AccountingList = useAccountingStore((state) => state.AccountingList);
+  const fetchPaidStudents = useAccountingStore((state) => state.fetchPaidStudents);
   const route = useRoute();
+
+  useEffect(() => {
+    fetchPaidStudents(); 
+  }, []);
 
   const handleRowClick = (studentId) => {
     router.visit(route("accounting.student.view", { studentId }));
@@ -31,7 +38,7 @@ const PaidStudentTable = () => {
                 className="hover:bg-ascend-lightblue cursor-pointer border-b border-ascend-gray1"
               >
                 <td className="py-5">{s.name}</td>
-                <td className="py-5">{s.program}</td>
+                <td className="py-5">{"N/A"}</td>
                 <td className="py-5">{s.email}</td>
                 <td className="py-5">
                     <span className="text-ascend-blue underline">

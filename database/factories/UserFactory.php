@@ -18,6 +18,14 @@ class UserFactory extends Factory
     {
         $gender = $this->faker->randomElement(['male', 'female']);
 
+        $fakeRegions = [
+        'Fake Region 1',
+        'Fake Region 2',
+        'Fake Region 3',
+        'Fake Region 4',
+        'Fake Region 5',
+        ];
+
         return [
             'first_name' => $this->faker->firstName($gender),
             'last_name' => $this->faker->lastName(),
@@ -28,6 +36,7 @@ class UserFactory extends Factory
             'contact_number' => $this->faker->phoneNumber(),
             'email' => $this->faker->unique()->safeEmail(),
             'house_no' => $this->faker->buildingNumber(),
+            'region' => $this->faker->randomElement($fakeRegions),
             'province' => $this->faker->state(),
             'city' => $this->faker->city(),
             'barangay' => $this->faker->streetName(),
