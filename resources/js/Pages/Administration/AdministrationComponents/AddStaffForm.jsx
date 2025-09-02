@@ -1,11 +1,12 @@
 import React from "react";
 import SecondaryButton from "../../../Components/Button/SecondaryButton";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
+import ModalContainer from "../../../Components/ModalContainer";
 
 export default function AddStaffForm({ toggleForm }) {
     return (
-        <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center font-nunito-sans ">
-            <form className="bg-ascend-white opacity-100 p-5 w-112 space-y-5  max-h-[calc(100vh-5rem)] overflow-y-auto my-10">
+        <ModalContainer>
+            <form className="bg-ascend-white opacity-100 p-5 w-112 space-y-5">
                 <h1 className="text-size4 font-bold">Create Staff Account</h1>
 
                 <div className="flex flex-col">
@@ -69,6 +70,6 @@ export default function AddStaffForm({ toggleForm }) {
                     <PrimaryButton text={"Create"} doSomething={toggleForm} />
                 </div>
             </form>
-        </div>
+        </ModalContainer>
     );
 }

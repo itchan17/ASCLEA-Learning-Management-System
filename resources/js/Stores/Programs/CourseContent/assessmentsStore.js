@@ -4,97 +4,155 @@ import useUserStore from "../../User/userStore";
 import useModulesStore from "./modulesStore";
 
 const useAssessmentsStore = create((set) => ({
-    isFormOpen: false,
+    assessmentList: [],
+    setAssessmentList: (assessments) => {
+        set({ assessmentList: assessments });
+    },
+
+    page: 1,
+
+    hasMore: true,
+
+    setPagination: (page, hasMore) => {
+        set({ page, hasMore });
+    },
+
+    resetPagination: () => set({ page: 1, hasMore: true, lastPage: null }),
 
     assessmentDetails: {
-        id: null,
-        sectionId: null,
-        sortOrder: null,
-        contentType: "assessment",
-        assessmentStatus: null,
-        assessmentType: "",
-        assessmentDueDateTime: "",
-        assessmentPoints: 0,
-        assessmentTitle: "",
-        assessmentDescription: "",
-        assessmentFiles: [],
-        assessmentQuiz: null,
-        assessmentPostDate: "",
-        userPosted: "",
-        responseReceived: 0,
+        assessment_title: "",
+        assessment_description: null,
+        status: "published",
+        assessment_type: "",
+        due_datetime: "",
+        total_points: 0,
+        assessment_files: [],
+        removed_files: [],
+        // sectionId: null,
+        // sortOrder: null,
+        // contentType: "assessment",
+        // assessmentQuiz: null,
+        // responseReceived: 0,
     },
 
-    assessmentList: [
-        {
-            id: 1,
-            sectionId: 1,
-            sortOrder: 2,
-            contentType: "assessment",
-            assessmentType: "quiz",
-            assessmentDueDateTime: "2025-07-15T23:59",
-            assessmentPoints: 100,
-            assessmentTitle: "Chapter 3 Quiz: Photosynthesis",
-            assessmentDescription:
-                "<h2>This quiz will cover all topics in Chapter 3, including light-dependent and light-independent reactions. Please review all diagrams and key concepts.</h2>",
-            assessmentFiles: [],
-            assessmentQuiz: {
-                id: 1,
-                quizTitle: "First quiz",
-                quizDescription: "",
+    // Set the data of assessment thaw will be use to edit
+    setAssessmentDetails: (dataToEdit) => {
+        // Manually set because of nested objects
+        set({
+            assessmentDetails: {
+                assessment_title: dataToEdit.assessment_title,
+                assessment_description: dataToEdit.assessment_description,
+                status: dataToEdit.status,
+                assessment_type: dataToEdit.assessment_type.assessment_type,
+                due_datetime: dataToEdit.due_datetime
+                    ? new Date(dataToEdit.due_datetime)
+                          .toISOString()
+                          .slice(0, 16)
+                    : null, // Converts time into format: Y-m-d\TH:i
+                total_points: dataToEdit.total_points,
+                assessment_files: [],
+                uploaded_files: dataToEdit.files,
+                removed_files: [],
             },
-            assessmentPostDate: "2025-07-07",
-            userPosted: "John Doe",
-            responseReceived: 3,
-        },
-        {
-            id: 2,
-            sectionId: 2,
-            sortOrder: 1,
-            contentType: "assessment",
-            assessmentType: "activity",
-            assessmentDueDateTime: "2025-07-20T23:59",
-            assessmentPoints: 50,
-            assessmentTitle: "Lab Activity: Plant Cell Observation",
-            assessmentDescription: `
-                                        <h2>Instructions:</h2>
-                                        <ol>
-                                            <li>Obtain the prepared slides of plant cells from your instructor.</li>
-                                            <li>Set up the microscope and carefully observe the slides.</li>
-                                            <li>Draw and label the visible parts of the plant cells.</li>
-                                            <li>Complete the observation sheet provided.</li>
-                                            <li>Submit both the labeled diagram and the observation sheet before the deadline.</li>
-                                        </ol>
-                                    `,
-            assessmentFiles: [],
-            assessmentQuiz: null,
-            assessmentPostDate: "2025-07-08",
-            userPosted: "Jane Smith",
-            responseReceived: 5,
-        },
-    ],
-
-    // this handle creation of emty quiz form
-    // the logic for creating empty form and saving it to database will be write here
-    handleCreateIntialQuizForm: () => {
-        const quizdetails = useCreateQuizStore.getState().quizDetails;
-        const { handleAssessmentChange } = useAssessmentsStore.getState();
-
-        // set inital id to 1
-        quizdetails.id = 101;
-        handleAssessmentChange("assessmentQuiz", quizdetails);
-        console.log(quizdetails);
+        });
     },
 
-    toggleAssessmentForm: () => {
-        const { isFormOpen } = useAssessmentsStore.getState();
-        set({ isFormOpen: !isFormOpen });
+    removeAssessment: (id) => {
+        const { assessmentList } = useAssessmentsStore.getState();
+        const newList = assessmentList.filter(
+            (assessment) => assessment.assessment_id !== id
+        );
+        set({
+            assessmentList: newList,
+        });
     },
+
+    addToAssessmentList: (newAssessments) => {
+        const { assessmentList } = useAssessmentsStore.getState();
+
+        const assmnts = [...assessmentList, ...newAssessments];
+
+        // Map handle removing duplicate values based on the assessment id
+        const uniqueAssessments = [
+            ...new Map(assmnts.map((a) => [a.assessment_id, a])).values(),
+        ];
+
+        set({
+            assessmentList: uniqueAssessments,
+        });
+    },
+
+    addNewAssessment: (newAssessment) => {
+        const { assessmentList } = useAssessmentsStore.getState();
+
+        set({ assessmentList: [newAssessment, ...assessmentList] });
+    },
+
+    updateAssessmentInList: (updatedAssessment) => {
+        const { assessmentList } = useAssessmentsStore.getState();
+
+        const updatedAssessmentList = assessmentList.map((assessment) =>
+            assessment.assessment_id === updatedAssessment.assessment_id
+                ? updatedAssessment
+                : assessment
+        );
+        set({ assessmentList: updatedAssessmentList });
+    },
+
+    // assessmentList: [
+    //     {
+    //         id: 1,
+    //         sectionId: 1,
+    //         sortOrder: 2,
+    //         contentType: "assessment",
+    //         assessmentType: "quiz",
+    //         assessmentDueDateTime: "2025-07-15T23:59",
+    //         assessmentPoints: 100,
+    //         assessmentTitle: "Chapter 3 Quiz: Photosynthesis",
+    //         assessmentDescription:
+    //             "<h2>This quiz will cover all topics in Chapter 3, including light-dependent and light-independent reactions. Please review all diagrams and key concepts.</h2>",
+    //         assessmentFiles: [],
+    //         assessmentQuiz: {
+    //             id: 1,
+    //             quizTitle: "First quiz",
+    //             quizDescription: "",
+    //         },
+    //         assessmentPostDate: "2025-07-07",
+    //         userPosted: "John Doe",
+    //         responseReceived: 3,
+    //     },
+    //     {
+    //         id: 2,
+    //         sectionId: 2,
+    //         sortOrder: 1,
+    //         contentType: "assessment",
+    //         assessmentType: "activity",
+    //         assessmentDueDateTime: "2025-07-20T23:59",
+    //         assessmentPoints: 50,
+    //         assessmentTitle: "Lab Activity: Plant Cell Observation",
+    //         assessmentDescription: `
+    //                                     <h2>Instructions:</h2>
+    //                                     <ol>
+    //                                         <li>Obtain the prepared slides of plant cells from your instructor.</li>
+    //                                         <li>Set up the microscope and carefully observe the slides.</li>
+    //                                         <li>Draw and label the visible parts of the plant cells.</li>
+    //                                         <li>Complete the observation sheet provided.</li>
+    //                                         <li>Submit both the labeled diagram and the observation sheet before the deadline.</li>
+    //                                     </ol>
+    //                                 `,
+    //         assessmentFiles: [],
+    //         assessmentQuiz: null,
+    //         assessmentPostDate: "2025-07-08",
+    //         userPosted: "Jane Smith",
+    //         responseReceived: 5,
+    //     },
+    // ],
 
     handleAssessmentChange: (field, value) => {
         const { assessmentDetails } = useAssessmentsStore.getState();
 
         // Check if the field is assessmentFiles then add the new files in the array
-        if (field === "assessmentFiles" && Array.isArray(value)) {
+        if (field === "assessment_files" && Array.isArray(value)) {
             set({
                 assessmentDetails: {
                     ...assessmentDetails,
@@ -117,9 +175,24 @@ const useAssessmentsStore = create((set) => ({
         set({
             assessmentDetails: {
                 ...assessmentDetails,
-                assessmentFiles: assessmentDetails.assessmentFiles.filter(
+                assessment_files: assessmentDetails.assessment_files.filter(
                     (file, index) => index !== fileId
                 ),
+            },
+        });
+    },
+
+    // This add the id of uploaded file into removed_files array
+    removeUploadedFile: (fileId) => {
+        const { assessmentDetails } = useAssessmentsStore.getState();
+
+        set({
+            assessmentDetails: {
+                ...assessmentDetails,
+                uploaded_files: assessmentDetails.uploaded_files.filter(
+                    (file) => file.assessment_file_id !== fileId
+                ),
+                removed_files: [...assessmentDetails.removed_files, fileId],
             },
         });
     },
@@ -127,13 +200,13 @@ const useAssessmentsStore = create((set) => ({
     clearAssessmentDetails: () => {
         set({
             assessmentDetails: {
-                assessmentType: "",
-                assessmentDueDate: "",
-                assessmentDuration: "",
-                assessmentPoints: "",
-                assessmentTitle: "",
-                assessmentDescription: "",
-                assessmentFiles: [],
+                assessment_title: "",
+                assessment_description: null,
+                status: "published",
+                assessment_type: "",
+                due_datetime: "",
+                total_points: 0,
+                assessment_files: [],
             },
         });
     },

@@ -25,10 +25,13 @@ export default function TextEditor({ value, setValue, fieldName }) {
     console.log(value);
     return (
         <ReactQuill
+            value={value}
             modules={module}
             theme="snow"
-            value={value}
-            onChange={(value) => setValue(fieldName, value)}
+            onChange={(val) => {
+                console.log(val);
+                setValue(fieldName, val);
+            }}
         />
     );
 }

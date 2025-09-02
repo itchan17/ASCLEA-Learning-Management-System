@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Models\Programs;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Quiz extends Model
+{
+    use HasUuids, HasFactory;
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
+    protected $primaryKey = 'quiz_id';
+
+    protected $fillable = [
+        'assessment_id',
+        'quiz_title',
+        'quiz_description',
+        'quiz_total_points',
+        'duration',
+        'created_by',
+        'cheating_mitigation',
+        'show_answers_after',
+    ];
+
+    public function assessment(): BelongsTo
+    {
+        return  $this->belongsTo(Assessment::class, 'assessment_id');
+    }
+}

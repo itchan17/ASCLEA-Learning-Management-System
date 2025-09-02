@@ -2,6 +2,7 @@ import "./bootstrap";
 import { createInertiaApp } from "@inertiajs/react";
 import { createRoot } from "react-dom/client";
 import MainLayout from "./Components/Layout/MainLayout";
+import { ToastContainer } from "react-toastify";
 
 createInertiaApp({
     resolve: (name) => {
@@ -18,6 +19,15 @@ createInertiaApp({
         return page;
     },
     setup({ el, App, props }) {
-        createRoot(el).render(<App {...props} />);
+        createRoot(el).render(
+            <>
+                <ToastContainer />
+                <App {...props} />
+            </>
+        );
+    },
+    progress: {
+        // The color of the progress bar...
+        color: "#01007d",
     },
 });
