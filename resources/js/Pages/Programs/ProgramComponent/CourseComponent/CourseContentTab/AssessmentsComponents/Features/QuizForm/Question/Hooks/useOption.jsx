@@ -1,6 +1,7 @@
 import { useState } from "react";
 import useQuestionStore from "../Stores/questionStore";
-import useOptionService from "../Services/useOptionService";
+import { addOption, deleteOption } from "../Services/optionService";
+import useOptionAutoSave from "./useOptionAutoSave";
 
 export default function useOption({ assessmentId, quizId, questionId }) {
     // Local states
@@ -12,8 +13,8 @@ export default function useOption({ assessmentId, quizId, questionId }) {
         (state) => state.setQuestionOptions
     );
 
-    // Custom hook
-    const { addOption } = useOptionService({
+    // Cusotm hook
+    const { debounceUpdateOption } = useOptionAutoSave({
         assessmentId,
         quizId,
         questionId,
@@ -27,11 +28,16 @@ export default function useOption({ assessmentId, quizId, questionId }) {
                     .toString(36)
                     .substr(2, 9)}`,
                 option_text: `Option ${questionOptions.length + 1}`,
+                is_correct: false,
             };
 
             setQuestionOptions((prev) => [...prev, newOption]);
 
-            const response = await addOption();
+            const response = await addOption({
+                assessmentId,
+                quizId,
+                questionId,
+            });
 
             // Merge the IDs of the craeted option in the backend to
             setQuestionOptions((prev) =>
@@ -60,5 +66,70 @@ export default function useOption({ assessmentId, quizId, questionId }) {
         }
     };
 
-    return { handleAddOption, optionToEdit, setOptionToEdit };
+    const handleOptionChange = (optionToUpdate, index) => {
+        console.log(`QUESTION ID: ${questionId}`);
+        setQuestionOptions((prev) => {
+            // List of updated option
+            const newOptions = prev.map((option) =>
+                option.question_option_id === optionToUpdate.question_option_id
+                    ? {
+                          ...option,
+                          option_text: optionToUpdate.option_text,
+                          is_correct: optionToUpdate.is_correct,
+                      }
+                    : option
+            );
+
+            const updatedOption = newOptions.find(
+                (o) =>
+                    o.question_option_id === optionToUpdate.question_option_id
+            );
+
+            // Check first for id
+            // this verifies that the data from backend was verfied
+            if (updatedOption.question_option_id) {
+                // If the option name is empty update it with the default value
+                debounceUpdateOption(
+                    updatedOption.option_text.trim() !== ""
+                        ? updatedOption
+                        : {
+                              ...updatedOption,
+                              option_text: `Option ${index + 1}`,
+                          }
+                );
+            }
+
+            return newOptions;
+        });
+    };
+
+    const handleDeleteOption = async (option) => {
+        try {
+            // Remove first the option in the list before making a request
+            // to make it more responsive
+            setQuestionOptions((prev) =>
+                prev.filter(
+                    (opt) =>
+                        opt.question_option_id !== option.question_option_id
+                )
+            );
+
+            await deleteOption({
+                assessmentId,
+                quizId,
+                questionId,
+                optionId: option.question_option_id,
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    return {
+        handleAddOption,
+        optionToEdit,
+        setOptionToEdit,
+        handleOptionChange,
+        handleDeleteOption,
+    };
 }

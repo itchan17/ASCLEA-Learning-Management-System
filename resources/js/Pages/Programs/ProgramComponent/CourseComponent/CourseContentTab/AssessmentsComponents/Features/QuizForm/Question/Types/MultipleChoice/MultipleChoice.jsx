@@ -27,7 +27,13 @@ export default function MultipleChoice({
     const questionOptions = useQuestionStore((state) => state.questionOptions);
 
     // Custom hooks
-    const { handleAddOption, optionToEdit, setOptionToEdit } = useOption({
+    const {
+        handleAddOption,
+        optionToEdit,
+        setOptionToEdit,
+        handleOptionChange,
+        handleDeleteOption,
+    } = useOption({
         assessmentId,
         quizId: quiz.quiz_id,
         questionId: questionDetails.question_id,
@@ -145,99 +151,96 @@ export default function MultipleChoice({
     //     }
     // };
 
-    const debounceUpdateOption = useCallback(
-        debounce(async (data) => {
-            try {
-                console.log(data);
-                const response = await axios.put(
-                    route("assessment.quiz-form.question.option.update", {
-                        assessment: assessmentId,
-                        quiz: quiz.quiz_id,
-                        question: data.question_id,
-                        option: data.question_option_id,
-                    }),
-                    data
-                );
-            } catch (error) {
-                console.error(error);
-            }
-        }, 300),
-        []
-    );
+    // const debounceUpdateOption = useCallback(
+    //     debounce(async (data) => {
+    //         try {
+    //             console.log(data);
+    //             const response = await axios.put(
+    //                 route("assessment.quiz-form.question.option.update", {
+    //                     assessment: assessmentId,
+    //                     quiz: quiz.quiz_id,
+    //                     question: data.question_id,
+    //                     option: data.question_option_id,
+    //                 }),
+    //                 data
+    //             );
+    //         } catch (error) {
+    //             console.error(error);
+    //         }
+    //     }, 300),
+    //     []
+    // );
 
     // Handle the udpate of option text and setting as correct answer
     // has optionToUpdate which contains the updated option data
-    const handleOptionChange = (optionToUpdate, index) => {
-        setOptions((prev) => {
-            // List of updated option
-            const newOptions = prev.map((option) =>
-                option.question_option_id === optionToUpdate.question_option_id
-                    ? {
-                          ...option,
-                          option_text: optionToUpdate.option_text,
-                          is_correct: optionToUpdate.is_correct,
-                      }
-                    : option
-            );
+    // const handleOptionChange = (optionToUpdate, index) => {
+    //     setOptions((prev) => {
+    //         // List of updated option
+    //         const newOptions = prev.map((option) =>
+    //             option.question_option_id === optionToUpdate.question_option_id
+    //                 ? {
+    //                       ...option,
+    //                       option_text: optionToUpdate.option_text,
+    //                       is_correct: optionToUpdate.is_correct,
+    //                   }
+    //                 : option
+    //         );
 
-            const updatedOption = newOptions.find(
-                (o) =>
-                    o.question_option_id === optionToUpdate.question_option_id
-            );
+    //         const updatedOption = newOptions.find(
+    //             (o) =>
+    //                 o.question_option_id === optionToUpdate.question_option_id
+    //         );
 
-            // Check first for id
-            // this verifies that the data from backend was verfied
-            if (updatedOption.question_option_id) {
-                // If the option name is empty update it with the default value
-                debounceUpdateOption(
-                    updatedOption.option_text.trim() !== ""
-                        ? updatedOption
-                        : {
-                              ...updatedOption,
-                              option_text: `Option ${index + 1}`,
-                          }
-                );
-            }
+    //         // Check first for id
+    //         // this verifies that the data from backend was verfied
+    //         if (updatedOption.question_option_id) {
+    //             // If the option name is empty update it with the default value
+    //             debounceUpdateOption(
+    //                 updatedOption.option_text.trim() !== ""
+    //                     ? updatedOption
+    //                     : {
+    //                           ...updatedOption,
+    //                           option_text: `Option ${index + 1}`,
+    //                       }
+    //             );
+    //         }
 
-            return newOptions;
-        });
-    };
+    //         return newOptions;
+    //     });
+    // };
 
-    useEffect(() => {
-        return () => {
-            debounceUpdateOption.cancel(); // cancels any pending API call
-        };
-    }, [debounceUpdateOption]);
+    // useEffect(() => {
+    //     return () => {
+    //         debounceUpdateOption.cancel(); // cancels any pending API call
+    //     };
+    // }, [debounceUpdateOption]);
 
-    const handleDeleteOption = async (option) => {
-        try {
-            // Remove first the option in the list before making a request
-            // to make it more responsive
-            setOptions((prev) =>
-                prev.filter(
-                    (opt) =>
-                        opt.question_option_id !== option.question_option_id
-                )
-            );
+    // const handleDeleteOption = async (option) => {
+    //     try {
+    //         // Remove first the option in the list before making a request
+    //         // to make it more responsive
+    //         setOptions((prev) =>
+    //             prev.filter(
+    //                 (opt) =>
+    //                     opt.question_option_id !== option.question_option_id
+    //             )
+    //         );
 
-            const response = await axios.delete(
-                route("assessment.quiz-form.question.option.delete", {
-                    assessment: assessmentId,
-                    quiz: quiz.quiz_id,
-                    question: questionDetails.question_id,
-                    option: option.question_option_id,
-                })
-            );
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    useEffect(() => console.log(options), [options]);
+    //         const response = await axios.delete(
+    //             route("assessment.quiz-form.question.option.delete", {
+    //                 assessment: assessmentId,
+    //                 quiz: quiz.quiz_id,
+    //                 question: questionDetails.question_id,
+    //                 option: option.question_option_id,
+    //             })
+    //         );
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
 
     return (
         <div className="space-y-5">
-            {console.log(questionOptions)}
             <div>
                 {/* List Options */}
                 {questionOptions.length > 0 && (

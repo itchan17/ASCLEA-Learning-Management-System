@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import useQuestionService from "../Services/useQuestionService";
 import useQuestionStore from "../Stores/questionStore";
 import useQuizStore from "../../Stores/quizStore";
@@ -133,6 +133,11 @@ export default function useQuestion({ assessmentId, quizId }) {
     };
 
     const clearQuestionDetails = () => {
+        const latestQuestionDetails =
+            useQuestionStore.getState().questionDetails;
+        const latestQuestionOptions =
+            useQuestionStore.getState().questionOptions;
+
         // Check if theres questionDetails
         // this means the question form is curently open
         // if the user click another question type
@@ -140,16 +145,17 @@ export default function useQuestion({ assessmentId, quizId }) {
         // Ensures only question details with merged IDs from the
         // backend will be pushed in the list
         if (
-            questionDetails &&
-            questionDetails.quiz_id &&
-            questionDetails.question_id
+            latestQuestionDetails &&
+            latestQuestionDetails.quiz_id &&
+            latestQuestionDetails.question_id
         ) {
             //These updated data was made because onBlur dont get triggered when
             // the form was closed through outside with ref
             // so we have to ensure no field are empty that will be displayed
-
+            console.log(latestQuestionDetails);
+            console.log(questionOptions);
             // Ensures no empty option
-            const updatedOptions = questionOptions.map((option, i) =>
+            const updatedOptions = latestQuestionOptions.map((option, i) =>
                 option.option_text.trim() === ""
                     ? { ...option, option_text: `Option ${i + 1}` }
                     : option
@@ -157,9 +163,9 @@ export default function useQuestion({ assessmentId, quizId }) {
 
             // Enusres question is not empty
             const updatedQuestionDetails =
-                questionDetails.question.trim() === ""
-                    ? { ...questionDetails, question: "Question" }
-                    : questionDetails;
+                latestQuestionDetails.question.trim() === ""
+                    ? { ...latestQuestionDetails, question: "Question" }
+                    : latestQuestionDetails;
 
             setQuestionList((prev) => [
                 ...prev,
@@ -170,6 +176,10 @@ export default function useQuestion({ assessmentId, quizId }) {
             setQuestionOptions([]);
         }
     };
+
+    useEffect(() => {
+        console.log(questionOptions);
+    }, [questionOptions]);
 
     return {
         handleCreateInitialQuestion,
