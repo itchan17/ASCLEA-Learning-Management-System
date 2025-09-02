@@ -2,14 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\AccountingController;
 
 Route::prefix('accounting')
     ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin'])
     ->group(function () {
-        // Route for Accounting
-        Route::get('/', function () {
-            return Inertia::render('Accounting/AccountingPage');
-        });
+        // Route for Accounting main page (Paid Students table)
+        Route::get('/', [AccountingController::class, 'paidStudents'])
+            ->name('accounting.paid.students');
 
         // Route for Viewing Payment History of Student
         Route::get('/paymenthistory/{studentId}', function ($studentId) {

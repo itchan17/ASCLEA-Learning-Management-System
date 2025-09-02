@@ -22,6 +22,4 @@ Route::prefix('payment-history')
     });
 
 
-Route::get('/accounting/paid-students', [AccountingController::class, 'paidStudents'])
-    ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin']) 
-    ->name('accounting.paid.students');
+
