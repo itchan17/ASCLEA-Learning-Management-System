@@ -20,10 +20,11 @@ export default function QuestionForm({ activeForm }) {
     const questionDetails = useQuestionStore((state) => state.questionDetails);
 
     // Custom hooks
-    const { handleQuestionDetailsChange } = useQuestion({
-        assessmentId,
-        quizId: quiz.quiz_id,
-    });
+    const { handleQuestionDetailsChange, isQuestionDetailsChanged } =
+        useQuestion({
+            assessmentId,
+            quizId: quiz.quiz_id,
+        });
     const { debounceUpdateQuestion } = useQuestionAutoSave({
         assessmentId,
         quizId: quiz.quiz_id,
@@ -50,13 +51,24 @@ export default function QuestionForm({ activeForm }) {
     // Handles autosave of question details here
     useEffect(() => {
         // Only run when details was truly changed by the user
-        if (isQuizDetailsChanged && questionDetails.question_id) {
+        if (isQuestionDetailsChanged && questionDetails.question_id) {
             // If the question is empty update it with the default value
-            debounceUpdateQuestion(
-                questionDetails.question.trim() !== ""
-                    ? questionDetails
-                    : { ...questionDetails, question: "Question" }
-            );
+            let updatedQuestionDetails = questionDetails;
+
+            if (questionDetails.question.trim() === "") {
+                updatedQuestionDetails = {
+                    ...updatedQuestionDetails,
+                    question: "Question",
+                };
+            }
+            if (questionDetails.question_points.toString().trim() === "") {
+                updatedQuestionDetails = {
+                    ...updatedQuestionDetails,
+                    question_points: 0,
+                };
+            }
+
+            debounceUpdateQuestion(updatedQuestionDetails);
         }
     }, [questionDetails]);
 

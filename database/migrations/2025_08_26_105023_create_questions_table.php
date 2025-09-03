@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign("quiz_id")->references("quiz_id")->on("quizzes")->onDelete("cascade");
             $table->text("question");
             $table->enum('question_type', ['multiple_choice', 'true_or_false', 'identification']);
-            $table->integer("question_points")->nullable();
+            $table->integer("question_points")->default(0);
             $table->boolean("is_required")->default(false);
             $table->integer("sort_order");
             $table->timestamps();

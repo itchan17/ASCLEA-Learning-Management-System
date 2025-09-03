@@ -24,7 +24,7 @@ class SaveQuizRequest extends FormRequest
         return [
             'quiz_title' => 'required|string|max:255',
             'quiz_description' => 'nullable|string',
-            'duration' => 'nullable|numeric|min:0',
+            'duration' => 'integer|min:0',
             'quiz_total_points' => 'nullable|numeric|min:0',
             'show_answers_after' => 'boolean',
             'cheating_mitigation' => 'boolean',

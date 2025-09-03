@@ -3,14 +3,12 @@ import useQuizStore from "../Stores/quizStore";
 
 export default function useQuizDetails() {
     // Quiz store
-    const setIsQuizDetailsChanged = useQuizStore(
-        (state) => state.setIsQuizDetailsChanged
-    );
     const quizDetails = useQuizStore((state) => state.quizDetails);
     const setQuizDetails = useQuizStore((state) => state.setQuizDetails);
 
     // Local states
     const [timeoutId, setTimeoutId] = useState(null);
+    const [isQuizDetailsChanged, setIsQuizDetailsChanged] = useState(false);
 
     const handleQuizDetailsChange = (field, value) => {
         if (field === "cv_options") {
@@ -64,7 +62,7 @@ export default function useQuizDetails() {
             quiz_title: initialQuizDetails.quiz_title,
             quiz_description: initialQuizDetails.quiz_description,
             quiz_total_points: initialQuizDetails.quiz_total_points || 0,
-            duration: initialQuizDetails.duration || 0,
+            duration: initialQuizDetails.duration,
             show_answers_after: initialQuizDetails.show_answers_after,
             cheating_mitigation: initialQuizDetails.cheating_mitigation,
             quiz_total_points: initialQuizDetails.quiz_total_points,
@@ -75,5 +73,9 @@ export default function useQuizDetails() {
         });
     };
 
-    return { initializeQuizDetails, handleQuizDetailsChange };
+    return {
+        initializeQuizDetails,
+        handleQuizDetailsChange,
+        isQuizDetailsChanged,
+    };
 }

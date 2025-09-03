@@ -8,9 +8,8 @@ import { displayToast } from "../../../../../../../../../../Utils/displayToast";
 
 export default function useQuestion({ assessmentId, quizId }) {
     // Quiz store
-    const setIsQuizDetailsChanged = useQuizStore(
-        (state) => state.setIsQuizDetailsChanged
-    );
+    const setIsFormSaving = useQuizStore((state) => state.setIsFormSaving);
+    const setSavedLabel = useQuizStore((state) => state.setSavedLabel);
     const quizDetails = useQuizStore((state) => state.quizDetails);
 
     // Question store
@@ -29,6 +28,8 @@ export default function useQuestion({ assessmentId, quizId }) {
     const [initalQuestionPoints, setInitalQuestionPoints] = useState(
         questionDetails?.question_points || 0
     );
+    const [isQuestionDetailsChanged, setIsQuestionDetailsChanged] =
+        useState(false);
 
     // Custom hooks
     const { handleQuizDetailsChange } = useQuizDetails();
@@ -44,6 +45,9 @@ export default function useQuestion({ assessmentId, quizId }) {
             };
 
             try {
+                console.log("CREATING INITAL QUESTIOn");
+                setIsFormSaving(true);
+
                 clearQuestionDetails();
 
                 setIsCreatingQuestion(true);
@@ -69,10 +73,11 @@ export default function useQuestion({ assessmentId, quizId }) {
                 // Merge the IDs of the craeted option in the backend to
                 // We do not merge the IDs from backend in idetification type
                 // since we don't have temporary option for this
+
                 if (
                     questionType !== "identification" &&
                     temporaryOptions.length !== 0 &&
-                    !response.data.data.options
+                    response.data.data.options
                 ) {
                     setQuestionOptions((prev) =>
                         prev.map((opt, index) =>
@@ -91,6 +96,8 @@ export default function useQuestion({ assessmentId, quizId }) {
                         )
                     );
                 }
+
+                setSavedLabel("Changes saved");
             } catch (error) {
                 console.error(error);
                 displayToast(
@@ -101,6 +108,7 @@ export default function useQuestion({ assessmentId, quizId }) {
                 );
             } finally {
                 setIsCreatingQuestion(false);
+                setIsFormSaving(false);
             }
         }
     };
@@ -147,15 +155,17 @@ export default function useQuestion({ assessmentId, quizId }) {
     };
 
     const handleQuestionDetailsChange = (field, value) => {
-        setIsQuizDetailsChanged(true);
+        setIsQuestionDetailsChanged(true);
         if (field === "question_points") {
-            const questionPoints = parseInt(
-                value.length > 3 ? value.slice(0, 3) : value
-            );
+            const questionPoints =
+                value.trim() === ""
+                    ? 0
+                    : parseInt(value.length > 3 ? value.slice(0, 3) : value);
+            console.log(value.trim() === "");
 
             setQuestionDetails((prev) => ({
                 ...prev,
-                [field]: questionPoints, // Limit the input to 3 char,
+                [field]: value, // Limit the input to 3 char,
             }));
 
             // Update the question points
@@ -215,10 +225,26 @@ export default function useQuestion({ assessmentId, quizId }) {
             );
 
             // Enusres question is not empty
-            const updatedQuestionDetails =
-                latestQuestionDetails.question.trim() === ""
-                    ? { ...latestQuestionDetails, question: "Question" }
-                    : latestQuestionDetails;
+            // const updatedQuestionDetails =
+            //     latestQuestionDetails.question.trim() === ""
+            //         ? { ...latestQuestionDetails, question: "Question" }
+            //         : latestQuestionDetails;
+            let updatedQuestionDetails = latestQuestionDetails;
+
+            if (latestQuestionDetails.question.trim() === "") {
+                updatedQuestionDetails = {
+                    ...updatedQuestionDetails,
+                    question: "Question",
+                };
+            }
+            if (
+                latestQuestionDetails.question_points.toString().trim() === ""
+            ) {
+                updatedQuestionDetails = {
+                    ...updatedQuestionDetails,
+                    question_points: 0,
+                };
+            }
 
             setQuestionList((prev) => [
                 ...prev,
@@ -239,5 +265,6 @@ export default function useQuestion({ assessmentId, quizId }) {
         clearQuestionDetails,
         handleQuestionDetailsChange,
         isCreatingQuestion,
+        isQuestionDetailsChanged,
     };
 }

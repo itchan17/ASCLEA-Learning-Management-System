@@ -40,7 +40,11 @@ export default function QuizForm({ assessmentId, quiz }) {
         assessmentId,
         quizId: quiz.quiz_id,
     });
-    const { initializeQuizDetails, handleQuizDetailsChange } = useQuizDetails();
+    const {
+        initializeQuizDetails,
+        handleQuizDetailsChange,
+        isQuizDetailsChanged,
+    } = useQuizDetails();
     const {
         handleCreateInitialQuestion,
         clearQuestionDetails,
@@ -53,9 +57,6 @@ export default function QuizForm({ assessmentId, quiz }) {
     // Quiz store
     const resetQuizStore = useQuizStore((state) => state.resetQuizStore);
     const quizDetails = useQuizStore((state) => state.quizDetails);
-    const isQuizDetailsChanged = useQuizStore(
-        (state) => state.isQuizDetailsChanged
-    );
 
     // Question store
     const questionDetails = useQuestionStore((state) => state.questionDetails);
@@ -93,9 +94,15 @@ export default function QuizForm({ assessmentId, quiz }) {
     useEffect(() => {
         // Only render when there's a changes to the details
         // not when the quizdetails was initally set
+        console.log("QUIZ FORM IS RUNNUNG");
         if (isQuizDetailsChanged) {
             if (quizDetails.quiz_title.trim() !== "") {
-                debounceAutoSave(quizDetails);
+                if (quizDetails.duration.toString().trim() === "") {
+                    const updatedQuizDetails = { ...quizDetails, duration: 0 };
+                    debounceAutoSave(updatedQuizDetails);
+                } else {
+                    debounceAutoSave(quizDetails);
+                }
             }
         }
     }, [quizDetails, debounceAutoSave]);
@@ -183,21 +190,9 @@ export default function QuizForm({ assessmentId, quiz }) {
     return (
         <div className="font-nunito-sans relative space-y-5 text-ascend-black">
             <QuizFormNav />
-            <div className="w-full flex gap-5 items-center px-5 lg:px-[100px]">
-                <BackButton doSomething={handleClickBackBtn} />
-            </div>
+
             <div className="flex justify-center px-5 pb-5 lg:px-[150px]">
                 <div className="w-full max-w-235 space-y-5">
-                    <div className="flex gap-5 items-center justify-between">
-                        <h1 className="text-size6 font-bold text-nowrap">
-                            Create Quiz
-                        </h1>
-
-                        <div className="font-bold text-end">
-                            Total points: {quizDetails.quiz_total_points || 0}
-                        </div>
-                    </div>
-
                     <div className="w-full space-y-5">
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 w-full">
                             <div className="col-span-1 sm:col-span-3">

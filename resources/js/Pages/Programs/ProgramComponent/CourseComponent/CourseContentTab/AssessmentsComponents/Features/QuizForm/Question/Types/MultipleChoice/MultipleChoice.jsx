@@ -171,6 +171,7 @@ export default function MultipleChoice({}) {
                                         <div className="flex gap-2">
                                             <div
                                                 onClick={(e) => {
+                                                    console.log(option);
                                                     stopPropagation(e);
                                                     setOptionToEdit(option);
                                                 }}

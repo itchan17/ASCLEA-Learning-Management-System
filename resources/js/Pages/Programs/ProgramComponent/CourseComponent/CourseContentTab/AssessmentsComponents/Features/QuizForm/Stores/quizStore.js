@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 const useQuizStore = create((set) => ({
     isFormSaving: false,
-    isQuizDetailsChanged: false,
+
     quizDetails: {
         quiz_title: "",
         quiz_description: null,
@@ -18,12 +18,6 @@ const useQuizStore = create((set) => ({
     setIsFormSaving: (value) => {
         set({
             isFormSaving: value,
-        });
-    },
-
-    setIsQuizDetailsChanged: (value) => {
-        set({
-            isQuizDetailsChanged: value,
         });
     },
 

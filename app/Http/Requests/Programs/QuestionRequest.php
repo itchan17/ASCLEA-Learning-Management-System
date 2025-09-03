@@ -37,7 +37,7 @@ class QuestionRequest extends FormRequest
                     'question' => 'required|string',
                     'question_type' => 'required|string|in:multiple_choice,true_or_false,identification',
                     'sort_order' => 'required|integer',
-                    'question_points' => 'nullable|integer|min:0|max:999',
+                    'question_points' => 'integer|min:0|max:999',
                     'is_required' => 'required|boolean',
                 ];
 

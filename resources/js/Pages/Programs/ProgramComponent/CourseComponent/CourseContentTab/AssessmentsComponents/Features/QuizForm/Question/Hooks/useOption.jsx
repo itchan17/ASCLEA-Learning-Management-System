@@ -2,10 +2,17 @@ import { useState } from "react";
 import useQuestionStore from "../Stores/questionStore";
 import { addOption, deleteOption } from "../Services/optionService";
 import useOptionAutoSave from "./useOptionAutoSave";
+import useQuizStore from "../../Stores/quizStore";
+import { displayToast } from "../../../../../../../../../../Utils/displayToast";
+import DefaultCustomToast from "../../../../../../../../../../Components/CustomToast/DefaultCustomToast";
 
 export default function useOption({ assessmentId, quizId, questionId }) {
     // Local states
     const [optionToEdit, setOptionToEdit] = useState(null);
+
+    // Quiz store
+    const setIsFormSaving = useQuizStore((state) => state.setIsFormSaving);
+    const setSavedLabel = useQuizStore((state) => state.setSavedLabel);
 
     // Question store
     const questionOptions = useQuestionStore((state) => state.questionOptions);
@@ -22,6 +29,7 @@ export default function useOption({ assessmentId, quizId, questionId }) {
 
     const handleAddOption = async (questionType) => {
         try {
+            setIsFormSaving(true);
             // Create he intial option with temporary id
             const newOption = {
                 option_temp_id: `${Date.now()}-${Math.random()
@@ -65,13 +73,22 @@ export default function useOption({ assessmentId, quizId, questionId }) {
                     return opt;
                 })
             );
+
+            setSavedLabel("Changes saved");
         } catch (error) {
             console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please try again."}
+                />,
+                "error"
+            );
+        } finally {
+            setIsFormSaving(false);
         }
     };
 
     const handleOptionChange = (optionToUpdate, index, questionType) => {
-        console.log(`QUESTION ID: ${questionId}`);
         if (optionToUpdate.question_option_id) {
             setQuestionOptions((prev) => {
                 // List of updated option
@@ -116,6 +133,7 @@ export default function useOption({ assessmentId, quizId, questionId }) {
 
     const handleDeleteOption = async (option) => {
         try {
+            setIsFormSaving(true);
             // Remove first the option in the list before making a request
             // to make it more responsive
             setQuestionOptions((prev) =>
@@ -131,8 +149,17 @@ export default function useOption({ assessmentId, quizId, questionId }) {
                 questionId,
                 optionId: option.question_option_id,
             });
+            setSavedLabel("Changes saved");
         } catch (error) {
             console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please try again."}
+                />,
+                "error"
+            );
+        } finally {
+            setIsFormSaving(false);
         }
     };
 
