@@ -10,6 +10,19 @@ class QuestionOption extends Model
 {
     use HasUuids;
 
+    protected static function booted(): void
+    {
+        // Update the option's order whenever an option was deleted
+        static::deleted(function (QuestionOption $option) {
+            $options = QuestionOption::where('question_id', $option->question_id)->orderBy('option_order')->get();
+
+            foreach ($options as $index => $option) {
+                $option->update(['option_order' => $index + 1]);
+            }
+        });
+    }
+
+
     public $incrementing = false;
 
     protected $keyType = 'string';
@@ -19,6 +32,7 @@ class QuestionOption extends Model
     protected $fillable = [
         'question_id',
         'option_text',
+        'option_order',
         'is_correct'
     ];
 

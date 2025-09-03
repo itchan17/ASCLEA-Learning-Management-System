@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import useQuestionService from "../Services/useQuestionService";
 import useQuestionStore from "../Stores/questionStore";
 import useQuizStore from "../../Stores/quizStore";
 import useQuizDetails from "../../Hooks/useQuizDetails";
+import { createInitalQuestion } from "../Services/questionService";
+import DefaultCustomToast from "../../../../../../../../../../Components/CustomToast/DefaultCustomToast";
+import { displayToast } from "../../../../../../../../../../Utils/displayToast";
 
 export default function useQuestion({ assessmentId, quizId }) {
     // Quiz store
@@ -29,10 +31,6 @@ export default function useQuestion({ assessmentId, quizId }) {
     );
 
     // Custom hooks
-    const { createInitalQuestion, updateQuestion } = useQuestionService({
-        assessmentId,
-        quizId,
-    });
     const { handleQuizDetailsChange } = useQuizDetails();
 
     const handleCreateInitialQuestion = async (questionType, sortOrder) => {
@@ -45,31 +43,21 @@ export default function useQuestion({ assessmentId, quizId }) {
                 sort_order: 1,
             };
 
-            // Create he intial option with temporary id for multiple choice type of question
-            const newOption = {
-                option_temp_id: `${Date.now()}-${Math.random()
-                    .toString(36)
-                    .substr(2, 9)}`,
-                option_text: "Option 1",
-                is_correct: false,
-            };
-
             try {
-                console.log("WORKING");
+                clearQuestionDetails();
 
                 setIsCreatingQuestion(true);
 
-                clearQuestionDetails();
-
                 setQuestionDetails(newQuestion);
 
-                // Set the inital to imeediately dispaly in the front end
-                setQuestionOptions([newOption]);
+                const temporaryOptions = createTemporaryOptions(questionType);
 
-                const response = await createInitalQuestion(
+                const response = await createInitalQuestion({
+                    assessmentId,
+                    quizId,
                     questionType,
-                    sortOrder
-                );
+                    sortOrder,
+                });
 
                 // Merge the IDs from backend to the question details
                 setQuestionDetails((prev) => ({
@@ -79,26 +67,83 @@ export default function useQuestion({ assessmentId, quizId }) {
                 }));
 
                 // Merge the IDs of the craeted option in the backend to
-                setQuestionOptions((prev) =>
-                    prev.map((opt) =>
-                        opt.option_temp_id === newOption.option_temp_id
-                            ? {
-                                  ...opt,
-                                  question_option_id:
-                                      response.data.data.options
-                                          .question_option_id,
-                                  question_id:
-                                      response.data.data.options.question_id,
-                              }
-                            : opt
-                    )
-                );
+                // We do not merge the IDs from backend in idetification type
+                // since we don't have temporary option for this
+                if (
+                    questionType !== "identification" &&
+                    temporaryOptions.length !== 0 &&
+                    !response.data.data.options
+                ) {
+                    setQuestionOptions((prev) =>
+                        prev.map((opt, index) =>
+                            opt.option_temp_id ===
+                            temporaryOptions[index].option_temp_id
+                                ? {
+                                      ...opt,
+                                      question_option_id:
+                                          response.data.data.options[index]
+                                              .question_option_id,
+                                      question_id:
+                                          response.data.data.options[index]
+                                              .question_id,
+                                  }
+                                : opt
+                        )
+                    );
+                }
             } catch (error) {
                 console.error(error);
+                displayToast(
+                    <DefaultCustomToast
+                        message={"Something went wrong. Please try again."}
+                    />,
+                    "error"
+                );
             } finally {
                 setIsCreatingQuestion(false);
             }
         }
+    };
+
+    // Create a temporary option based on the question type
+    const createTemporaryOptions = (questionType) => {
+        let temporaryOptions = [];
+
+        if (questionType === "multiple_choice") {
+            // Create he intial option with temporary id for multiple choice type of question
+
+            temporaryOptions = [
+                {
+                    option_temp_id: `${Date.now()}-${Math.random()
+                        .toString(36)
+                        .substr(2, 9)}`,
+                    option_text: "Option 1",
+                    is_correct: false,
+                },
+            ];
+        } else if (questionType === "true_or_false") {
+            // Create a temporary two options with temporary id, true and false
+            temporaryOptions = [
+                {
+                    option_temp_id: `${Date.now()}-${Math.random()
+                        .toString(36)
+                        .substr(2, 9)}`,
+                    option_text: "True",
+                    is_correct: false,
+                },
+                {
+                    option_temp_id: `${Date.now()}-${Math.random()
+                        .toString(36)
+                        .substr(2, 9)}`,
+                    option_text: "False",
+                    is_correct: false,
+                },
+            ];
+        }
+
+        setQuestionOptions(temporaryOptions);
+
+        return temporaryOptions;
     };
 
     const handleQuestionDetailsChange = (field, value) => {
@@ -157,7 +202,15 @@ export default function useQuestion({ assessmentId, quizId }) {
             // Ensures no empty option
             const updatedOptions = latestQuestionOptions.map((option, i) =>
                 option.option_text.trim() === ""
-                    ? { ...option, option_text: `Option ${i + 1}` }
+                    ? {
+                          ...option,
+                          option_text: `${
+                              latestQuestionDetails.question_type ===
+                              "multiple_choice"
+                                  ? "Option"
+                                  : "Correct Answer"
+                          } ${i + 1}`,
+                      }
                     : option
             );
 

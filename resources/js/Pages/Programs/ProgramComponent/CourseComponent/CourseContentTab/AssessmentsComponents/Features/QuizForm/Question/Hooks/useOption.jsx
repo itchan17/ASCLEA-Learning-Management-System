@@ -20,15 +20,19 @@ export default function useOption({ assessmentId, quizId, questionId }) {
         questionId,
     });
 
-    const handleAddOption = async () => {
+    const handleAddOption = async (questionType) => {
         try {
             // Create he intial option with temporary id
             const newOption = {
                 option_temp_id: `${Date.now()}-${Math.random()
                     .toString(36)
                     .substr(2, 9)}`,
-                option_text: `Option ${questionOptions.length + 1}`,
-                is_correct: false,
+                option_text: `${
+                    questionType === "multiple_choice"
+                        ? "Option"
+                        : "Correct Answer"
+                } ${questionOptions.length + 1}`,
+                is_correct: questionType === "multiple_choice" ? false : true,
             };
 
             setQuestionOptions((prev) => [...prev, newOption]);
@@ -48,8 +52,8 @@ export default function useOption({ assessmentId, quizId, questionId }) {
                         const updatedOption = {
                             ...opt,
                             question_option_id:
-                                response.data.option.question_option_id,
-                            question_id: response.data.option.question_id,
+                                response.data.option[0].question_option_id,
+                            question_id: response.data.option[0].question_id,
                         };
                         console.log(updatedOption);
                         // Set it as option to edit
@@ -66,41 +70,48 @@ export default function useOption({ assessmentId, quizId, questionId }) {
         }
     };
 
-    const handleOptionChange = (optionToUpdate, index) => {
+    const handleOptionChange = (optionToUpdate, index, questionType) => {
         console.log(`QUESTION ID: ${questionId}`);
-        setQuestionOptions((prev) => {
-            // List of updated option
-            const newOptions = prev.map((option) =>
-                option.question_option_id === optionToUpdate.question_option_id
-                    ? {
-                          ...option,
-                          option_text: optionToUpdate.option_text,
-                          is_correct: optionToUpdate.is_correct,
-                      }
-                    : option
-            );
+        if (optionToUpdate.question_option_id) {
+            setQuestionOptions((prev) => {
+                // List of updated option
+                const newOptions = prev.map((option) =>
+                    option.question_option_id ===
+                    optionToUpdate.question_option_id
+                        ? {
+                              ...option,
+                              option_text: optionToUpdate.option_text,
+                              is_correct: optionToUpdate.is_correct,
+                          }
+                        : option
+                );
 
-            const updatedOption = newOptions.find(
-                (o) =>
-                    o.question_option_id === optionToUpdate.question_option_id
-            );
+                const updatedOption = newOptions.find(
+                    (o) =>
+                        o.question_option_id ===
+                        optionToUpdate.question_option_id
+                );
 
-            // Check first for id
-            // this verifies that the data from backend was verfied
-            if (updatedOption.question_option_id) {
+                // Check first for id
+                // this verifies that the data from backend was verfied
+
                 // If the option name is empty update it with the default value
                 debounceUpdateOption(
                     updatedOption.option_text.trim() !== ""
                         ? updatedOption
                         : {
                               ...updatedOption,
-                              option_text: `Option ${index + 1}`,
+                              option_text: `${
+                                  questionType === "multiple_choice"
+                                      ? "Option"
+                                      : "Correct Answer"
+                              } ${index + 1}`,
                           }
                 );
-            }
 
-            return newOptions;
-        });
+                return newOptions;
+            });
+        }
     };
 
     const handleDeleteOption = async (option) => {

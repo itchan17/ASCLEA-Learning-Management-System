@@ -3,24 +3,23 @@ import { debounce } from "lodash";
 import useQuizStore from "../../Stores/quizStore";
 import { displayToast } from "../../../../../../../../../../Utils/displayToast";
 import DefaultCustomToast from "../../../../../../../../../../Components/CustomToast/DefaultCustomToast";
-import useQuestionService from "../Services/useQuestionService";
+import { updateQuestion } from "../Services/questionService";
 
 export default function useQuestionAutoSave({ assessmentId, quizId }) {
     // Store
     const setIsFormSaving = useQuizStore((state) => state.setIsFormSaving);
     const setSavedLabel = useQuizStore((state) => state.setSavedLabel);
 
-    // Custom hook
-    const { updateQuestion } = useQuestionService({ assessmentId, quizId });
-
     const debounceUpdateQuestion = useCallback(
         debounce(async (questionDetails) => {
             try {
                 setIsFormSaving(true);
-                await updateQuestion(
-                    questionDetails.question_id,
-                    questionDetails
-                );
+                await updateQuestion({
+                    assessmentId,
+                    quizId,
+                    questionId: questionDetails.question_id,
+                    questionDetails,
+                });
 
                 setSavedLabel("Changes saved");
             } catch (error) {

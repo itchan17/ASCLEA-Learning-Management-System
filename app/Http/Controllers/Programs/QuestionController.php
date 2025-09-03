@@ -23,10 +23,14 @@ class QuestionController extends Controller
     {
         $validated = $req->validated();
 
-        $newQuestion = $this->questionService->createInitalQuestion($quiz, $validated);
+        $newQuestion = $this->questionService->createInitialQuestion($quiz, $validated);
 
         // Creates the inital option of the question
-        $initialOption = $this->questionService->createOption($validated['question_type'], $newQuestion['question_id']);
+        // We dontneed to create inital option for identification
+        $initialOption = null;
+        if ($validated['question_type'] !== "identification") {
+            $initialOption  = $this->questionService->createOption($validated['question_type'], $newQuestion['question_id']);
+        }
 
         // Merge the IDs of the question and the option and send to client
         $data = [

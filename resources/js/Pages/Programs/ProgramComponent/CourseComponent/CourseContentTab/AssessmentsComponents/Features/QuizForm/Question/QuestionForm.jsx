@@ -1,37 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react";
-import useCreateQuizStore from "../../../../../../../../../Stores/Programs/CourseContent/createQuizStore";
+import { useState, useEffect } from "react";
 import MultipleChoice from "./Types/MultipleChoice/MultipleChoice";
 import TrueOrFalse from "./Types/TrueOrFalse/TrueOrFalse";
 import Identification from "./Types/Identification/Identification";
-import { debounce } from "lodash";
 import { usePage } from "@inertiajs/react";
-import axios from "axios";
 import useQuestionStore from "./Stores/questionStore";
 import useQuestion from "./Hooks/useQuestion";
 import useQuestionAutoSave from "./Hooks/useQuestionAutoSave";
 import useQuizStore from "../Stores/quizStore";
 
-export default function QuestionForm({
-    isChanged,
-    setIsChanged,
-    // questionDetails,
-    setQuestionDetails,
-    questionOptions,
-    setQuestionOptions,
-    quizTotalPoints,
-
-    activeForm,
-    setActiveForm,
-    questionIndex,
-    onEdit,
-    setSelectedIndex,
-}) {
+export default function QuestionForm({ activeForm }) {
     const { assessmentId, quiz } = usePage().props;
-
-    // Create Quiz Store
-    // const questionDetails = useCreateQuizStore(
-    //     (state) => state.questionDetails
-    // );
 
     // Quiz store
     const isQuizDetailsChanged = useQuizStore(
@@ -51,25 +29,12 @@ export default function QuestionForm({
         quizId: quiz.quiz_id,
     });
 
-    // const handleQuizDetailsChange = useCreateQuizStore(
-    //     (state) => state.handleQuizDetailsChange
-    // );
-    // const clearQuestionDetails = useCreateQuizStore(
-    //     (state) => state.clearQuestionDetails
-    // );
-    // const handleEditQuestion = useCreateQuizStore(
-    //     (state) => state.handleEditQuestion
-    // );
-
     // Local States
     const [isAddOption, setIsAddOption] = useState(false);
     const [option, setOption] = useState("");
 
     // set the form title depending on the seleced question type
     const [formTitle, setFormTitle] = useState("");
-    // const [initalQuestionPoints, setInitalQuestionPOints] = useState(
-    //     questionDetails.question_points
-    // );
 
     useEffect(() => {
         // set the form title basec on the currently active form
@@ -81,69 +46,6 @@ export default function QuestionForm({
                 : "Identification"
         );
     }, [activeForm]);
-
-    // const addQuestion = (key) => {
-    //     // function in the createQuiz store that handle adding question
-    //     handleAddQuestion();
-    //     setOption("");
-    //     setIsAddOption(false);
-    //     setActiveForm("");
-    // };
-
-    // const cancelAddQuestion = (key) => {
-    //     // this fucntion reset the questionDetails object in createQuiz store
-    //     clearQuestionDetails();
-    //     setActiveForm("");
-    //     setSelectedIndex(null);
-    // };
-
-    // const handleQuestionDetailsChange = (field, value) => {
-    //     setIsChanged(true);
-    //     if (field === "question_points") {
-    //         const questionPoints = parseInt(
-    //             value.length > 3 ? value.slice(0, 3) : value
-    //         );
-
-    //         setQuestionDetails((prev) => ({
-    //             ...prev,
-    //             [field]: questionPoints, // Limit the input to 3 char,
-    //         }));
-
-    //         // Update the question points
-    //         // Initial question points was used for editing the question
-    //         // since the question that will be editied is already part of the list
-    //         // and it needs to be reduce first before updating the question points
-    //         handleQuizDetailsChange(
-    //             "quiz_total_points",
-    //             quizTotalPoints - initalQuestionPoints + questionPoints
-    //         );
-    //     } else {
-    //         setQuestionDetails((prev) => ({
-    //             ...prev,
-    //             [field]: value,
-    //         }));
-    //     }
-    // };
-
-    // Debounce the function that autosave the question updates
-    // const debounceUpdateQuestion = useCallback(
-    //     debounce(async (data) => {
-    //         try {
-    //             console.log(data);
-    //             const response = await axios.put(
-    //                 route("assessment.quiz-form.question.update", {
-    //                     assessment: assessmentId,
-    //                     quiz: quiz.quiz_id,
-    //                     question: data.question_id,
-    //                 }),
-    //                 data
-    //             );
-    //         } catch (error) {
-    //             console.error(error);
-    //         }
-    //     }, 300),
-    //     []
-    // );
 
     // Handles autosave of question details here
     useEffect(() => {
@@ -209,21 +111,11 @@ export default function QuestionForm({
 
             {/* Display the form based on the question type */}
             {questionDetails.question_type === "multiple_choice" ? (
-                <MultipleChoice
-                    questionDetails={questionDetails}
-                    setQuestionDetails={setQuestionDetails}
-                    options={questionOptions}
-                    setOptions={setQuestionOptions}
-                />
+                <MultipleChoice />
             ) : questionDetails.question_type === "true_or_false" ? (
                 <TrueOrFalse />
             ) : (
-                <Identification
-                    option={option}
-                    setOption={setOption}
-                    isAddOption={isAddOption}
-                    setIsAddOption={setIsAddOption}
-                />
+                <Identification />
             )}
             <div className="flex flex-wrap gap-5 justify-between items-center">
                 <div className="flex gap-1">
@@ -242,27 +134,6 @@ export default function QuestionForm({
                         Required
                     </span>
                 </div>
-                {/* <div className="flex justify-end gap-2 w-full sm:w-auto">
-                    <SecondaryButton
-                        doSomething={() => cancelAddQuestion(activeForm)}
-                        text={"Cancel"}
-                    />
-                    {onEdit ? (
-                        <PrimaryButton
-                            doSomething={() => {
-                                handleEditQuestion(questionIndex);
-                                setActiveForm("");
-                                setSelectedIndex(null);
-                            }}
-                            text={"Save changes"}
-                        />
-                    ) : (
-                        <PrimaryButton
-                            doSomething={() => addQuestion(activeForm)}
-                            text={"Save"}
-                        />
-                    )}
-                </div> */}
             </div>
         </div>
     );

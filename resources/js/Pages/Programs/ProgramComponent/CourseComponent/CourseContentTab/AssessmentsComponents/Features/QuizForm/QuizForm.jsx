@@ -9,9 +9,6 @@ import QuestionForm from "./Question/QuestionForm";
 import BackButton from "../../../../../../../../Components/Button/BackButton";
 import { handleClickBackBtn } from "../../../../../../../../Utils/handleClickBackBtn";
 import QuizFormNav from "./Components/QuizFormNav";
-import { debounce } from "lodash";
-import axios from "axios";
-import { usePage } from "@inertiajs/react";
 import useQuizAutosave from "./Hooks/UseQuizAutosave";
 import useQuizDetails from "./Hooks/useQuizDetails";
 import useQuizStore from "./Stores/quizStore";
@@ -38,9 +35,6 @@ export function useQuiz() {
 }
 
 export default function QuizForm({ assessmentId, quiz }) {
-    // Local States
-    const [initalRender, setInitialRender] = useState(true);
-
     // Custom hooks
     const { debounceAutoSave } = useQuizAutosave({
         assessmentId,
@@ -70,43 +64,11 @@ export default function QuizForm({ assessmentId, quiz }) {
     );
     const questionList = useQuestionStore((state) => state.questionList);
     const setQuestionList = useQuestionStore((state) => state.setQuestionList);
+    const questionOptions = useQuestionStore((state) => state.questionOptions);
 
-    // Create Quiz Store
-    const handleQuestionDetailsChange = useCreateQuizStore(
-        (state) => state.handleQuestionDetailsChange
-    );
-    // const quizDetails = useCreateQuizStore((state) => state.quizDetails);
-    // const handleQuizDetailsChange = useCreateQuizStore(
-    //     (state) => state.handleQuizDetailsChange
-    // );
-    // const questionList = useCreateQuizStore((state) => state.questionList);
-    // const clearQuestionDetails = useCreateQuizStore(
-    //     (state) => state.clearQuestionDetails
-    // );
-    // const setQuestionList = useCreateQuizStore(
-    //     (state) => state.setQuestionList
-    // );
-    // const setQuizDetails = useCreateQuizStore((state) => state.setQuizDetails);
-    // const isChanged = useCreateQuizStore((state) => state.isChanged);
-    // const setIsChanged = useCreateQuizStore((state) => state.setIsChanged);
-    // const [isLoading, setIsLoading] = useState(false);
-
-    // const [openQuestionForm, setOpenQuestionForm] = useState({
-    //     multipleChoice: false,
-    //     trueOrFalse: false,
-    //     identification: false,
-    // });
-
-    // const [isCreatingQuestion, setIsCreatingQuestion] = useState(false);
     const [activeForm, setActiveForm] = useState("");
     const [onEdit, setOnEdit] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(null);
-    // const [questionDetails, setQuestionDetails] = useState(null);
-    const [questionOptions, setQuestionOptions] = useState([]);
-    const [isQuestioNDetailsChanged, setIsQuestioNDetailsChanged] =
-        useState(false);
-    // const [questionList, setQuestionList] = useState(quiz.questions);
-    const [quizTotalPoints, setQuizTotalPoints] = useState(0);
 
     // Refs
     const targetForm = useRef(null);
@@ -137,10 +99,6 @@ export default function QuizForm({ assessmentId, quiz }) {
             }
         }
     }, [quizDetails, debounceAutoSave]);
-
-    // useEffect(() => {
-    //     console.log("ON EDIT: " + onEdit);
-    // }, [onEdit]);
 
     // Scroll into the form once opened
     useEffect(() => {
@@ -193,27 +151,6 @@ export default function QuizForm({ assessmentId, quiz }) {
         setActiveForm(questionType);
     };
 
-    // Calculate the total points of the quiz
-    // useEffect(() => {
-    //     if (!initalRender) {
-    //         let totalPoints = 0;
-    //         questionList.forEach((question) => {
-    //             totalPoints += question.question_points;
-    //         });
-
-    //         // Set the intial total points
-    //         // when the user create new question this will be used
-    //         // everytime the user makes chanegs to the question points
-    //         setQuizTotalPoints(totalPoints);
-
-    //         // Calling this in intial render set the isQuizDetailsChanegd to true
-    //         // Displaying the label in the navbar to prevent this initialRendet state was used
-    //         handleQuizDetailsChange("quiz_total_points", totalPoints);
-    //     }
-
-    //     setInitialRender(false);
-    // }, [questionList]);
-
     // Close the form when the user click outside the form
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -238,124 +175,6 @@ export default function QuizForm({ assessmentId, quiz }) {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [isCreatingQuestion, targetForm, questionDetails, questionOptions]);
-
-    // Handles creating of the inital question when the question type  button was clicked
-    // const handleCreateQuestion = async (questionType, sortOrder) => {
-    //     if (!isCreatingQuestion) {
-    //         try {
-    //             clearQuestionDetails();
-
-    //             console.log("CREATING..");
-    //             setIsCreatingQuestion(true);
-
-    //             // Set the initial question details
-    //             // to immidiately open the form and not wait
-    //             // from the response of the back end
-    //             setQuestionDetails({
-    //                 is_required: false,
-    //                 question: "Question",
-    //                 question_points: 0,
-    //                 question_type: questionType,
-    //                 sort_order: 1,
-    //             });
-
-    //             // Create he intial option with temporary id for multiple choice type of question
-    //             const newOption = {
-    //                 option_temp_id: `${Date.now()}-${Math.random()
-    //                     .toString(36)
-    //                     .substr(2, 9)}`,
-    //                 option_text: "Option 1",
-    //                 is_correct: false,
-    //             };
-    //             // Set the inital to imeediately dispaly in the front end
-    //             setQuestionOptions([newOption]);
-
-    //             const response = await axios.post(
-    //                 route("assessment.quiz-form.question.create", {
-    //                     assessment: assessmentId,
-    //                     quiz: quiz.quiz_id,
-    //                 }),
-    //                 {
-    //                     question_type: questionType,
-    //                     sort_order: sortOrder,
-    //                 }
-    //             );
-    //             console.log(response);
-    //             // Merge the IDs from backend to the question details
-    //             setQuestionDetails((prev) => ({
-    //                 ...prev,
-    //                 quiz_id: response.data.data.question.quiz_id,
-    //                 question_id: response.data.data.question.question_id,
-    //             }));
-
-    //             // Merge the IDs of the craeted option in the backend to
-    //             setQuestionOptions((prev) =>
-    //                 prev.map((opt) =>
-    //                     opt.option_temp_id === newOption.option_temp_id
-    //                         ? {
-    //                               ...opt,
-    //                               question_option_id:
-    //                                   response.data.data.options
-    //                                       .question_option_id,
-    //                               question_id:
-    //                                   response.data.data.options.question_id,
-    //                           }
-    //                         : opt
-    //                 )
-    //             );
-
-    //             // This reset the state which is use to determine if the user updates the
-    //             // details of the question
-    //             setIsCreatingQuestion(false);
-    //         } catch (error) {
-    //             console.error(error);
-    //             // Clear the question details
-    //             // this also forces the form to close immediately
-    //             setQuestionDetails(null);
-    //             setIsCreatingQuestion(false);
-    //         }
-    //     }
-    // };
-
-    // const clearQuestionDetails = () => {
-    //     // Check if theres questionDetails
-    //     // this means the question form is curently open
-    //     // if the user click another question type
-    //     // the previous question will be added to the list
-    //     // Ensures only question details with merged IDs from the
-    //     // backend will be pushed in the list
-    //     if (
-    //         questionDetails &&
-    //         questionDetails.quiz_id &&
-    //         questionDetails.question_id
-    //     ) {
-    //         //These updated data was made because onBlur dont get triggered when
-    //         // the form was closed through outside with ref
-    //         // so we have to ensure no field are empty that will be displayed
-
-    //         // Ensures no empty option
-    //         const updatedOptions = questionOptions.map((option, i) =>
-    //             option.option_text.trim() === ""
-    //                 ? { ...option, option_text: `Option ${i + 1}` }
-    //                 : option
-    //         );
-
-    //         // Enusres question is not empty
-    //         const updatedQuestionDetails =
-    //             questionDetails.question.trim() === ""
-    //                 ? { ...questionDetails, question: "Question" }
-    //                 : questionDetails;
-
-    //         setQuestionList((prev) => [
-    //             ...prev,
-    //             { ...updatedQuestionDetails, options: updatedOptions },
-    //         ]);
-
-    //         // setQuestionDetails(null);
-    //         setQuestionOptions([]);
-    //         setIsQuestioNDetailsChanged(false);
-    //     }
-    // };
 
     useEffect(() => console.log(questionList), [questionList]);
 
@@ -473,16 +292,7 @@ export default function QuizForm({ assessmentId, quiz }) {
                             <div ref={targetForm}>
                                 <QuestionForm
                                     key={questionList.length}
-                                    isChanged={isQuestioNDetailsChanged}
-                                    setIsChanged={setIsQuestioNDetailsChanged}
-                                    // questionDetails={questionDetails}
-                                    // setQuestionDetails={setQuestionDetails}
-                                    questionOptions={questionOptions}
-                                    setQuestionOptions={setQuestionOptions}
-                                    quizTotalPoints={quizTotalPoints}
                                     activeForm={activeForm}
-                                    setActiveForm={setActiveForm}
-                                    setSelectedIndex={setSelectedIndex}
                                 />
                             </div>
                         )}
@@ -508,13 +318,9 @@ export default function QuizForm({ assessmentId, quiz }) {
                                 <div ref={truOrFalseRef}>
                                     <SecondaryButton
                                         doSomething={() => {
-                                            clearQuestionDetails();
-                                            handleOpenQuestionForm(
-                                                "trueOrFalse"
-                                            );
-                                            handleQuestionDetailsChange(
-                                                "questionType",
-                                                "trueOrFalse"
+                                            handleCreateInitialQuestion(
+                                                "true_or_false",
+                                                questionList.length + 1
                                             );
                                         }}
                                         width={"w-full"}
@@ -525,13 +331,9 @@ export default function QuizForm({ assessmentId, quiz }) {
                                 <div ref={indentificationRef}>
                                     <SecondaryButton
                                         doSomething={() => {
-                                            clearQuestionDetails();
-                                            handleOpenQuestionForm(
-                                                "identification"
-                                            );
-                                            handleQuestionDetailsChange(
-                                                "questionType",
-                                                "identification"
+                                            handleCreateInitialQuestion(
+                                                "identification",
+                                                questionList.length + 1
                                             );
                                         }}
                                         width={"w-full"}
