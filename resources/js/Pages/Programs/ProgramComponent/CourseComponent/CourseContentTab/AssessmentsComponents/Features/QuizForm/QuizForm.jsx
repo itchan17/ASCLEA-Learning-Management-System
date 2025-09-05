@@ -9,7 +9,7 @@ import QuestionForm from "./Question/QuestionForm";
 import BackButton from "../../../../../../../../Components/Button/BackButton";
 import { handleClickBackBtn } from "../../../../../../../../Utils/handleClickBackBtn";
 import QuizFormNav from "./Components/QuizFormNav";
-import useQuizAutosave from "./Hooks/UseQuizAutosave";
+import useQuizAutosave from "./Hooks/useQuizAutoSave";
 import useQuizDetails from "./Hooks/useQuizDetails";
 import useQuizStore from "./Stores/quizStore";
 import useQuestion from "./Question/Hooks/useQuestion";
@@ -40,11 +40,7 @@ export default function QuizForm({ assessmentId, quiz }) {
         assessmentId,
         quizId: quiz.quiz_id,
     });
-    const {
-        initializeQuizDetails,
-        handleQuizDetailsChange,
-        isQuizDetailsChanged,
-    } = useQuizDetails();
+    const { initializeQuizDetails, handleQuizDetailsChange } = useQuizDetails();
     const {
         handleCreateInitialQuestion,
         clearQuestionDetails,
@@ -57,6 +53,9 @@ export default function QuizForm({ assessmentId, quiz }) {
     // Quiz store
     const resetQuizStore = useQuizStore((state) => state.resetQuizStore);
     const quizDetails = useQuizStore((state) => state.quizDetails);
+    const isQuizDetailsChanged = useQuizStore(
+        (state) => state.isQuizDetailsChanged
+    );
 
     // Question store
     const questionDetails = useQuestionStore((state) => state.questionDetails);
@@ -66,10 +65,11 @@ export default function QuizForm({ assessmentId, quiz }) {
     const questionList = useQuestionStore((state) => state.questionList);
     const setQuestionList = useQuestionStore((state) => state.setQuestionList);
     const questionOptions = useQuestionStore((state) => state.questionOptions);
+    const onEdit = useQuestionStore((state) => state.onEdit);
 
-    const [activeForm, setActiveForm] = useState("");
-    const [onEdit, setOnEdit] = useState(false);
-    const [selectedIndex, setSelectedIndex] = useState(null);
+    // const [activeForm, setActiveForm] = useState("");
+    // const [onEdit, setOnEdit] = useState(false);
+    // const [selectedIndex, setSelectedIndex] = useState(null);
 
     // Refs
     const targetForm = useRef(null);
@@ -262,33 +262,35 @@ export default function QuizForm({ assessmentId, quiz }) {
                                         )}
                                         strategy={verticalListSortingStrategy}
                                     >
-                                        {questionList.map((question, i) => (
-                                            <Question
-                                                key={question.question_id}
-                                                questionDetails={question}
-                                                questionNumber={i + 1}
-                                                questionIndex={i}
-                                                onEdit={onEdit}
-                                                setOnEdit={setOnEdit}
-                                                selectedIndex={selectedIndex}
-                                                setSelectedIndex={
-                                                    setSelectedIndex
-                                                }
-                                                disabled={false}
-                                            />
-                                        ))}
+                                        {questionList.map((question, i) => {
+                                            return questionDetails &&
+                                                questionDetails.question_id ===
+                                                    question.question_id &&
+                                                onEdit ? (
+                                                <div
+                                                    key={question.question_id}
+                                                    ref={targetForm}
+                                                >
+                                                    <QuestionForm />
+                                                </div>
+                                            ) : (
+                                                <Question
+                                                    key={question.question_id}
+                                                    questionDetails={question}
+                                                    questionNumber={i + 1}
+                                                    disabled={false}
+                                                />
+                                            );
+                                        })}
                                     </SortableContext>
                                 </DndContext>
                             </div>
                         )}
 
                         {/* Display the question form */}
-                        {questionDetails && (
+                        {questionDetails && !onEdit && (
                             <div ref={targetForm}>
-                                <QuestionForm
-                                    key={questionList.length}
-                                    activeForm={activeForm}
-                                />
+                                <QuestionForm key={questionList.length} />
                             </div>
                         )}
 
@@ -301,8 +303,7 @@ export default function QuizForm({ assessmentId, quiz }) {
                                     <SecondaryButton
                                         doSomething={() =>
                                             handleCreateInitialQuestion(
-                                                "multiple_choice",
-                                                questionList.length + 1
+                                                "multiple_choice"
                                             )
                                         }
                                         width={"w-full"}
@@ -314,8 +315,7 @@ export default function QuizForm({ assessmentId, quiz }) {
                                     <SecondaryButton
                                         doSomething={() => {
                                             handleCreateInitialQuestion(
-                                                "true_or_false",
-                                                questionList.length + 1
+                                                "true_or_false"
                                             );
                                         }}
                                         width={"w-full"}
@@ -327,8 +327,7 @@ export default function QuizForm({ assessmentId, quiz }) {
                                     <SecondaryButton
                                         doSomething={() => {
                                             handleCreateInitialQuestion(
-                                                "identification",
-                                                questionList.length + 1
+                                                "identification"
                                             );
                                         }}
                                         width={"w-full"}

@@ -10,9 +10,6 @@ export default function QuizFormNav() {
     // Quiz store
     const quizDetails = useQuizStore((state) => state.quizDetails);
     const isFormSaving = useQuizStore((state) => state.isFormSaving);
-    const isQuizDetailsChanged = useQuizStore(
-        (state) => state.isQuizDetailsChanged
-    );
     const savedLabel = useQuizStore((state) => state.savedLabel);
 
     // Custom hooks
@@ -57,8 +54,6 @@ export default function QuizFormNav() {
                 </div>
 
                 <menu className="hidden sm:flex items-center justify-end gap-5 w-full sm:w-fit">
-                    <PrimaryButton text={"Save Quiz"} />
-
                     <div className="dropdown dropdown-end">
                         <div
                             tabIndex={0}
@@ -480,9 +475,6 @@ export default function QuizFormNav() {
                                 ""
                             )}
                         </li>
-                        <div className="grid">
-                            <PrimaryButton text={"Save Quiz"} />
-                        </div>
                     </ul>
                 </menu>
             </div>

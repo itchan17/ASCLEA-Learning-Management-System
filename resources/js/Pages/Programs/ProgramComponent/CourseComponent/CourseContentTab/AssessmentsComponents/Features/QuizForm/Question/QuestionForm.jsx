@@ -8,13 +8,8 @@ import useQuestion from "./Hooks/useQuestion";
 import useQuestionAutoSave from "./Hooks/useQuestionAutoSave";
 import useQuizStore from "../Stores/quizStore";
 
-export default function QuestionForm({ activeForm }) {
+export default function QuestionForm() {
     const { assessmentId, quiz } = usePage().props;
-
-    // Quiz store
-    const isQuizDetailsChanged = useQuizStore(
-        (state) => state.isQuizDetailsChanged
-    );
 
     // Question store
     const questionDetails = useQuestionStore((state) => state.questionDetails);
@@ -30,23 +25,14 @@ export default function QuestionForm({ activeForm }) {
         quizId: quiz.quiz_id,
     });
 
-    // Local States
-    const [isAddOption, setIsAddOption] = useState(false);
-    const [option, setOption] = useState("");
-
     // set the form title depending on the seleced question type
-    const [formTitle, setFormTitle] = useState("");
-
-    useEffect(() => {
-        // set the form title basec on the currently active form
-        setFormTitle(
-            questionDetails.question_type === "multiple_choice"
-                ? "Multiple Choice"
-                : questionDetails.question_type === "true_or_false"
-                ? "True or False"
-                : "Identification"
-        );
-    }, [activeForm]);
+    const [formTitle, setFormTitle] = useState(
+        questionDetails.question_type === "multiple_choice"
+            ? "Multiple Choice"
+            : questionDetails.question_type === "true_or_false"
+            ? "True or False"
+            : "Identification"
+    );
 
     // Handles autosave of question details here
     useEffect(() => {

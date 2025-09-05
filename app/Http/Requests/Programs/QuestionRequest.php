@@ -28,7 +28,6 @@ class QuestionRequest extends FormRequest
 
                 return [
                     'question_type' => 'required|string|in:multiple_choice,true_or_false,identification',
-                    'sort_order' => 'required|integer',
                 ];
 
             case 'PUT':
@@ -36,7 +35,6 @@ class QuestionRequest extends FormRequest
                 return [
                     'question' => 'required|string',
                     'question_type' => 'required|string|in:multiple_choice,true_or_false,identification',
-                    'sort_order' => 'required|integer',
                     'question_points' => 'integer|min:0|max:999',
                     'is_required' => 'required|boolean',
                 ];

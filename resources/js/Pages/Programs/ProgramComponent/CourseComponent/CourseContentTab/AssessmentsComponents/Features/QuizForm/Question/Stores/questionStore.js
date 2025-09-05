@@ -4,6 +4,7 @@ const useQuestionStore = create((set) => ({
     questionDetails: null,
     questionOptions: [],
     questionList: [],
+    onEdit: false,
 
     setQuestionDetails: (updater) => {
         const { questionDetails } = useQuestionStore.getState();
@@ -36,8 +37,19 @@ const useQuestionStore = create((set) => ({
         });
     },
 
+    setOnEdit: (value) => {
+        set({
+            onEdit: value,
+        });
+    },
+
     resetQuestionStore: () => {
-        set({ questionDetails: null, questionOptions: [], questionList: [] });
+        set({
+            questionDetails: null,
+            questionOptions: [],
+            questionList: [],
+            onEdit: false,
+        });
     },
 }));
 

@@ -8,17 +8,20 @@ Route::prefix('assessments/{assessment}/')
     ->middleware(['auth', 'verified', 'preventBack'])
     ->group(function () {
 
-        // Route for display the edit page of quiz
+        // Route to display the edit page of quiz
         Route::get('quiz-form/{quiz}/edit', [QuizController::class, 'showEditQuizForm'])->name('assessment.quiz-form.edit');
 
-        // Route for display the edit page of quiz
+        // Route for updating quiz details
         Route::put('quiz-form/{quiz}/update', [QuizController::class, 'updateQuizDetails'])->name('assessment.quiz-form.update');
 
-        // Route for display the edit page of quiz
+        // Route for creating question
         Route::post('quiz-form/{quiz}/questions/create', [QuestionController::class, 'createQuestion'])->name('assessment.quiz-form.question.create');
 
-        // Route for display the edit page of quiz
+        // Route for updating quesiton details
         Route::put('quiz-form/{quiz}/questions/{question}/update', [QuestionController::class, 'updateQuestion'])->name('assessment.quiz-form.question.update');
+
+        // Route for deleting question
+        Route::delete('quiz-form/{quiz}/questions/{question}/delete', [QuestionController::class, 'deleteQuestion'])->name('assessment.quiz-form.question.delete');
 
         // Create the data for the option
         Route::post('quiz-form/{quiz}/questions/{question}/create', [QuestionController::class, 'createOption'])->name('assessment.quiz-form.question.option.create');

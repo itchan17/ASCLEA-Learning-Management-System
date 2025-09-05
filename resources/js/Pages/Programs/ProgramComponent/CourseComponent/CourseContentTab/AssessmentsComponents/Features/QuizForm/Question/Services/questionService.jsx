@@ -34,7 +34,18 @@ export async function updateQuestion({
     );
 }
 
+export async function deleteQuestion({ assessmentId, quizId, questionId }) {
+    return await axios.delete(
+        route("assessment.quiz-form.question.delete", {
+            assessment: assessmentId,
+            quiz: quizId,
+            question: questionId,
+        })
+    );
+}
+
 export default {
     createInitalQuestion,
     updateQuestion,
+    deleteQuestion,
 };

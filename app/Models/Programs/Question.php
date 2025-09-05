@@ -11,6 +11,19 @@ class Question extends Model
 {
     use HasUuids;
 
+    protected static function booted(): void
+    {
+        // Update the question's order whenever a question was deleted
+        static::deleted(function (Question $question) {
+            $questions = Question::where('quiz_id', $question->quiz_id)->orderBy('sort_order')->get();
+
+            foreach ($questions as $index => $question) {
+                $question->update(['sort_order' => $index + 1]);
+            }
+        });
+    }
+
+
     public $incrementing = false;
 
     protected $keyType = 'string';

@@ -1,34 +1,32 @@
 import React, { useState, useRef, useEffect } from "react";
 import { AiFillEdit, AiFillDelete, AiOutlineArrowDown } from "react-icons/ai";
 import { MdOutlineDragIndicator } from "react-icons/md";
-import QuestionForm from "./QuestionForm";
-import useCreateQuizStore from "../../../../../../../../../Stores/Programs/CourseContent/createQuizStore";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import useQuestionStore from "./Stores/questionStore";
+import useQuestion from "./Hooks/useQuestion";
+import { usePage } from "@inertiajs/react";
 
 export default function Question({
     questionDetails,
-
-    questionNumber,
-    questionIndex,
-    onEdit,
-    setOnEdit,
-    selectedIndex,
-    setSelectedIndex,
     disabled,
+    questionNumber,
 }) {
-    // Create Quiz Store
-    const setQuestionDetails = useCreateQuizStore(
+    const { assessmentId, quiz } = usePage().props;
+    // Question store
+    const setOnEdit = useQuestionStore((state) => state.setOnEdit);
+    const setQuestionDetails = useQuestionStore(
         (state) => state.setQuestionDetails
     );
-    const handleDeleteQuestion = useCreateQuizStore(
-        (state) => state.handleDeleteQuestion
+    const setQuestionOptions = useQuestionStore(
+        (state) => state.setQuestionOptions
     );
 
-    const [activeForm, setActiveForm] = useState("");
-    let targetForm = useRef(null);
-
-    const [questionToEdit, setQuestionToEdit] = useState(null);
+    // Custom hook
+    const { handleDeleteQuestion } = useQuestion({
+        assessmentId,
+        quizId: quiz.quiz_id,
+    });
 
     const {
         attributes,
@@ -52,175 +50,142 @@ export default function Question({
         transition,
     };
 
-    useEffect(() => {
-        {
-            console.log("TARGET FORM: " + targetForm.current);
-        }
-
-        if (targetForm.current) {
-            targetForm.current?.scrollIntoView({ behavior: "smooth" });
-        }
-    }, [activeForm, selectedIndex]);
-
     const handleEditBtn = () => {
-        setSelectedIndex(questionIndex);
-        setActiveForm(questionDetails.question_type);
         setQuestionDetails(questionDetails);
+        setQuestionOptions(questionDetails.options);
         setOnEdit(true);
     };
 
-    useEffect(() => {
-        console.log("QUESTION RENDERING");
-    }, [onEdit, selectedIndex]);
-
     return (
-        <div>
-            {questionToEdit &&
-            questionToEdit.question_id === questionDetails.question_id ? (
-                <div ref={targetForm}>
-                    <QuestionForm questionDetails={questionDetails} />
-                </div>
-            ) : (
-                <div
-                    ref={setNodeRef}
-                    {...attributes}
-                    style={style}
-                    className={` bg-ascend-white ${
-                        onEdit && selectedIndex === questionIndex
-                            ? "hidden"
-                            : "flex"
-                    } shadow-shadow1 `}
-                >
-                    <div className="space-y-2 w-full p-5 border-t border-l border-b border-ascend-gray1">
-                        <div className="flex justify-end gap-1 text-ascend-black">
-                            <div
-                                onClick={handleEditBtn}
-                                className="p-1 rounded-3xl hover:bg-ascend-lightblue transition-all duration-300"
-                            >
-                                <AiFillEdit
-                                    title="Edit question"
-                                    className="cursor-pointer text-size4 text-ascend-yellow"
-                                />
-                            </div>
-                            <div
-                                onClick={() =>
-                                    handleDeleteQuestion(questionIndex)
-                                }
-                                className="p-1 rounded-3xl hover:bg-ascend-lightblue transition-all duration-300"
-                            >
-                                <AiFillDelete
-                                    title="Delete question"
-                                    className="cursor-pointer text-size4 text-ascend-red"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="flex">
-                            <span>{questionNumber}.</span>
-                            <div className="w-full min-w-0 ml-2 space-y-5">
-                                {/* Question */}
-                                <div className="flex items-start gap-2 md:gap-20">
-                                    <p className="flex-1 min-w-0 break-words">
-                                        {questionDetails.question}
-                                        {questionDetails.is_required === 1 && (
-                                            <span className="text-ascend-red ml-1">
-                                                *
-                                            </span>
-                                        )}
-                                    </p>
-                                    <span className="font-bold">
-                                        {`${questionDetails.question_points} ${
-                                            questionDetails.question_points > 1
-                                                ? "pts"
-                                                : "pt"
-                                        }`}
-                                    </span>
-                                </div>
-                                {/* List questions */}
-                                {questionDetails.question_type ===
-                                "multiple_choice" ? (
-                                    <div className="flex flex-col space-y-4">
-                                        {questionDetails.options?.length > 0 &&
-                                            questionDetails.options?.map(
-                                                (option, i) => {
-                                                    return (
-                                                        // List choices for multiple choice
-                                                        <label
-                                                            key={i}
-                                                            className="flex items-center"
-                                                        >
-                                                            <input
-                                                                disabled
-                                                                type="radio"
-                                                                name="multipleChoiceOption"
-                                                                value={
-                                                                    option.option_text
-                                                                }
-                                                                className="w-5 h-5 accent-ascend-blue shrink-0"
-                                                            />
-                                                            <span className="ml-3 min-w-0 break-words">
-                                                                {
-                                                                    option.option_text
-                                                                }
-                                                            </span>
-                                                        </label>
-                                                    );
-                                                }
-                                            )}
-                                    </div>
-                                ) : questionDetails.question_type ===
-                                  "true_or_false" ? (
-                                    <div className="flex flex-col space-y-4">
-                                        {questionDetails.options?.length > 0 &&
-                                            questionDetails.options?.map(
-                                                (option, i) => {
-                                                    return (
-                                                        // List choices for true or false
-                                                        <label
-                                                            key={i}
-                                                            className="flex items-center"
-                                                        >
-                                                            <input
-                                                                disabled
-                                                                type="radio"
-                                                                name="trueOrFalseOption"
-                                                                value={
-                                                                    option.option_text
-                                                                }
-                                                                className="w-5 h-5 accent-ascend-blue"
-                                                            />
-                                                            <span className="ml-3">
-                                                                {
-                                                                    option.option_text
-                                                                }
-                                                            </span>
-                                                        </label>
-                                                    );
-                                                }
-                                            )}
-                                    </div>
-                                ) : (
-                                    // Question for identification
-                                    <input
-                                        disabled
-                                        type="text"
-                                        placeholder="Enter answer"
-                                        className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
-                                    />
-                                )}
-                            </div>
-                        </div>
+        <div
+            ref={setNodeRef}
+            {...attributes}
+            style={style}
+            className={` bg-ascend-white flex shadow-shadow1 `}
+        >
+            <div className="space-y-2 w-full p-5 border-t border-l border-b border-ascend-gray1">
+                <div className="flex justify-end gap-1 text-ascend-black">
+                    <div
+                        onClick={handleEditBtn}
+                        className="p-1 rounded-3xl hover:bg-ascend-lightblue transition-all duration-300"
+                    >
+                        <AiFillEdit
+                            title="Edit question"
+                            className="cursor-pointer text-size4 text-ascend-yellow"
+                        />
                     </div>
                     <div
-                        style={{ touchAction: "none" }}
-                        ref={setActivatorNodeRef}
-                        {...(!disabled && listeners)}
-                        className="group border-y border-r border-ascend-gray1 flex items-center self-stretch bg-ascend-white hover:bg-ascend-blue cursor-grab transition-all duration-300"
+                        onClick={() =>
+                            handleDeleteQuestion(questionDetails.question_id)
+                        }
+                        className="p-1 rounded-3xl hover:bg-ascend-lightblue transition-all duration-300"
                     >
-                        <MdOutlineDragIndicator className="text-2xl text-ascend-black group-hover:text-ascend-white transition-all duration-300" />
+                        <AiFillDelete
+                            title="Delete question"
+                            className="cursor-pointer text-size4 text-ascend-red"
+                        />
                     </div>
                 </div>
-            )}
+
+                <div className="flex">
+                    <span>{questionNumber}.</span>
+                    <div className="w-full min-w-0 ml-2 space-y-5">
+                        {/* Question */}
+                        <div className="flex items-start gap-2 md:gap-20">
+                            <p className="flex-1 min-w-0 break-words">
+                                {questionDetails.question}
+                                {questionDetails.is_required == true && (
+                                    <span className="text-ascend-red ml-1">
+                                        *
+                                    </span>
+                                )}
+                            </p>
+                            <span className="font-bold">
+                                {`${questionDetails.question_points} ${
+                                    questionDetails.question_points > 1
+                                        ? "pts"
+                                        : "pt"
+                                }`}
+                            </span>
+                        </div>
+                        {/* List questions */}
+                        {questionDetails.question_type === "multiple_choice" ? (
+                            <div className="flex flex-col space-y-4">
+                                {questionDetails.options?.length > 0 &&
+                                    questionDetails.options?.map(
+                                        (option, i) => {
+                                            return (
+                                                // List choices for multiple choice
+                                                <label
+                                                    key={i}
+                                                    className="flex items-center"
+                                                >
+                                                    <input
+                                                        disabled
+                                                        type="radio"
+                                                        name="multipleChoiceOption"
+                                                        value={
+                                                            option.option_text
+                                                        }
+                                                        className="w-5 h-5 accent-ascend-blue shrink-0"
+                                                    />
+                                                    <span className="ml-3 min-w-0 break-words">
+                                                        {option.option_text}
+                                                    </span>
+                                                </label>
+                                            );
+                                        }
+                                    )}
+                            </div>
+                        ) : questionDetails.question_type ===
+                          "true_or_false" ? (
+                            <div className="flex flex-col space-y-4">
+                                {questionDetails.options?.length > 0 &&
+                                    questionDetails.options?.map(
+                                        (option, i) => {
+                                            return (
+                                                // List choices for true or false
+                                                <label
+                                                    key={i}
+                                                    className="flex items-center"
+                                                >
+                                                    <input
+                                                        disabled
+                                                        type="radio"
+                                                        name="trueOrFalseOption"
+                                                        value={
+                                                            option.option_text
+                                                        }
+                                                        className="w-5 h-5 accent-ascend-blue"
+                                                    />
+                                                    <span className="ml-3">
+                                                        {option.option_text}
+                                                    </span>
+                                                </label>
+                                            );
+                                        }
+                                    )}
+                            </div>
+                        ) : (
+                            // Question for identification
+                            <input
+                                disabled
+                                type="text"
+                                placeholder="Enter answer"
+                                className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
+                            />
+                        )}
+                    </div>
+                </div>
+            </div>
+            <div
+                style={{ touchAction: "none" }}
+                ref={setActivatorNodeRef}
+                {...(!disabled && listeners)}
+                className="group border-y border-r border-ascend-gray1 flex items-center self-stretch bg-ascend-white hover:bg-ascend-blue cursor-grab transition-all duration-300"
+            >
+                <MdOutlineDragIndicator className="text-2xl text-ascend-black group-hover:text-ascend-white transition-all duration-300" />
+            </div>
         </div>
     );
 }

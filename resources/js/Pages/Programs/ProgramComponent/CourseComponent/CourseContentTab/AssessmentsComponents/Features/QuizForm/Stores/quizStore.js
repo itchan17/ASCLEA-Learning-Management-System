@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 const useQuizStore = create((set) => ({
     isFormSaving: false,
-
+    isQuizDetailsChanged: false,
     quizDetails: {
         quiz_title: "",
         quiz_description: null,
@@ -33,6 +33,10 @@ const useQuizStore = create((set) => ({
         set({
             savedLabel: label,
         });
+    },
+
+    setIsQuizDetailsChanged: (value) => {
+        set({ isQuizDetailsChanged: value });
     },
 
     resetQuizStore: () => {

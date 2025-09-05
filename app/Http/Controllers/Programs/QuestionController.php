@@ -41,13 +41,6 @@ class QuestionController extends Controller
         return response()->json(['success' => 'New question created successfully.', 'data' => $data]);
     }
 
-    public function createOption($assessment, $quiz, Question $question)
-    {
-        $newOption = $this->questionService->createOption($question->question_type, $question->question_id);
-
-        return response()->json(['success' => 'New option created successfully.', 'option' => $newOption]);
-    }
-
     public function updateQuestion(QuestionRequest $req, $assessment, $quiz, Question $question)
     {
         $validated = $req->validated();
@@ -56,6 +49,24 @@ class QuestionController extends Controller
 
         return response()->json("Question updated successfully.");
     }
+
+    public function deleteQuestion(QuestionRequest $req, $assessment, $quiz, Question $question)
+    {
+        $validated = $req->validated();
+
+        $this->questionService->deleteQuestions($question);
+
+        return response()->json("Question deeleted successfully.");
+    }
+
+    public function createOption($assessment, $quiz, Question $question)
+    {
+        $newOption = $this->questionService->createOption($question->question_type, $question->question_id);
+
+        return response()->json(['success' => 'New option created successfully.', 'option' => $newOption]);
+    }
+
+
 
     public function updateOption(Request $req, $assessment, $quiz, $question, QuestionOption $option)
     {

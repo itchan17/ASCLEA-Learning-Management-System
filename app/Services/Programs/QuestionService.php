@@ -10,12 +10,14 @@ class QuestionService
 {
     public function createInitialQuestion(string $quizId, array $otherDetails)
     {
+        $questionCount = Question::where('quiz_id', $quizId)->count();
+
         $questiondetails =  [
             'quiz_id' => $quizId,
             'question' => "Question",
             'question_type' => $otherDetails['question_type'],
             'question_points' => 0,
-            'sort_order' => $otherDetails['sort_order'],
+            'sort_order' => $questionCount + 1,
             'is_required' => false,
         ];
 
@@ -25,6 +27,11 @@ class QuestionService
     public function updateQuestionDetails(Question $question, array $validatedQuestionDetails)
     {
         $question->update($validatedQuestionDetails);
+    }
+
+    public function deleteQuestions(Question $question)
+    {
+        $question->delete();
     }
 
     public function createOption(string $questionType, string $questionId)

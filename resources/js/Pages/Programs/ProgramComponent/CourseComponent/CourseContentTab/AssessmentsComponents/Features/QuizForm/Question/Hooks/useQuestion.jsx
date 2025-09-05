@@ -2,7 +2,10 @@ import { useState, useEffect, useCallback } from "react";
 import useQuestionStore from "../Stores/questionStore";
 import useQuizStore from "../../Stores/quizStore";
 import useQuizDetails from "../../Hooks/useQuizDetails";
-import { createInitalQuestion } from "../Services/questionService";
+import {
+    createInitalQuestion,
+    deleteQuestion,
+} from "../Services/questionService";
 import DefaultCustomToast from "../../../../../../../../../../Components/CustomToast/DefaultCustomToast";
 import { displayToast } from "../../../../../../../../../../Utils/displayToast";
 
@@ -22,6 +25,9 @@ export default function useQuestion({ assessmentId, quizId }) {
         (state) => state.setQuestionOptions
     );
     const setQuestionList = useQuestionStore((state) => state.setQuestionList);
+    const onEdit = useQuestionStore((state) => state.onEdit);
+    const setOnEdit = useQuestionStore((state) => state.setOnEdit);
+    const questionList = useQuestionStore((state) => state.questionList);
 
     // Local state
     const [isCreatingQuestion, setIsCreatingQuestion] = useState(false);
@@ -34,18 +40,16 @@ export default function useQuestion({ assessmentId, quizId }) {
     // Custom hooks
     const { handleQuizDetailsChange } = useQuizDetails();
 
-    const handleCreateInitialQuestion = async (questionType, sortOrder) => {
+    const handleCreateInitialQuestion = async (questionType) => {
         if (!isCreatingQuestion) {
             const newQuestion = {
                 is_required: false,
                 question: "Question",
                 question_points: 0,
                 question_type: questionType,
-                sort_order: 1,
             };
 
             try {
-                console.log("CREATING INITAL QUESTIOn");
                 setIsFormSaving(true);
 
                 clearQuestionDetails();
@@ -60,7 +64,6 @@ export default function useQuestion({ assessmentId, quizId }) {
                     assessmentId,
                     quizId,
                     questionType,
-                    sortOrder,
                 });
 
                 // Merge the IDs from backend to the question details
@@ -187,11 +190,35 @@ export default function useQuestion({ assessmentId, quizId }) {
         }
     };
 
+    const handleDeleteQuestion = async (questionId) => {
+        try {
+            setIsFormSaving(true);
+            const updatedQuestionList = questionList.filter(
+                (question) => question.question_id !== questionId
+            );
+            setQuestionList(updatedQuestionList);
+
+            await deleteQuestion({ assessmentId, quizId, questionId });
+            setSavedLabel("Changes saved");
+        } catch (error) {
+            console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please try again."}
+                />,
+                "error"
+            );
+        } finally {
+            setIsFormSaving(false);
+        }
+    };
+
     const clearQuestionDetails = () => {
         const latestQuestionDetails =
             useQuestionStore.getState().questionDetails;
         const latestQuestionOptions =
             useQuestionStore.getState().questionOptions;
+        const latestQuestionList = useQuestionStore.getState().questionList;
 
         // Check if theres questionDetails
         // this means the question form is curently open
@@ -207,8 +234,7 @@ export default function useQuestion({ assessmentId, quizId }) {
             //These updated data was made because onBlur dont get triggered when
             // the form was closed through outside with ref
             // so we have to ensure no field are empty that will be displayed
-            console.log(latestQuestionDetails);
-            console.log(questionOptions);
+
             // Ensures no empty option
             const updatedOptions = latestQuestionOptions.map((option, i) =>
                 option.option_text.trim() === ""
@@ -224,11 +250,7 @@ export default function useQuestion({ assessmentId, quizId }) {
                     : option
             );
 
-            // Enusres question is not empty
-            // const updatedQuestionDetails =
-            //     latestQuestionDetails.question.trim() === ""
-            //         ? { ...latestQuestionDetails, question: "Question" }
-            //         : latestQuestionDetails;
+            // Ensures question and points are not empty
             let updatedQuestionDetails = latestQuestionDetails;
 
             if (latestQuestionDetails.question.trim() === "") {
@@ -246,10 +268,22 @@ export default function useQuestion({ assessmentId, quizId }) {
                 };
             }
 
-            setQuestionList((prev) => [
-                ...prev,
-                { ...updatedQuestionDetails, options: updatedOptions },
-            ]);
+            if (onEdit) {
+                setOnEdit(false);
+
+                const updatedQuestionList = latestQuestionList.map((question) =>
+                    question.question_id === updatedQuestionDetails.question_id
+                        ? { ...updatedQuestionDetails, options: updatedOptions }
+                        : question
+                );
+
+                setQuestionList(updatedQuestionList);
+            } else {
+                setQuestionList((prev) => [
+                    ...prev,
+                    { ...updatedQuestionDetails, options: updatedOptions },
+                ]);
+            }
 
             setQuestionDetails(null);
             setQuestionOptions([]);
@@ -264,6 +298,7 @@ export default function useQuestion({ assessmentId, quizId }) {
         handleCreateInitialQuestion,
         clearQuestionDetails,
         handleQuestionDetailsChange,
+        handleDeleteQuestion,
         isCreatingQuestion,
         isQuestionDetailsChanged,
     };

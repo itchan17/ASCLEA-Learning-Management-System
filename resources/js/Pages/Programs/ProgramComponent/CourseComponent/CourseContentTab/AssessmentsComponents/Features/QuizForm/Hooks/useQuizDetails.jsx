@@ -5,10 +5,12 @@ export default function useQuizDetails() {
     // Quiz store
     const quizDetails = useQuizStore((state) => state.quizDetails);
     const setQuizDetails = useQuizStore((state) => state.setQuizDetails);
+    const setIsQuizDetailsChanged = useQuizStore(
+        (state) => state.setIsQuizDetailsChanged
+    );
 
     // Local states
     const [timeoutId, setTimeoutId] = useState(null);
-    const [isQuizDetailsChanged, setIsQuizDetailsChanged] = useState(false);
 
     const handleQuizDetailsChange = (field, value) => {
         if (field === "cv_options") {
@@ -76,6 +78,5 @@ export default function useQuizDetails() {
     return {
         initializeQuizDetails,
         handleQuizDetailsChange,
-        isQuizDetailsChanged,
     };
 }
