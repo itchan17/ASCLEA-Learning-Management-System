@@ -4,19 +4,19 @@ namespace App\Http\Controllers\Programs;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Programs\QuestionRequest;
-use App\Models\Programs\Assessment;
 use App\Models\Programs\Question;
-use App\Models\Programs\QuestionOption;
+use App\Services\Programs\OptionService;
 use App\Services\Programs\QuestionService;
-use Illuminate\Http\Request;
 
 class QuestionController extends Controller
 {
     protected QuestionService $questionService;
+    protected OptionService $optionsService;
 
-    public function __construct(QuestionService $service)
+    public function __construct(QuestionService $questionService, OptionService $optionService)
     {
-        $this->questionService = $service;
+        $this->questionService = $questionService;
+        $this->optionsService = $optionService;
     }
 
     public function createQuestion(QuestionRequest $req, $assessment, $quiz)
@@ -29,7 +29,7 @@ class QuestionController extends Controller
         // We dontneed to create inital option for identification
         $initialOption = null;
         if ($validated['question_type'] !== "identification") {
-            $initialOption  = $this->questionService->createOption($validated['question_type'], $newQuestion['question_id']);
+            $initialOption  = $this->optionsService->createOption($validated['question_type'], $newQuestion['question_id']);
         }
 
         // Merge the IDs of the question and the option and send to client
@@ -57,30 +57,5 @@ class QuestionController extends Controller
         $this->questionService->deleteQuestions($question);
 
         return response()->json("Question deeleted successfully.");
-    }
-
-    public function createOption($assessment, $quiz, Question $question)
-    {
-        $newOption = $this->questionService->createOption($question->question_type, $question->question_id);
-
-        return response()->json(['success' => 'New option created successfully.', 'option' => $newOption]);
-    }
-
-
-
-    public function updateOption(Request $req, $assessment, $quiz, $question, QuestionOption $option)
-    {
-        $validated = $req->validate(['option_text' => 'required|string', 'is_correct' => 'required|boolean']);
-
-        $this->questionService->updateOptionName($option,  $validated);
-
-        return response()->json("Option udpated successfully");
-    }
-
-    public function deleteOption($assessment, $quiz, $question, QuestionOption $option)
-    {
-        $this->questionService->deleteOption($option);
-
-        return response()->json("Option deleted successfully");
     }
 }
