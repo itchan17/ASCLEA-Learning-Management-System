@@ -1,19 +1,15 @@
 import React, { useEffect, useState, useRef } from "react";
-import SinglePage from "../../../../../../../../Components/Layout/SInglePage";
-import PrimaryButton from "../../../../../../../../Components/Button/PrimaryButton";
 import TextEditor from "../../../../TextEditor";
-import useCreateQuizStore from "../../../../../../../../Stores/Programs/CourseContent/createQuizStore";
 import Question from "./Question/Question";
 import SecondaryButton from "../../../../../../../../Components/Button/SecondaryButton";
 import QuestionForm from "./Question/QuestionForm";
-import BackButton from "../../../../../../../../Components/Button/BackButton";
-import { handleClickBackBtn } from "../../../../../../../../Utils/handleClickBackBtn";
 import QuizFormNav from "./Components/QuizFormNav";
 import useQuizAutosave from "./Hooks/useQuizAutoSave";
 import useQuizDetails from "./Hooks/useQuizDetails";
 import useQuizStore from "./Stores/quizStore";
 import useQuestion from "./Question/Hooks/useQuestion";
 import useQuestionStore from "./Question/Stores/questionStore";
+import useAssessmentsStore from "../../../../../../../../Stores/Programs/CourseContent/assessmentsStore";
 import {
     SortableContext,
     verticalListSortingStrategy,
@@ -67,9 +63,11 @@ export default function QuizForm({ assessmentId, quiz }) {
     const questionOptions = useQuestionStore((state) => state.questionOptions);
     const onEdit = useQuestionStore((state) => state.onEdit);
 
-    // const [activeForm, setActiveForm] = useState("");
-    // const [onEdit, setOnEdit] = useState(false);
-    // const [selectedIndex, setSelectedIndex] = useState(null);
+    // Assessment store
+    const assessmentList = useAssessmentsStore((state) => state.assessmentList);
+    const setAssessmentList = useAssessmentsStore(
+        (state) => state.setAssessmentList
+    );
 
     // Refs
     const targetForm = useRef(null);
@@ -90,6 +88,36 @@ export default function QuizForm({ assessmentId, quiz }) {
         };
     }, []);
 
+    // Function that updates the quiz title in the assessment list
+    const updateQuizTitleInAssessmentList = () => {
+        if (assessmentList.length > 0) {
+            const assessmentToUpdate = assessmentList.find(
+                (assessment) => assessment.assessment_id === assessmentId
+            );
+
+            // Checks if the quiz title changed
+            if (
+                assessmentToUpdate &&
+                assessmentToUpdate.quiz.quiz_title !== quizDetails.quiz_title
+            ) {
+                const updatedQuizTitle = assessmentList.map((assessment) =>
+                    assessment.assessment_id === assessmentId &&
+                    assessment.assessment_type.assessment_type === "quiz"
+                        ? {
+                              ...assessment,
+                              quiz: {
+                                  ...assessment.quiz,
+                                  quiz_title: quizDetails.quiz_title,
+                              },
+                          }
+                        : assessment
+                );
+
+                setAssessmentList(updatedQuizTitle);
+            }
+        }
+    };
+
     // Handles update of quiz details changes in backend
     useEffect(() => {
         // Only render when there's a changes to the details
@@ -103,6 +131,8 @@ export default function QuizForm({ assessmentId, quiz }) {
                 } else {
                     debounceAutoSave(quizDetails);
                 }
+
+                updateQuizTitleInAssessmentList(); // Updates the quiz title in the list
             }
         }
     }, [quizDetails, debounceAutoSave]);
@@ -152,11 +182,6 @@ export default function QuizForm({ assessmentId, quiz }) {
             coordinateGetter: sortableKeyboardCoordinates,
         })
     );
-
-    const handleOpenQuestionForm = (questionType) => {
-        setOnEdit(false);
-        setActiveForm(questionType);
-    };
 
     // Close the form when the user click outside the form
     useEffect(() => {
