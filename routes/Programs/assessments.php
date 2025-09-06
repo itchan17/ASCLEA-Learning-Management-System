@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Programs\AssessmentController;
+use App\Models\Programs\Assessment;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('programs/{program}/courses/{course}')
@@ -8,34 +9,32 @@ Route::prefix('programs/{program}/courses/{course}')
     ->group(function () {
 
         // Create assesmsent
-        Route::post('/assessments/create', [AssessmentController::class, 'createAssessment'])->name('assessment.create');
+        Route::post('/assessments/create', [AssessmentController::class, 'createAssessment'])->can('createAssessment', [Assessment::class, 'course'])->name('assessment.create');
 
         // Get assessments
-        Route::get('/assessments', [AssessmentController::class, 'listAssessments'])->name('program.course.assessments');
+        Route::get('/assessments', [AssessmentController::class, 'listAssessments'])->can('getAssessments', [Assessment::class, 'course'])->name('program.course.assessments');
 
         // Route for viewing assessment
-        Route::get('/assessments/{assessment}', [AssessmentController::class, 'showAssessment'])->name('program.course.assessment.view');
-
-        // Route for display the edit page of quiz
-        Route::get('/assessments/{assessment}/quiz-form/{quiz}/edit', [AssessmentController::class, 'showEditQuizForm'])->name('program.course.quiz-form.edit');
+        Route::get('/assessments/{assessment}', [AssessmentController::class, 'showAssessment'])->can('viewAssessment', ['assessment', 'course'])->name('program.course.assessment.view');
 
         // Update assessment
-        Route::put('/assessments/{assessment}/update', [AssessmentController::class, 'updateAssessment'])->name('assessment.update');
+        Route::put('/assessments/{assessment}/update', [AssessmentController::class, 'updateAssessment'])->can('updateAssessment', 'assessment')->name('assessment.update');
 
         // Unppulsh assessment
-        Route::put('/assessments/{assessment}/unpublish', [AssessmentController::class, 'unPublishAssessment'])->name('assessment.unpublish');
+        Route::put('/assessments/{assessment}/unpublish', [AssessmentController::class, 'unPublishAssessment'])->can('updateAssessment', 'assessment')->name('assessment.unpublish');
 
-        // Delete assessment
-        Route::delete('/assessments/{assessment}/archive', [AssessmentController::class, 'archiveAssessment'])->name('assessment.archive');
+        // Archive assessment
+        Route::delete('/assessments/{assessment}/archive', [AssessmentController::class, 'archiveAssessment'])->can('archiveAssessment', 'assessment')->name('assessment.archive');
 
-        // Delete assessment
-        Route::put('/assessments/{assessment}/restore', [AssessmentController::class, 'restoreAssessment'])->name('assessment.restore');
+        // Restore assessment
+        Route::put('/assessments/{assessment}/restore', [AssessmentController::class, 'restoreAssessment'])->can('restoreAssessment', [Assessment::class, 'assessment'])->name('assessment.restore');
 
-        // Route for viewing file
-        Route::get('/assessments/{assessment}/files/{file}', [AssessmentController::class, "viewFile"])->name('program.course.file.view');
+        // Route for viewing file page
+        Route::get('/assessments/{assessment}/files/{file}', [AssessmentController::class, "viewFile"])->can('viewAssessmentFile', ['assessment', 'course'])->name('program.course.file.view');
 
         // Route for displaying the file
-        Route::get('/assessments/{assessment}/files/{file}/stream', [AssessmentController::class, "streamAssessmentFile"])->middleware(['auth', 'verified', 'preventBack'])->name('program.course.file.stream');
+        Route::get('/assessments/{assessment}/files/{file}/stream', [AssessmentController::class, "streamAssessmentFile"])->can('viewAssessmentFile', ['assessment', 'course'])->name('program.course.file.stream');
 
-        Route::get('/assessments/{assessment}/files/{file}/download', [AssessmentController::class, "downloadAssessmentFile"])->middleware(['auth', 'verified', 'preventBack'])->name('program.course.file.download');
+        // ROute for downloading the file
+        Route::get('/assessments/{assessment}/files/{file}/download', [AssessmentController::class, "downloadAssessmentFile"])->can('downloadAssessmentFile', ['assessment', 'course'])->name('program.course.file.download');
     });
