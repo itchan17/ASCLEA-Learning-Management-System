@@ -48,6 +48,8 @@ return Application::configure(basePath: dirname(__DIR__))
             '/logout',
             '/programs',
             'programs/*',
+            '/assessments',
+            'assessments/*',
         ]);
         // ------ END ------
         $middleware->web(append: [

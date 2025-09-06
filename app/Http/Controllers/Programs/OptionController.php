@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Programs;
 
 use App\Http\Controllers\Controller;
+use App\Models\Programs\Assessment;
 use App\Models\Programs\Question;
 use App\Models\Programs\QuestionOption;
 use App\Services\Programs\OptionService;
@@ -18,7 +19,7 @@ class OptionController extends Controller
         $this->optionService = $service;
     }
 
-    public function createOption($assessment, $quiz, Question $question)
+    public function createOption(Assessment $assessment, $quiz, Question $question)
     {
         $newOption = $this->optionService->createOption($question->question_type, $question->question_id);
 
@@ -27,7 +28,7 @@ class OptionController extends Controller
 
 
 
-    public function updateOption(Request $req, $assessment, $quiz, $question, QuestionOption $option)
+    public function updateOption(Request $req, Assessment $assessment, $quiz, $question, QuestionOption $option)
     {
         $validated = $req->validate(['option_text' => 'required|string', 'is_correct' => 'required|boolean']);
 
@@ -36,7 +37,7 @@ class OptionController extends Controller
         return response()->json("Option udpated successfully");
     }
 
-    public function deleteOption($assessment, $quiz, $question, QuestionOption $option)
+    public function deleteOption(Assessment $assessment, $quiz, $question, QuestionOption $option)
     {
         $this->optionService->deleteOption($option);
 

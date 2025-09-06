@@ -8,7 +8,6 @@ use App\Http\Requests\Programs\SaveQuizRequest;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\Quiz;
 use App\Services\Programs\QuizService;
-use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class QuizController extends Controller
@@ -22,8 +21,6 @@ class QuizController extends Controller
 
     public function showEditQuizForm(Assessment $assessment, Quiz $quiz)
     {
-        // Check if user an view edit quiz form page of teh assessment
-        Gate::authorize('viewEditQuizForm',  [Quiz::class, $assessment]);
 
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizForm/QuizForm', [
             'assessmentId' => $assessment->assessment_id,
@@ -34,6 +31,7 @@ class QuizController extends Controller
 
     public function updateQuizDetails(SaveQuizRequest $req, Assessment $assessment, Quiz $quiz)
     {
+
         $validatedQuizDetails = $req->validated();
         $this->quizService->saveUpdatedQuizDetails($validatedQuizDetails, $quiz);
 

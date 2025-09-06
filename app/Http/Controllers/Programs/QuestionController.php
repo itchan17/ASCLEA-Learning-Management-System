@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Programs;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Programs\QuestionRequest;
+use App\Models\Programs\Assessment;
 use App\Models\Programs\Question;
 use App\Services\Programs\OptionService;
 use App\Services\Programs\QuestionService;
@@ -19,8 +20,9 @@ class QuestionController extends Controller
         $this->optionsService = $optionService;
     }
 
-    public function createQuestion(QuestionRequest $req, $assessment, $quiz)
+    public function createQuestion(QuestionRequest $req, Assessment $assessment, $quiz)
     {
+
         $validated = $req->validated();
 
         $newQuestion = $this->questionService->createInitialQuestion($quiz, $validated);
@@ -41,7 +43,7 @@ class QuestionController extends Controller
         return response()->json(['success' => 'New question created successfully.', 'data' => $data]);
     }
 
-    public function updateQuestion(QuestionRequest $req, $assessment, $quiz, Question $question)
+    public function updateQuestion(QuestionRequest $req, Assessment $assessment, $quiz, Question $question)
     {
         $validated = $req->validated();
 
@@ -50,7 +52,7 @@ class QuestionController extends Controller
         return response()->json("Question updated successfully.");
     }
 
-    public function deleteQuestion(QuestionRequest $req, $assessment, $quiz, Question $question)
+    public function deleteQuestion(QuestionRequest $req, Assessment $assessment, $quiz, Question $question)
     {
         $validated = $req->validated();
 
