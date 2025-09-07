@@ -8,12 +8,14 @@ import { IoCaretDownOutline } from "react-icons/io5";
 import AddStaffForm from "./AdministrationComponents/AddStaffForm";
 import { router } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
+import { usePage } from "@inertiajs/react";
+import Pagination from "@/Components/Pagination";
+import { useEffect } from "react";
 
 export default function Administration() {
     const route = useRoute();
-
-    // People Store
-    const staffList = useAdministrationStore((state) => state.staffList);
+    const { props } = usePage();
+    const { staffs } = props;
 
     const [openAddStaff, setOpenAddStaff] = useState(false);
 
@@ -23,8 +25,36 @@ export default function Administration() {
 
     const handleStaffClick = (userId) => {
         console.log(userId);
-        // Navigate to ViewStaff
         router.visit(route("administration.view", userId));
+    };
+
+    const [search, setSearch] = useState(props.filters?.search || "");
+
+    useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+        router.get(
+        route("administration.index"),
+        { search },
+        { preserveState: true, replace: true }
+        );
+    }, 500); // wait 500ms after typing before searching
+
+    return () => clearTimeout(delayDebounce); // cleanup previous timeout
+    }, [search]);
+
+    const handleSearch = () => {
+        router.get(route("administration.index"),
+        { search }, // send search value to backend
+        { preserveState: true, replace: true }
+            );
+        };
+
+    const handlePageClick = (page) => {
+    router.get(
+        route("administration.index", { page }),
+        { search },
+        { preserveState: true, replace: true }
+    );
     };
 
     return (
@@ -44,8 +74,17 @@ export default function Administration() {
                         className="w-full sm:w-50 border h-9 pl-10 p-2 border-ascend-black focus:outline-ascend-blue"
                         type="text"
                         placeholder="Search name"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                        handleSearch();
+                        }
+                    }}
                     />
-                    <IoSearch className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1" />
+                    <IoSearch 
+                    onClick={handleSearch}
+                    className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1" />
                 </div>
             </div>
             <div className="overflow-x-auto">
@@ -69,44 +108,47 @@ export default function Administration() {
                             </th>
                         </tr>
                     </thead>
-                    {staffList?.length > 0 && (
-                        <tbody>
-                            {staffList.map((staff, index) => (
+                    <tbody>
+                        {staffs.data && staffs.data.length > 0 ? (
+                            staffs.data.map((staff) => (
                                 <tr
-                                    key={index}
+                                    key={staff.staff_id}
                                     className="hover:bg-ascend-lightblue cursor-pointer"
-                                    onClick={() => handleStaffClick(staff.id)}
+                                    onClick={() => handleStaffClick(staff.staff_id)}
                                 >
                                     <td>
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl shrink-0"></div>
-
-                                            <div className="font-bold">
-                                                {`${staff.firstName} ${staff.lastName}`}
-                                            </div>
-                                        </div>
+                                    {staff.user
+                                        ? `${staff.user.first_name} ${staff.user.middle_name || ""} ${staff.user.last_name}`.trim()
+                                        : "N/A"}
                                     </td>
-                                    <td>{staff.email}</td>
-                                    <td>{staff.role}</td>
-                                    <td>
-                                        {staff.status.charAt(0).toUpperCase() +
-                                            staff.status.slice(1)}
-                                    </td>
-                                    <td>{staff.lastLogin}</td>
+                                    <td>{staff.user.email || "N/A"}</td>
+                                    <td>{staff.user?.role?.role_name || "N/A"}</td>
+                                    <td>{staff.status || "N/A"}</td>
+                                    <td>{staff.user.last_login || "N/A"}</td>
                                 </tr>
-                            ))}
-                        </tbody>
-                    )}
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="5">
+                                    <EmptyState
+                                        paddingY="py-0"
+                                        imgSrc="/images/illustrations/grades.svg"
+                                        text="No staff members yet. Click 'Add Staff' to get started!"
+                                    />
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
                 </table>
-                {staffList?.length === 0 && (
-                    <EmptyState
-                        paddingY="py-0"
-                        imgSrc={"/images/illustrations/grades.svg"}
-                        text={`“Oops! No one to hand an A+ to. Add your first student to get started.”`}
-                    />
-                )}
             </div>
-
+            {/* Pagination */}
+            {staffs?.links && (
+                <Pagination
+                    links={staffs.links}
+                    currentPage={staffs.current_page}
+                    lastPage={staffs.last_page}
+                    only={["staffs"]}
+            />)}
             <div className="flex space-x-[0.5px]">
                 <PrimaryButton text="Download" />
 

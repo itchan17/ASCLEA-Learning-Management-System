@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Administration;
 
 use App\Http\Controllers\Controller;
-use App\Models\Staff;
+use App\Models\Administration\Staff;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -16,34 +16,25 @@ class StaffController extends Controller
     /**
      * Display a listing of the resource.
      */
-    
+
     // Show the administration dashboard
-    public function administrationIndex()
+    public function administrationIndex(Request $request)
     {
-        return Inertia::render('Administration/Administration');
-    }
+        // Fetch role IDs for 'admin' and 'faculty'
+        $roleIds = Role::whereIn('role_name', ['admin', 'faculty'])->pluck('role_id')->toArray();
 
-    // Show the staff detail page (wrapper)
-    public function administrationView($userId)
-    {
-        return Inertia::render('Administration/AdministrationComponents/ViewStaff', [
-            'userId' => $userId,
-        ]);
-    }
-
-    public function index(Request $request)
-    {
-        $query = Staff::query()
-            ->with('user') // eager load user info
-            ->whereHas('user', function($q) {
-                $q->whereIn('role', ['admin','faculty']);
-            });
+        // Query Staff with related user, filtered by role
+        $query = Staff::with('user.role') // load the user and their role
+        ->whereHas('user', function($q) use ($roleIds) {
+        $q->whereIn('role_id', $roleIds);
+        });
 
         // Search filter
         if ($search = $request->input('search')) {
             $query->whereHas('user', function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%");
+                $q->where('users.first_name', 'like', "%{$search}%")
+                ->orWhere('users.last_name', 'like', "%{$search}%")
+                ->orWhere('users.email', 'like', "%{$search}%");
             });
         }
 
@@ -53,14 +44,24 @@ class StaffController extends Controller
         }
 
         $staffs = $query->orderBy('created_at', 'desc')
-            ->paginate(10) // adjust per page
+            ->paginate(5)
             ->withQueryString();
 
-        return Inertia::render('Staff/Index', [
+        return Inertia::render('Administration/Administration', [
             'staffs' => $staffs,
-            'filters' => $request->only(['search','status']),
+            'filters' => $request->only(['search', 'status']),
         ]);
     }
+
+
+    // Show the staff detail page (wrapper)
+    public function administrationView($userId)
+    {
+        return Inertia::render('Administration/AdministrationComponents/ViewStaff', [
+            'userId' => $userId,
+        ]);
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -81,19 +82,37 @@ class StaffController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,user_id|unique:staff,user_id',
-            'status' => 'required|in:active,inactive',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'role_name' => 'required|in:admin,faculty',
         ]);
 
-        $staff = Staff::create([
+        $role = Role::where('role_name', $request->role_name)->firstOrFail();
+
+        // create user
+        $user = User::create([
+            'user_id' => Str::uuid(),
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'middle_name' => $request->middle_name,
+            'email' => $request->email,
+            'role_id' => $role->role_id,
+            'password' => bcrypt('password123'), // temporary password
+        ]);
+
+        // create staff
+        Staff::create([
             'staff_id' => Str::uuid(),
-            'user_id' => $request->user_id,
-            'status' => $request->status,
-            'created_by' => auth()->user()->user_id, // assuming you have auth
+            'user_id' => $user->user_id,
+            'status' => 'active',
+            'created_by' => auth()->id(),
         ]);
 
-        return redirect()->route('staff.index')->with('success', 'Staff added successfully.');
+        return redirect()->route('administration.index')->with('success', 'Staff added successfully.');
     }
+
 
     /**
      * Display the specified resource.
@@ -154,7 +173,7 @@ class StaffController extends Controller
     {
         $staff = Staff::with('assignedCourses')->findOrFail($id);
 
-        $courses = $staff->assignedCourses()->paginate(10);
+        $courses = $staff->assignedCourses()->paginate(5);
 
         return Inertia::render('Staff/AssignedCourses', [
             'staff' => $staff,

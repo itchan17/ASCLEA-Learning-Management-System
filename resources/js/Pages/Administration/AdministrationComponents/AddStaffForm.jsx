@@ -2,8 +2,25 @@ import React from "react";
 import SecondaryButton from "../../../Components/Button/SecondaryButton";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
 import ModalContainer from "../../../Components/ModalContainer";
+import { useForm } from "@inertiajs/react";
 
 export default function AddStaffForm({ toggleForm }) {
+
+    const { data, setData, post, processing, errors } = useForm({
+        first_name: "",
+        last_name: "",
+        middle_name: "",
+        email: "",
+        role_name: "",
+    });
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        post(route("staff.store"), {
+            onSuccess: () => toggleForm(),
+        });
+    };
+
     return (
         <ModalContainer>
             <form className="bg-ascend-white opacity-100 p-5 w-112 space-y-5">
@@ -16,8 +33,13 @@ export default function AddStaffForm({ toggleForm }) {
                     </label>
                     <input
                         type="text"
+                        value={data.first_name}
+                        onChange={(e) => setData("first_name", e.target.value)}
                         className="border px-3 py-2  border-ascend-gray1 focus:outline-ascend-blue"
                     />
+                    {errors.first_name && (
+                        <span className="text-red-500 text-sm">{errors.first_name}</span>
+                    )}
                 </div>
 
                 <div className="flex flex-col">
@@ -27,8 +49,13 @@ export default function AddStaffForm({ toggleForm }) {
                     </label>
                     <input
                         type="text"
+                        value={data.last_name}
+                        onChange={(e) => setData("last_name", e.target.value)}
                         className="border px-3 py-2  border-ascend-gray1 focus:outline-ascend-blue"
                     />
+                    {errors.last_name && (
+                        <span className="text-red-500 text-sm">{errors.last_name}</span>
+                    )}
                 </div>
 
                 <div className="flex flex-col">
@@ -38,8 +65,13 @@ export default function AddStaffForm({ toggleForm }) {
                     </label>
                     <input
                         type="text"
+                        value={data.middle_name}
+                        onChange={(e) => setData("middle_name", e.target.value)}
                         className="border px-3 py-2  border-ascend-gray1 focus:outline-ascend-blue"
                     />
+                    {errors.middle_name && (
+                        <span className="text-red-500 text-sm">{errors.middle_name}</span>
+                    )}
                 </div>
 
                 <div className="flex flex-col">
@@ -49,8 +81,13 @@ export default function AddStaffForm({ toggleForm }) {
                     </label>
                     <input
                         type="email"
+                        value={data.email}
+                        onChange={(e) => setData("email", e.target.value)}
                         className="border px-3 py-2  border-ascend-gray1 focus:outline-ascend-blue"
                     />
+                    {errors.email && (
+                        <span className="text-red-500 text-sm">{errors.email}</span>
+                    )}
                 </div>
 
                 <div className="flex flex-col">
@@ -58,16 +95,25 @@ export default function AddStaffForm({ toggleForm }) {
                         Role
                         <span className="text-ascend-red">*</span>
                     </label>
-                    <select className="textField border px-3 py-2  border-ascend-gray1 focus:outline-ascend-blue">
+                    <select 
+                        value={data.role_name}
+                        onChange={(e) => setData("role_name", e.target.value)}
+                        className="textField border px-3 py-2  border-ascend-gray1 focus:outline-ascend-blue">
                         <option value="">Select Role</option>
-                        <option value="metro_manila">Administrator</option>
-                        <option value="metro_manila">Faculty</option>
+                        <option value="admin">Administrator</option>
+                        <option value="faculty">Faculty</option>
                     </select>
+                    {errors.role_name && (
+                        <span className="text-red-500 text-sm">{errors.role_name}</span>
+                    )}
                 </div>
 
                 <div className="flex justify-end gap-2">
-                    <SecondaryButton text={"Cancel"} doSomething={toggleForm} />
-                    <PrimaryButton text={"Create"} doSomething={toggleForm} />
+                    <SecondaryButton text="Cancel" doSomething={toggleForm} />
+                    <PrimaryButton
+                        text={processing ? "Creating..." : "Create"}
+                        doSomething={handleSubmit}
+                    />
                 </div>
             </form>
         </ModalContainer>
