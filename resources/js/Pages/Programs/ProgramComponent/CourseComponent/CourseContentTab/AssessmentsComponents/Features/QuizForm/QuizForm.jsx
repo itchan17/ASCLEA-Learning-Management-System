@@ -26,6 +26,8 @@ import {
     useSensor,
 } from "@dnd-kit/core";
 
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+
 export function useQuiz() {
     return useContext(QuizContext);
 }
@@ -41,6 +43,7 @@ export default function QuizForm({ assessmentId, quiz }) {
         handleCreateInitialQuestion,
         clearQuestionDetails,
         isCreatingQuestion,
+        handleQuestionReordering,
     } = useQuestion({
         assessmentId,
         quizId: quiz.quiz_id,
@@ -151,8 +154,9 @@ export default function QuizForm({ assessmentId, quiz }) {
     // Function for sorting the array
     const handleDragEnd = (event) => {
         const { active, over } = event;
-        // console.log(active);
+
         if (active.id === over.id) return;
+
         const originalPos = getQuestionPos(active.id);
         const newPos = getQuestionPos(over.id);
 
@@ -162,8 +166,8 @@ export default function QuizForm({ assessmentId, quiz }) {
                 sort_order: index + 1,
             })
         );
-        // console.log(updatedOrder);
-        setQuestionList(updatedOrder);
+
+        handleQuestionReordering(active.id, newPos, updatedOrder, originalPos);
     };
 
     // This allows drag and drop in mobile device
@@ -280,6 +284,7 @@ export default function QuizForm({ assessmentId, quiz }) {
                                     sensors={sensors}
                                     onDragEnd={handleDragEnd}
                                     collisionDetection={closestCorners}
+                                    modifiers={[restrictToVerticalAxis]}
                                 >
                                     <SortableContext
                                         items={questionList.map(

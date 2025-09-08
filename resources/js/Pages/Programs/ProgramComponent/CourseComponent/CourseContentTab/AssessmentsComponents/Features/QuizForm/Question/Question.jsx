@@ -182,9 +182,9 @@ export default function Question({
                 style={{ touchAction: "none" }}
                 ref={setActivatorNodeRef}
                 {...(!disabled && listeners)}
-                className="group border-y border-r border-ascend-gray1 flex items-center self-stretch bg-ascend-white hover:bg-ascend-blue cursor-grab transition-all duration-300"
+                className="border-y border-r border-ascend-gray1 flex items-center self-stretch bg-ascend-blue cursor-grab "
             >
-                <MdOutlineDragIndicator className="text-2xl text-ascend-black group-hover:text-ascend-white transition-all duration-300" />
+                <MdOutlineDragIndicator className="text-2xl  text-ascend-white" />
             </div>
         </div>
     );

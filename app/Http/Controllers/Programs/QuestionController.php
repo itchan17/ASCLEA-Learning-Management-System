@@ -8,6 +8,7 @@ use App\Models\Programs\Assessment;
 use App\Models\Programs\Question;
 use App\Services\Programs\OptionService;
 use App\Services\Programs\QuestionService;
+use Illuminate\Http\Request;
 
 class QuestionController extends Controller
 {
@@ -52,12 +53,19 @@ class QuestionController extends Controller
         return response()->json("Question updated successfully.");
     }
 
-    public function deleteQuestion(QuestionRequest $req, Assessment $assessment, $quiz, Question $question)
+    public function deleteQuestion(Assessment $assessment, $quiz, Question $question)
     {
-        $validated = $req->validated();
 
         $this->questionService->deleteQuestions($question);
 
-        return response()->json("Question deeleted successfully.");
+        return response()->json("Question deleted successfully.");
+    }
+
+    public function reorderQuestion(Request $req, Assessment $assessment, $quiz, Question $question)
+    {
+
+        $this->questionService->reorderQuestion($question, $req->all(), $quiz);
+
+        return response()->json("Questions reordered successfully.");
     }
 }

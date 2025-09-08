@@ -5,6 +5,7 @@ import useQuizDetails from "../../Hooks/useQuizDetails";
 import {
     createInitalQuestion,
     deleteQuestion,
+    reorderQuestion,
 } from "../Services/questionService";
 import DefaultCustomToast from "../../../../../../../../../../Components/CustomToast/DefaultCustomToast";
 import { displayToast } from "../../../../../../../../../../Utils/displayToast";
@@ -213,6 +214,38 @@ export default function useQuestion({ assessmentId, quizId }) {
         }
     };
 
+    const handleQuestionReordering = async (
+        questionId,
+        newPos,
+        updatedQuestionListOrder,
+        originalPos
+    ) => {
+        try {
+            setQuestionList(updatedQuestionListOrder);
+            setIsFormSaving(true);
+
+            await reorderQuestion({
+                assessmentId,
+                quizId,
+                questionId,
+                newPos,
+                originalPos,
+            });
+
+            setSavedLabel("Changes saved");
+        } catch (error) {
+            console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please try again."}
+                />,
+                "error"
+            );
+        } finally {
+            setIsFormSaving(false);
+        }
+    };
+
     const clearQuestionDetails = () => {
         const latestQuestionDetails =
             useQuestionStore.getState().questionDetails;
@@ -301,5 +334,6 @@ export default function useQuestion({ assessmentId, quizId }) {
         handleDeleteQuestion,
         isCreatingQuestion,
         isQuestionDetailsChanged,
+        handleQuestionReordering,
     };
 }

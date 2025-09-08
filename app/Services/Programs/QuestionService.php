@@ -33,4 +33,30 @@ class QuestionService
     {
         $question->delete();
     }
+
+    public function reorderQuestion(Question $question, array $data, string $quizId)
+    {
+        // Updates the sort order of the dragged question
+        $question->update(['sort_order' => $data['newSortOrder']]);
+
+        // Reorder logic:
+        // - If the question is moved DOWN (newSortOrder > origSortOrder):
+        //   We have to decrement all the questions between the original pos and new pos of the question
+        // - If the question is moved UP (newSortOrder < origSortOrder):
+        //   We have to increment all the questions between the original pos and new pos of the question
+
+        if ($data['newSortOrder'] > $data['origSortOrder']) {
+            Question::where('question_id', "!=", $question->question_id)
+                ->where('quiz_id', $quizId)
+                ->where('sort_order', "<=", $data['newSortOrder'])
+                ->where('sort_order', '>', $data['origSortOrder'])
+                ->decrement('sort_order');
+        } else {
+            Question::where('question_id', "!=", $question->question_id)
+                ->where('quiz_id', $quizId)
+                ->where('sort_order', ">=", $data['newSortOrder'])
+                ->where('sort_order', '<', $data['origSortOrder'])
+                ->increment('sort_order');
+        }
+    }
 }

@@ -44,8 +44,26 @@ export async function deleteQuestion({ assessmentId, quizId, questionId }) {
     );
 }
 
+export async function reorderQuestion({
+    assessmentId,
+    quizId,
+    questionId,
+    newPos,
+    originalPos,
+}) {
+    return await axios.put(
+        route("assessment.quiz-form.question.reorder", {
+            assessment: assessmentId,
+            quiz: quizId,
+            question: questionId,
+        }),
+        { newSortOrder: newPos + 1, origSortOrder: originalPos + 1 } // newPos is an an index, so we should add 1 since sort order is not 0 based
+    );
+}
+
 export default {
     createInitalQuestion,
     updateQuestion,
     deleteQuestion,
+    reorderQuestion,
 };

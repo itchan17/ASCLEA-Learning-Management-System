@@ -16,4 +16,7 @@ Route::prefix('assessments/{assessment}/')
 
         // Route for deleting question
         Route::delete('quiz-form/{quiz}/questions/{question}/delete', [QuestionController::class, 'deleteQuestion'])->can('deleteQuestion', [Question::class, 'assessment'])->name('assessment.quiz-form.question.delete');
+
+        // Route for re ordering questions
+        Route::put('quiz-form/{quiz}/questions/{question}',  [QuestionController::class, 'reorderQuestion'])->can('updateQuestion', [Question::class, 'assessment'])->name('assessment.quiz-form.question.reorder');
     });

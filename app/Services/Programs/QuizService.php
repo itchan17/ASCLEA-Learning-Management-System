@@ -14,7 +14,7 @@ class QuizService
         return $quiz
             ->load([
                 'options',
-                'questions' => fn($query) => $query->with(['options' => fn($query) => $query->orderBy('option_order')])
+                'questions' => fn($query) => $query->with(['options' => fn($query) => $query->orderBy('option_order')])->orderBy('sort_order')
             ]);
     }
 
