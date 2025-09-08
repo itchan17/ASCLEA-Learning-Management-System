@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import TextEditor from "../../../../TextEditor";
 import Question from "./Question/Question";
 import SecondaryButton from "../../../../../../../../Components/Button/SecondaryButton";
@@ -142,7 +142,7 @@ export default function QuizForm({ assessmentId, quiz }) {
 
     // Scroll into the form once opened
     useEffect(() => {
-        if (questionDetails) {
+        if (questionDetails && targetForm.current) {
             targetForm.current?.scrollIntoView({ behavior: "smooth" });
         }
     }, [questionDetails]);
@@ -153,6 +153,7 @@ export default function QuizForm({ assessmentId, quiz }) {
 
     // Function for sorting the array
     const handleDragEnd = (event) => {
+        console.log("THIS IS RUNNING");
         const { active, over } = event;
 
         if (active.id === over.id) return;
@@ -190,6 +191,7 @@ export default function QuizForm({ assessmentId, quiz }) {
     // Close the form when the user click outside the form
     useEffect(() => {
         const handleClickOutside = (event) => {
+            console.log(event.target);
             // If the click is outside the element referenced by `targetForm`
             if (
                 targetForm.current &&
@@ -215,6 +217,11 @@ export default function QuizForm({ assessmentId, quiz }) {
     useEffect(() => console.log(questionList), [questionList]);
 
     useEffect(() => console.log(quizDetails), [quizDetails]);
+
+    const itemIds = useMemo(
+        () => questionList.map((q) => q.question_id),
+        [questionList]
+    );
 
     return (
         <div className="font-nunito-sans relative space-y-5 text-ascend-black">
@@ -287,12 +294,11 @@ export default function QuizForm({ assessmentId, quiz }) {
                                     modifiers={[restrictToVerticalAxis]}
                                 >
                                     <SortableContext
-                                        items={questionList.map(
-                                            (q) => q.question_id
-                                        )}
+                                        items={itemIds}
                                         strategy={verticalListSortingStrategy}
                                     >
                                         {questionList.map((question, i) => {
+                                            // console.log(questionDetails);
                                             return questionDetails &&
                                                 questionDetails.question_id ===
                                                     question.question_id &&
@@ -300,6 +306,7 @@ export default function QuizForm({ assessmentId, quiz }) {
                                                 <div
                                                     key={question.question_id}
                                                     ref={targetForm}
+                                                    className="scroll-mt-50"
                                                 >
                                                     <QuestionForm />
                                                 </div>

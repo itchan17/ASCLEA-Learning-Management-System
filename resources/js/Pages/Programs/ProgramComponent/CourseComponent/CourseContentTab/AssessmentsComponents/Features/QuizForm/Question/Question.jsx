@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { memo } from "react";
 import { AiFillEdit, AiFillDelete, AiOutlineArrowDown } from "react-icons/ai";
 import { MdOutlineDragIndicator } from "react-icons/md";
 import { useSortable } from "@dnd-kit/sortable";
@@ -7,11 +7,12 @@ import useQuestionStore from "./Stores/questionStore";
 import useQuestion from "./Hooks/useQuestion";
 import { usePage } from "@inertiajs/react";
 
-export default function Question({
+export default memo(function Question({
     questionDetails,
     disabled,
     questionNumber,
 }) {
+    console.log(`QUESTION RENDERING: ${questionDetails.question_id}`);
     const { assessmentId, quiz } = usePage().props;
     // Question store
     const setOnEdit = useQuestionStore((state) => state.setOnEdit);
@@ -23,7 +24,7 @@ export default function Question({
     );
 
     // Custom hook
-    const { handleDeleteQuestion } = useQuestion({
+    const { handleDeleteQuestion, clearQuestionDetails } = useQuestion({
         assessmentId,
         quizId: quiz.quiz_id,
     });
@@ -51,6 +52,8 @@ export default function Question({
     };
 
     const handleEditBtn = () => {
+        console.log("EDIT BUTTON CLICKED");
+        clearQuestionDetails();
         setQuestionDetails(questionDetails);
         setQuestionOptions(questionDetails.options);
         setOnEdit(true);
@@ -61,11 +64,12 @@ export default function Question({
             ref={setNodeRef}
             {...attributes}
             style={style}
-            className={` bg-ascend-white flex shadow-shadow1 `}
+            className={` bg-ascend-white flex shadow-shadow1 relative z-100`}
         >
             <div className="space-y-2 w-full p-5 border-t border-l border-b border-ascend-gray1">
                 <div className="flex justify-end gap-1 text-ascend-black">
                     <div
+                        onMouseDown={(e) => e.stopPropagation()}
                         onClick={handleEditBtn}
                         className="p-1 rounded-3xl hover:bg-ascend-lightblue transition-all duration-300"
                     >
@@ -75,6 +79,7 @@ export default function Question({
                         />
                     </div>
                     <div
+                        onMouseDown={(e) => e.stopPropagation()}
                         onClick={() =>
                             handleDeleteQuestion(questionDetails.question_id)
                         }
@@ -188,4 +193,4 @@ export default function Question({
             </div>
         </div>
     );
-}
+});

@@ -35,7 +35,8 @@ export default function QuizFormNav() {
 
     return (
         <nav
-            className={`sticky top-0 z-100 bg-ascend-white transition-all duration-300 ${
+            id="quizform-nav"
+            className={`sticky top-0 z-999 bg-ascend-white transition-all duration-300 ${
                 isScrolledDown ? "shadow-[0px_0px_15px_5px_#a1a1a1]" : ""
             }`}
         >

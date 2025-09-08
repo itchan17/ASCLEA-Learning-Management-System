@@ -247,6 +247,7 @@ export default function useQuestion({ assessmentId, quizId }) {
     };
 
     const clearQuestionDetails = () => {
+        console.log("CLEARING QUESTION DETAILS");
         const latestQuestionDetails =
             useQuestionStore.getState().questionDetails;
         const latestQuestionOptions =
@@ -323,9 +324,9 @@ export default function useQuestion({ assessmentId, quizId }) {
         }
     };
 
-    useEffect(() => {
-        console.log(questionOptions);
-    }, [questionOptions]);
+    // useEffect(() => {
+    //     console.log(questionOptions);
+    // }, [questionOptions]);
 
     return {
         handleCreateInitialQuestion,
