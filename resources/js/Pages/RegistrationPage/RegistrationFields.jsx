@@ -3,9 +3,64 @@ import PrimaryButton from "../../Components/Button/PrimaryButton";
 import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import useRegistrationStore from "../../Stores/Registration/registrationStore";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { regions, provinces, cities, barangays } from "select-philippines-address";
+
 
 const RegistrationFields = () => {
     const route = useRoute();
+
+    // Toggle Password State
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    // Region, Province, City and Barangay
+    const [regionList, setRegionList] = useState([]);
+    const [provinceList, setProvinceList] = useState([]);
+    const [cityList, setCityList] = useState([]);
+    const [barangayList, setBarangayList] = useState([]);
+
+    useEffect(() => {
+        regions().then((res) => {
+            setRegionList(res);
+        });
+    }, []);
+
+    const handleRegionChange = (regionCode) => {
+        const selectedRegion = regionList.find(r => r.region_code === regionCode);
+        handleRegistrationChange("region", selectedRegion.region_code);
+        handleRegistrationChange("region_name", selectedRegion.region_name); // new
+        provinces(regionCode).then((res) => {
+            setProvinceList(res);
+            setCityList([]);
+            setBarangayList([]);
+        });
+    };
+
+    const handleProvinceChange = (provinceCode) => {
+        const selectedProvince = provinceList.find(p => p.province_code === provinceCode);
+        handleRegistrationChange("province", selectedProvince.province_code);
+        handleRegistrationChange("province_name", selectedProvince.province_name); // new
+        cities(provinceCode).then((res) => {
+            setCityList(res);
+            setBarangayList([]);
+        });
+    };
+
+    const handleCityChange = (cityCode) => {
+        const selectedCity = cityList.find(c => c.city_code === cityCode);
+        handleRegistrationChange("city", selectedCity.city_code);
+        handleRegistrationChange("city_name", selectedCity.city_name); // new
+        barangays(cityCode).then((res) => {
+            setBarangayList(res);
+        });
+    };
+
+    const handleBarangayChange = (brgyCode) => {
+        const selectedBarangay = barangayList.find(b => b.brgy_code === brgyCode);
+        handleRegistrationChange("barangay", selectedBarangay.brgy_code);
+        handleRegistrationChange("barangay_name", selectedBarangay.brgy_name); // new
+    };
 
     // Registration store
     const registration = useRegistrationStore((state) => state.registration);
@@ -40,6 +95,9 @@ const RegistrationFields = () => {
     return (
         <>
             <div className="mx-auto max-w-4xl bg-white">
+                <p className="text-xs text-red-500 font-nunito-sans mb-3">
+                        * All Fields are Required.
+                </p>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <div class="relative">
                         <input
@@ -52,14 +110,14 @@ const RegistrationFields = () => {
                                 )
                             }
                             id="LastNameOutlined"
-                            class="block px-3 py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
+                            class="block px-3 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
                         <label
                             for="LastNameOutlined"
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
-                            Last Name <span className="text-ascend-red">*</span>
+                            Last Name 
                         </label>
                     </div>
                     <div class="relative">
@@ -73,7 +131,7 @@ const RegistrationFields = () => {
                                 )
                             }
                             id="FirstNameOutlined"
-                            class="block px-3 py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
+                            class="block px-3 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
                         <label
@@ -81,7 +139,7 @@ const RegistrationFields = () => {
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
                             First Name{" "}
-                            <span className="text-ascend-red">*</span>
+                            
                         </label>
                     </div>
                     <div class="relative">
@@ -95,7 +153,7 @@ const RegistrationFields = () => {
                                 )
                             }
                             id="MiddleNameOutlined"
-                            class="block px-3 py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
+                            class="block px-3 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
                         <label
@@ -103,7 +161,7 @@ const RegistrationFields = () => {
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
                             Middle Name{" "}
-                            <span className="text-ascend-red">*</span>
+                            
                         </label>
                     </div>
                 </div>
@@ -119,7 +177,7 @@ const RegistrationFields = () => {
                                     e.target.value
                                 )
                             }
-                            className="w-full border border-ascend-gray1 px-3 py-2 text-sm  focus:outline-ascend-blue"
+                            className="w-full border border-ascend-gray1 px-3 py-3 text-sm  focus:outline-ascend-blue"
                         />
                     </div>
                     <div>
@@ -131,11 +189,11 @@ const RegistrationFields = () => {
                                     e.target.value
                                 )
                             }
-                            className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
+                            className="textField w-full border border-ascend-gray1 px-3 py-3 text-sm focus:outline-ascend-blue"
                         >
                             <option value="">
                                 Select sex{" "}
-                                <span className="text-ascend-red">*</span>
+                                
                             </option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
@@ -155,7 +213,7 @@ const RegistrationFields = () => {
                                 )
                             }
                             id="HouseStreetOutlined"
-                            class="block px-3 py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
+                            class="block px-3 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
                         <label
@@ -163,75 +221,102 @@ const RegistrationFields = () => {
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
                             House no., Street{" "}
-                            <span className="text-ascend-red">*</span>
+                            
                         </label>
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 pt-4">
-                    <select
-                        value={registration.province}
-                        onChange={(e) =>
-                            handleRegistrationChange("province", e.target.value)
-                        }
-                        className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
-                    >
-                        <option value="">
-                            Province <span className="text-ascend-red">*</span>
-                        </option>
-                        <option>None</option>
-                        <option>None</option>
-                    </select>
-
-                    <select
-                        value={registration.city}
-                        onChange={(e) =>
-                            handleRegistrationChange("city", e.target.value)
-                        }
-                        className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
-                    >
-                        <option value="">
-                            City <span className="text-ascend-red">*</span>
-                        </option>
-                        <option>None</option>
-                        <option>None</option>
-                    </select>
-
-                    <select
-                        value={registration.barangay}
-                        onChange={(e) =>
-                            handleRegistrationChange("barangay", e.target.value)
-                        }
-                        className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
-                    >
-                        <option value="">
-                            Barangay <span className="text-ascend-red">*</span>
-                        </option>
-                        <option>None</option>
-                        <option>None</option>
-                    </select>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-4">
+                    {/* Region */}
+                    <div>
+                        <select
+                            value={registration.region}
+                            onChange={(e) => handleRegionChange(e.target.value)}
+                            className="textField w-full border border-ascend-gray1 px-3 py-3 text-sm focus:outline-ascend-blue"
+                        >
+                            <option value="">Select Region {" "} 
+                                
+                            </option> 
+                            {regionList.map((reg) => (
+                                <option key={reg.region_code} value={reg.region_code}>
+                                    {reg.region_name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    {/* Province */}
+                    <div>
+                        <select
+                            value={registration.province}
+                            onChange={(e) => handleProvinceChange(e.target.value)}
+                            disabled={!provinceList.length}
+                            className="textField w-full border border-ascend-gray1 px-3 py-3 text-sm focus:outline-ascend-blue"
+                        >
+                            <option value="">Select Province {" "} 
+                                
+                            </option>
+                            {provinceList.map((prov) => (
+                                <option key={prov.province_code} value={prov.province_code}>
+                                    {prov.province_name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    {/* City */}
+                    <div>
+                        <select
+                            value={registration.city}
+                            onChange={(e) => handleCityChange(e.target.value)}
+                            disabled={!cityList.length}
+                            className="textField w-full border border-ascend-gray1 px-3 py-3 text-sm focus:outline-ascend-blue"
+                        >
+                            <option value="">Select City {" "} 
+                                
+                            </option>
+                            {cityList.map((ct) => (
+                                <option key={ct.city_code} value={ct.city_code}>
+                                    {ct.city_name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    {/* Barangay */}
+                    <div>
+                        <select
+                            value={registration.barangay}
+                            onChange={(e) => handleBarangayChange(e.target.value)}
+                            disabled={!barangayList.length}
+                            className="textField w-full border border-ascend-gray1 px-3 py-3 text-sm focus:outline-ascend-blue"
+                        >
+                            <option value="">Select Barangay {" "} 
+                                
+                            </option>
+                            {barangayList.map((brgy) => (
+                                <option key={brgy.brgy_code} value={brgy.brgy_code}>
+                                    {brgy.brgy_name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
-
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-4">
                     <div class="relative">
                         <input
                             type="text"
                             value={registration.contact_number}
-                            onChange={(e) =>
-                                handleRegistrationChange(
-                                    "contact_number",
-                                    e.target.value
-                                )
-                            }
+                            onChange={(e) => {
+                                const onlyNumbers = e.target.value.replace(/\D/g, "").slice(0, 11);
+                                handleRegistrationChange("contact_number", onlyNumbers);
+                                }}
                             id="ContactOutlined"
-                            class="block px-3 py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
+                            class="block px-3 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
                         <label
                             for="ContactOutlined"
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
-                            Contact Number
+                            Contact Number 
                         </label>
                     </div>
                     <div class="relative">
@@ -245,7 +330,7 @@ const RegistrationFields = () => {
                                 )
                             }
                             id="EmailAddressOutlined"
-                            class="block px-3 py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
+                            class="block px-3 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
                         <label
@@ -253,68 +338,69 @@ const RegistrationFields = () => {
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
                             Email Address{" "}
-                            <span className="text-ascend-red">*</span>
+                            
                         </label>
                     </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 pt-4">
-                    <select
-                        onChange={(e) =>
-                            handleRegistrationChange("program", e.target.value)
-                        }
-                        className="textField w-full border border-ascend-gray1 px-3 py-2 text-sm focus:outline-ascend-blue"
-                    >
-                        <option value="">
-                            Program <span className="text-ascend-red">*</span>
-                        </option>
-                        <option>LET</option>
-                        <option>CPT</option>
-                    </select>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-4">
                     <div class="relative">
-                        <input
-                            type="password"
+                    <input
+                            type={showPassword ? "text" : "password"}
                             value={registration.password}
-                            onChange={(e) =>
-                                handleRegistrationChange(
-                                    "password",
-                                    e.target.value
-                                )
-                            }
+                            onChange={(e) => handleRegistrationChange("password", e.target.value)}
                             id="PasswordOutlined"
-                            class="block px-3 py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
+                            className="block px-3 py-3 w-full text-sm bg-transparent border border-ascend-gray1 focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
+
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                            tabIndex={-1}
+                        >
+                            {showPassword ? (
+                                <AiOutlineEyeInvisible className="h-5 w-5" />
+                            ) : (
+                                <AiOutlineEye className="h-5 w-5" />
+                            )}
+                        </button>
                         <label
                             for="PasswordOutlined"
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
-                            Password <span className="text-ascend-red">*</span>
+                            Password 
                         </label>
                     </div>
                     <div class="relative">
                         <input
-                            type="password"
+                            type={showConfirmPassword ? "text" : "password"}
                             value={registration.password_confirmation}
                             onChange={(e) =>
-                                handleRegistrationChange(
-                                    "password_confirmation",
-                                    e.target.value
-                                )
+                                handleRegistrationChange("password_confirmation", e.target.value)
                             }
                             id="CPasswordOutlined"
-                            class="block px-3 py-2 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
+                            className="block px-3 py-3 w-full text-sm bg-transparent border border-ascend-gray1 focus:outline-ascend-blue peer"
                             placeholder=" "
                         />
+                        <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                        >
+                            {showConfirmPassword ? (
+                                <AiOutlineEyeInvisible className="h-5 w-5" />
+                            ) : (
+                                <AiOutlineEye className="h-5 w-5" />
+                            )}
+                        </button>
                         <label
                             for="CPasswordOutlined"
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
                             Confirm Password{" "}
-                            <span className="text-ascend-red">*</span>
+                            
                         </label>
                     </div>
                 </div>
@@ -341,7 +427,7 @@ const RegistrationFields = () => {
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 gap-4 pt-4">
+                <div className="grid grid-cols-1 gap-4 pt-4 mb-5">
                     <PrimaryButton
                         isDisabled={loading}
                         doSomething={register}
