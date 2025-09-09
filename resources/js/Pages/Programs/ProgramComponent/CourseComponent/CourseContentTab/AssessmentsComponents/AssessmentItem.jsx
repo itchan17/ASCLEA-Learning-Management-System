@@ -64,12 +64,25 @@ export default function AssessmentItem({
 
     const handleQuizClick = () => {
         if (!assessmentDetails.deleted_at) {
-            router.visit(
-                route("assessment.quiz-form.edit", {
-                    assessment: assessmentDetails.assessment_id,
-                    quiz: assessmentDetails.quiz.quiz_id,
-                })
-            );
+            // Check if the user is student, if true it will navigate the user to quiz instruction page
+            // instead of the edit quiz form
+            if (auth.user.role_name === "student") {
+                router.visit(
+                    route("assessment.quiz.instruction", {
+                        program: program.program_id,
+                        course: course.course_id,
+                        assessment: assessmentDetails.assessment_id,
+                        quiz: assessmentDetails.quiz.quiz_id,
+                    })
+                );
+            } else {
+                router.visit(
+                    route("assessment.quiz-form.edit", {
+                        assessment: assessmentDetails.assessment_id,
+                        quiz: assessmentDetails.quiz.quiz_id,
+                    })
+                );
+            }
         }
     };
 

@@ -4,7 +4,7 @@ namespace App\Services\Programs;
 
 use App\Models\Programs\Question;
 use App\Models\Programs\QuestionOption;
-
+use App\Models\Programs\Quiz;
 
 class QuestionService
 {
@@ -58,5 +58,20 @@ class QuestionService
                 ->where('sort_order', '<', $data['origSortOrder'])
                 ->increment('sort_order');
         }
+    }
+
+    public function getQuestions(Quiz $quiz)
+    {
+        // Return the list of question along with its options
+        return $quiz->questions()
+            ->with([
+                'options' => function ($query) {
+                    $query->select(['question_option_id', 'question_id', 'option_text'])
+                        ->orderBy("option_order");
+                }
+            ])
+            ->orderBy("sort_order")
+            ->paginate(10, ['*'], 'page')
+            ->withQueryString();
     }
 }

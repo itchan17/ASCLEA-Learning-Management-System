@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Programs\SaveQuizRequest;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\Quiz;
+use App\Services\Programs\QuestionService;
 use App\Services\Programs\QuizService;
 use Inertia\Inertia;
 
@@ -14,9 +15,12 @@ class QuizController extends Controller
 {
     protected QuizService $quizService;
 
-    public function __construct(QuizService $service)
+    protected QuestionService $questionService;
+
+    public function __construct(QuizService $quizService, QuestionService $questionService)
     {
-        $this->quizService = $service;
+        $this->quizService = $quizService;
+        $this->questionService = $questionService;
     }
 
     public function showEditQuizForm(Assessment $assessment, Quiz $quiz)
@@ -49,7 +53,9 @@ class QuizController extends Controller
     public function showQuizAnswerForm($assessment, Quiz $quiz)
     {
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/Components/QuizAnswerForm', [
-            'quiz' => $quiz
+            'assessmentId' => $assessment,
+            'quiz' => $quiz,
+            'questions' => $this->questionService->getQuestions($quiz)
         ]);
     }
 }

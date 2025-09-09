@@ -11,10 +11,9 @@ import useQuizAnswerForm from "./Hooks/useQuizAnswerForm";
 
 export default function QuizInstruction({ quiz, assessmentId }) {
     const [openAlertModal, setOpenAlertModal] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
 
     // Custom hook
-    const { navigateQuizAnswerForm } = useQuizAnswerForm();
+    const { navigateQuizAnswerForm, isLoading } = useQuizAnswerForm();
 
     const convertDuration = (duration) => {
         if (duration < 60) {
@@ -37,7 +36,10 @@ export default function QuizInstruction({ quiz, assessmentId }) {
         if (quiz.cheating_mitigation == true) {
             setOpenAlertModal(true);
         } else {
-            navigateQuizAnswerForm(assessmentId, quiz.quiz_id, setIsLoading);
+            navigateQuizAnswerForm({
+                assessmentId: assessmentId,
+                quizId: quiz.quiz_id,
+            });
         }
     };
 
@@ -89,11 +91,10 @@ export default function QuizInstruction({ quiz, assessmentId }) {
                     }
                     closeModal={() => setOpenAlertModal(false)}
                     onConfirm={() =>
-                        navigateQuizAnswerForm(
-                            assessmentId,
-                            quiz.quiz_id,
-                            setIsLoading
-                        )
+                        navigateQuizAnswerForm({
+                            assessmentId: assessmentId,
+                            quizId: quiz.quiz_id,
+                        })
                     }
                     isLoading={isLoading}
                 />
