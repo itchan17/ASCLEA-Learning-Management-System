@@ -37,4 +37,19 @@ class QuizController extends Controller
 
         return response()->json('Quiz changes was successfully saved.');
     }
+
+    public function showQuizInstruction($program, $course, $assessment, Quiz $quiz)
+    {
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/QuizInstruction', [
+            'assessmentId' => $assessment,
+            'quiz' => $quiz
+        ]);
+    }
+
+    public function showQuizAnswerForm($assessment, Quiz $quiz)
+    {
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/Components/QuizAnswerForm', [
+            'quiz' => $quiz
+        ]);
+    }
 }
