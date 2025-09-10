@@ -13,4 +13,6 @@ Route::prefix('courses/{course}/assessments/{assessment}/quizzes/')
 
         // Route to display the quiz asnwer form for student
         Route::get('{quiz}/response', [AssessmentSubmissionController::class, 'showQuizAnswerForm'])->name('assessment.quizzes.quiz');
+
+        Route::get('{quiz}/submitted', [AssessmentSubmissionController::class, 'showSubmittedPage'])->name('quizzes.quiz.submitted.page');
     });

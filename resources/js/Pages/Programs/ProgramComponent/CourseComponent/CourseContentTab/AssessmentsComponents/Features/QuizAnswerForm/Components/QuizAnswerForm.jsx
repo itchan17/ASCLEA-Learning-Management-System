@@ -8,7 +8,12 @@ import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryB
 import SecondaryButton from "../../../../../../../../../Components/Button/SecondaryButton";
 import useQuizAnswerForm from "../Hooks/useQuizAnswerForm";
 
-export default function QuizAnswerForm({ assessmentId, quiz, questions }) {
+export default function QuizAnswerForm({
+    courseId,
+    assessmentId,
+    quiz,
+    questions,
+}) {
     // Custom hook
     const { navigateQuizAnswerForm } = useQuizAnswerForm();
 
@@ -49,6 +54,7 @@ export default function QuizAnswerForm({ assessmentId, quiz, questions }) {
                             <SecondaryButton
                                 doSomething={() =>
                                     navigateQuizAnswerForm({
+                                        courseId: courseId,
                                         assessmentId: assessmentId,
                                         quizId: quiz.quiz_id,
                                         page: questions.current_page - 1,
@@ -61,6 +67,7 @@ export default function QuizAnswerForm({ assessmentId, quiz, questions }) {
                         <PrimaryButton
                             doSomething={() =>
                                 navigateQuizAnswerForm({
+                                    courseId: courseId,
                                     assessmentId: assessmentId,
                                     quizId: quiz.quiz_id,
                                     page: questions.current_page + 1,

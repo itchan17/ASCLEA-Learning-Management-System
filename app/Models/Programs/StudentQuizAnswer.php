@@ -4,6 +4,7 @@ namespace App\Models\Programs;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StudentQuizAnswer extends Model
 {
@@ -23,4 +24,9 @@ class StudentQuizAnswer extends Model
         'is_correct',
         'feedback',
     ];
+
+    public function question(): BelongsTo
+    {
+        return $this->belongsTo(Question::class, 'question_id');
+    }
 }

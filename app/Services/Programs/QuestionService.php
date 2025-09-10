@@ -60,7 +60,7 @@ class QuestionService
         }
     }
 
-    public function getQuestions(Quiz $quiz)
+    public function getQuestions(Quiz $quiz, string $assessmentSubmisisonId)
     {
         // Return the list of question along with its options
         return $quiz->questions()
@@ -68,6 +68,11 @@ class QuestionService
                 'options' => function ($query) {
                     $query->select(['question_option_id', 'question_id', 'option_text'])
                         ->orderBy("option_order");
+                }
+            ])
+            ->with([
+                'studentAnswers' => function ($query) use ($assessmentSubmisisonId) {
+                    $query->where('assessment_submission_id', $assessmentSubmisisonId);
                 }
             ])
             ->orderBy("sort_order")
