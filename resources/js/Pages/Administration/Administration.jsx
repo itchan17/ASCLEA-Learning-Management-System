@@ -67,8 +67,8 @@ export default function Administration() {
                 />
             </div>
             <div className="flex justify-end items-center">
-                <BiFilter className="text-size5 shrink-0" />
-                <div className="font-bold text-size2 pr-10">Filter</div>
+                {/*<BiFilter className="text-size5 shrink-0" />
+                <div className="font-bold text-size2 pr-10">Filter</div>*/}
                 <div className="relative">
                     <input
                         className="w-full sm:w-50 border h-9 pl-10 p-2 border-ascend-black focus:outline-ascend-blue"

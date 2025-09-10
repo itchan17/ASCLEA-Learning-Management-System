@@ -45,6 +45,8 @@ class Staff extends Model
         'created_by',
     ];
 
+    protected $dates = ['deleted_at'];
+
     /**
      * Relationship to the User model.
      */
@@ -60,4 +62,10 @@ class Staff extends Model
     {
         return $this->hasMany(\App\Models\AssignedCourse::class, 'staff_id', 'staff_id');
     }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'created_by', 'user_id');
+    }
+
 }

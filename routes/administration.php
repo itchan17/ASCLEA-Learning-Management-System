@@ -33,5 +33,5 @@ Route::prefix('administration')
         Route::get('staff/{id}/courses', [StaffController::class, 'showAssignedCourses'])->name('staff.courses');
 
         // View staff details (like your old closure)
-        Route::get('/{userId}', [StaffController::class, 'administrationView'])->name('administration.view');
+        Route::get('/{staffId}', [StaffController::class, 'administrationView'])->name('administration.view');
 });

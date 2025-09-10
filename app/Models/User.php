@@ -52,11 +52,13 @@ class User extends Authenticatable implements MustVerifyEmail
         'contact_number',
         'email',
         'house_no',
+        'region',
         'province',
         'city',
         'barangay',
         'password',
         'role_id',
+        'profile_image', //added profile image
     ];
 
     /**

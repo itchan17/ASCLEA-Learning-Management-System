@@ -55,13 +55,14 @@ class StaffController extends Controller
 
 
     // Show the staff detail page (wrapper)
-    public function administrationView($userId)
+    public function administrationView($staffId)
     {
+        $staff = Staff::with(['user', 'createdBy'])->findOrFail($staffId);
+
         return Inertia::render('Administration/AdministrationComponents/ViewStaff', [
-            'userId' => $userId,
+            'staffDetails' => $staff
         ]);
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -110,7 +111,7 @@ class StaffController extends Controller
             'created_by' => auth()->id(),
         ]);
 
-        return redirect()->route('administration.index')->with('success', 'Staff added successfully.');
+        return back()->with('success', 'Staff added successfully.');
     }
 
 
@@ -132,7 +133,7 @@ class StaffController extends Controller
      */
     public function edit($id)
     {
-        $staff = Staff::with('user')->findOrFail($id);
+        $staff = Staff::with(['user', 'createdBy'])->findOrFail($id);
 
         return Inertia::render('Staff/Edit', [
             'staff' => $staff
@@ -145,18 +146,48 @@ class StaffController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $staff = Staff::findOrFail($id);
+        $staff = Staff::with('user')->findOrFail($id);
 
         $request->validate([
-            'status' => 'required|in:active,inactive',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $staff->user->user_id . ',user_id',
+            'contact_number' => 'nullable|string|max:20',
+            'birthdate' => 'nullable|date',
+            'gender' => 'nullable|in:male,female,other',
+            'house_no' => 'nullable|string|max:255',
+            'region' => 'nullable|string|max:255',
+            'province' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'barangay' => 'nullable|string|max:255',
+            'status' => 'required|in:active,inactive'
         ]);
 
-        $staff->update([
-            'status' => $request->status,
+        // Update all user info (all fields in $fillable)
+        $staff->user->update([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'middle_name' => $request->middle_name,
+            'email' => $request->email,
+            'contact_number' => $request->contact_number,
+            'birthdate' => $request->birthdate,
+            'gender' => $request->gender,
+            'status' => $request->status
+        ]);
+        
+        $staff->user->update([
+            'house_no' => $request->house_no,
+            'region' => $request->region,
+            'province' => $request->province,
+            'city' => $request->city,
+            'barangay' => $request->barangay,
         ]);
 
-        return redirect()->route('staff.index')->with('success', 'Staff updated successfully.');
+
+        return redirect()->back()->with('success', 'Staff updated successfully.');
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -166,7 +197,7 @@ class StaffController extends Controller
         $staff = Staff::findOrFail($id);
         $staff->delete(); // uses SoftDeletes
 
-        return redirect()->route('staff.index')->with('success', 'Staff archived successfully.');
+        return redirect()->route('administration.index')->with('success', 'Staff archived successfully.');
     }
 
     public function showAssignedCourses($id)
