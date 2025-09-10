@@ -10,12 +10,11 @@ export default function Quiz({ quizDetails }) {
 
     console.log(usePage().props);
 
-    const { auth, programId, courseId } = usePage().props;
+    const { auth, courseId } = usePage().props;
     const handleQuizClick = () => {
         if (auth.user.role_name === "student") {
             router.visit(
                 route("assessment.quiz.instruction", {
-                    program: programId,
                     course: courseId,
                     assessment: quizDetails.assessment_id,
                     quiz: quizDetails.quiz_id,

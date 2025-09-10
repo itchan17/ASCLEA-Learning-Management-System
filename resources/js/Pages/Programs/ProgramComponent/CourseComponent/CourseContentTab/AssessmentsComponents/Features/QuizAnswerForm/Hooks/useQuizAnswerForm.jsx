@@ -9,6 +9,7 @@ export default function useQuizAnswerForm() {
     // Has a parameter of page for getting the next or prev page
     // preserveUrl is used to prevent displaying the current page in the url
     const navigateQuizAnswerForm = ({
+        courseId,
         assessmentId,
         quizId,
         page,
@@ -17,6 +18,7 @@ export default function useQuizAnswerForm() {
         setIsLoading(true);
         router.visit(
             route("assessment.quizzes.quiz", {
+                course: courseId,
                 assessment: assessmentId,
                 quiz: quizId,
                 page: page,

@@ -69,7 +69,6 @@ export default function AssessmentItem({
             if (auth.user.role_name === "student") {
                 router.visit(
                     route("assessment.quiz.instruction", {
-                        program: program.program_id,
                         course: course.course_id,
                         assessment: assessmentDetails.assessment_id,
                         quiz: assessmentDetails.quiz.quiz_id,

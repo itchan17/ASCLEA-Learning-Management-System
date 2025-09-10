@@ -9,7 +9,7 @@ import { AiFillCheckCircle } from "react-icons/ai";
 import AlertModal from "../../../../../../../../Components/AlertModal";
 import useQuizAnswerForm from "./Hooks/useQuizAnswerForm";
 
-export default function QuizInstruction({ quiz, assessmentId }) {
+export default function QuizInstruction({ courseId, quiz, assessmentId }) {
     const [openAlertModal, setOpenAlertModal] = useState(false);
 
     // Custom hook
@@ -37,6 +37,7 @@ export default function QuizInstruction({ quiz, assessmentId }) {
             setOpenAlertModal(true);
         } else {
             navigateQuizAnswerForm({
+                courseId: courseId,
                 assessmentId: assessmentId,
                 quizId: quiz.quiz_id,
             });
@@ -92,6 +93,7 @@ export default function QuizInstruction({ quiz, assessmentId }) {
                     closeModal={() => setOpenAlertModal(false)}
                     onConfirm={() =>
                         navigateQuizAnswerForm({
+                            courseId: courseId,
                             assessmentId: assessmentId,
                             quizId: quiz.quiz_id,
                         })
