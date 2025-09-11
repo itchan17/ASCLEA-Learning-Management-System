@@ -25,6 +25,13 @@ class StudentQuizAnswer extends Model
         'feedback',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'is_correct' => 'boolean',
+        ];
+    }
+
     public function question(): BelongsTo
     {
         return $this->belongsTo(Question::class, 'question_id');

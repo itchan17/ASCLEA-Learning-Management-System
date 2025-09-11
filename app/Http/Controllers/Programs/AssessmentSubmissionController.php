@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Programs;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Programs\RequiredQuestionRequest;
+use App\Models\Programs\Question;
 use App\Models\Programs\Quiz;
 use App\Services\Programs\AssessmentSubmissionService;
 use App\Services\Programs\QuestionService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
 class AssessmentSubmissionController extends Controller
@@ -74,6 +78,12 @@ class AssessmentSubmissionController extends Controller
             'assessment' => $assessment,
             'quiz' => $quiz,
         ]);
+    }
+
+    // In the form request valdiates if all required questions was completed
+    public function validateRequiredQuestions(RequiredQuestionRequest $request, $course, $assessment, Quiz $quiz)
+    {
+        return response()->json(['message' => 'All required questions was completed']);
     }
 
     public function showSubmittedPage($course, $assessment, Quiz $quiz)

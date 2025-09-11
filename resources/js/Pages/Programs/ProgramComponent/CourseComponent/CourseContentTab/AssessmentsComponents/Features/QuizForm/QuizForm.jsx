@@ -32,7 +32,7 @@ export function useQuiz() {
     return useContext(QuizContext);
 }
 
-export default function QuizForm({ assessmentId, quiz }) {
+export default function QuizForm({ courseId, assessmentId, quiz }) {
     // Custom hooks
     const { debounceAutoSave } = useQuizAutosave({
         assessmentId,
@@ -71,6 +71,12 @@ export default function QuizForm({ assessmentId, quiz }) {
     const setAssessmentList = useAssessmentsStore(
         (state) => state.setAssessmentList
     );
+    const assessmentByCourse = useAssessmentsStore(
+        (state) => state.assessmentByCourse
+    );
+    const updateAssessmentInList = useAssessmentsStore(
+        (state) => state.updateAssessmentInList
+    );
 
     // Refs
     const targetForm = useRef(null);
@@ -91,10 +97,13 @@ export default function QuizForm({ assessmentId, quiz }) {
         };
     }, []);
 
-    // Function that updates the quiz title in the assessment list
+    // Function that updates the quiz title in the assessment list of the course
     const updateQuizTitleInAssessmentList = () => {
-        if (assessmentList.length > 0) {
-            const assessmentToUpdate = assessmentList.find(
+        if (
+            assessmentByCourse[courseId] &&
+            assessmentByCourse[courseId].list.length > 0
+        ) {
+            const assessmentToUpdate = assessmentByCourse[courseId].list.find(
                 (assessment) => assessment.assessment_id === assessmentId
             );
 
@@ -103,20 +112,21 @@ export default function QuizForm({ assessmentId, quiz }) {
                 assessmentToUpdate &&
                 assessmentToUpdate.quiz.quiz_title !== quizDetails.quiz_title
             ) {
-                const updatedQuizTitle = assessmentList.map((assessment) =>
-                    assessment.assessment_id === assessmentId &&
-                    assessment.assessment_type.assessment_type === "quiz"
-                        ? {
-                              ...assessment,
-                              quiz: {
-                                  ...assessment.quiz,
-                                  quiz_title: quizDetails.quiz_title,
-                              },
-                          }
-                        : assessment
+                const updatedQuizTitle = assessmentByCourse[courseId].list.map(
+                    (assessment) =>
+                        assessment.assessment_id === assessmentId &&
+                        assessment.assessment_type.assessment_type === "quiz"
+                            ? {
+                                  ...assessment,
+                                  quiz: {
+                                      ...assessment.quiz,
+                                      quiz_title: quizDetails.quiz_title,
+                                  },
+                              }
+                            : assessment
                 );
 
-                setAssessmentList(updatedQuizTitle);
+                updateAssessmentInList(updatedQuizTitle, courseId);
             }
         }
     };

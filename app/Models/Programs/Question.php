@@ -39,6 +39,13 @@ class Question extends Model
         'is_required',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'is_required' => 'boolean',
+        ];
+    }
+
     public function quiz(): BelongsTo
     {
         return $this->belongsTo(Quiz::class, 'quiz_id');

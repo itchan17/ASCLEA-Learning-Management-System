@@ -29,6 +29,14 @@ class Quiz extends Model
         'show_answers_after',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'cheating_mitigation' => 'boolean',
+            'show_answers_after' => 'boolean',
+        ];
+    }
+
     public function assessment(): BelongsTo
     {
         return  $this->belongsTo(Assessment::class, 'assessment_id');

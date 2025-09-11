@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function QuestionItem({ questionId, questionDetails }) {
+export default function QuestionItem({ questionDetails }) {
     return (
         <div className="p-5 shadow-shadow1 border border-ascend-gray1 space-y-5">
             <div className="flex">
@@ -41,6 +41,11 @@ export default function QuestionItem({ questionId, questionDetails }) {
                                         name={questionDetails.question_id}
                                         value={option.option_text}
                                         className="w-5 h-5 accent-ascend-blue shrink-0"
+                                        onChange={(e) =>
+                                            console.log(
+                                                `OPTION ID: ${option.question_option_id} QUESTION ID: ${questionDetails.question_id}`
+                                            )
+                                        }
                                     />
                                     <span className="ml-3 min-w-0 break-words">
                                         {option.option_text}
