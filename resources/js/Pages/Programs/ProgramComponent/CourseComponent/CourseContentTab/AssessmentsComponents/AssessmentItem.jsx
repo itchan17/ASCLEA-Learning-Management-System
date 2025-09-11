@@ -25,10 +25,6 @@ export default function AssessmentItem({
     const setAssessmentDetails = useAssessmentsStore(
         (state) => state.setAssessmentDetails
     );
-    const assessmentList = useAssessmentsStore((state) => state.assessmentList);
-    const setAssessmentList = useAssessmentsStore(
-        (state) => state.setAssessmentList
-    );
     const updateAssessmentInList = useAssessmentsStore(
         (state) => state.updateAssessmentInList
     );
@@ -104,13 +100,8 @@ export default function AssessmentItem({
                 })
             );
 
-            const updatedAssessmentList = assessmentList.map((assessment) =>
-                assessment.assessment_id === response.data.data.assessment_id
-                    ? response.data.data
-                    : assessment
-            );
+            updateAssessmentInList(response.data.data, course.course_id);
 
-            setAssessmentList(updatedAssessmentList);
             displayToast(
                 <DefaultCustomToast message={response.data.success} />,
                 "success"
@@ -138,7 +129,10 @@ export default function AssessmentItem({
                 })
             );
             console.log(response);
-            updateAssessmentInList(response.data.archivedAssessment);
+            updateAssessmentInList(
+                response.data.archivedAssessment,
+                course.course_id
+            );
 
             displayToast(
                 <DefaultCustomToast message={response.data.success} />,
@@ -167,7 +161,10 @@ export default function AssessmentItem({
                 })
             );
             console.log(response);
-            updateAssessmentInList(response.data.restoredAssessment);
+            updateAssessmentInList(
+                response.data.restoredAssessment,
+                course.course_id
+            );
 
             displayToast(
                 <DefaultCustomToast message={response.data.success} />,

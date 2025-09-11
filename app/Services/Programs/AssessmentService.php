@@ -103,15 +103,46 @@ class AssessmentService
         // Query for getting all related data of the assessment
         // also get soft deleted assessment but with conditon
         // that it only displays assessment deleted by the user
-        return Assessment::where('course_id', $courseId)->with('assessmentType')->with(['author' => function ($query) {
-            $query->select('user_id', 'first_name', 'last_name');
-        }])->where('created_by', $user->user_id)->orWhere('status', 'published')->with(['quiz' => function ($query) {
-            $query->select('assessment_id', 'quiz_id', 'quiz_title');
-        }])->with(['files' => function ($query) {
-            $query->select('assessment_id', 'assessment_file_id', 'file_name', 'file_path');
-        }])->withTrashed()->where(function ($query) use ($user) {
-            $query->whereNull('deleted_at')->orWhere('created_by', $user->user_id);
-        })->select('assessment_id', 'assessment_type_id', 'created_by', 'assessment_title', 'assessment_description', 'status', 'course_id', 'due_datetime', 'total_points', 'created_at', 'updated_at', 'deleted_at')->orderBy('created_at', 'desc')->orderBy('assessment_id', 'desc')->paginate(5);
+        $assessmentList = Assessment::where('course_id', $courseId)
+            ->with('assessmentType')
+            ->with(['author' => function ($query) {
+                $query->select('user_id', 'first_name', 'last_name');
+            }])
+            ->where(function ($query) use ($user) {
+                $query->where('created_by', $user->user_id)
+                    ->orWhere('status', 'published');
+            })
+            ->with(['quiz' => function ($query) {
+                $query->select('assessment_id', 'quiz_id', 'quiz_title');
+            }])
+            ->with(['files' => function ($query) {
+                $query->select('assessment_id', 'assessment_file_id', 'file_name', 'file_path');
+            }])
+            ->withTrashed()
+            ->where(function ($query) use ($user) {
+                $query->whereNull('deleted_at')
+                    ->orWhere('created_by', $user->user_id);
+            })
+            ->select(
+                'assessment_id',
+                'assessment_type_id',
+                'created_by',
+                'assessment_title',
+                'assessment_description',
+                'status',
+                'course_id',
+                'due_datetime',
+                'total_points',
+                'created_at',
+                'updated_at',
+                'deleted_at'
+            )
+            ->orderBy('created_at', 'desc')
+            ->orderBy('assessment_id', 'desc')
+            ->paginate(5);
+
+
+        return $assessmentList;
     }
 
     public function updateAssessment(Assessment $assessment, array $updatedData, bool $isUnpublish = false)

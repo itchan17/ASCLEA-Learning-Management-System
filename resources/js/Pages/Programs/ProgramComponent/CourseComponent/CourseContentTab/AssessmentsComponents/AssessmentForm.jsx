@@ -103,7 +103,7 @@ export default function AssessmentForm({
             }
         );
 
-        addNewAssessment(response.data.data);
+        addNewAssessment(response.data.data, course.course_id);
 
         displayToast(
             <DefaultCustomToast message={response.data.success} />,
@@ -131,7 +131,7 @@ export default function AssessmentForm({
         );
 
         // Change the updated assessment data in the list
-        updateAssessmentInList(response.data.data);
+        updateAssessmentInList(response.data.data, course.course_id);
 
         displayToast(
             <DefaultCustomToast message={response.data.success} />,
@@ -150,7 +150,6 @@ export default function AssessmentForm({
                 await addAssessment();
             }
 
-            setIsLoading(false);
             toggleForm();
             clearAssessmentDetails();
         } catch (error) {
@@ -168,6 +167,7 @@ export default function AssessmentForm({
                     "error"
                 );
             }
+        } finally {
             setIsLoading(false);
         }
     };
