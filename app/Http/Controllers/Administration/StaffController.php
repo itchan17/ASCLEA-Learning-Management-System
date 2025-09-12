@@ -24,7 +24,7 @@ class StaffController extends Controller
         $roleIds = Role::whereIn('role_name', ['admin', 'faculty'])->pluck('role_id')->toArray();
 
         // Query Staff with related user, filtered by role
-        $query = Staff::with('user.role') // load the user and their role
+        $query = Staff::with(['user.role', 'user.lastLogin', 'user.lastLogout']) // load the user and their role
         ->whereHas('user', function($q) use ($roleIds) {
         $q->whereIn('role_id', $roleIds);
         });
@@ -211,5 +211,23 @@ class StaffController extends Controller
             'courses' => $courses
         ]);
     }
+
+    public function updateProfile(Request $request, $id)
+    {
+        $staff = Staff::with('user')->findOrFail($id);
+
+        if ($request->hasFile('profile_image')) {
+            $path = $request->file('profile_image')->store('profile_images', 'public');
+
+            // update profile_image on the related user
+            $staff->user->update([
+                'profile_image' => $path,
+            ]);
+        }
+
+        return back()->with('success', 'Profile updated successfully!');
+    }
+
+
 
 }

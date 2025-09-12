@@ -101,4 +101,20 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Assessment::class, 'created_by', 'user_id');
     }
+
+    public function logins()
+    {
+        return $this->hasMany(UserLogin::class, 'user_id', 'id'); 
+        // user_logins.user_id → users.id
+    }
+
+    public function lastLogin()
+    {
+        return $this->hasOne(UserLogin::class, 'user_id', 'user_id')->latestOfMany('login_at');
+    }
+
+    public function lastLogout()
+    {
+        return $this->hasOne(UserLogin::class, 'user_id', 'user_id')->latestOfMany('logout_at');
+    }
 }

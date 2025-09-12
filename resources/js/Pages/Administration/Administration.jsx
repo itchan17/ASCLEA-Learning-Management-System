@@ -106,6 +106,9 @@ export default function Administration() {
                             <th className="text-ascend-black font-black">
                                 Last login
                             </th>
+                            {/*<th className="text-ascend-black font-black">
+                                Last Logout
+                            </th>*/}
                         </tr>
                     </thead>
                     <tbody>
@@ -124,7 +127,12 @@ export default function Administration() {
                                     <td>{staff.user.email || "N/A"}</td>
                                     <td>{staff.user?.role?.role_name || "N/A"}</td>
                                     <td>{staff.status || "N/A"}</td>
-                                    <td>{staff.user.last_login || "N/A"}</td>
+                                    <td>
+                                    {staff.user?.last_login?.login_at
+                                        ? new Date(staff.user.last_login.login_at).toLocaleDateString("en-US") : "N/A"}
+                                    </td>
+                                    {/*<td>{staff.user?.last_logout?.logout_at || "N/A"}</td>*/}
+
                                 </tr>
                             ))
                         ) : (

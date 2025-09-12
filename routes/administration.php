@@ -20,6 +20,9 @@ Route::prefix('administration')
         // Store new staff
         Route::get('staff/{id}', [StaffController::class, 'show'])->name('staff.show');
 
+        // Update Photo
+        Route::put('staff/{id}/profile', [StaffController::class, 'updateProfile'])->name('staff.profile.update');
+
         // Show edit form
         Route::get('staff/{id}/edit', [StaffController::class, 'edit'])->name('staff.edit');
 

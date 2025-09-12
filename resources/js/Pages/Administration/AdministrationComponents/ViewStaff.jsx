@@ -13,6 +13,9 @@ import { regions, provinces, cities, barangays } from "select-philippines-addres
 import AlertModal from "../../../Components/AlertModal";
 import { displayToast } from "../../../Utils/displayToast";
 import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToast";
+import { router } from "@inertiajs/react";
+import Loader from "../../../Components/Loader";
+
 
 export default function ViewStaff() {
     const route = useRoute();
@@ -232,6 +235,33 @@ export default function ViewStaff() {
         setData("barangay", selectedBarangay.brgy_name);
     };
 
+    const [isProfileLoading, setIsProfileLoading] = useState(false);
+    const [updateProfileError, setUpdateProfileError] = useState(null);
+
+    const handleProfileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsProfileLoading(true);
+
+    router.post(
+        route("staff.profile.update", staffDetails.staff_id), // make sure you have this route in Laravel
+        { _method: "put", profile_image: file },
+        {
+            showProgress: false,
+            onError: (error) => {
+                setUpdateProfileError(error);
+                setIsProfileLoading(false);
+            },
+            onFinish: () => {
+                setIsProfileLoading(false);
+            },
+        }
+    );
+};
+
+
+
     //=============================================================================================//
     return (
         <div className="space-y-5 font-nunito-sans">
@@ -258,10 +288,33 @@ export default function ViewStaff() {
             <div className="flex flex-wrap gap-5 items-center justify-between">
                 <div className="justify-start flex items-center">
                     <div className="relative w-18 h-18 bg-ascend-gray1 rounded-full shrink-0">
-                        <label htmlFor="inputBg">
+                        {isProfileLoading && (
+                            <>
+                                <div className="absolute inset-0 bg-ascend-lightblue opacity-40 rounded-full"></div>
+                                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                                    <Loader color="bg-ascend-blue" size="sm" />
+                                </div>
+                            </>
+                        )}
+                        <img
+                            src={
+                                staffDetails?.user?.profile_image
+                                    ? `/storage/${staffDetails.user.profile_image}`
+                                    : "/images/default_profile.png"
+                            }
+                            alt="Profile"
+                            className="w-full h-full object-cover rounded-full"
+                        />
+                        <label htmlFor="inputProfile">
                             <BiSolidEditAlt className="text-size4 text-ascend-black absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer" />
                         </label>
-                        <input className="hidden" type="file" id="inputBg" />
+                        <input
+                            id="inputProfile"
+                            type="file"
+                            className="hidden"
+                            accept="image/*"
+                            onChange={handleProfileChange}
+                        />
                     </div>
                     <div className="flex flex-col ml-2">
                         <div className="flex items-center gap-2">
