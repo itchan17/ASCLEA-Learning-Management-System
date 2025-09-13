@@ -6,6 +6,7 @@ use App\Models\Programs\Question;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\ValidationException;
 
 class RequiredQuestionRequest extends FormRequest
 {
@@ -25,31 +26,15 @@ class RequiredQuestionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'answers' => 'required|array',
-            'answers.*.answer_id' => [
-                function ($attribute, $value, $fail) {
-                    $index = explode('.', $attribute)[1];
-                    $questionId = $this->input("answers.$index.question_id");
+            'answers.*.student_answer' => 'required_if:answers.*.is_required,true'
+        ];
+    }
 
-                    $question = Question::find($questionId);
-
-                    if ($question && $question->is_required && !$value && in_array($question->question_type, ['multiple_choice', 'true_or_false'])) {
-                        $fail("This question is required.");
-                    }
-                }
-            ],
-            'answers.*.answer_text' => [
-                function ($attribute, $value, $fail) {
-                    $index = explode('.', $attribute)[1];
-                    $questionId = $this->input("answers.$index.question_id");
-
-                    $question = Question::find($questionId);
-
-                    if ($question && $question->is_required && !$value && $question->question_type === "identification") {
-                        $fail("This question is required.");
-                    }
-                }
-            ],
+    public function messages(): array
+    {
+        // Require student_answer if the question is required
+        return [
+            'answers.*.student_answer.required_if' => 'This question is required.',
         ];
     }
 
@@ -59,6 +44,7 @@ class RequiredQuestionRequest extends FormRequest
 
         $formatted = [];
 
+        // Errors need to be formatted with question_id as key name, to be easily display to question in frontend
         foreach ($errors as $key => $messages) {
             if (preg_match('/answers\.(\d+)\./', $key, $matches)) {
                 $index = (int) $matches[1];
@@ -67,11 +53,8 @@ class RequiredQuestionRequest extends FormRequest
             }
         }
 
-        throw new HttpResponseException(
-            response()->json([
-                'message' => 'Required questions was not completed.',
-                'errors'  => $formatted,
-            ], 422)
-        );
+        $response = back()->withErrors($formatted)->withInput();
+
+        throw new ValidationException($validator, $response);
     }
 }

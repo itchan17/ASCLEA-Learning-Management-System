@@ -1,6 +1,30 @@
-import React from "react";
+import { useState, useEffect } from "react";
+import useQuizAnswerForm from "../Hooks/useQuizAnswerForm";
+import { usePage } from "@inertiajs/react";
 
-export default function QuestionItem({ questionDetails }) {
+export default function QuestionItem({ questionDetails, requiredError }) {
+    const { assessmentSubmission, courseId } = usePage().props;
+
+    // Custom hook
+    const { handleAnswerQuestion, debouncedSaveAnswer } = useQuizAnswerForm();
+
+    const [answer, setAnswer] = useState(
+        questionDetails.student_answer
+            ? questionDetails.question_type !== "identification"
+                ? questionDetails.student_answer.answer_id
+                : questionDetails.student_answer.answer_text
+            : ""
+    );
+
+    // useEffect(() => {
+    //     debouncedSaveAnswer(
+    //         answer,
+    //         courseId,
+    //         assessmentSubmission.assessment_submission_id,
+    //         questionDetails.question_id
+    //     );
+    // }, [answer]);
+
     return (
         <div className="p-5 shadow-shadow1 border border-ascend-gray1 space-y-5">
             <div className="flex">
@@ -40,10 +64,17 @@ export default function QuestionItem({ questionDetails }) {
                                         type="radio"
                                         name={questionDetails.question_id}
                                         value={option.option_text}
+                                        checked={
+                                            answer === option.question_option_id
+                                        }
                                         className="w-5 h-5 accent-ascend-blue shrink-0"
-                                        onChange={(e) =>
-                                            console.log(
-                                                `OPTION ID: ${option.question_option_id} QUESTION ID: ${questionDetails.question_id}`
+                                        onChange={() =>
+                                            handleAnswerQuestion(
+                                                option.question_option_id,
+                                                setAnswer,
+                                                courseId,
+                                                assessmentSubmission.assessment_submission_id,
+                                                questionDetails.question_id
                                             )
                                         }
                                     />
@@ -56,12 +87,23 @@ export default function QuestionItem({ questionDetails }) {
                             <input
                                 type="text"
                                 placeholder="Enter answer"
+                                value={answer}
+                                onChange={(e) =>
+                                    handleAnswerQuestion(
+                                        e.target.value,
+                                        setAnswer,
+                                        courseId,
+                                        assessmentSubmission.assessment_submission_id,
+                                        questionDetails.question_id
+                                    )
+                                }
                                 className="p-2 h-9 w-full border border-ascend-gray1 focus:outline-ascend-blue"
                             />
                         )}
                     </div>
                 </div>
             </div>
+            <span className="text-ascend-red">{requiredError}</span>
         </div>
     );
 }

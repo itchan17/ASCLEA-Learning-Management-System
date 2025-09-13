@@ -20,14 +20,13 @@ class StudentQuizAnswerController extends Controller
     public function answerQuestion(Request $request, $course, $assessmentSubmission, Question $question)
     {
         $validated = $request->validate([
-            'answer_id' => 'nullable|string',
-            'answer_text' => 'nullable|string',
+            'answer' => 'nullable|string',
         ]);
 
-        $isAnswerCorrect = $this->studentQuizAnswerService->checkAnswer($question, $validated);
+        $isAnswerCorrect = $this->studentQuizAnswerService->checkAnswer($question, $validated['answer']);
 
-        $this->studentQuizAnswerService->createOrUpdateQuestionAnswer($assessmentSubmission, $question->question_id, $isAnswerCorrect, $validated);
+        $answer = $this->studentQuizAnswerService->createOrUpdateQuestionAnswer($assessmentSubmission, $question->question_id, $isAnswerCorrect, $validated['answer'], $question->question_type);
 
-        dd($isAnswerCorrect);
+        return response()->json(['message' => "Question answered sucessfully.", 'answer' => $answer ? $answer->only(['student_quiz_answer_id', 'assessment_submission_id', 'question_id', 'answer_id', 'answer_text']) : null]);
     }
 }

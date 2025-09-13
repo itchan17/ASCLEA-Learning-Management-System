@@ -9,7 +9,6 @@ use App\Models\Programs\Quiz;
 use App\Services\Programs\AssessmentSubmissionService;
 use App\Services\Programs\QuestionService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
@@ -65,10 +64,10 @@ class AssessmentSubmissionController extends Controller
         if (!$assessmentSubmission->submitted_at) {
             return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/Components/QuizAnswerForm', [
                 'courseId' => $course,
-                'assessmentSubmission' => $assessmentSubmission,
+                'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'submitted_at']),
                 'assessmentId' => $assessment,
                 'quiz' => $quiz,
-                'questions' => $this->questionService->getQuestions($quiz, $assessmentSubmission->assessment_submission_id)
+                'questions' => fn() => $this->questionService->getQuestions($quiz, $assessmentSubmission->assessment_submission_id)
             ]);
         }
 
@@ -83,7 +82,13 @@ class AssessmentSubmissionController extends Controller
     // In the form request valdiates if all required questions was completed
     public function validateRequiredQuestions(RequiredQuestionRequest $request, $course, $assessment, Quiz $quiz)
     {
-        return response()->json(['message' => 'All required questions was completed']);
+        // Redirect to the next page of the quiz using the page pass from the payload
+        return redirect()->route('assessment.quizzes.quiz', [
+            'course' => $course,
+            'assessment' => $assessment,
+            'quiz' => $quiz,
+            'page' => $request->page
+        ]);
     }
 
     public function showSubmittedPage($course, $assessment, Quiz $quiz)

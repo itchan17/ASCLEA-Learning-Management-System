@@ -27,7 +27,7 @@ class AssessmentSubmissionService
 
     public function getAssessmentSubmission(string $assignedCourseId, string $assesmentId)
     {
-        $assessmentSubmission = AssessmentSubmission::where('assessment_id', $assesmentId)->where('submitted_by', $assignedCourseId)->get()->first();
+        $assessmentSubmission = AssessmentSubmission::where('assessment_id', $assesmentId)->where('submitted_by', $assignedCourseId)->first();
 
         return $assessmentSubmission;
     }
@@ -35,14 +35,13 @@ class AssessmentSubmissionService
     // This create the initial data of the assessment submission when the user start answering the quiz
     public function createAssessmentSubmission(string $assignedCourseId, string $assessmentId)
     {
-        $assessmentSubmisison =  AssessmentSubmission::create(
+        $assessmentSubmission =  AssessmentSubmission::create(
             [
                 'assessment_id' => $assessmentId,
                 'submitted_by' => $assignedCourseId,
-
             ]
         );
 
-        return $assessmentSubmisison;
+        return $assessmentSubmission;
     }
 }

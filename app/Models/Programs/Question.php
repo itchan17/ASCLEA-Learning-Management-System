@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Question extends Model
 {
@@ -57,8 +58,8 @@ class Question extends Model
         return $this->hasMany(QuestionOption::class, 'question_id');
     }
 
-    public function studentAnswers(): HasMany
+    public function studentAnswer(): HasOne
     {
-        return $this->hasMany(StudentQuizAnswer::class, 'question_id');
+        return $this->hasOne(StudentQuizAnswer::class, 'question_id');
     }
 }

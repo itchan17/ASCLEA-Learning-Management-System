@@ -7,28 +7,34 @@ use App\Models\Programs\StudentQuizAnswer;
 
 class StudentQuizAnswerService
 {
-    public function checkAnswer(Question $question, array $answer)
+    public function checkAnswer(Question $question, ?string $answer)
     {
-        $studentAnswer = $answer['answer_id'];
+        if (is_null($answer)) return false;
 
-        if ($question->question_type === 'identification') {
-            $studentAnswer = $answer['answer_text'];
-        }
-
-        $option = $question->options()->where('question_option_id', $studentAnswer)->first();
+        $option = $question->options()->where('question_option_id', $answer)->orWhere('option_text', $answer)->first();
 
         return $option ? $option->is_correct : false;
     }
 
-    public function createOrUpdateQuestionAnswer(string $assessmentSubmissionId, string $questionId, bool $isAnswerCorrect, array $answer)
+    public function createOrUpdateQuestionAnswer(string $assessmentSubmissionId, string $questionId, bool $isAnswerCorrect, ?string $studentAnswer, string $questionType)
     {
-        $answer['is_correct'] = $isAnswerCorrect;
+        if (is_null($studentAnswer)) {
+            StudentQuizAnswer::where('assessment_submission_id', $assessmentSubmissionId)->where('question_id', $questionId)->delete();
 
-        $studentQuizAnswer = StudentQuizAnswer::updateOrCreate(
-            ['assessment_submission_id' => $assessmentSubmissionId, 'question_id' => $questionId],
-            $answer
-        );
+            return null;
+        } else {
+            $answer = ['is_correct' => $isAnswerCorrect];
 
-        dd($studentQuizAnswer);
+            if ($questionType === "identification") {
+                $answer['answer_text'] = $studentAnswer;
+            } else {
+                $answer['answer_id'] = $studentAnswer;
+            }
+
+            return StudentQuizAnswer::updateOrCreate(
+                ['assessment_submission_id' => $assessmentSubmissionId, 'question_id' => $questionId],
+                $answer
+            );
+        }
     }
 }

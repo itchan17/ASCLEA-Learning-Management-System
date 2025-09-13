@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect } from "react";
 import QuizAnswerFormNav from "./QuizAnswerFormNav";
 import QuestionItem from "./QuestionItem";
 import ReactQuill from "react-quill-new";
@@ -7,6 +7,7 @@ import { hasText } from "../../../../../../../../../Utils/hasText";
 import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
 import SecondaryButton from "../../../../../../../../../Components/Button/SecondaryButton";
 import useQuizAnswerForm from "../Hooks/useQuizAnswerForm";
+import useQuizAnswerStore from "../Stores/quizAnswerStore";
 
 export default function QuizAnswerForm({
     courseId,
@@ -15,7 +16,35 @@ export default function QuizAnswerForm({
     questions,
 }) {
     // Custom hook
-    const { navigateQuizAnswerForm } = useQuizAnswerForm();
+    const {
+        navigateQuizAnswerForm,
+        handleValidateRequiredQuestion,
+        questionRequiredError,
+    } = useQuizAnswerForm();
+
+    // Quiz answer store
+    const initializeStudentAnswers = useQuizAnswerStore(
+        (state) => state.initializeStudentAnswers
+    );
+    const studentAnswers = useQuizAnswerStore((state) => state.studentAnswers);
+
+    // Initalize the student answers
+    // this will be use as a payload to validate if user answer all the required questions
+    useEffect(() => {
+        initializeStudentAnswers(
+            questions.data.map((q) => {
+                return {
+                    question_id: q.question_id,
+                    is_required: q.is_required,
+                    student_answer: q.student_answer,
+                };
+            })
+        );
+    }, [questions.data]);
+
+    useEffect(() => {
+        console.log(studentAnswers);
+    }, [studentAnswers]);
 
     return (
         <div className="font-nunito-sans">
@@ -46,6 +75,14 @@ export default function QuizAnswerForm({
                             <QuestionItem
                                 key={question.question_id}
                                 questionDetails={question}
+                                requiredError={
+                                    questionRequiredError &&
+                                    questionRequiredError[question.question_id]
+                                        ? questionRequiredError[
+                                              question.question_id
+                                          ]
+                                        : ""
+                                }
                             />
                         ))}
 
@@ -58,7 +95,6 @@ export default function QuizAnswerForm({
                                         assessmentId: assessmentId,
                                         quizId: quiz.quiz_id,
                                         page: questions.current_page - 1,
-                                        preserveUrl: true,
                                     })
                                 }
                                 text={"Back"}
@@ -66,12 +102,11 @@ export default function QuizAnswerForm({
                         )}
                         <PrimaryButton
                             doSomething={() =>
-                                navigateQuizAnswerForm({
+                                handleValidateRequiredQuestion({
                                     courseId: courseId,
                                     assessmentId: assessmentId,
                                     quizId: quiz.quiz_id,
                                     page: questions.current_page + 1,
-                                    preserveUrl: true,
                                 })
                             }
                             text={

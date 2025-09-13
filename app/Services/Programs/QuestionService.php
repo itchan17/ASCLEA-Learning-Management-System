@@ -71,7 +71,7 @@ class QuestionService
                 }
             ])
             ->with([
-                'studentAnswers' => function ($query) use ($assessmentSubmisisonId) {
+                'studentAnswer' => function ($query) use ($assessmentSubmisisonId) {
                     $query->where('assessment_submission_id', $assessmentSubmisisonId)->select(['student_quiz_answer_id', 'assessment_submission_id', 'question_id', 'answer_id', 'answer_text']);
                 }
             ])
