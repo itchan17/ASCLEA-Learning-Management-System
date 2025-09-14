@@ -1,14 +1,23 @@
 import React from "react";
 import useCourseList from "../../../Stores/Programs/courseLIstStore";
+import PrimaryButton from "../../../Components/Button/PrimaryButton";
 import RoleGuard from "../../../Components/Auth/RoleGuard";
 import EmptyState from "../../../Components/EmptyState/EmptyState";
 
 export default function AssignedCourses() {
     // User Store
     const courseList = useCourseList((state) => state.courseList);
+    //console.log("courseList:", courseList);
     return (
         <div className="font-nunito-sans spave-y-5">
-            <h1 className="text-size6 font-bold">Assigned Courses</h1>
+            <div className="flex justify-between items-center ">
+                            <h1 className="text-size6 font-bold">Assigned Courses</h1>
+                            <RoleGuard allowedRoles={["admin"]}>
+                                <PrimaryButton
+                                    text={"Assign Course"}
+                                />
+                            </RoleGuard>
+                        </div>
             <div className="overflow-x-auto">
                 <table className="table">
                     {/* head */}

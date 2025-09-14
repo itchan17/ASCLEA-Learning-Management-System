@@ -41,7 +41,8 @@ export default function ViewStaff() {
         province_code: "",
         city_code: "",
         barangay_code: "",
-        status: staffDetails?.status || "active"
+        status: staffDetails?.status || "active",
+        role: staffDetails?.user?.role?.role_name || "",
     });
 
     //Update Handle
@@ -260,8 +261,9 @@ export default function ViewStaff() {
     );
 };
 
-
-
+    console.log("staffDetails:", staffDetails);
+    console.log("role name:", staffDetails?.user?.role?.role_name);
+    console.log("user role:", staffDetails?.user?.role);
     //=============================================================================================//
     return (
         <div className="space-y-5 font-nunito-sans">
@@ -326,9 +328,8 @@ export default function ViewStaff() {
                             </div>
                         </div>
                         <div className="font-nunito-sans text-size2 ml-5">
-                            {staffDetails?.role
-                                ? staffDetails.role.charAt(0).toUpperCase() +
-                                  staffDetails.role.slice(1)
+                            {staffDetails?.user?.role?.role_name
+                                ? staffDetails.user.role.role_name.charAt(0).toUpperCase() + staffDetails.user.role.role_name.slice(1)
                                 : ""}
                         </div>
                     </div>
@@ -569,7 +570,7 @@ export default function ViewStaff() {
                 </div>
             </form>
 
-            {staffDetails && staffDetails?.role === "faculty" && (
+            {staffDetails?.user?.role?.role_name === "faculty" && (
                 <AssignedCourses />
             )}
         </div>

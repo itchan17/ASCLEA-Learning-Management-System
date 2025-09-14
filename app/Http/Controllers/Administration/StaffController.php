@@ -57,7 +57,7 @@ class StaffController extends Controller
     // Show the staff detail page (wrapper)
     public function administrationView($staffId)
     {
-        $staff = Staff::with(['user', 'createdBy'])->findOrFail($staffId);
+        $staff = Staff::with(['user.role', 'createdBy'])->findOrFail($staffId);
 
         return Inertia::render('Administration/AdministrationComponents/ViewStaff', [
             'staffDetails' => $staff
@@ -133,7 +133,7 @@ class StaffController extends Controller
      */
     public function edit($id)
     {
-        $staff = Staff::with(['user', 'createdBy'])->findOrFail($id);
+        $staff = Staff::with(['user.role', 'createdBy'])->findOrFail($id);
 
         return Inertia::render('Staff/Edit', [
             'staff' => $staff
