@@ -3,20 +3,24 @@ import BackButton from "../../../../../../../../../Components/Button/BackButton"
 import { handleClickBackBtn } from "../../../../../../../../../Utils/handleClickBackBtn";
 import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
 import EmptyState from "../../../../../../../../../Components/EmptyState/EmptyState";
+import { formatDueDateTime } from "../../../../../../../../../Utils/formatDueDateTime";
 
-export default function QuizSubmitted() {
+export default function QuizSubmitted({ quiz, assessmentSubmission }) {
     return (
-        <div className="text-ascend-black space-y-5 font-nunito-sans">
+        <div className="text-ascend-black space-y-5 font-nunito-sans bg-ascend-white">
             <div className="flex">
                 <BackButton doSomething={handleClickBackBtn} />
             </div>
 
             <div className="w-full min-w-0 flex flex-wrap justify-between items-center gap-5">
                 <h1 className="text-size6 break-words font-semibold">
-                    Quiz Title
+                    {quiz.quiz_title}
                 </h1>
                 <div className="flex flex-wrap justify-between space-x-5">
-                    <h1 className="font-bold">Submitted on:</h1>
+                    <h1 className="font-bold">
+                        Submitted on:{" "}
+                        {formatDueDateTime(assessmentSubmission.submitted_at)}
+                    </h1>
                 </div>
             </div>
 

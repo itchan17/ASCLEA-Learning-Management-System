@@ -56,5 +56,12 @@ class RequiredQuestionRequest extends FormRequest
         $response = back()->withErrors($formatted)->withInput();
 
         throw new ValidationException($validator, $response);
+
+        // throw new HttpResponseException(
+        //     response()->json([
+        //         'message' => 'Required questions was not completed.',
+        //         'errors'  => $formatted,
+        //     ], 422)
+        // );
     }
 }

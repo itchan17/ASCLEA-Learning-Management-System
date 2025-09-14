@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Programs;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Programs\RequiredQuestionRequest;
+use App\Models\Programs\AssessmentSubmission;
 use App\Models\Programs\Question;
 use App\Models\Programs\Quiz;
 use App\Services\Programs\AssessmentSubmissionService;
@@ -40,6 +41,7 @@ class AssessmentSubmissionController extends Controller
                 'quiz' => $quiz
             ]);
         } else {
+
             return redirect()->route('quizzes.quiz.submitted.page', [
                 'course' => $course,
                 'assessment' => $assessment,
@@ -91,12 +93,31 @@ class AssessmentSubmissionController extends Controller
         ]);
     }
 
-    public function showSubmittedPage($course, $assessment, Quiz $quiz)
+    public function showSubmittedPage(Request $request, $course, $assessment, Quiz $quiz)
     {
+        $assignedCourseId =  $this->assessmentSubmisisonService->getAssignedCourseId($request->user(), $course);
+
+        $assessmentSubmission = $this->assessmentSubmisisonService->getAssessmentSubmission($assignedCourseId, $assessment);
+
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/Components/QuizSubmitted', [
             'courseId' => $course,
             'assessmentId' => $assessment,
-            'quiz' => $quiz
+            'quiz' => $quiz,
+            'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'submitted_at'])
+        ]);
+    }
+
+    public function submitQuiz(RequiredQuestionRequest $request, $course, $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
+    {
+        $totalScore = $this->assessmentSubmisisonService->getTotalScore($assessmentSubmission);
+
+        $this->assessmentSubmisisonService->updateAssessmentSubmission($assessmentSubmission, $totalScore);
+
+        // Redirect to the submitted page
+        return redirect()->route('quizzes.quiz.submitted.page', [
+            'course' => $course,
+            'assessment' => $assessment,
+            'quiz' => $quiz,
         ]);
     }
 }

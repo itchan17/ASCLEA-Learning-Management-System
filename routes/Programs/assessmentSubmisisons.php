@@ -17,5 +17,9 @@ Route::prefix('courses/{course}/assessments/{assessment}/quizzes/')
         // Route for validating if required questions was completed
         Route::post('{quiz}/validate', [AssessmentSubmissionController::class, 'validateRequiredQuestions'])->name('assessment.quiz.validate');
 
+        // Route for displaying the submitted page
         Route::get('{quiz}/submitted', [AssessmentSubmissionController::class, 'showSubmittedPage'])->name('quizzes.quiz.submitted.page');
+
+        // Route for submitting the quiz
+        Route::post('{quiz}/assessment-submission/{assessmentSubmission}', [AssessmentSubmissionController::class, 'submitQuiz'])->name('quizzes.quiz.submit');
     });

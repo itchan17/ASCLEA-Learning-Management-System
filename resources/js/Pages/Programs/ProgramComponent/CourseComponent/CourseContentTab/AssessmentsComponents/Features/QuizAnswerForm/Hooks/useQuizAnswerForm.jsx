@@ -59,6 +59,7 @@ export default function useQuizAnswerForm() {
                 }),
                 { page, answers: studentAnswers },
                 {
+                    only: ["questions"],
                     onError: (e) => {
                         console.error(e);
                         setQuestionRequiredError(e);
@@ -132,6 +133,41 @@ export default function useQuizAnswerForm() {
         };
     }, [debouncedSaveAnswer]);
 
+    const submitQuiz = ({
+        courseId,
+        assessmentId,
+        quizId,
+        assessmentSubmissionId,
+    }) => {
+        if (!isLoading) {
+            router.post(
+                route("quizzes.quiz.submit", {
+                    course: courseId,
+                    assessment: assessmentId,
+                    quiz: quizId,
+                    assessmentSubmission: assessmentSubmissionId,
+                }),
+                { answers: studentAnswers },
+                {
+                    only: ["questions"],
+                    onError: (e) => {
+                        console.error(e);
+                        setQuestionRequiredError(e);
+                        displayToast(
+                            <DefaultCustomToast
+                                message={"Some required questions are missing."}
+                            />,
+                            "error"
+                        );
+                    },
+                    onSuccess: () => {
+                        setQuestionRequiredError(null);
+                    },
+                }
+            );
+        }
+    };
+
     return {
         navigateQuizAnswerForm,
         isLoading,
@@ -139,5 +175,6 @@ export default function useQuizAnswerForm() {
         debouncedSaveAnswer,
         handleValidateRequiredQuestion,
         questionRequiredError,
+        submitQuiz,
     };
 }

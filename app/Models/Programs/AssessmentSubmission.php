@@ -4,6 +4,7 @@ namespace App\Models\Programs;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AssessmentSubmission extends Model
 {
@@ -22,4 +23,9 @@ class AssessmentSubmission extends Model
         'score',
         'feedback',
     ];
+
+    public function quizAnswers(): HasMany
+    {
+        return $this->hasMany(StudentQuizAnswer::class, 'assessment_submission_id');
+    }
 }

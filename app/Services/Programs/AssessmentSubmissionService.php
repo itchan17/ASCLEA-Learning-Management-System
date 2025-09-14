@@ -3,7 +3,9 @@
 namespace App\Services\Programs;
 
 use App\Models\Programs\AssessmentSubmission;
+use App\Models\Programs\Quiz;
 use App\Models\User;
+use Carbon\Carbon;
 
 class AssessmentSubmissionService
 {
@@ -43,5 +45,28 @@ class AssessmentSubmissionService
         );
 
         return $assessmentSubmission;
+    }
+
+    public function getTotalScore(AssessmentSubmission $assessmentSubmission)
+    {
+        $answers = $assessmentSubmission->quizAnswers()->with('question')->get();
+
+        $totalScore = 0;
+
+        foreach ($answers as $answer) {
+            if ($answer->is_correct) {
+                $totalScore += $answer->question->question_points;
+            }
+        }
+
+        return $totalScore;
+    }
+
+    public function updateAssessmentSubmission(AssessmentSubmission $assessmentSubmission, int $totalScore)
+    {
+        $assessmentSubmission->update([
+            'score' => $totalScore,
+            'submitted_at' => Carbon::now()
+        ]);
     }
 }

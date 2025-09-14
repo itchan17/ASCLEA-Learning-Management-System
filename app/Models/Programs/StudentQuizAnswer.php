@@ -36,4 +36,9 @@ class StudentQuizAnswer extends Model
     {
         return $this->belongsTo(Question::class, 'question_id');
     }
+
+    public function assessmentSubmiison(): BelongsTo
+    {
+        return $this->belongsTo(AssessmentSubmission::class, 'assessment_submission_id');
+    }
 }

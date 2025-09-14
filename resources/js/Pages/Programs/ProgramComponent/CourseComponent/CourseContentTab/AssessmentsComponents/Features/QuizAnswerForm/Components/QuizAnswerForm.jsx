@@ -14,12 +14,14 @@ export default function QuizAnswerForm({
     assessmentId,
     quiz,
     questions,
+    assessmentSubmission,
 }) {
     // Custom hook
     const {
         navigateQuizAnswerForm,
         handleValidateRequiredQuestion,
         questionRequiredError,
+        submitQuiz,
     } = useQuizAnswerForm();
 
     // Quiz answer store
@@ -45,6 +47,26 @@ export default function QuizAnswerForm({
     useEffect(() => {
         console.log(studentAnswers);
     }, [studentAnswers]);
+
+    const handleNextOrSubmit = () => {
+        if (questions.current_page === questions.last_page) {
+            console.log("SUBMITTING QUIZ");
+            submitQuiz({
+                courseId: courseId,
+                assessmentId: assessmentId,
+                quizId: quiz.quiz_id,
+                assessmentSubmissionId:
+                    assessmentSubmission.assessment_submission_id,
+            });
+        } else {
+            handleValidateRequiredQuestion({
+                courseId: courseId,
+                assessmentId: assessmentId,
+                quizId: quiz.quiz_id,
+                page: questions.current_page + 1,
+            });
+        }
+    };
 
     return (
         <div className="font-nunito-sans">
@@ -101,14 +123,7 @@ export default function QuizAnswerForm({
                             />
                         )}
                         <PrimaryButton
-                            doSomething={() =>
-                                handleValidateRequiredQuestion({
-                                    courseId: courseId,
-                                    assessmentId: assessmentId,
-                                    quizId: quiz.quiz_id,
-                                    page: questions.current_page + 1,
-                                })
-                            }
+                            doSomething={handleNextOrSubmit}
                             text={
                                 questions.current_page < questions.last_page
                                     ? "Next"
