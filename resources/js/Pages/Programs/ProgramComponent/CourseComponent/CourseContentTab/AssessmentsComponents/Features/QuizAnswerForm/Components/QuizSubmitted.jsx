@@ -4,8 +4,27 @@ import { handleClickBackBtn } from "../../../../../../../../../Utils/handleClick
 import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
 import EmptyState from "../../../../../../../../../Components/EmptyState/EmptyState";
 import { formatDueDateTime } from "../../../../../../../../../Utils/formatDueDateTime";
+import { router } from "@inertiajs/react";
+import { route } from "ziggy-js";
 
-export default function QuizSubmitted({ quiz, assessmentSubmission }) {
+export default function QuizSubmitted({
+    courseId,
+    assessmentId,
+    quiz,
+    assessmentSubmission,
+}) {
+    const handleViewResult = () => {
+        router.get(
+            route("quizzes.quiz.result", {
+                course: courseId,
+                assessment: assessmentId,
+                quiz: quiz.quiz_id,
+                assessmentSubmission:
+                    assessmentSubmission.assessment_submission_id,
+            })
+        );
+    };
+
     return (
         <div className="text-ascend-black space-y-5 font-nunito-sans bg-ascend-white">
             <div className="flex">
@@ -30,7 +49,10 @@ export default function QuizSubmitted({ quiz, assessmentSubmission }) {
                     text={`“You've already completed this quiz. You can go ahead and review your responses”`}
                 />
                 <div className="flex justify-center w-full">
-                    <PrimaryButton text={"View Results"} />
+                    <PrimaryButton
+                        doSomething={handleViewResult}
+                        text={"View Results"}
+                    />
                 </div>
             </div>
         </div>

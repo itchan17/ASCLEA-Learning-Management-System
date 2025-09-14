@@ -22,4 +22,7 @@ Route::prefix('courses/{course}/assessments/{assessment}/quizzes/')
 
         // Route for submitting the quiz
         Route::post('{quiz}/assessment-submission/{assessmentSubmission}', [AssessmentSubmissionController::class, 'submitQuiz'])->name('quizzes.quiz.submit');
+
+        // Route for showing the quiz result 
+        Route::get('{quiz}/assessment-submission/{assessmentSubmission}/result', [AssessmentSubmissionController::class, 'showQuizResult'])->name('quizzes.quiz.result');
     });

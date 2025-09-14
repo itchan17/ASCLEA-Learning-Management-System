@@ -64,12 +64,17 @@ class AssessmentSubmissionController extends Controller
 
         // If user already started the but its not yet submitted return the existing submission data
         if (!$assessmentSubmission->submitted_at) {
+
+            // Fields to be selected in student quiz answer data
+            $optionSlectedFields = ['question_option_id', 'question_id', 'option_text'];
+            $studentAnswerSelectedFields = ['student_quiz_answer_id', 'assessment_submission_id', 'question_id', 'answer_id', 'answer_text'];
+
             return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/Components/QuizAnswerForm', [
                 'courseId' => $course,
                 'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'submitted_at']),
                 'assessmentId' => $assessment,
                 'quiz' => $quiz,
-                'questions' => fn() => $this->questionService->getQuestions($quiz, $assessmentSubmission->assessment_submission_id)
+                'questions' => fn() => $this->questionService->getQuestions($quiz, $assessmentSubmission->assessment_submission_id, $optionSlectedFields, $studentAnswerSelectedFields, true)
             ]);
         }
 
@@ -118,6 +123,22 @@ class AssessmentSubmissionController extends Controller
             'course' => $course,
             'assessment' => $assessment,
             'quiz' => $quiz,
+        ]);
+    }
+
+    public function showQuizResult($course, $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
+    {
+        // Fields to be selected in student quiz answer data
+        $optionSlectedFields = ['question_option_id', 'question_id', 'option_text', 'is_correct'];
+        $studentAnswerSelectedFields = ['student_quiz_answer_id', 'assessment_submission_id', 'question_id', 'answer_id', 'answer_text', 'is_correct', 'feedback'];
+
+
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/Components/QuizResult', [
+            'courseId' => $course,
+            'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'submitted_at']),
+            'assessmentId' => $assessment,
+            'quiz' => $quiz,
+            'questions' => fn() => $this->questionService->getQuestions($quiz, $assessmentSubmission->assessment_submission_id,  $optionSlectedFields, $studentAnswerSelectedFields, false)
         ]);
     }
 }

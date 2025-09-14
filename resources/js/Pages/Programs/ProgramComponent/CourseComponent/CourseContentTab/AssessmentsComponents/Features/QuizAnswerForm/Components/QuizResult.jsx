@@ -1,0 +1,170 @@
+import { useEffect } from "react";
+import QuizAnswerFormNav from "./QuizAnswerFormNav";
+import QuestionResultItem from "./QuestionResultItem";
+import ReactQuill from "react-quill-new";
+import DOMPurify from "dompurify";
+import { hasText } from "../../../../../../../../../Utils/hasText";
+import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
+import SecondaryButton from "../../../../../../../../../Components/Button/SecondaryButton";
+import useQuizAnswerForm from "../Hooks/useQuizAnswerForm";
+import useQuizAnswerStore from "../Stores/quizAnswerStore";
+import { Doughnut } from "react-chartjs-2";
+import { MdOutlineAccessTimeFilled } from "react-icons/md";
+
+export default function QuizResult({
+    courseId,
+    assessmentId,
+    quiz,
+    questions,
+    assessmentSubmission,
+}) {
+    return (
+        <div className="font-nunito-sans">
+            <QuizAnswerFormNav />
+
+            <main className="flex justify-center px-5 pb-5 lg:px-[150px]">
+                <div className="w-full max-w-235 space-y-5">
+                    <div className="w-full space-y-5 border border-ascend-gray1 shadow-shadow1 p-5">
+                        <h1 className="font-bold text-size6">Result</h1>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 space-x-0 lg:space-x-5 space-y-5 lg:space-y-0">
+                            <div className="col-span-1 flex flex-col items-center space-y-5">
+                                <div className="relative w-40 h-40">
+                                    <Doughnut
+                                        data={{
+                                            labels: [],
+                                            datasets: [
+                                                {
+                                                    data: [78, 100 - 78],
+                                                    backgroundColor: [
+                                                        "#01007d",
+                                                        "#E0E0E0",
+                                                    ],
+                                                    borderWidth: 0,
+                                                },
+                                            ],
+                                        }}
+                                        options={{
+                                            cutout: "75%",
+                                            plugins: {
+                                                legend: { display: false },
+                                                tooltip: { enabled: false },
+                                            },
+                                        }}
+                                    />
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="flex justify-center items-center flex-col">
+                                            <h1 className="text-size6 font-bold text-ascend-black">
+                                                78%
+                                            </h1>
+                                            <p className="text-size1 text-ascend-black">
+                                                117 out of 150
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex space-x-5 w-full">
+                                    <MdOutlineAccessTimeFilled className="text-ascend-blue text-5xl" />
+                                    <div>
+                                        <h1>Time Spent</h1>
+                                        <p className="font-bold">
+                                            1 hour and 30 minutes
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-span-2 flex flex-col space-y-5">
+                                <h1 className="font-bold text-size5">
+                                    Feedback{" "}
+                                    <span className="text-size2 font-normal">
+                                        AI Generated
+                                    </span>
+                                </h1>
+                                <div className="space-y-5">
+                                    <div>
+                                        <h1 className="font-bold text-size4">
+                                            Strengths
+                                        </h1>
+                                        <ul className="list-disc list-outside ml-5">
+                                            <li>
+                                                You demonstrated a solid
+                                                understanding of the 4A’s of
+                                                facilitating learning,
+                                                specifically identifying the
+                                                correct steps for both starting
+                                                a lesson (Activity) and relating
+                                                ideas to real life
+                                                (Application).
+                                            </li>
+                                            <li>
+                                                This shows that you are familiar
+                                                with effective instructional
+                                                strategies and how to structure
+                                                lessons for meaningful learning.
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h1 className="font-bold text-size4">
+                                            Weaknesses
+                                        </h1>
+                                        <ul className="list-disc list-outside ml-5">
+                                            <li>
+                                                There’s some confusion in
+                                                distinguishing between teaching
+                                                approaches, such as reflective
+                                                vs. inquiry-based.
+                                            </li>
+                                            <li>
+                                                Understanding of assessment
+                                                types also needs improvement,
+                                                especially in terms of
+                                                identifying subjective vs.
+                                                objective formats and
+                                                recognizing tools used to
+                                                connect ideas (e.g., mapping).
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h1 className="font-bold text-size4">
+                                            Suggestions
+                                        </h1>
+                                        <p>
+                                            Focus on reviewing the different
+                                            types of assessment methods and
+                                            teaching approaches. Make a
+                                            comparison chart or flashcards to
+                                            differentiate terms like reflective,
+                                            inquiry-based, constructivist, and
+                                            assessment tools like mapping,
+                                            essay, matching. Practice by
+                                            analyzing sample scenarios and
+                                            matching them to the correct
+                                            teaching or assessment strategy.
+                                            This will help reinforce key
+                                            concepts and reduce confusion during
+                                            exams.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Questions here */}
+
+                    {questions &&
+                        questions.length > 0 &&
+                        questions.map((question) => (
+                            <QuestionResultItem
+                                key={question.question_id}
+                                questionDetails={question}
+                            />
+                        ))}
+                </div>
+            </main>
+        </div>
+    );
+}
+
+QuizResult.layout = null;

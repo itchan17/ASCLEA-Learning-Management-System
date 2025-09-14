@@ -60,23 +60,32 @@ class QuestionService
         }
     }
 
-    public function getQuestions(Quiz $quiz, string $assessmentSubmisisonId)
+    public function getQuestions(Quiz $quiz, string $assessmentSubmisisonId, array $optionSelectedFields, array $studentAnswerSelectedFields, bool $isPaginated)
     {
+        // $studentAnswerSelectedFields is parameter use to conditionally select the fields of student quiz answer
+        // since this function will be use for displaying the question in quiz answer form and in the results along with 
+        // student quiz answer / question answer of the student
+
         // Return the list of question along with its options
-        return $quiz->questions()
+        $query = $quiz->questions()
             ->with([
-                'options' => function ($query) {
-                    $query->select(['question_option_id', 'question_id', 'option_text'])
+                'options' => function ($query) use ($optionSelectedFields) {
+                    $query->select($optionSelectedFields)
                         ->orderBy("option_order");
                 }
             ])
             ->with([
-                'studentAnswer' => function ($query) use ($assessmentSubmisisonId) {
-                    $query->where('assessment_submission_id', $assessmentSubmisisonId)->select(['student_quiz_answer_id', 'assessment_submission_id', 'question_id', 'answer_id', 'answer_text']);
+                'studentAnswer' => function ($query) use ($assessmentSubmisisonId, $studentAnswerSelectedFields) {
+                    $query->where('assessment_submission_id', $assessmentSubmisisonId)->select($studentAnswerSelectedFields);
                 }
             ])
-            ->orderBy("sort_order")
-            ->paginate(10, ['*'], 'page')
-            ->withQueryString();
+            ->orderBy("sort_order");
+
+
+        if ($isPaginated) {
+            return $query->paginate(10, ['*'], 'page')->withQueryString();
+        } else {
+            return $query->get();
+        }
     }
 }
