@@ -17,6 +17,9 @@ export default function useQuizAnswerForm() {
     const studentAnswers = useQuizAnswerStore((state) => state.studentAnswers);
     const isLoading = useQuizAnswerStore((state) => state.isLoading);
     const setIsLoading = useQuizAnswerStore((state) => state.setIsLoading);
+    const setRemainingTime = useQuizAnswerStore(
+        (state) => state.setRemainingTime
+    );
 
     // This is used for navigating the pagination of quiz answer form
     // Has a parameter of page for getting the next or prev page
@@ -26,17 +29,29 @@ export default function useQuizAnswerForm() {
         assessmentId,
         quizId,
         page,
+        isForBackBtn = false,
     }) => {
-        window.open(
-            route("assessment.quizzes.quiz", {
-                course: courseId,
-                assessment: assessmentId,
-                quiz: quizId,
-                page: page,
-            }),
+        if (isForBackBtn) {
+            router.visit(
+                route("assessment.quizzes.quiz", {
+                    course: courseId,
+                    assessment: assessmentId,
+                    quiz: quizId,
+                    page: page,
+                })
+            );
+        } else {
+            window.open(
+                route("assessment.quizzes.quiz", {
+                    course: courseId,
+                    assessment: assessmentId,
+                    quiz: quizId,
+                    page: page,
+                }),
 
-            "_blank"
-        );
+                "_blank"
+            );
+        }
     };
 
     // WEe have to validate if user fill all the required questiosns
@@ -135,6 +150,7 @@ export default function useQuizAnswerForm() {
         assessmentId,
         quizId,
         assessmentSubmissionId,
+        isTimerEnded = false,
     }) => {
         if (!isLoading) {
             router.post(
@@ -144,7 +160,7 @@ export default function useQuizAnswerForm() {
                     quiz: quizId,
                     assessmentSubmission: assessmentSubmissionId,
                 }),
-                { answers: studentAnswers },
+                { answers: studentAnswers, isTimerEnded },
                 {
                     only: ["questions"],
                     onError: (e) => {
@@ -159,6 +175,7 @@ export default function useQuizAnswerForm() {
                     },
                     onSuccess: () => {
                         setQuestionRequiredError(null);
+                        setRemainingTime(null);
                     },
                 }
             );

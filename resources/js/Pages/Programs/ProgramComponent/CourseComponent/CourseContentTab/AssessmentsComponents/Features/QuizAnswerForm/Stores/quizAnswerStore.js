@@ -3,6 +3,7 @@ import { create } from "zustand";
 const useQuizAnswerStore = create((set) => ({
     studentAnswers: false,
     isLoading: false,
+    remainingTime: null,
 
     initializeStudentAnswers: (answers) => {
         set({ studentAnswers: answers });
@@ -23,6 +24,10 @@ const useQuizAnswerStore = create((set) => ({
 
     setIsLoading: (loading) => {
         set({ isLoading: loading });
+    },
+
+    setRemainingTime: (remainingTime) => {
+        set({ remainingTime });
     },
 }));
 

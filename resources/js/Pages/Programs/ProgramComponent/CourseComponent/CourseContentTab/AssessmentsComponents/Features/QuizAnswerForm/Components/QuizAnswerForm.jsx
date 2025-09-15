@@ -69,13 +69,13 @@ export default function QuizAnswerForm({
     };
 
     return (
-        <div className="font-nunito-sans">
+        <div className="font-nunito-sans space-y-5">
             <QuizAnswerFormNav />
 
             <main className="flex justify-center px-5 pb-5 lg:px-[150px]">
                 <div className="w-full max-w-235 space-y-5">
                     <div className="w-full space-y-5 border border-ascend-gray1 shadow-shadow1 p-5">
-                        <h1 className="font-bold text-size6">
+                        <h1 className="font-bold text-size6 whitespace-normal break-words">
                             {quiz.quiz_title}
                         </h1>
                         {hasText(quiz.quiz_description) && (
@@ -117,6 +117,7 @@ export default function QuizAnswerForm({
                                         assessmentId: assessmentId,
                                         quizId: quiz.quiz_id,
                                         page: questions.current_page - 1,
+                                        isForBackBtn: true,
                                     })
                                 }
                                 text={"Back"}

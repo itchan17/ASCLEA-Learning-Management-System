@@ -25,9 +25,15 @@ class RequiredQuestionRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'answers.*.student_answer' => 'required_if:answers.*.is_required,true'
-        ];
+
+        // Only validate the field if its null or isTimerEnded is false
+        if (!$this->boolean('isTimerEnded')) {
+            return [
+                'answers.*.student_answer' => 'required_unless:isTimerEnded,null,false|required_if:answers.*.is_required,true'
+            ];
+        }
+
+        return [];
     }
 
     public function messages(): array

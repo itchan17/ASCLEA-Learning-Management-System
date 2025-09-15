@@ -115,7 +115,7 @@ export default function QuizInstruction({ courseId, quiz, assessmentId }) {
                             </h1>
                             <div className="flex flex-wrap justify-between space-x-5">
                                 <h1 className="font-bold">
-                                    Duration: {convertDuration(105)}
+                                    Duration: {convertDuration(quiz.duration)}
                                 </h1>
                                 <h1 className="font-bold">
                                     Total points: {quiz.quiz_total_points}
