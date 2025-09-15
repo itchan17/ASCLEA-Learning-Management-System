@@ -1,11 +1,8 @@
 import React from "react";
-import BackButton from "../../../../../../../../../Components/Button/BackButton";
-import { handleClickBackBtn } from "../../../../../../../../../Utils/handleClickBackBtn";
 import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
 import EmptyState from "../../../../../../../../../Components/EmptyState/EmptyState";
 import { formatDueDateTime } from "../../../../../../../../../Utils/formatDueDateTime";
-import { router } from "@inertiajs/react";
-import { route } from "ziggy-js";
+import useQuizResult from "../Hooks/useQuizResult";
 
 export default function QuizSubmitted({
     courseId,
@@ -13,24 +10,11 @@ export default function QuizSubmitted({
     quiz,
     assessmentSubmission,
 }) {
-    const handleViewResult = () => {
-        router.get(
-            route("quizzes.quiz.result", {
-                course: courseId,
-                assessment: assessmentId,
-                quiz: quiz.quiz_id,
-                assessmentSubmission:
-                    assessmentSubmission.assessment_submission_id,
-            })
-        );
-    };
+    // Custom hook
+    const { handleViewResult } = useQuizResult();
 
     return (
-        <div className="text-ascend-black space-y-5 font-nunito-sans bg-ascend-white">
-            <div className="flex">
-                <BackButton doSomething={handleClickBackBtn} />
-            </div>
-
+        <div className="text-ascend-black space-y-5 font-nunito-sans bg-ascend-white px-5 lg:px-[100px] py-5">
             <div className="w-full min-w-0 flex flex-wrap justify-between items-center gap-5">
                 <h1 className="text-size6 break-words font-semibold">
                     {quiz.quiz_title}
@@ -50,7 +34,14 @@ export default function QuizSubmitted({
                 />
                 <div className="flex justify-center w-full">
                     <PrimaryButton
-                        doSomething={handleViewResult}
+                        doSomething={() =>
+                            handleViewResult(
+                                courseId,
+                                assessmentId,
+                                quiz.quiz_id,
+                                assessmentSubmission.assessment_submission_id
+                            )
+                        }
                         text={"View Results"}
                     />
                 </div>
@@ -58,3 +49,5 @@ export default function QuizSubmitted({
         </div>
     );
 }
+
+QuizSubmitted.layout = null;

@@ -3,9 +3,10 @@
 use App\Http\Controllers\Programs\AssessmentSubmissionController;
 use App\Models\Programs\Quiz;
 use Illuminate\Support\Facades\Route;
+use Inertia\EncryptHistoryMiddleware;
 
 Route::prefix('courses/{course}/assessments/{assessment}/quizzes/')
-    ->middleware(['auth', 'verified', 'preventBack'])
+    ->middleware(['auth', 'verified', 'preventBack', EncryptHistoryMiddleware::class])
     ->group(function () {
 
         // Route for displaying the quiz instructions page

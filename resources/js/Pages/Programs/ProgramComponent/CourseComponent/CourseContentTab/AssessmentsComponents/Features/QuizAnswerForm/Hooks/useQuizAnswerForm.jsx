@@ -27,18 +27,15 @@ export default function useQuizAnswerForm() {
         quizId,
         page,
     }) => {
-        setIsLoading(true);
-        router.visit(
+        window.open(
             route("assessment.quizzes.quiz", {
                 course: courseId,
                 assessment: assessmentId,
                 quiz: quizId,
                 page: page,
             }),
-            {
-                onFinish: setIsLoading(false),
-                onError: setIsLoading(false),
-            }
+
+            "_blank"
         );
     };
 

@@ -91,13 +91,14 @@ export default function QuizInstruction({ courseId, quiz, assessmentId }) {
                         </div>
                     }
                     closeModal={() => setOpenAlertModal(false)}
-                    onConfirm={() =>
+                    onConfirm={() => {
                         navigateQuizAnswerForm({
                             courseId: courseId,
                             assessmentId: assessmentId,
                             quizId: quiz.quiz_id,
-                        })
-                    }
+                        });
+                        setOpenAlertModal(false);
+                    }}
                     isLoading={isLoading}
                 />
             )}

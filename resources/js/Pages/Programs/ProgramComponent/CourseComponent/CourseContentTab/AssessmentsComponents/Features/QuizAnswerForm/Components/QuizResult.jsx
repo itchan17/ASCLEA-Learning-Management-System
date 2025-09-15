@@ -1,17 +1,11 @@
 import { useState } from "react";
 import QuizAnswerFormNav from "./QuizAnswerFormNav";
 import QuestionResultItem from "./QuestionResultItem";
-import ReactQuill from "react-quill-new";
-import DOMPurify from "dompurify";
-import { hasText } from "../../../../../../../../../Utils/hasText";
-import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
-import SecondaryButton from "../../../../../../../../../Components/Button/SecondaryButton";
-import useQuizAnswerForm from "../Hooks/useQuizAnswerForm";
-import useQuizAnswerStore from "../Stores/quizAnswerStore";
 import { Doughnut } from "react-chartjs-2";
 import { MdOutlineAccessTimeFilled } from "react-icons/md";
 import { calcPercentage } from "../../../../../../../../../Utils/calcPercentage";
 import { getElapsedTime } from "../../../../../../../../../Utils/getElapsedTime";
+import useQuizResult from "../Hooks/useQuizResult";
 
 export default function QuizResult({
     courseId,
@@ -31,7 +25,7 @@ export default function QuizResult({
     );
 
     return (
-        <div className="font-nunito-sans">
+        <div className="font-nunito-sans space-y-5">
             <QuizAnswerFormNav />
 
             <main className="flex justify-center px-5 pb-5 lg:px-[150px]">
