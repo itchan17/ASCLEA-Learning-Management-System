@@ -302,7 +302,7 @@ const RegistrationFields = () => {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-4">
                     <div class="relative">
                         <input
-                            type="text"
+                            type="number"
                             value={registration.contact_number}
                             onChange={(e) => {
                                 const onlyNumbers = e.target.value.replace(/\D/g, "").slice(0, 11);
@@ -430,6 +430,7 @@ const RegistrationFields = () => {
                 <div className="grid grid-cols-1 gap-4 pt-4 mb-5">
                     <PrimaryButton
                         isDisabled={loading}
+                        isLoading={loading}
                         doSomething={register}
                         text="Register"
                     />

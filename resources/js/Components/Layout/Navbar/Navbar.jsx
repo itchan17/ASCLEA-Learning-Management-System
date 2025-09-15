@@ -6,6 +6,7 @@ import NotifDropdown from "./NotifDropdown";
 
 export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
     const { url } = usePage();
+    const { auth } = usePage().props;
 
     // States
     const [pageTitle, setPageTitle] = useState("");
@@ -100,7 +101,11 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
                 <img
                     ref={profileRef}
                     alt="Profile image"
-                    className="w-12 h-12 rounded-full cursor-pointer object-cover bg-ascend-gray1"
+                    src={
+                        auth.user.profile_image &&
+                        `/storage/${auth.user.profile_image}`
+                    }
+                    className="w-12 h-12 rounded-full cursor-pointer object-cover bg-ascend-gray1/20"
                     onClick={() => openDropdown("profile")}
                 ></img>
             </div>

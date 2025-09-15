@@ -18,9 +18,11 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('middle_name')->nullable();
 
-            $table->string('birthdate'); 
-            $table->string('gender');
-            $table->string('contact_number');
+            $table->longText('profile_image')->nullable();
+
+            $table->string('birthdate')->nullable(); 
+            $table->string('gender')->nullable();
+            $table->string('contact_number')->nullable();
 
             $table->string('email')->unique();
 
@@ -33,6 +35,9 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
 
             $table->string('password');
+
+            $table->timestamp('email_verified_at')->nullable();
+            $table->softDeletes();
 
             $table->timestamps();
         });
