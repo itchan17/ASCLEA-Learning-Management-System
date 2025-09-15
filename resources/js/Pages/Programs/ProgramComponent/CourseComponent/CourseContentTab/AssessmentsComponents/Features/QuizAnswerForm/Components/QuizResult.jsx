@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState } from "react";
 import QuizAnswerFormNav from "./QuizAnswerFormNav";
 import QuestionResultItem from "./QuestionResultItem";
 import ReactQuill from "react-quill-new";
@@ -10,6 +10,8 @@ import useQuizAnswerForm from "../Hooks/useQuizAnswerForm";
 import useQuizAnswerStore from "../Stores/quizAnswerStore";
 import { Doughnut } from "react-chartjs-2";
 import { MdOutlineAccessTimeFilled } from "react-icons/md";
+import { calcPercentage } from "../../../../../../../../../Utils/calcPercentage";
+import { getElapsedTime } from "../../../../../../../../../Utils/getElapsedTime";
 
 export default function QuizResult({
     courseId,
@@ -18,6 +20,16 @@ export default function QuizResult({
     questions,
     assessmentSubmission,
 }) {
+    const percentage = calcPercentage(
+        assessmentSubmission.score,
+        quiz.quiz_total_points
+    );
+
+    const { hours, minutes, seconds } = getElapsedTime(
+        assessmentSubmission.created_at,
+        assessmentSubmission.submitted_at
+    );
+
     return (
         <div className="font-nunito-sans">
             <QuizAnswerFormNav />
@@ -34,7 +46,10 @@ export default function QuizResult({
                                             labels: [],
                                             datasets: [
                                                 {
-                                                    data: [78, 100 - 78],
+                                                    data: [
+                                                        percentage,
+                                                        100 - percentage,
+                                                    ],
                                                     backgroundColor: [
                                                         "#01007d",
                                                         "#E0E0E0",
@@ -52,12 +67,13 @@ export default function QuizResult({
                                         }}
                                     />
                                     <div className="absolute inset-0 flex items-center justify-center">
-                                        <div className="flex justify-center items-center flex-col">
+                                        <div className="flex justify-center w-30 items-center flex-col">
                                             <h1 className="text-size6 font-bold text-ascend-black">
-                                                78%
+                                                {percentage}%
                                             </h1>
-                                            <p className="text-size1 text-ascend-black">
-                                                117 out of 150
+                                            <p className="text-size1 text-ascend-black text-center">
+                                                {assessmentSubmission.score} out
+                                                of {quiz.quiz_total_points}
                                             </p>
                                         </div>
                                     </div>
@@ -67,7 +83,16 @@ export default function QuizResult({
                                     <div>
                                         <h1>Time Spent</h1>
                                         <p className="font-bold">
-                                            1 hour and 30 minutes
+                                            {hours > 0
+                                                ? hours === 1
+                                                    ? `${hours} hour`
+                                                    : `${hours} hours`
+                                                : ""}
+                                            {minutes > 0
+                                                ? minutes === 1
+                                                    ? ` and ${minutes} minute`
+                                                    : ` and ${minutes} minutes`
+                                                : ""}
                                         </p>
                                     </div>
                                 </div>
