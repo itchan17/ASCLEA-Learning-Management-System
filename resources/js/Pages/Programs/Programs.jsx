@@ -5,14 +5,13 @@ import useProgramStore from "../../Stores/Programs/programStore";
 import ProgramCard from "./ProgramComponent/ProgramCard";
 import EmptyState from "../../Components/EmptyState/EmptyState";
 import RoleGuard from "../../Components/Auth/RoleGuard";
+import { usePage } from "@inertiajs/react";
 
-export default function Programs() {
+export default function Programs({ program_list: programList }) {
+    const { auth } = usePage().props;
+
     // Program Store
-    const programList = useProgramStore((state) => state.programList);
     const setActiveTab = useProgramStore((state) => state.setActiveTab);
-
-    console.log(programList);
-    console.log("Render Programs");
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editProgram, setEditProgram] = useState(false);
@@ -25,13 +24,9 @@ export default function Programs() {
         setActiveTab(0);
     }, []);
 
-    useEffect(() => {
-        console.log("Edit program: " + editProgram);
-    }, [editProgram]);
-
     return (
-        <div className="font-nunito-sans space-y-5">
-            <RoleGuard allowedRoles={["admin", "faculty"]}>
+        <div className="flex flex-col font-nunito-sans space-y-5 h-full">
+            <RoleGuard allowedRoles={["admin"]}>
                 <div className="flex justify-end">
                     <PrimaryButton
                         doSomething={toggleModal}
@@ -39,28 +34,33 @@ export default function Programs() {
                     />
                 </div>
             </RoleGuard>
-
             {/* Display created program */}
-            <div className="w-full flex flex-wrap gap-5">
-                {programList?.length > 0 ? (
-                    programList.map((program, index) => {
+            {programList.length > 0 ? (
+                <div className="w-full flex flex-wrap gap-5">
+                    {programList.map((program) => {
                         return (
                             <ProgramCard
-                                key={index}
+                                key={program.program_id}
                                 programDetails={program}
                                 setIsModalOpen={setIsModalOpen}
                                 setEditProgram={setEditProgram}
                             />
                         );
-                    })
-                ) : (
+                    })}
+                </div>
+            ) : (
+                <div className="flex flex-1 w-full">
                     <EmptyState
                         imgSrc={"/images/illustrations/launch.svg"}
-                        text={`“No programs? Time to fill this space to start learning
-                adventures!”`}
+                        text={
+                            auth.user.role_name === "admin"
+                                ? `No programs? Time to fill this space to start learning
+                adventures!`
+                                : "No programs found at the moment. Please check back soon!"
+                        }
                     />
-                )}
-            </div>
+                </div>
+            )}
 
             {isModalOpen && (
                 <AddProgramForm

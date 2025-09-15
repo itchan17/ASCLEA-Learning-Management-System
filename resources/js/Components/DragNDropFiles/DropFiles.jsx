@@ -6,7 +6,14 @@ export default function DropFiles({
     toggleDropFiles,
     handleFileChange,
     fieldName,
-    withCancel = false,
+    withCancel = true,
+    allowedFiles = {
+        "image/png": [".png"],
+        "image/jpeg": [".jpeg", ".jpg"],
+        "application/pdf": [".pdf"],
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+            [".pptx"],
+    },
 }) {
     // callback function for handling drop files
     const onDrop = useCallback((acceptedFiles) => {
@@ -31,13 +38,7 @@ export default function DropFiles({
     const { acceptedFiles, getRootProps, getInputProps, fileRejections } =
         useDropzone({
             onDrop,
-            accept: {
-                "image/png": [".png"],
-                "image/jpeg": [".jpeg", ".jpg"],
-                "application/pdf": [".pdf"],
-                "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-                    [".pptx"],
-            },
+            accept: allowedFiles,
         });
 
     // for file typ valdiation
@@ -54,23 +55,23 @@ export default function DropFiles({
 
     return (
         <div className="space-y-5">
-            {!withCancel && (
-                <div className="flex items-center justify-between">
-                    <label className="font-bold">Upload Files</label>
+            <div className="flex items-center justify-between">
+                <label className="font-bold">Upload Files</label>
+                {withCancel && (
                     <span
                         onClick={toggleDropFiles}
                         className="cursor-pointer text-ascend-red"
                     >
                         Cancel
                     </span>
-                </div>
-            )}
+                )}
+            </div>
 
             {/* File Dropzone */}
             <section className="">
                 <div
                     {...getRootProps()}
-                    className="flex items-center justify-center border-2 border-dashed border-ascend-gray1 h-15 w-full cursor-pointer hover:bg-ascend-lightblue transition-colors duration-300 gap-2"
+                    className="flex flex-wrap items-center justify-center border-2 border-dashed border-ascend-gray1 min-h-15  w-full cursor-pointer hover:bg-ascend-lightblue transition-colors duration-300 gap-2"
                 >
                     <input {...getInputProps()}></input>
                     <FiUploadCloud className="shrink-0 text-size4" />
