@@ -104,8 +104,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function logins()
     {
-        return $this->hasMany(UserLogin::class, 'user_id', 'id'); 
-        // user_logins.user_id → users.id
+        return $this->hasMany(UserLogin::class, 'user_id', 'user_id'); 
     }
 
     public function lastLogin()
