@@ -5,15 +5,13 @@ import BackButton from "../../../Components/Button/BackButton";
 import { handleClickBackBtn } from "../../../Utils/handleClickBackBtn";
 import { BiSolidEditAlt } from "react-icons/bi";
 import useAdministrationStore from "../../../Stores/Administration/administrationStore";
-import { usePage } from "@inertiajs/react";
+import { usePage, useForm, router } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
-import { useForm } from "@inertiajs/react";
 import AssignedCourses from "./AssignedCourses";
 import { regions, provinces, cities, barangays } from "select-philippines-address";
 import AlertModal from "../../../Components/AlertModal";
 import { displayToast } from "../../../Utils/displayToast";
 import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToast";
-import { router } from "@inertiajs/react";
 import Loader from "../../../Components/Loader";
 
 
@@ -261,9 +259,11 @@ export default function ViewStaff() {
     );
 };
 
-    console.log("staffDetails:", staffDetails);
-    console.log("role name:", staffDetails?.user?.role?.role_name);
-    console.log("user role:", staffDetails?.user?.role);
+        useEffect(() => {
+        console.log("staffDetails:", staffDetails);
+        console.log("role name:", staffDetails?.user?.role?.role_name);
+        console.log("user role:", staffDetails.user?.role);
+    }, []); 
     //=============================================================================================//
     return (
         <div className="space-y-5 font-nunito-sans">
@@ -571,7 +571,7 @@ export default function ViewStaff() {
             </form>
 
             {staffDetails?.user?.role?.role_name === "faculty" && (
-                <AssignedCourses />
+                <AssignedCourses staffId={staffDetails.staff_id} />
             )}
         </div>
     );

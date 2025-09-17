@@ -32,9 +32,6 @@ Route::prefix('administration')
         // Soft delete (archive)
         Route::delete('staff/{id}', [StaffController::class, 'destroy'])->name('staff.destroy');
 
-        //separate route for assigned courses
-        Route::get('staff/{id}/courses', [StaffController::class, 'showAssignedCourses'])->name('staff.courses');
-
         // View staff details (like your old closure)
         Route::get('/{staffId}', [StaffController::class, 'administrationView'])->name('administration.view');
 });

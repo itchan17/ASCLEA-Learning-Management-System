@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import EmptyState from "../../Components/EmptyState/EmptyState";
 import useAdministrationStore from "../../Stores/Administration/administrationStore";
 import { IoSearch } from "react-icons/io5";
@@ -6,11 +6,10 @@ import { BiFilter } from "react-icons/bi";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
 import { IoCaretDownOutline } from "react-icons/io5";
 import AddStaffForm from "./AdministrationComponents/AddStaffForm";
-import { router } from "@inertiajs/react";
+import { usePage, router } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
-import { usePage } from "@inertiajs/react";
 import Pagination from "@/Components/Pagination";
-import { useEffect } from "react";
+import { debounce } from "lodash";
 
 export default function Administration() {
     const route = useRoute();
@@ -29,25 +28,34 @@ export default function Administration() {
     };
 
     const [search, setSearch] = useState(props.filters?.search || "");
+    const [initialRender, setInitialRender] = useState(true);
+
+    // Update search state
+    const handleSearch = (value) => {
+        setSearch(value);
+        setInitialRender(false);
+    };
+
+    const debounceHandleSearch = useMemo(() => {
+        return debounce(handleSearch, 300); 
+    }, []);
 
     useEffect(() => {
-    const delayDebounce = setTimeout(() => {
-        router.get(
-        route("administration.index"),
-        { search },
-        { preserveState: true, replace: true }
-        );
-    }, 500); // wait 500ms after typing before searching
+        return () => debounceHandleSearch.cancel(); 
+    }, []);
 
-    return () => clearTimeout(delayDebounce); // cleanup previous timeout
-    }, [search]);
+    useEffect(() => {
+        if (!initialRender) {
+            const query = {};
+            if (search.trim()) query.search = search.trim();
 
-    const handleSearch = () => {
-        router.get(route("administration.index"),
-        { search }, // send search value to backend
-        { preserveState: true, replace: true }
+            router.get(
+                route("administration.index"),
+                query,
+                { preserveState: true, replace: true }
             );
-        };
+        }
+    }, [search]);
 
     const handlePageClick = (page) => {
     router.get(
@@ -74,16 +82,11 @@ export default function Administration() {
                         className="w-full sm:w-50 border h-9 pl-10 p-2 border-ascend-black focus:outline-ascend-blue"
                         type="text"
                         placeholder="Search name"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                        handleSearch();
-                        }
-                    }}
+                        defaultValue={search}
+                        onChange={(e) => debounceHandleSearch(e.target.value)}
                     />
                     <IoSearch 
-                    onClick={handleSearch}
+                    onClick={() => handleSearch(search)}
                     className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1" />
                 </div>
             </div>

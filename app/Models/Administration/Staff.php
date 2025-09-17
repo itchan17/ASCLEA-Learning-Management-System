@@ -55,17 +55,27 @@ class Staff extends Model
         return $this->belongsTo(\App\Models\User::class, 'user_id', 'user_id');
     }
 
-    /**
-     * Relationship to assigned courses (if this staff is a faculty).
-     */
-    public function assignedCourses(): HasMany
-    {
-        return $this->hasMany(\App\Models\AssignedCourse::class, 'staff_id', 'staff_id');
-    }
-
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'created_by', 'user_id');
     }
+
+    public function learningMembers(): HasMany
+    {
+        return $this->hasMany(LearningMember::class, 'user_id', 'user_id');
+    }
+
+    public function assignedCourses()
+    {
+        return $this->hasManyThrough(
+            \App\Models\AssignedCourse::class,  // final model
+            \App\Models\LearningMember::class,  // intermediate model
+            'user_id',              // learning_members.user_id
+            'learning_member_id',   // assigned_courses.learning_member_id
+            'user_id',              // staff.user_id
+            'learning_member_id'    // learning_members.learning_member_id
+        )->with('course.program'); // eager load course and program
+    }
+
 
 }

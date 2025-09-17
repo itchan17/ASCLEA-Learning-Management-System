@@ -54,15 +54,38 @@ class StaffController extends Controller
     }
 
 
-    // Show the staff detail page (wrapper)
     public function administrationView($staffId)
     {
-        $staff = Staff::with(['user.role', 'createdBy'])->findOrFail($staffId);
+        $staff = Staff::with(['user.role', 'createdBy', 'assignedCourses.course.program'])
+            ->findOrFail($staffId);
+
+        // Only load assigned courses if faculty
+        $assignedCourses = [];
+        if ($staff->user->role->role_name === 'faculty') {
+            $assignedCourses = $staff->assignedCourses()
+                ->with('course.program')
+                ->paginate(5)
+                ->through(function ($assignedCourse) {
+                    $course = $assignedCourse->course;
+                    return [
+                        'program_id' => optional($course->program)->program_id,
+                        'program_name' => optional($course->program)->program_name,
+                        'course_id' => $course->course_id ?? null,
+                        'course_code' => $course->course_code ?? null,
+                        'course_name' => $course->course_name ?? null,
+                        'course_day' => $course->course_day ?? null,
+                        'start_time' => $course->start_time ?? null,
+                        'end_time' => $course->end_time ?? null,
+                    ];
+                });
+        }
 
         return Inertia::render('Administration/AdministrationComponents/ViewStaff', [
-            'staffDetails' => $staff
+            'staffDetails' => $staff,
+            'assignedCourses' => $assignedCourses, // ✅ pass courses here
         ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -200,18 +223,6 @@ class StaffController extends Controller
         return redirect()->route('administration.index')->with('success', 'Staff archived successfully.');
     }
 
-    public function showAssignedCourses($id)
-    {
-        $staff = Staff::with('assignedCourses')->findOrFail($id);
-
-        $courses = $staff->assignedCourses()->paginate(5);
-
-        return Inertia::render('Staff/AssignedCourses', [
-            'staff' => $staff,
-            'courses' => $courses
-        ]);
-    }
-
     public function updateProfile(Request $request, $id)
     {
         $staff = Staff::with('user')->findOrFail($id);
@@ -227,6 +238,13 @@ class StaffController extends Controller
 
         return back()->with('success', 'Profile updated successfully!');
     }
+
+    /**
+     * Display all assigned courses for a faculty staff member across all programs.
+     */
+    
+
+
 
 
 
