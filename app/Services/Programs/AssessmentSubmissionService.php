@@ -35,12 +35,20 @@ class AssessmentSubmissionService
     }
 
     // This create the initial data of the assessment submission when the user start answering the quiz
-    public function createAssessmentSubmission(string $assignedCourseId, string $assessmentId)
+    public function createQuizAssessmentSubmission(string $assignedCourseId, string $assessmentId, Quiz $quiz)
     {
+        $endAt = null;
+
+        // Check if quiz has a timer then set the end time
+        if ($quiz->duration > 0) {
+            $endAt = Carbon::now()->addMinutes($quiz->duration);
+        }
+
         $assessmentSubmission =  AssessmentSubmission::create(
             [
                 'assessment_id' => $assessmentId,
                 'submitted_by' => $assignedCourseId,
+                'end_at' => $endAt
             ]
         );
 
@@ -62,7 +70,8 @@ class AssessmentSubmissionService
         return $totalScore;
     }
 
-    public function updateAssessmentSubmission(AssessmentSubmission $assessmentSubmission, int $totalScore)
+    // This is use for updating the assessment submission of the quiz when the quiz was actually submitted
+    public function updateQuizAssessmentSubmission(AssessmentSubmission $assessmentSubmission, int $totalScore)
     {
         $assessmentSubmission->update([
             'score' => $totalScore,

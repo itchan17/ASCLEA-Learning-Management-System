@@ -42,7 +42,7 @@ class AssessmentSubmissionController extends Controller
         // Check if user has a assessment submission data/user already stater the quiz
         // If not create a new data
         if (!$assessmentSubmission) {
-            $assessmentSubmission = $this->assessmentSubmisisonService->createAssessmentSubmission($assignedCourseId, $assessment);
+            $assessmentSubmission = $this->assessmentSubmisisonService->createQuizAssessmentSubmission($assignedCourseId, $assessment, $quiz);
         }
 
         // If user already started the but its not yet submitted return the existing submission data
@@ -54,7 +54,7 @@ class AssessmentSubmissionController extends Controller
 
             return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/Components/QuizAnswerForm', [
                 'courseId' => $course,
-                'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'submitted_at']),
+                'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'end_at', 'submitted_at']),
                 'assessmentId' => $assessment,
                 'quiz' => $quiz,
                 'questions' => fn() => $this->questionService->getQuestions($quiz, $assessmentSubmission->assessment_submission_id, $optionSlectedFields, $studentAnswerSelectedFields, true)
@@ -109,7 +109,7 @@ class AssessmentSubmissionController extends Controller
     {
         $totalScore = $this->assessmentSubmisisonService->getTotalScore($assessmentSubmission);
 
-        $this->assessmentSubmisisonService->updateAssessmentSubmission($assessmentSubmission, $totalScore);
+        $this->assessmentSubmisisonService->updateQuizAssessmentSubmission($assessmentSubmission, $totalScore);
 
         inertia()->clearHistory();
 

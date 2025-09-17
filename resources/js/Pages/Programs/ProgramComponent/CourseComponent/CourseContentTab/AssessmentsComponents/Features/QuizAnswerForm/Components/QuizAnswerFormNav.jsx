@@ -54,9 +54,7 @@ export default function QuizAnswerFormNav() {
 
     useEffect(() => {
         if (quiz.duration > 0 && !assessmentSubmission.submitted_at) {
-            const start =
-                new Date(assessmentSubmission.created_at).getTime() / 1000;
-            const end = start + quiz.duration * 60;
+            const end = new Date(assessmentSubmission.end_at).getTime() / 1000;
 
             const interval = timer(end);
 
