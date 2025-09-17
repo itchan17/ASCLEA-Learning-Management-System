@@ -72,24 +72,34 @@ export default function QuizResult({
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex space-x-5 w-full">
-                                    <MdOutlineAccessTimeFilled className="text-ascend-blue text-5xl" />
-                                    <div>
-                                        <h1>Time Spent</h1>
-                                        <p className="font-bold">
-                                            {hours > 0
-                                                ? hours === 1
-                                                    ? `${hours} hour`
-                                                    : `${hours} hours`
-                                                : ""}
-                                            {minutes > 0
-                                                ? minutes === 1
-                                                    ? ` and ${minutes} minute`
-                                                    : ` and ${minutes} minutes`
-                                                : ""}
-                                        </p>
+                                {quiz.duration > 0 && (
+                                    <div className="flex space-x-5 w-full">
+                                        <MdOutlineAccessTimeFilled className="text-ascend-blue text-5xl" />
+                                        <div>
+                                            <h1>Time Spent</h1>
+                                            <p className="font-bold">
+                                                {hours > 0
+                                                    ? hours === 1
+                                                        ? `${hours} hour`
+                                                        : `${hours} hours`
+                                                    : ""}
+                                                {minutes > 0
+                                                    ? minutes === 1
+                                                        ? ` ${
+                                                              hours > 0
+                                                                  ? "and"
+                                                                  : ""
+                                                          } ${minutes} minute`
+                                                        : ` ${
+                                                              hours > 0
+                                                                  ? "and"
+                                                                  : ""
+                                                          } ${minutes} minutes`
+                                                    : ""}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
                             <div className="col-span-2 flex flex-col space-y-5">
                                 <h1 className="font-bold text-size5">

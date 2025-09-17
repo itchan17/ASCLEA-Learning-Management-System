@@ -71,11 +71,12 @@ class AssessmentSubmissionService
     }
 
     // This is use for updating the assessment submission of the quiz when the quiz was actually submitted
-    public function updateQuizAssessmentSubmission(AssessmentSubmission $assessmentSubmission, int $totalScore)
+    public function updateQuizAssessmentSubmission(AssessmentSubmission $assessmentSubmission, int $totalScore, ?string $submittedAt = null)
     {
+        // Parameter $submittedAt is use to specify the time submitted for auto submitting in AutoSubmitAbandonedQuiz scheduled task
         $assessmentSubmission->update([
             'score' => $totalScore,
-            'submitted_at' => Carbon::now()
+            'submitted_at' => $submittedAt ?? Carbon::now()
         ]);
     }
 }
