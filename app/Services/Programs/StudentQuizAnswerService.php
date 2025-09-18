@@ -11,7 +11,10 @@ class StudentQuizAnswerService
     {
         if (is_null($answer)) return false;
 
-        $option = $question->options()->where('question_option_id', $answer)->orWhere('option_text', $answer)->first();
+        // Get the right option from the question
+        $option = $question->options()->where(function ($q) use ($answer) {
+            $q->where('question_option_id', $answer)->orWhere('option_text', $answer);
+        })->first();
 
         return $option ? $option->is_correct : false;
     }
