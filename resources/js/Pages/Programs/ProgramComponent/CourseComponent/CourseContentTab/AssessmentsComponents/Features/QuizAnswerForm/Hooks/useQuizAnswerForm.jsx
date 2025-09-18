@@ -60,6 +60,7 @@ export default function useQuizAnswerForm() {
         courseId,
         assessmentId,
         quizId,
+        assessmentSubmissionId,
         page,
     }) => {
         if (!isLoading) {
@@ -68,6 +69,7 @@ export default function useQuizAnswerForm() {
                     course: courseId,
                     assessment: assessmentId,
                     quiz: quizId,
+                    assessmentSubmission: assessmentSubmissionId,
                 }),
                 { page, answers: studentAnswers },
                 {

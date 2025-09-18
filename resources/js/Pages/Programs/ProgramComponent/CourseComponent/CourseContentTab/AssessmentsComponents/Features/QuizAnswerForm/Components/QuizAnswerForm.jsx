@@ -63,6 +63,8 @@ export default function QuizAnswerForm({
                 courseId: courseId,
                 assessmentId: assessmentId,
                 quizId: quiz.quiz_id,
+                assessmentSubmissionId:
+                    assessmentSubmission.assessment_submission_id,
                 page: questions.current_page + 1,
             });
         }

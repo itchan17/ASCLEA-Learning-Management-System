@@ -2,6 +2,7 @@
 
 namespace App\Models\Programs;
 
+use App\Models\AssignedCourse;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -34,5 +35,10 @@ class AssessmentSubmission extends Model
     public function assessment(): BelongsTo
     {
         return $this->belongsTo(Assessment::class, 'assessment_id');
+    }
+
+    public function submittedBy(): BelongsTo
+    {
+        return $this->belongsTo(AssignedCourse::class, 'submitted_by', 'assigned_course_id');
     }
 }

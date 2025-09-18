@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Programs;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Programs\RequiredQuestionRequest;
 use App\Models\Course;
+use App\Models\Programs\Assessment;
 use App\Models\Programs\AssessmentSubmission;
 use App\Models\Programs\Quiz;
 use App\Services\Programs\AssessmentSubmissionService;
@@ -24,25 +25,24 @@ class AssessmentSubmissionController extends Controller
         $this->assessmentSubmisisonService = $assessmentSubmisisonService;
     }
 
-    public function showQuizInstruction(Request $request, $course, $assessment, Quiz $quiz)
+    public function showQuizInstruction(Request $request, Course $course, Assessment $assessment, Quiz $quiz)
     {
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/QuizInstruction', [
-            'courseId' => $course,
-            'assessmentId' => $assessment,
+            'courseId' => $course->course_id,
+            'assessmentId' => $assessment->assessment_id,
             'quiz' => $quiz
         ]);
     }
 
-    public function showQuizAnswerForm(Request $request, $course, $assessment, Quiz $quiz)
+    public function showQuizAnswerForm(Request $request, Course $course, Assessment $assessment, Quiz $quiz)
     {
-        $assignedCourseId =  $this->assessmentSubmisisonService->getAssignedCourseId($request->user(), $course);
-
-        $assessmentSubmission = $this->assessmentSubmisisonService->getAssessmentSubmission($assignedCourseId, $assessment);
+        $assignedCourseId =  $this->assessmentSubmisisonService->getAssignedCourseId($request->user(), $course->course_id);
+        $assessmentSubmission = $this->assessmentSubmisisonService->getAssessmentSubmission($assignedCourseId, $assessment->assessment_id);
 
         // Check if user has a assessment submission data/user already stater the quiz
         // If not create a new data
         if (!$assessmentSubmission) {
-            $assessmentSubmission = $this->assessmentSubmisisonService->createQuizAssessmentSubmission($assignedCourseId, $assessment, $quiz);
+            $assessmentSubmission = $this->assessmentSubmisisonService->createQuizAssessmentSubmission($assignedCourseId, $assessment->assessment_id, $quiz);
         }
 
         // If user already started the but its not yet submitted return the existing submission data
@@ -53,9 +53,9 @@ class AssessmentSubmissionController extends Controller
             $studentAnswerSelectedFields = ['student_quiz_answer_id', 'assessment_submission_id', 'question_id', 'answer_id', 'answer_text'];
 
             return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/Components/QuizAnswerForm', [
-                'courseId' => $course,
+                'courseId' => $course->course_id,
                 'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'end_at', 'submitted_at']),
-                'assessmentId' => $assessment,
+                'assessmentId' => $assessment->assessment_id,
                 'quiz' => $quiz,
                 'questions' => fn() => $this->questionService->getQuestions($quiz, $assessmentSubmission->assessment_submission_id, $optionSlectedFields, $studentAnswerSelectedFields, true)
             ]);
@@ -63,14 +63,14 @@ class AssessmentSubmissionController extends Controller
 
         // Else redirect the user to the submitted page
         return redirect()->route('quizzes.quiz.submitted.page', [
-            'course' => $course,
-            'assessment' => $assessment,
+            'course' => $course->course_id,
+            'assessment' => $assessment->assessment_id,
             'quiz' => $quiz,
         ]);
     }
 
     // In the form request valdiates if all required questions was completed
-    public function validateRequiredQuestions(RequiredQuestionRequest $request, $course, $assessment, Quiz $quiz)
+    public function validateRequiredQuestions(RequiredQuestionRequest $request, Course $course, Assessment $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
     {
         // Redirect to the next page of the quiz using the page pass from the payload
         return redirect()->route('assessment.quizzes.quiz', [
@@ -81,31 +81,31 @@ class AssessmentSubmissionController extends Controller
         ]);
     }
 
-    public function showSubmittedPage(Request $request, $course, $assessment, Quiz $quiz)
+    public function showSubmittedPage(Request $request, Course $course, Assessment $assessment, Quiz $quiz)
     {
-        $assignedCourseId =  $this->assessmentSubmisisonService->getAssignedCourseId($request->user(), $course);
+        $assignedCourseId =  $this->assessmentSubmisisonService->getAssignedCourseId($request->user(), $course->course_id);
 
-        $assessmentSubmission = $this->assessmentSubmisisonService->getAssessmentSubmission($assignedCourseId, $assessment);
+        $assessmentSubmission = $this->assessmentSubmisisonService->getAssessmentSubmission($assignedCourseId, $assessment->assessment_id);
 
         // Redirect use to quiz instruction page
         // this is to ensure they cant access the submitted page without submitting the page
-        if (!$assessmentSubmission->submitted_at) {
+        if (!$assessmentSubmission || !$assessmentSubmission->submitted_at) {
             return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/QuizInstruction', [
-                'courseId' => $course,
-                'assessmentId' => $assessment,
+                'courseId' => $course->course_id,
+                'assessmentId' => $assessment->assessment_id,
                 'quiz' => $quiz
             ]);
         }
 
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/Components/QuizSubmitted', [
-            'courseId' => $course,
-            'assessmentId' => $assessment,
+            'courseId' => $course->course_id,
+            'assessmentId' => $assessment->assessment_id,
             'quiz' => $quiz,
             'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'submitted_at'])
         ]);
     }
 
-    public function submitQuiz(RequiredQuestionRequest $request, $course, $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
+    public function submitQuiz(RequiredQuestionRequest $request, $course, Assessment $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
     {
         $totalScore = $this->assessmentSubmisisonService->getTotalScore($assessmentSubmission);
 
@@ -121,14 +121,14 @@ class AssessmentSubmissionController extends Controller
         ]);
     }
 
-    public function showQuizResult($course, $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
+    public function showQuizResult(Course $course, Assessment $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
     {
         // Redirect use to quiz instruction page
         // this is to ensure they cant access the result without submitting the page
         if (!$assessmentSubmission->submitted_at) {
             return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/QuizInstruction', [
-                'courseId' => $course,
-                'assessmentId' => $assessment,
+                'courseId' => $course->course_id,
+                'assessmentId' => $assessment->assessment_id,
                 'quiz' => $quiz
             ]);
         }
@@ -138,9 +138,9 @@ class AssessmentSubmissionController extends Controller
         $studentAnswerSelectedFields = ['student_quiz_answer_id', 'assessment_submission_id', 'question_id', 'answer_id', 'answer_text', 'is_correct', 'feedback'];
 
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/Components/QuizResult', [
-            'courseId' => $course,
+            'courseId' => $course->course_id,
             'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'submitted_at', 'score', 'feedback']),
-            'assessmentId' => $assessment,
+            'assessmentId' => $assessment->assessment_id,
             'quiz' => $quiz,
             'questions' => fn() => $this->questionService->getQuestions($quiz, $assessmentSubmission->assessment_submission_id,  $optionSlectedFields, $studentAnswerSelectedFields, false)
         ]);

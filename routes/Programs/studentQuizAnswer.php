@@ -3,6 +3,7 @@
 use App\Http\Controllers\Programs\AssessmentSubmissionController;
 use App\Http\Controllers\Programs\StudentQuizAnswerController;
 use App\Models\Programs\Quiz;
+use App\Models\Programs\StudentQuizAnswer;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('courses/{course}/assessment-submission/{assessmentSubmission}/questions/')
@@ -10,5 +11,5 @@ Route::prefix('courses/{course}/assessment-submission/{assessmentSubmission}/que
     ->group(function () {
 
         // Route for answering the question
-        Route::post('{question}', [StudentQuizAnswerController::class, 'answerQuestion'])->name('assessment.quiz.question.answer');
+        Route::post('{question}', [StudentQuizAnswerController::class, 'answerQuestion'])->can('answerQuestion', [StudentQuizAnswer::class, 'assessmentSubmission'])->name('assessment.quiz.question.answer');
     });
