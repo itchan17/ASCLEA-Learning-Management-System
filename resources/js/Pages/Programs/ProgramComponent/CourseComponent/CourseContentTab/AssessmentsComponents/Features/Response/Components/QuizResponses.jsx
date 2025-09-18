@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import usePeopleStore from "../../../../../../../Stores/Programs/peopleStore";
+import usePeopleStore from "../../../../../../../../../Stores/Programs/peopleStore";
 import { IoSearch } from "react-icons/io5";
-import BackButton from "../../../../../../../Components/Button/BackButton";
-import PrimaryButton from "../../../../../../../Components/Button/PrimaryButton";
-import { handleClickBackBtn } from "../../../../../../../Utils/handleClickBackBtn";
+import BackButton from "../../../../../../../../../Components/Button/BackButton";
+import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
+import { handleClickBackBtn } from "../../../../../../../../../Utils/handleClickBackBtn";
 import { IoCaretDownOutline } from "react-icons/io5";
 import { Pie } from "react-chartjs-2";
 import { RiFeedbackFill } from "react-icons/ri";
 import StudentQuizDetails from "./StudentQuizDetails";
 import ViewEvidence from "./ViewEvidence";
 
-export default function QuizReponses({ responsesData }) {
-    console.log(responsesData);
+export default function QuizReponses({ responsesData, assessment }) {
+    // console.log(responsesData);
     // People Store
     const peopleList = usePeopleStore((state) => state.peopleList);
 
@@ -20,55 +20,18 @@ export default function QuizReponses({ responsesData }) {
 
     return (
         <div className="space-y-5 font-nunito-sans">
-            <div className="flex items-center w-full justify-between">
-                <div className="flex">
-                    <BackButton doSomething={handleClickBackBtn} />
-                </div>
-
-                {/* Download button */}
-                <div className="flex  space-x-[0.5px]">
-                    <PrimaryButton text={"Download"} />
-
-                    {/* Dropdown button */}
-                    <div className="dropdown dropdown-end cursor-pointer ">
-                        <button
-                            tabIndex={0}
-                            role="button"
-                            className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
-                        >
-                            <div className="text-size1 ">
-                                {<IoCaretDownOutline />}
-                            </div>
-                        </button>
-
-                        <ul
-                            tabIndex={0}
-                            className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-                        >
-                            <li>
-                                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Download as PDF
-                                </a>
-                            </li>
-                            <li>
-                                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Download as CSV
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
             <div className="w-full min-w-0">
                 <h1 className="text-size6 break-words font-semibold">
-                    {responsesData.assessmentTitle}
+                    {assessment.assessment_title}
                 </h1>
                 <div className="space-x-5">
                     <span className="font-medium">
-                        Possible Points: {responsesData.assessmentPoints}
+                        {/* Possible Points: {assessment.assessmentPoints} */}
+                        Possible Points: 15
                     </span>
                     <span className="font-medium">
-                        Response Received: {responsesData.responseReceived}
+                        {/* Response Received: {responsesData.responseReceived} */}
+                        Response Received: 20
                     </span>
                 </div>
             </div>
@@ -321,7 +284,7 @@ export default function QuizReponses({ responsesData }) {
                             <th className="text-ascend-black font-black"></th>
                         </tr>
                     </thead>
-                    {peopleList?.length > 0 && (
+                    {/* {peopleList?.length > 0 && (
                         <tbody>
                             {peopleList.map((p, index) => (
                                 <tr
@@ -357,7 +320,7 @@ export default function QuizReponses({ responsesData }) {
                                 </tr>
                             ))}
                         </tbody>
-                    )}
+                    )} */}
                 </table>
                 {isDetailsOpen && (
                     <StudentQuizDetails setIsDetailsOpen={setIsDetailsOpen} />

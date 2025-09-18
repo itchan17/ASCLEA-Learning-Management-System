@@ -105,7 +105,7 @@ class AssessmentSubmissionController extends Controller
         ]);
     }
 
-    public function submitQuiz(RequiredQuestionRequest $request, $course, Assessment $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
+    public function submitQuiz(RequiredQuestionRequest $request, Course $course, Assessment $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
     {
         $totalScore = $this->assessmentSubmisisonService->getTotalScore($assessmentSubmission);
 

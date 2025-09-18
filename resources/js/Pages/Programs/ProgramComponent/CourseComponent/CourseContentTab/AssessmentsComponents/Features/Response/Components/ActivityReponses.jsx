@@ -1,9 +1,9 @@
 import React from "react";
-import usePeopleStore from "../../../../../../../Stores/Programs/peopleStore";
+import usePeopleStore from "../../../../../../../../../Stores/Programs/peopleStore";
 import { IoSearch } from "react-icons/io5";
-import BackButton from "../../../../../../../Components/Button/BackButton";
-import PrimaryButton from "../../../../../../../Components/Button/PrimaryButton";
-import { handleClickBackBtn } from "../../../../../../../Utils/handleClickBackBtn";
+import BackButton from "../../../../../../../../../Components/Button/BackButton";
+import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
+import { handleClickBackBtn } from "../../../../../../../../../Utils/handleClickBackBtn";
 import { IoCaretDownOutline } from "react-icons/io5";
 
 export default function ActivityReponses({ responsesData }) {

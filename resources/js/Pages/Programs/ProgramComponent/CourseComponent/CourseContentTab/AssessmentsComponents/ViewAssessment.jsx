@@ -16,6 +16,7 @@ import { formatFullDate } from "../../../../../../Utils/formatFullDate";
 import { formatDueDateTime } from "../../../../../../Utils/formatDueDateTime";
 import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
 import { hasText } from "../../../../../../Utils/hasText";
+import { closeDropDown } from "../../../../../../Utils/closeDropdown";
 
 export default function ViewAssessment({
     programId,
@@ -46,21 +47,23 @@ export default function ViewAssessment({
     //     }
     // }, [assessmentId]);
 
-    // const clickViewResponses = () => {
-    //     router.visit(
-    //         route("program.course.assessment.responses", {
-    //             programId,
-    //             courseId,
-    //             assessmentId,
-    //         })
-    //     );
-
     //     // Close the dropdown after clicked
     //     const elem = document.activeElement;
     //     if (elem) {
     //         elem?.blur();
     //     }
     // };
+
+    const handleClickViewResponses = () => {
+        router.visit(
+            route("assessment.responses.view", {
+                program: programId,
+                course: courseId,
+                assessment: assessment.assessment_id,
+            })
+        );
+        closeDropDown();
+    };
 
     const handleFileClick = (fileId) => {
         router.get(
@@ -106,7 +109,7 @@ export default function ViewAssessment({
                                     tabIndex={0}
                                     className="dropdown-content menu bg-ascend-white w-42 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                                 >
-                                    <li>
+                                    <li onClick={handleClickViewResponses}>
                                         <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                             View responses
                                         </a>
