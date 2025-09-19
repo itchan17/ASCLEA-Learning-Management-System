@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import usePeopleStore from "../../../../../../../../../Stores/Programs/peopleStore";
 import { IoSearch } from "react-icons/io5";
 import BackButton from "../../../../../../../../../Components/Button/BackButton";
@@ -9,14 +9,73 @@ import { Pie } from "react-chartjs-2";
 import { RiFeedbackFill } from "react-icons/ri";
 import StudentQuizDetails from "./StudentQuizDetails";
 import ViewEvidence from "./ViewEvidence";
+import { calcPercentage } from "../../../../../../../../../Utils/calcPercentage";
+import { convertDurationMinutes } from "../../../../../../../../../Utils/convertDurationMinutes";
+import { usePage } from "@inertiajs/react";
+import EmptyState from "../../../../../../../../../Components/EmptyState/EmptyState";
 
-export default function QuizReponses({ responsesData, assessment }) {
-    // console.log(responsesData);
+export default function QuizReponses() {
+    const { assessment, summary, frequentlyMissedQuestions, responses } =
+        usePage().props;
+    console.log(frequentlyMissedQuestions);
     // People Store
     const peopleList = usePeopleStore((state) => state.peopleList);
 
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
     const [isEvidenceOpen, setIsEvidenceOpen] = useState(false);
+    const [averageTime, setAverageTime] = useState(0);
+    const [isSeeMore, setIsSeeMore] = useState(false);
+    const [numOfQuestionToDisplay, setnumOfQuestionToDisplay] = useState(5);
+    const [
+        frequentlyMissedQuestionsWithColors,
+        setFrequentlyMissedQuestionsWithColors,
+    ] = useState(null);
+
+    useEffect(() => {
+        const { hours, minutes } = convertDurationMinutes(summary.average_time);
+        console.log(hours, minutes);
+        setAverageTime(
+            hours && minutes
+                ? `${
+                      hours > 0
+                          ? hours === 1
+                              ? `${hours}hr`
+                              : `${hours}hrs`
+                          : ""
+                  }
+            ${
+                minutes > 0
+                    ? minutes === 1
+                        ? ` ${hours > 0 ? "and" : ""} ${minutes}min`
+                        : ` ${hours > 0 ? "and" : ""} ${minutes}mins`
+                    : ""
+            }`
+                : 0
+        );
+    }, []);
+
+    function getRandomColor() {
+        return `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`;
+    }
+
+    useEffect(() => {
+        if (frequentlyMissedQuestions.length > 0) {
+            setFrequentlyMissedQuestionsWithColors(
+                frequentlyMissedQuestions.map((question) => {
+                    return { ...question, color: getRandomColor() };
+                })
+            );
+        }
+    }, []);
+
+    const handleClickSeeMore = () => {
+        if (!isSeeMore) {
+            setnumOfQuestionToDisplay(frequentlyMissedQuestions.length);
+        } else {
+            setnumOfQuestionToDisplay(5);
+        }
+        setIsSeeMore(!isSeeMore);
+    };
 
     return (
         <div className="space-y-5 font-nunito-sans">
@@ -27,11 +86,12 @@ export default function QuizReponses({ responsesData, assessment }) {
                 <div className="space-x-5">
                     <span className="font-medium">
                         {/* Possible Points: {assessment.assessmentPoints} */}
-                        Possible Points: 15
+                        Total Points: {assessment.quiz.quiz_total_points}
                     </span>
                     <span className="font-medium">
                         {/* Response Received: {responsesData.responseReceived} */}
-                        Response Received: 20
+                        Responses Received:{" "}
+                        {assessment.assessment_submissions_count}
                     </span>
                 </div>
             </div>
@@ -45,8 +105,15 @@ export default function QuizReponses({ responsesData, assessment }) {
                     <div className="flex flex-col items-start justify-center border border-ascend-gray1 shadow-shadow1 p-4 font-bold">
                         <div className="w-full min-w-0">
                             <h1 className="text-size7 break-words text-ascend-black">
-                                88%
+                                {summary.average_score}
                             </h1>
+                            <span className="text-size4 text-ascend-gray2">
+                                {calcPercentage(
+                                    summary.average_score,
+                                    assessment.quiz.quiz_total_points
+                                )}
+                                %
+                            </span>
                         </div>
 
                         <div className="flex items-center justify-center space-x-2">
@@ -58,7 +125,7 @@ export default function QuizReponses({ responsesData, assessment }) {
                     <div className="flex flex-col items-start justify-center border border-ascend-gray1 shadow-shadow1 p-4 font-bold">
                         <div className="w-full min-w-0">
                             <h1 className="text-size7 break-words text-ascend-black">
-                                2hrs
+                                {averageTime}
                             </h1>
                         </div>
 
@@ -71,12 +138,16 @@ export default function QuizReponses({ responsesData, assessment }) {
                     <div className="flex flex-col items-start justify-center border border-ascend-gray1 shadow-shadow1 p-4 font-bold">
                         <div className="w-full min-w-0">
                             <h1 className="text-size7 break-words text-ascend-black">
-                                125/150
+                                {`${summary.highest_score}/${assessment.quiz.quiz_total_points}`}
                             </h1>
                         </div>
 
                         <span className="text-size4 text-ascend-gray2">
-                            (83%)
+                            {calcPercentage(
+                                summary.highest_score,
+                                assessment.quiz.quiz_total_points
+                            )}
+                            %
                         </span>
                         <div className="flex items-center justify-center space-x-2">
                             <span className="text-ascend-black">
@@ -87,12 +158,16 @@ export default function QuizReponses({ responsesData, assessment }) {
                     <div className="flex flex-col items-start justify-center border border-ascend-gray1 shadow-shadow1 p-4 font-bold">
                         <div className="w-full min-w-0">
                             <h1 className="text-size7 break-words text-ascend-black">
-                                98/150
+                                {`${summary.highest_score}/${assessment.quiz.quiz_total_points}`}
                             </h1>
                         </div>
 
                         <span className="text-size4 text-ascend-gray2">
-                            (65%)
+                            {calcPercentage(
+                                summary.lowest_score,
+                                assessment.quiz.quiz_total_points
+                            )}
+                            %
                         </span>
                         <div className="flex items-center justify-center space-x-2">
                             <span className="text-ascend-black">
@@ -109,87 +184,134 @@ export default function QuizReponses({ responsesData, assessment }) {
                     <h1 className="text-size5 break-words font-semibold">
                         Frequently Missed Questions
                     </h1>
-                    <span className="cursor-pointer hover:text-ascend-blue transition-all duration-300 text-nowrap hover:underline">
-                        See more
-                    </span>
+                    {frequentlyMissedQuestions.length > 0 && (
+                        <span
+                            onClick={handleClickSeeMore}
+                            className="cursor-pointer hover:text-ascend-blue transition-all duration-300 text-nowrap hover:underline"
+                        >
+                            {!isSeeMore ? "See more" : "See less"}
+                        </span>
+                    )}
                 </div>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    <div className="flex justify-center col-span-1 lg:p-10">
-                        <Pie
-                            data={{
-                                labels: [
-                                    `Question no. 21`,
-                                    `Question no. 2`,
-                                    `Question no. 10`,
-                                    `Question no. 13`,
-                                    `Question no. 18`,
-                                ],
-                                datasets: [
-                                    {
-                                        data: [72, 68, 66, 55, 43],
-                                        backgroundColor: [
-                                            "#00a600",
-                                            "#f9a502",
-                                            "#f514bc",
-                                            "#01007d",
-                                            "#c51919",
-                                        ],
+
+                {frequentlyMissedQuestions.length > 0 ? (
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <div className="flex justify-center col-span-1 lg:p-10">
+                            <Pie
+                                data={{
+                                    labels: frequentlyMissedQuestionsWithColors?.map(
+                                        (question) =>
+                                            `Question no. ${question.question_number}`
+                                    ),
+                                    datasets: [
+                                        {
+                                            data: frequentlyMissedQuestionsWithColors?.map(
+                                                (question) =>
+                                                    question.missed_rate
+                                            ),
+                                            backgroundColor:
+                                                frequentlyMissedQuestionsWithColors?.map(
+                                                    (question) => question.color
+                                                ),
+                                            extra: frequentlyMissedQuestionsWithColors?.map(
+                                                (q) => q.missed_count
+                                            ),
+                                        },
+                                    ],
+                                }}
+                                options={{
+                                    plugins: {
+                                        legend: {
+                                            display: false,
+                                        },
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function (context) {
+                                                    const dataset =
+                                                        context.dataset;
+                                                    let missedRate =
+                                                        context.raw;
+                                                    const missedCount =
+                                                        dataset.extra[
+                                                            context.dataIndex
+                                                        ];
+
+                                                    return [
+                                                        `Missed Rate: ${missedRate}%`,
+                                                        `Missed Count: ${missedCount}`,
+                                                    ];
+                                                },
+                                            },
+                                        },
                                     },
-                                ],
-                            }}
-                            options={{
-                                plugins: {
-                                    legend: {
-                                        display: false,
-                                    },
-                                },
-                            }}
-                        ></Pie>
+                                }}
+                            ></Pie>
+                        </div>
+
+                        <ol className="md:col-span-1 lg:col-span-2 space-y-5 flex flex-col items-start max-h-[600px] overflow-y-auto ">
+                            {frequentlyMissedQuestionsWithColors &&
+                                frequentlyMissedQuestionsWithColors
+                                    ?.slice(0, numOfQuestionToDisplay)
+                                    .map((missedQuestion) => (
+                                        <li className="space-y-2">
+                                            <div className="flex flex-col items-start space-x-4 w-full">
+                                                <div className="flex items-center space-x-4 w-full mb-2">
+                                                    <div
+                                                        className={` w-5 h-5 shrink-0`}
+                                                        style={{
+                                                            backgroundColor:
+                                                                missedQuestion.color,
+                                                        }}
+                                                    ></div>
+                                                    <p className="text-gray-700 text-nowrap font-bold">
+                                                        Question no.{" "}
+                                                        {
+                                                            missedQuestion.question_number
+                                                        }
+                                                        :
+                                                    </p>
+                                                </div>
+
+                                                <p className="text-gray-700">
+                                                    {missedQuestion.question}
+                                                </p>
+                                            </div>
+                                            <div className="flex w-fit space-x-4">
+                                                <div className="flex items-start space-x-1 w-full">
+                                                    <p className="text-gray-700 text-nowrap font-bold">
+                                                        Missed Rate:
+                                                    </p>
+
+                                                    <p className="text-gray-700">
+                                                        {
+                                                            missedQuestion.missed_rate
+                                                        }
+                                                        %
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-start space-x-1 w-full">
+                                                    <p className="text-gray-700 text-nowrap font-bold">
+                                                        Missed Count:
+                                                    </p>
+
+                                                    <p className="text-gray-700">
+                                                        {
+                                                            missedQuestion.missed_count
+                                                        }
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    ))}
+                        </ol>
                     </div>
-
-                    <ol className="md:col-span-1 lg:col-span-2 space-y-10 flex flex-col justify-center items-center">
-                        <li className="flex items-start space-x-4 w-full">
-                            <div className="bg-ascend-green w-5 h-5 shrink-0 mt-1"></div>
-                            <p className="text-gray-700">
-                                Teacher A avoids giving out-of-context drills.
-                                Instead, he makes use of real-world problems for
-                                his students to solve. Doing so makes Teacher
-                                A’s approach more meaningful and relevant.
-                            </p>
-                        </li>
-                        <li className="flex items-start space-x-4 w-full">
-                            <div className="bg-ascend-yellow w-5 h-5 shrink-0 mt-1"></div>
-                            <p className="text-gray-700">
-                                In the 4A's of facilitating learning, the first
-                                thing that a teacher should do is:
-                            </p>
-                        </li>
-                        <li className="flex items-start space-x-4 w-full">
-                            <div className="bg-ascend-pink w-5 h-5 shrink-0 mt-1"></div>
-                            <p className="text-gray-700">
-                                In the 4A's approach to facilitating learning,
-                                the students learn best to relate ideas to real
-                                life through
-                            </p>
-                        </li>
-                        <li className="flex items-start space-x-4 w-full">
-                            <div className="bg-ascend-blue w-5 h-5 shrink-0 mt-1"></div>
-                            <p className="text-gray-700">
-                                Which test measure is basic to select and
-                                connect ideas?
-                            </p>
-                        </li>
-                        <li className="flex items-start space-x-4 w-full">
-                            <div className="bg-ascend-red w-5 h-5 shrink-0 mt-1"></div>
-                            <p className="text-gray-700">
-                                Which test a subjective and less reliable for
-                                scoring and grading?
-                            </p>
-                        </li>
-                    </ol>
-                </div>
+                ) : (
+                    <EmptyState
+                        imgSrc={"/images/illustrations/empty.svg"}
+                        text={`“No responses have been submitted for this quiz yet.”`}
+                    />
+                )}
             </div>
-
             {/* Feedback */}
             <div className="space-y-5">
                 <div className="flex flex-wrap gap-5 items-center justify-between">
@@ -284,14 +406,14 @@ export default function QuizReponses({ responsesData, assessment }) {
                             <th className="text-ascend-black font-black"></th>
                         </tr>
                     </thead>
-                    {/* {peopleList?.length > 0 && (
+                    {responses.length > 0 && (
                         <tbody>
-                            {peopleList.map((p, index) => (
+                            {responses.map((response) => (
                                 <tr
                                     onClick={() => {
                                         setIsDetailsOpen(true);
                                     }}
-                                    key={index}
+                                    key={response.assessment_submission_id}
                                     className="hover:bg-ascend-lightblue cursor-pointer"
                                 >
                                     <td>
@@ -299,19 +421,22 @@ export default function QuizReponses({ responsesData, assessment }) {
                                             <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl shrink-0"></div>
 
                                             <div className="font-bold">
-                                                {p.name}
+                                                {`${response.submitted_by.first_name} ${response.submitted_by.last_name}`}
                                             </div>
                                         </div>
                                     </td>
                                     <td>2.5 hrs</td>
-                                    <td>119/150</td>
+                                    <td>
+                                        {response.score}/
+                                        {assessment.quiz.quiz_total_points}
+                                    </td>
                                     <td className="text-ascend-red">6</td>
                                     <td>
                                         <span
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setIsEvidenceOpen(true);
-                                            }}
+                                            // onClick={(e) => {
+                                            //     e.stopPropagation();
+                                            //     setIsEvidenceOpen(true);
+                                            // }}
                                             className="hover:text-ascend-blue underline"
                                         >
                                             View detection results
@@ -320,7 +445,7 @@ export default function QuizReponses({ responsesData, assessment }) {
                                 </tr>
                             ))}
                         </tbody>
-                    )} */}
+                    )}
                 </table>
                 {isDetailsOpen && (
                     <StudentQuizDetails setIsDetailsOpen={setIsDetailsOpen} />

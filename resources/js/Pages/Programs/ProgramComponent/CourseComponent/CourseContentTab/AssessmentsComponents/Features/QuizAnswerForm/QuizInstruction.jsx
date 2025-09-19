@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BackButton from "../../../../../../../../Components/Button/BackButton";
 import { handleClickBackBtn } from "../../../../../../../../Utils/handleClickBackBtn";
 import ReactQuill from "react-quill-new";
@@ -8,29 +8,14 @@ import PrimaryButton from "../../../../../../../../Components/Button/PrimaryButt
 import { AiFillCheckCircle } from "react-icons/ai";
 import AlertModal from "../../../../../../../../Components/AlertModal";
 import useQuizAnswerForm from "./Hooks/useQuizAnswerForm";
+import { convertDurationMinutes } from "../../../../../../../../Utils/convertDurationMinutes";
 
 export default function QuizInstruction({ courseId, quiz, assessmentId }) {
     const [openAlertModal, setOpenAlertModal] = useState(false);
+    const [duration, setDuration] = useState("");
 
     // Custom hook
     const { navigateQuizAnswerForm, isLoading } = useQuizAnswerForm();
-
-    const convertDuration = (duration) => {
-        if (duration < 60) {
-            return `${duration} ${duration > 2 ? "minutes" : "minute"}`;
-        }
-
-        const hours = Math.floor(duration / 60);
-        const remainingMinutes = duration % 60;
-
-        return `${hours} ${hours > 2 ? "hours" : "hour"} ${
-            remainingMinutes
-                ? `and ${remainingMinutes} ${
-                      remainingMinutes > 2 ? "minutes" : "minute"
-                  }`
-                : ""
-        }`;
-    };
 
     const handleStartCLick = () => {
         if (quiz.cheating_mitigation == true) {
@@ -43,6 +28,18 @@ export default function QuizInstruction({ courseId, quiz, assessmentId }) {
             });
         }
     };
+
+    useEffect(() => {
+        const { hours, minutes } = convertDurationMinutes(quiz.duration);
+
+        setDuration(
+            `${hours} ${hours > 2 ? "hours" : "hour"} ${
+                minutes
+                    ? `and ${minutes} ${minutes > 2 ? "minutes" : "minute"}`
+                    : ""
+            }`
+        );
+    }, []);
 
     return (
         <>
@@ -115,7 +112,7 @@ export default function QuizInstruction({ courseId, quiz, assessmentId }) {
                             </h1>
                             <div className="flex flex-wrap justify-between space-x-5">
                                 <h1 className="font-bold">
-                                    Duration: {convertDuration(quiz.duration)}
+                                    Duration: {duration}
                                 </h1>
                                 <h1 className="font-bold">
                                     Total points: {quiz.quiz_total_points}
