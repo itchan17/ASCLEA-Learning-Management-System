@@ -17,12 +17,12 @@ class AssessmentSubmissionController extends Controller
 {
 
     protected QuestionService $questionService;
-    protected AssessmentSubmissionService $assessmentSubmisisonService;
+    protected AssessmentSubmissionService $assessmentSubmissionService;
 
-    public function __construct(QuestionService $questionService, AssessmentSubmissionService $assessmentSubmisisonService)
+    public function __construct(QuestionService $questionService, AssessmentSubmissionService $assessmentSubmissionService)
     {
         $this->questionService = $questionService;
-        $this->assessmentSubmisisonService = $assessmentSubmisisonService;
+        $this->assessmentSubmissionService = $assessmentSubmissionService;
     }
 
     public function showQuizInstruction(Request $request, Course $course, Assessment $assessment, Quiz $quiz)
@@ -36,13 +36,13 @@ class AssessmentSubmissionController extends Controller
 
     public function showQuizAnswerForm(Request $request, Course $course, Assessment $assessment, Quiz $quiz)
     {
-        $assignedCourseId =  $this->assessmentSubmisisonService->getAssignedCourseId($request->user(), $course->course_id);
-        $assessmentSubmission = $this->assessmentSubmisisonService->getAssessmentSubmission($assignedCourseId, $assessment->assessment_id);
+        $assignedCourseId =  $this->assessmentSubmissionService->getAssignedCourseId($request->user(), $course->course_id);
+        $assessmentSubmission = $this->assessmentSubmissionService->getAssessmentSubmission($assignedCourseId, $assessment->assessment_id);
 
         // Check if user has a assessment submission data/user already stater the quiz
         // If not create a new data
         if (!$assessmentSubmission) {
-            $assessmentSubmission = $this->assessmentSubmisisonService->createQuizAssessmentSubmission($assignedCourseId, $assessment->assessment_id, $quiz);
+            $assessmentSubmission = $this->assessmentSubmissionService->createQuizAssessmentSubmission($assignedCourseId, $assessment->assessment_id, $quiz);
         }
 
         // If user already started the but its not yet submitted return the existing submission data
@@ -83,9 +83,9 @@ class AssessmentSubmissionController extends Controller
 
     public function showSubmittedPage(Request $request, Course $course, Assessment $assessment, Quiz $quiz)
     {
-        $assignedCourseId =  $this->assessmentSubmisisonService->getAssignedCourseId($request->user(), $course->course_id);
+        $assignedCourseId =  $this->assessmentSubmissionService->getAssignedCourseId($request->user(), $course->course_id);
 
-        $assessmentSubmission = $this->assessmentSubmisisonService->getAssessmentSubmission($assignedCourseId, $assessment->assessment_id);
+        $assessmentSubmission = $this->assessmentSubmissionService->getAssessmentSubmission($assignedCourseId, $assessment->assessment_id);
 
         // Redirect use to quiz instruction page
         // this is to ensure they cant access the submitted page without submitting the page
@@ -107,9 +107,9 @@ class AssessmentSubmissionController extends Controller
 
     public function submitQuiz(RequiredQuestionRequest $request, Course $course, Assessment $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
     {
-        $totalScore = $this->assessmentSubmisisonService->getTotalScore($assessmentSubmission);
+        $totalScore = $this->assessmentSubmissionService->getTotalScore($assessmentSubmission);
 
-        $this->assessmentSubmisisonService->updateQuizAssessmentSubmission($assessmentSubmission, $totalScore);
+        $this->assessmentSubmissionService->updateQuizAssessmentSubmission($assessmentSubmission, $totalScore);
 
         inertia()->clearHistory();
 

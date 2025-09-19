@@ -14,12 +14,12 @@ use Illuminate\Database\Seeder;
 class AssessmentSubmissionSeeder extends Seeder
 {
 
-    protected AssessmentSubmissionService $assessmentSubmisisonService;
+    protected AssessmentSubmissionService $assessmentSubmissionService;
     protected StudentQuizAnswerService $studenQuizAnswerService;
 
-    public function __construct(AssessmentSubmissionService $assessmentSubmisisonService, StudentQuizAnswerService $studenQuizAnswerService)
+    public function __construct(AssessmentSubmissionService $assessmentSubmissionService, StudentQuizAnswerService $studenQuizAnswerService)
     {
-        $this->assessmentSubmisisonService = $assessmentSubmisisonService;
+        $this->assessmentSubmissionService = $assessmentSubmissionService;
         $this->studenQuizAnswerService = $studenQuizAnswerService;
     }
 
@@ -44,7 +44,7 @@ class AssessmentSubmissionSeeder extends Seeder
         foreach ($studentsAssignedToCourse as $student) {
 
             // Create first the submission
-            $assessmentSubmission = $this->assessmentSubmisisonService->createQuizAssessmentSubmission($student->assigned_course_id, $assessment->assessment_id, $quiz);
+            $assessmentSubmission = $this->assessmentSubmissionService->createQuizAssessmentSubmission($student->assigned_course_id, $assessment->assessment_id, $quiz);
 
             // Loop through questions and answer each
             foreach ($questions as $question) {
@@ -74,7 +74,7 @@ class AssessmentSubmissionSeeder extends Seeder
             // Submit the quiz
 
             // Get the total score first
-            $totalScore = $this->assessmentSubmisisonService->getTotalScore($assessmentSubmission);
+            $totalScore = $this->assessmentSubmissionService->getTotalScore($assessmentSubmission);
             $submittedAt = null;
 
             // This means the quiz a has a set duration
@@ -90,7 +90,7 @@ class AssessmentSubmissionSeeder extends Seeder
             }
 
             // This will update the assessment submission data with the latest records
-            $this->assessmentSubmisisonService->updateQuizAssessmentSubmission($assessmentSubmission, $totalScore, $submittedAt);
+            $this->assessmentSubmissionService->updateQuizAssessmentSubmission($assessmentSubmission, $totalScore, $submittedAt);
         }
     }
 }
