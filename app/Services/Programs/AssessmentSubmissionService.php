@@ -73,10 +73,24 @@ class AssessmentSubmissionService
     // This is use for updating the assessment submission of the quiz when the quiz was actually submitted
     public function updateQuizAssessmentSubmission(AssessmentSubmission $assessmentSubmission, int $totalScore, ?string $submittedAt = null)
     {
+        $now = Carbon::now();
+        $timeSpent = null;
+
+        // Only runs quiz has set duration
+        if ($assessmentSubmission->assessment->quiz && $assessmentSubmission->assessment->quiz->duration > 0) {
+
+            // Calculate the time spent of the user in answering the quiz
+            $start = Carbon::parse($assessmentSubmission->created_at)->timestamp;
+            $submitTime = Carbon::parse($submittedAt ?? $now)->timestamp;
+
+            $timeSpent = (int)(($submitTime - $start) / 60); // This is in minutes
+        }
+
         // Parameter $submittedAt is use to specify the time submitted for auto submitting in AutoSubmitAbandonedQuiz scheduled task
         $assessmentSubmission->update([
             'score' => $totalScore,
-            'submitted_at' => $submittedAt ?? Carbon::now()
+            'submitted_at' => $submittedAt ?? $now,
+            'time_spent' => $timeSpent
         ]);
     }
 }

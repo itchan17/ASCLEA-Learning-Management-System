@@ -20,7 +20,7 @@ class AssessmentResponseController extends Controller
     }
 
 
-    public function showAssessmentResponse(Program $program, Course $course, Assessment $assessment)
+    public function showAssessmentResponse(Request $request, Program $program, Course $course, Assessment $assessment)
     {
         return Inertia::render(
             'Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/Response/ViewResponses',
@@ -32,7 +32,7 @@ class AssessmentResponseController extends Controller
                 }]),
                 'summary' => fn() => $this->assessmentResponseService->getAssessmentResponsesSummary($assessment),
                 'frequentlyMissedQuestions' => fn() =>  $this->assessmentResponseService->getFrequentlyMissedQuestion($assessment),
-                'responses' => fn() =>  $this->assessmentResponseService->getAssessmentResponses($assessment)
+                'responses' => fn() =>  $this->assessmentResponseService->getAssessmentResponses($request, $assessment)
             ]
         );
     }

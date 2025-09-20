@@ -13,46 +13,42 @@ import { calcPercentage } from "../../../../../../../../../Utils/calcPercentage"
 import { convertDurationMinutes } from "../../../../../../../../../Utils/convertDurationMinutes";
 import { usePage } from "@inertiajs/react";
 import EmptyState from "../../../../../../../../../Components/EmptyState/EmptyState";
+import Pagination from "../../../../../../../../../Components/Pagination";
+import useSearchSortQuizResponses from "../Hooks/useSearchSortQuizResponses";
+import { BiSortUp } from "react-icons/bi";
+import { FaSort } from "react-icons/fa";
 
 export default function QuizReponses() {
-    const { assessment, summary, frequentlyMissedQuestions, responses } =
-        usePage().props;
-    console.log(frequentlyMissedQuestions);
-    // People Store
-    const peopleList = usePeopleStore((state) => state.peopleList);
+    const {
+        programId,
+        courseId,
+        assessment,
+        summary,
+        frequentlyMissedQuestions,
+        responses,
+    } = usePage().props;
+
+    // Custom hook
+    const {
+        debouncedSearch,
+        handleSortScore,
+        sortScore,
+        handleSortTime,
+        sortTime,
+    } = useSearchSortQuizResponses({
+        programId,
+        courseId,
+        assessmentId: assessment.assessment_id,
+    });
 
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
     const [isEvidenceOpen, setIsEvidenceOpen] = useState(false);
-    const [averageTime, setAverageTime] = useState(0);
     const [isSeeMore, setIsSeeMore] = useState(false);
     const [numOfQuestionToDisplay, setnumOfQuestionToDisplay] = useState(5);
     const [
         frequentlyMissedQuestionsWithColors,
         setFrequentlyMissedQuestionsWithColors,
     ] = useState(null);
-
-    useEffect(() => {
-        const { hours, minutes } = convertDurationMinutes(summary.average_time);
-        console.log(hours, minutes);
-        setAverageTime(
-            hours && minutes
-                ? `${
-                      hours > 0
-                          ? hours === 1
-                              ? `${hours}hr`
-                              : `${hours}hrs`
-                          : ""
-                  }
-            ${
-                minutes > 0
-                    ? minutes === 1
-                        ? ` ${hours > 0 ? "and" : ""} ${minutes}min`
-                        : ` ${hours > 0 ? "and" : ""} ${minutes}mins`
-                    : ""
-            }`
-                : 0
-        );
-    }, []);
 
     function getRandomColor() {
         return `hsl(${Math.floor(Math.random() * 360)}, 70%, 50%)`;
@@ -125,7 +121,10 @@ export default function QuizReponses() {
                     <div className="flex flex-col items-start justify-center border border-ascend-gray1 shadow-shadow1 p-4 font-bold">
                         <div className="w-full min-w-0">
                             <h1 className="text-size7 break-words text-ascend-black">
-                                {averageTime}
+                                {
+                                    convertDurationMinutes(summary.average_time)
+                                        .formattedTime
+                                }
                             </h1>
                         </div>
 
@@ -380,25 +379,67 @@ export default function QuizReponses() {
                 </div>
                 <div className="relative">
                     <input
-                        className="w-full sm:w-50 border h-9 pl-10 p-2 border-ascend-black focus:outline-ascend-blue"
+                        className="w-full sm:w-50 border pl-10 pr-3 py-2 border-ascend-black focus:outline-ascend-blue"
                         type="text"
                         placeholder="Search name"
+                        onChange={debouncedSearch}
                     />
                     <IoSearch className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1" />
                 </div>
             </div>
             <div className="overflow-x-auto">
                 <table className="table">
-                    <thead className="">
+                    <thead>
                         <tr className="border-b-2 border-ascend-gray3">
                             <th className="text-ascend-black font-black">
                                 Name
                             </th>
                             <th className="text-ascend-black font-black">
-                                Time
+                                <div
+                                    onClick={handleSortTime}
+                                    className="flex space-x-1 items-center hover:bg-ascend-lightblue transition-all duration-300 w-fit p-2 cursor-pointer"
+                                >
+                                    <p>Time</p>
+                                    {!sortTime ? (
+                                        <span className="text-size4 ">
+                                            <FaSort />
+                                        </span>
+                                    ) : (
+                                        <span
+                                            className={`text-size4 ${
+                                                sortTime && sortTime === "desc"
+                                                    ? "transform scale-y-[-1]"
+                                                    : ""
+                                            } transition-all duration-300`}
+                                        >
+                                            <BiSortUp />
+                                        </span>
+                                    )}
+                                </div>
                             </th>
-                            <th className="text-ascend-black font-black">
-                                Score
+                            <th className="text-ascend-black font-black ">
+                                <div
+                                    onClick={handleSortScore}
+                                    className="flex space-x-1 items-center hover:bg-ascend-lightblue transition-all duration-300 w-fit p-2 cursor-pointer"
+                                >
+                                    <p>Score</p>
+                                    {!sortScore ? (
+                                        <span className="text-size4 ">
+                                            <FaSort />
+                                        </span>
+                                    ) : (
+                                        <span
+                                            className={`text-size4 ${
+                                                sortScore &&
+                                                sortScore === "desc"
+                                                    ? "transform scale-y-[-1]"
+                                                    : ""
+                                            } transition-all duration-300`}
+                                        >
+                                            <BiSortUp />
+                                        </span>
+                                    )}
+                                </div>
                             </th>
                             <th className="text-ascend-black font-black">
                                 Warnings
@@ -406,9 +447,9 @@ export default function QuizReponses() {
                             <th className="text-ascend-black font-black"></th>
                         </tr>
                     </thead>
-                    {responses.length > 0 && (
+                    {responses.data.length > 0 && (
                         <tbody>
-                            {responses.map((response) => (
+                            {responses.data.map((response) => (
                                 <tr
                                     onClick={() => {
                                         setIsDetailsOpen(true);
@@ -425,7 +466,13 @@ export default function QuizReponses() {
                                             </div>
                                         </div>
                                     </td>
-                                    <td>2.5 hrs</td>
+                                    <td>
+                                        {
+                                            convertDurationMinutes(
+                                                response.time_spent
+                                            ).formattedTime
+                                        }
+                                    </td>
                                     <td>
                                         {response.score}/
                                         {assessment.quiz.quiz_total_points}
@@ -433,10 +480,10 @@ export default function QuizReponses() {
                                     <td className="text-ascend-red">6</td>
                                     <td>
                                         <span
-                                            // onClick={(e) => {
-                                            //     e.stopPropagation();
-                                            //     setIsEvidenceOpen(true);
-                                            // }}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setIsEvidenceOpen(true);
+                                            }}
                                             className="hover:text-ascend-blue underline"
                                         >
                                             View detection results
@@ -447,14 +494,24 @@ export default function QuizReponses() {
                         </tbody>
                     )}
                 </table>
-                {isDetailsOpen && (
-                    <StudentQuizDetails setIsDetailsOpen={setIsDetailsOpen} />
-                )}
-
-                {isEvidenceOpen && (
-                    <ViewEvidence setIsEvidenceOpen={setIsEvidenceOpen} />
-                )}
             </div>
+
+            {responses.data.length > 0 && responses.total > 10 && (
+                <Pagination
+                    links={responses.links}
+                    currentPage={responses.current_page}
+                    lastPage={responses.last_page}
+                    only={["responses"]}
+                />
+            )}
+
+            {isDetailsOpen && (
+                <StudentQuizDetails setIsDetailsOpen={setIsDetailsOpen} />
+            )}
+
+            {isEvidenceOpen && (
+                <ViewEvidence setIsEvidenceOpen={setIsEvidenceOpen} />
+            )}
         </div>
     );
 }

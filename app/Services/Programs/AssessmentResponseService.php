@@ -7,6 +7,7 @@ use App\Models\Programs\AssessmentSubmission;
 use App\Models\Programs\Question;
 use App\Models\Programs\StudentQuizAnswer;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 use function PHPSTORM_META\map;
 
@@ -85,21 +86,37 @@ class AssessmentResponseService
         return $frequentMisses;
     }
 
-    public function getAssessmentResponses(Assessment $assessment)
+    public function getAssessmentResponses(Request $request, Assessment $assessment)
     {
         $responses = $assessment->assessmentSubmissions()->whereNotNull('submitted_at')->with('submittedBy.member.user', function ($query) {
             $query->select('user_id', 'first_name', 'last_name', 'profile_image');
-        })->get()->map(function ($response) {
+        });
 
+        if ($search = $request->input('search')) {
+            $responses->whereHas('submittedBy.member.user', function ($query) use ($search) {
+                $query->whereLike('first_name', "%$search%")
+                    ->orWhereLike('last_name', "%$search%")
+                    ->orwhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]); // Allows searching for both first and last name
+            });
+        }
+
+        if ($sortScore = $request->input('sortScore')) {
+            $responses->orderBy('score', $sortScore);
+        }
+
+        if ($sortTime = $request->input('sortTime')) {
+            $responses->orderBy('time_spent', $sortTime);
+        }
+
+        return $responses->paginate(10, ['*'], 'page')->withQueryString()->through(function ($response) {
             return [
                 'assessment_submission_id' => $response->assessment_submission_id,
                 'created_at' => $response->created_at->format('Y-m-d H:i:s'),
                 'submitted_at' => $response->submitted_at,
+                'time_spent' => $response->time_spent,
                 'score' => $response->score,
-                'submitted_by'  => $response->submittedBy->member->user
+                'submitted_by' => $response->submittedBy->member->user,
             ];
         });
-
-        return $responses;
     }
 }
