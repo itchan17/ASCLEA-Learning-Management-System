@@ -180,15 +180,21 @@ export default function Administration() {
                         className="text-size2 dropdown-content menu space-y-2 font-bold bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                     >
                         <li>
-                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                            <a
+                                href={route("staff.export.pdf")}
+                                className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
+                            >
                                 Download as pdf
                             </a>
                         </li>
                         <li>
-                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                Download as csv
-                            </a>
-                        </li>
+                        <a
+                            href={route("staff.export.csv")}
+                            className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
+                        >
+                            Download as csv
+                        </a>
+                    </li>
                     </ul>
                 </div>
             </div>

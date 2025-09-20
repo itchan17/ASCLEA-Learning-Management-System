@@ -7,19 +7,31 @@ use App\Models\Administration\Staff;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Inertia\Inertia;
 
 class StaffController extends Controller
-{
+{   
+
+    protected function checkAdmin()
+    {
+        if (!Auth::check() || Auth::user()->role->role_name !== 'admin') {
+            abort(403, 'Unauthorized'); // stops execution and returns 403
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
 
     // Show the administration dashboard
     public function administrationIndex(Request $request)
-    {
+    {   
+        $this->checkAdmin();
+
         // Fetch role IDs for 'admin' and 'faculty'
         $roleIds = Role::whereIn('role_name', ['admin', 'faculty'])->pluck('role_id')->toArray();
 
@@ -56,6 +68,8 @@ class StaffController extends Controller
 
     public function administrationView($staffId)
     {
+        $this->checkAdmin();
+
         $staff = Staff::with(['user.role', 'createdBy', 'assignedCourses.course.program'])
             ->findOrFail($staffId);
 
@@ -82,8 +96,57 @@ class StaffController extends Controller
 
         return Inertia::render('Administration/AdministrationComponents/ViewStaff', [
             'staffDetails' => $staff,
-            'assignedCourses' => $assignedCourses, // ✅ pass courses here
+            'assignedCourses' => $assignedCourses, 
         ]);
+    }
+
+
+    public function exportCsv()
+    {
+        $this->checkAdmin();
+
+        $fileName = 'staffs.csv';
+
+        $staffs = Staff::with('user.role')->get();
+
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+        $columns = ['Name', 'Email', 'Role', 'Status'];
+
+        $callback = function() use ($staffs, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($staffs as $staff) {
+                fputcsv($file, [
+                    $staff->user ? $staff->user->first_name . ' ' . $staff->user->last_name : 'N/A',
+                    $staff->user->email ?? 'N/A',
+                    $staff->user->role->role_name ?? 'N/A',
+                    $staff->status,
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+
+    public function exportPdf()
+    {   
+        $this->checkAdmin();
+
+        $staffs = Staff::with('user.role')->get();
+
+        $pdf = Pdf::loadView('administration.staffs-pdf', compact('staffs'));
+
+        return $pdf->download('staffs.pdf');
     }
 
 
@@ -91,7 +154,9 @@ class StaffController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-    {
+    {   
+        $this->checkAdmin();
+
         $users = User::whereNotIn('user_id', Staff::pluck('user_id'))->get();
 
         return Inertia::render('Staff/Create', [
@@ -104,7 +169,9 @@ class StaffController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
-    {
+    {   
+        $this->checkAdmin();
+
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -142,7 +209,9 @@ class StaffController extends Controller
      * Display the specified resource.
      */
     public function show($id)
-    {
+    {   
+        $this->checkAdmin();
+
         // Load the staff along with the related user info
         $staff = Staff::with('user')->findOrFail($id);
 
@@ -151,11 +220,14 @@ class StaffController extends Controller
         ]);
     }
 
+
     /**
      * Show the form for editing the specified resource.
      */
     public function edit($id)
-    {
+    {   
+        $this->checkAdmin();
+
         $staff = Staff::with(['user.role', 'createdBy'])->findOrFail($id);
 
         return Inertia::render('Staff/Edit', [
@@ -168,7 +240,9 @@ class StaffController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, $id)
-    {
+    {   
+        $this->checkAdmin();
+
         $staff = Staff::with('user')->findOrFail($id);
 
         $request->validate([
@@ -216,15 +290,20 @@ class StaffController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy($id)
-    {
+    {   
+        $this->checkAdmin();
+
         $staff = Staff::findOrFail($id);
         $staff->delete(); // uses SoftDeletes
 
         return redirect()->route('administration.index')->with('success', 'Staff archived successfully.');
     }
 
+
     public function updateProfile(Request $request, $id)
-    {
+    {   
+        $this->checkAdmin();
+        
         $staff = Staff::with('user')->findOrFail($id);
 
         if ($request->hasFile('profile_image')) {
@@ -239,13 +318,9 @@ class StaffController extends Controller
         return back()->with('success', 'Profile updated successfully!');
     }
 
+
     /**
      * Display all assigned courses for a faculty staff member across all programs.
      */
     
-
-
-
-
-
 }

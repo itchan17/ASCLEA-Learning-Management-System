@@ -11,6 +11,10 @@ Route::prefix('administration')
         // Administration dashboard
         Route::get('/', [StaffController::class, 'administrationIndex'])->name('administration.index');
 
+        // EXPORT routes
+        Route::get('/staffs/export/pdf', [StaffController::class, 'exportPdf'])->name('staff.export.pdf');
+        Route::get('/staffs/export/csv', [StaffController::class, 'exportCsv'])->name('staff.export.csv');
+
         // Show staff details + courses
         Route::get('staff/create', [StaffController::class, 'create'])->name('staff.create');
 

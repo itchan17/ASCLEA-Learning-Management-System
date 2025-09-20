@@ -4,6 +4,7 @@ namespace Database\Factories\Administration;
 
 use App\Models\Administration\Staff;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
