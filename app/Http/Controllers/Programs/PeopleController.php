@@ -41,11 +41,13 @@ class PeopleController extends Controller
         }
         // Searching is after filtering role to ensure that the user that will be search is only based on the role
         if ($search = $req->input('search')) {
+
             // Filter based on the search value from 3 columns
             $result->where(function ($query) use ($search) {
                 $query->whereLike('first_name', "%$search%")
                     ->orWhereLike('last_name', "%$search%")
-                    ->orWhereLike('email', "%$search%");
+                    ->orWhereLike('email', "%$search%")
+                    ->orwhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]); // Allows searching for both first and last name
             });
         }
 
@@ -80,7 +82,8 @@ class PeopleController extends Controller
                 $users->where(function ($query) use ($search) {
                     $query->whereLike('first_name', "%$search%")
                         ->orWhereLike('last_name', "%$search%")
-                        ->orWhereLike('email', "%$search%");
+                        ->orWhereLike('email', "%$search%")
+                        ->orwhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]); // Allows searching for both first and last name
                 });
             }
 
