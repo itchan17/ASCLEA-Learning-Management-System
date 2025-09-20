@@ -49,8 +49,8 @@ export default function Sidebar({
             roles: ["admin", "faculty", "student"],
         },
         {
-            url: "/accounting",
-            text: "Accounting",
+            url: "/payment-history",
+            text: "Payment History",
             icon: MdPayments,
             roles: ["admin"],
         },
@@ -67,7 +67,7 @@ export default function Sidebar({
             roles: ["student"],
         },
         {
-            url: "/payment-history",
+            url: "/student-payment-history",
             text: "Payment History",
             icon: MdPayments,
             roles: ["student"],

@@ -1,21 +1,39 @@
-import React, { useState } from "react";
-import { router } from "@inertiajs/react";
+import React, { useState, useMemo  } from "react";
+import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import Pagination from "@/Components/Pagination";
 import { BiFilter } from "react-icons/bi";
 import { IoSearch } from "react-icons/io5";
+import EmptyState from "../../../Components/EmptyState/EmptyState";
+import _ from "lodash";
 
-export default function PaidStudentTable({ students }) {
+export default function PaidStudentTable({ students, filters }) {
   const route = useRoute();
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(filters?.search || ""); // keep search state from backend
 
-  const handleRowClick = (studentId) => {
-    router.visit(route("accounting.student.view", { studentId }));
+  const handleRowClick = (userId) => {
+    if (!userId) {
+      console.error("userId is undefined!");
+      return;
+    }
+    router.visit(route("paymenthistory.payment.history", { userId }));
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    router.get(route("accounting.paid"), { search }, { preserveState: true });
+  const debouncedSearch = useMemo(
+    () =>
+      _.debounce((value) => {
+        router.get(
+          route("paymenthistory.index"), // use your route name
+          { search: value },
+          { preserveState: true, replace: true }
+        );
+      }, 500), // 500ms delay
+    []
+  );
+
+  const handlePageChange = (url) => {
+    if (!url) return;
+    router.get(url, { search }, { preserveState: true }); // keep search on pagination
   };
 
   return (
@@ -29,60 +47,80 @@ export default function PaidStudentTable({ students }) {
           <BiFilter className="text-size5" />
           <div className="font-bold text-size2 pr-10">Filter</div>
 
-          <form onSubmit={handleSearch} className="relative">
+          <div className="relative">
             <input
               className="w-full sm:w-50 border h-9 pl-10 p-2 border-ascend-black focus:outline-ascend-blue"
               type="text"
-              placeholder="Search name"
+              placeholder="Search"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                setSearch(value);
+                debouncedSearch(value); // live search
+              }}
             />
             <IoSearch className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1" />
-          </form>
+          </div>
         </div>
       </div>
 
-      {/*Table */}
+      {/* Table */}
       <div className="overflow-x-auto overflow-y-hidden scrollbar-hide">
-        <table className="table w-full">
-          <thead>
-            <tr className="border-b-2 border-ascend-gray3">
-              <th>Name</th>
-              <th>Program</th>
-              <th>Email</th>
-              <th>Action</th>
+       <table className="table w-full">
+        <thead>
+          <tr className="border-b-2 border-ascend-gray3">
+            <th>Name</th>
+            <th>Program</th>
+            <th>Email</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        {students?.data?.length > 0 ? (
+          <tbody>
+            {students.data.map((s) => (
+              <tr
+                key={s.id}
+                onClick={() => handleRowClick(s.user_id)}
+                className="hover:bg-ascend-lightblue cursor-pointer"
+              >
+                <td className="py-5">{s.name}</td>
+                <td className="py-5">{s.program}</td>
+                <td className="py-5">{s.email}</td>
+                <td className="py-5">
+                  <span className="text-ascend-blue underline">View More</span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        ) : (
+          <tbody>
+            <tr>
+              <td colSpan={4}>
+                <div className="flex flex-col items-center justify-center py-20">
+                  <EmptyState
+                    imgSrc={"/images/illustrations/empty-cat.svg"}
+                    text={
+                      search
+                        ? `Hmm… we couldn’t find any students. Maybe try a different search?`
+                        : "No paid students yet! Time to get the party started and enroll some students."
+                    }
+                  />
+                </div>
+              </td>
             </tr>
-          </thead>
+          </tbody>
+        )}
+      </table>
 
-          {students?.data?.length > 0 && (
-            <tbody>
-              {students.data.map((s) => (
-                <tr
-                  key={s.id}
-                  onClick={() => handleRowClick(s.id)}
-                  className="hover:bg-ascend-lightblue cursor-pointer"
-                >
-                  <td className="py-5">{s.name}</td>
-                  <td className="py-5">{s.program}</td>
-                  <td className="py-5">{s.email}</td>
-                  <td className="py-5">
-                    <span className="text-ascend-blue underline">
-                      View More
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          )}
-        </table>
 
-        {/* ✅ Pagination */}
+        {/*Pagination with search persistence */}
         {students?.links && (
           <Pagination
             links={students.links}
             currentPage={students.current_page}
             lastPage={students.last_page}
-            only={["students"]}
+            onPageChange={handlePageChange}
           />
         )}
       </div>
