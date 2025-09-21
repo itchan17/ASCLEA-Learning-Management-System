@@ -5,6 +5,8 @@ import { BiSortUp } from "react-icons/bi";
 import { FaSort } from "react-icons/fa";
 import { convertDurationMinutes } from "../../../../../../../../../Utils/convertDurationMinutes";
 import Pagination from "../../../../../../../../../Components/Pagination";
+import { router } from "@inertiajs/react";
+import { route } from "ziggy-js";
 
 export default function QuizResponsesTable({
     programId,
@@ -23,6 +25,17 @@ export default function QuizResponsesTable({
         courseId,
         assessmentId: assessment.assessment_id,
     });
+
+    const handleViewStudentQuizResult = (assessmentSubmissionId) => {
+        router.visit(
+            route("quizzes.quiz.result", {
+                course: courseId,
+                assessment: assessment.assessment_id,
+                quiz: assessment.quiz.quiz_id,
+                assessmentSubmission: assessmentSubmissionId,
+            })
+        );
+    };
 
     return (
         <>
@@ -106,9 +119,11 @@ export default function QuizResponsesTable({
                         <tbody>
                             {responses.data.map((response) => (
                                 <tr
-                                    onClick={() => {
-                                        setIsDetailsOpen(true);
-                                    }}
+                                    onClick={() =>
+                                        handleViewStudentQuizResult(
+                                            response.assessment_submission_id
+                                        )
+                                    }
                                     key={response.assessment_submission_id}
                                     className="hover:bg-ascend-lightblue cursor-pointer"
                                 >
@@ -133,7 +148,7 @@ export default function QuizResponsesTable({
                                         {assessment.quiz.quiz_total_points}
                                     </td>
                                     <td className="text-ascend-red">6</td>
-                                    <td>
+                                    {/* <td>
                                         <span
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -143,7 +158,7 @@ export default function QuizResponsesTable({
                                         >
                                             View detection results
                                         </span>
-                                    </td>
+                                    </td> */}
                                 </tr>
                             ))}
                         </tbody>

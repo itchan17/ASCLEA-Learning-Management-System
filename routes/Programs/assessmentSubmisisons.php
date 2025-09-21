@@ -28,5 +28,5 @@ Route::prefix('courses/{course}/assessments/{assessment}/quizzes/')
         Route::post('{quiz}/assessment-submission/{assessmentSubmission}', [AssessmentSubmissionController::class, 'submitQuiz'])->can('submitQuiz', ['assessmentSubmission', 'assessment'])->name('quizzes.quiz.submit');
 
         // Route for showing the quiz result 
-        Route::get('{quiz}/assessment-submission/{assessmentSubmission}/result', [AssessmentSubmissionController::class, 'showQuizResult'])->can('viewQuizResult', ['assessmentSubmission', 'assessment'])->name('quizzes.quiz.result');
+        Route::get('{quiz}/assessment-submission/{assessmentSubmission}/result', [AssessmentSubmissionController::class, 'showQuizResult'])->name('quizzes.quiz.result');
     });

@@ -3,6 +3,9 @@ import { AiFillCheckCircle } from "react-icons/ai";
 import { usePage } from "@inertiajs/react";
 import useQuizAnswerForm from "../Hooks/useQuizAnswerForm";
 import useQuizAnswerStore from "../Stores/quizAnswerStore";
+import BackButton from "../../../../../../../../../Components/Button/BackButton";
+import { handleClickBackBtn } from "../../../../../../../../../Utils/handleClickBackBtn";
+import RoleGuard from "../../../../../../../../../Components/Auth/RoleGuard";
 
 export default function QuizAnswerFormNav() {
     const { courseId, assessmentId, assessmentSubmission, quiz } =
@@ -73,7 +76,7 @@ export default function QuizAnswerFormNav() {
     }, []);
     return (
         <nav
-            className={`sticky top-0 z-999 bg-ascend-white transition-all duration-300 font-nunito-sans ${
+            className={`sticky top-0 z-998 bg-ascend-white transition-all duration-300 font-nunito-sans ${
                 isScrolledDown ? "shadow-[0px_0px_15px_5px_#a1a1a1]" : ""
             }`}
         >
@@ -111,6 +114,11 @@ export default function QuizAnswerFormNav() {
                     )}
                 </div>
             </div>
+            <RoleGuard allowedRoles={["admin", "faculty"]}>
+                <div className="px-5 lg:px-[100px] w-fit">
+                    <BackButton doSomething={handleClickBackBtn} />
+                </div>
+            </RoleGuard>
         </nav>
     );
 }

@@ -121,8 +121,9 @@ class AssessmentSubmissionController extends Controller
         ]);
     }
 
-    public function showQuizResult(Course $course, Assessment $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
+    public function showQuizResult(Request $request, Course $course, Assessment $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
     {
+
         // Redirect use to quiz instruction page
         // this is to ensure they cant access the result without submitting the page
         if (!$assessmentSubmission->submitted_at) {
@@ -139,10 +140,19 @@ class AssessmentSubmissionController extends Controller
 
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/Components/QuizResult', [
             'courseId' => $course->course_id,
-            'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'submitted_at', 'score', 'feedback']),
+            'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'submitted_at', 'score', 'feedback', 'time_spent']),
             'assessmentId' => $assessment->assessment_id,
             'quiz' => $quiz,
-            'questions' => fn() => $this->questionService->getQuestions($quiz, $assessmentSubmission->assessment_submission_id,  $optionSlectedFields, $studentAnswerSelectedFields, false)
+            'questions' => fn() => $this->questionService->getQuestions($quiz, $assessmentSubmission->assessment_submission_id,  $optionSlectedFields, $studentAnswerSelectedFields, false),
+            'prevQuizAssessmentSubmitted' => fn() => $this->assessmentSubmissionService->getPrevQuizAssessmentSubmitted($request->user(), $assessmentSubmission),
+            'studentData' => fn() => $assessmentSubmission->load([
+                'submittedBy.member.user' => function ($query) {
+                    $query->select('user_id', 'first_name', 'last_name', 'profile_image', 'email');
+                },
+            ])->submittedBy
+                ->member
+                ->user
+
         ]);
     }
 }

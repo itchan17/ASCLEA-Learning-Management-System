@@ -93,4 +93,27 @@ class AssessmentSubmissionService
             'time_spent' => $timeSpent
         ]);
     }
+
+    public function getPrevQuizAssessmentSubmitted(User $user, AssessmentSubmission $assessmentSubmission)
+    {
+        if ($user->role->role_name !== "student") {
+
+            // Get the first submitted assessment of the student based on the current assessmentSubmission
+            // Check if the assessment was also submitted by the same user
+            // The id used in submitted_by was assigned_course_id it's a unique identification for each user assigned to the course
+            // It also ensure that the assessment that will be fetched is in the same course
+            // Last condition makes sure the the assessment is a type of quiz
+            return AssessmentSubmission::where('created_at', '<', $assessmentSubmission->created_at)->where('submitted_by', $assessmentSubmission->submitted_by)->whereHas('assessment.assessmentType', function ($query) {
+                $query->where('assessment_type', 'quiz');
+            })->with('assessment.quiz')->orderBy('created_at', 'desc')
+                ->first();
+        } else {
+            return null;
+        }
+    }
+
+    public function updateQuizAssessmentSubmissionScore(AssessmentSubmission $assessmentSubmission, int $totalScore)
+    {
+        $assessmentSubmission->update(["score" => $totalScore]);
+    }
 }

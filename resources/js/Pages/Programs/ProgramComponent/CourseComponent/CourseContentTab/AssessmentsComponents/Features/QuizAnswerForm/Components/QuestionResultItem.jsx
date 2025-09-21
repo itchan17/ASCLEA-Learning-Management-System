@@ -1,10 +1,25 @@
 import { useState, useEffect } from "react";
-import useQuizAnswerForm from "../Hooks/useQuizAnswerForm";
-import { usePage } from "@inertiajs/react";
+import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
+import RoleGuard from "../../../../../../../../../Components/Auth/RoleGuard";
+import useUpdateStudentAnswerStatus from "../Hooks/useUpdateStudentAnswerStatus";
 
-export default function QuestionResultItem({ questionDetails }) {
+export default function QuestionResultItem({
+    courseId,
+    assessmentSubmission,
+    questionDetails,
+}) {
     const [isAnswerCorrect, setIsAnswerCorrect] = useState(true);
     const [hasCorrectOption, setHasCorrectOption] = useState(false);
+    console.log(questionDetails);
+    // Custom hook
+    const { handleUpdate, isLoading } = useUpdateStudentAnswerStatus({
+        courseId: courseId,
+        assessmentSubmissionId: assessmentSubmission.assessment_submission_id,
+        questionId: questionDetails.question_id,
+        studentQuizAnswerId: questionDetails.student_answer
+            ? questionDetails.student_answer.student_quiz_answer_id
+            : null,
+    });
 
     useEffect(() => {
         if (questionDetails.options) {
@@ -17,32 +32,47 @@ export default function QuestionResultItem({ questionDetails }) {
             if (hasCorrectOption && !questionDetails.student_answer) {
                 setIsAnswerCorrect(false);
             } else if (hasCorrectOption && questionDetails.student_answer) {
-                const isStudentAnswerCorrect = questionDetails.options.some(
-                    (option) =>
-                        option.is_correct === true &&
-                        (option.question_option_id ===
-                            questionDetails.student_answer.answer_id ||
-                            option.option_text ===
-                                questionDetails.student_answer.answer_text)
-                );
-
-                setIsAnswerCorrect(isStudentAnswerCorrect);
+                setIsAnswerCorrect(questionDetails.student_answer.is_correct);
             }
         }
-    }, []);
+    }, [questionDetails]);
     // console.log(questionDetails);
     return (
         <div className="p-5 shadow-shadow1 border border-ascend-gray1 space-y-5">
             {hasCorrectOption &&
                 (isAnswerCorrect ? (
-                    <div className="bg-ascend-green w-fit px-2 py-1">
-                        <h1 className="font-bold text-ascend-white">Correct</h1>
+                    <div className="flex justify-between">
+                        <div className="bg-ascend-green w-fit px-2 py-1 flex items-center">
+                            <h1 className="font-bold text-ascend-white">
+                                Correct
+                            </h1>
+                        </div>
+                        {questionDetails.student_answer && (
+                            <RoleGuard allowedRoles={["admin", "faculty"]}>
+                                <PrimaryButton
+                                    isDisabled={isLoading}
+                                    doSomething={() => handleUpdate(false)}
+                                    text={"Mark as Incorrect"}
+                                />
+                            </RoleGuard>
+                        )}
                     </div>
                 ) : (
-                    <div className="bg-ascend-red w-fit px-2 py-1">
-                        <h1 className="font-bold text-ascend-white">
-                            Incorrect
-                        </h1>
+                    <div className="flex justify-between">
+                        <div className="bg-ascend-red w-fit px-2 py-1 flex items-center">
+                            <h1 className="font-bold text-ascend-white">
+                                Incorrect
+                            </h1>
+                        </div>
+                        {questionDetails.student_answer && (
+                            <RoleGuard allowedRoles={["admin", "faculty"]}>
+                                <PrimaryButton
+                                    isDisabled={isLoading}
+                                    doSomething={() => handleUpdate(true)}
+                                    text={"Mark as Correct"}
+                                />
+                            </RoleGuard>
+                        )}
                     </div>
                 ))}
             <div className="flex">

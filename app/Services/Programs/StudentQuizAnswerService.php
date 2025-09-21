@@ -21,6 +21,7 @@ class StudentQuizAnswerService
 
     public function createOrUpdateQuestionAnswer(string $assessmentSubmissionId, string $questionId, bool $isAnswerCorrect, ?string $studentAnswer, string $questionType)
     {
+        // If user try to remove their answer, we delete the record of it
         if (is_null($studentAnswer)) {
             StudentQuizAnswer::where('assessment_submission_id', $assessmentSubmissionId)->where('question_id', $questionId)->delete();
 
@@ -39,5 +40,10 @@ class StudentQuizAnswerService
                 $answer
             );
         }
+    }
+
+    public function updateAnswerCorrectness(StudentQuizAnswer $studentQuizAnswer, bool $isAnswerCorrect)
+    {
+        $studentQuizAnswer->update(["is_correct" => $isAnswerCorrect]);
     }
 }

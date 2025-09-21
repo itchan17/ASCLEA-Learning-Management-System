@@ -12,4 +12,7 @@ Route::prefix('courses/{course}/assessment-submission/{assessmentSubmission}/que
 
         // Route for answering the question
         Route::post('{question}', [StudentQuizAnswerController::class, 'answerQuestion'])->can('answerQuestion', [StudentQuizAnswer::class, 'assessmentSubmission'])->name('assessment.quiz.question.answer');
+
+        // Route for mariking answer correct or incorrect
+        Route::put('{question}/student-answers/{studentQuizAnswer}', [StudentQuizAnswerController::class, 'markAnswerCorrectIncorrect'])->name('assessment.quiz.question.answer.update');
     });
