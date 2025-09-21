@@ -103,4 +103,14 @@ class AssessmentPolicy
 
         return $isAuthorized;
     }
+
+    public function viewAssessmentResponses(User $user, Assessment $assessment,): bool
+    {
+        $isAuthor = $assessment->created_by === $user->user_id;
+        $isAdmin = $user->role->role_name == "admin";
+
+        $isAuthorized = $isAuthor || $isAdmin;
+
+        return $isAuthorized;
+    }
 }

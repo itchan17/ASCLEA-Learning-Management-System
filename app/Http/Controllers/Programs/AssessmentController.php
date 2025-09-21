@@ -4,20 +4,26 @@ namespace App\Http\Controllers\Programs;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Programs\SaveAssessmentRequest;
+use App\Models\Course;
+use App\Models\Program;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\AssessmentFile;
 use App\Services\HandlingPrivateFileService;
+use App\Services\Programs\AssessmentResponseService;
 use App\Services\Programs\AssessmentService;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 
 class AssessmentController extends Controller
 {
     protected AssessmentService $assessmentService;
+    protected AssessmentResponseService $assessmentResponseService;
 
-    public function __construct(AssessmentService $service)
+    public function __construct(AssessmentService $assessmentService, AssessmentResponseService $assessmentResponseService)
     {
-        $this->assessmentService = $service;
+        $this->assessmentService = $assessmentService;
+        $this->assessmentResponseService = $assessmentResponseService;
     }
 
     public function createAssessment(SaveAssessmentRequest $req, $program, $course)
@@ -127,5 +133,22 @@ class AssessmentController extends Controller
     {
         // Use a service class that returns the file to be download
         return HandlingPrivateFileService::downloadFile($file->original_file_path, $file->file_name);
+    }
+
+    public function showAssessmentResponse(Request $request, Program $program, Course $course, Assessment $assessment)
+    {
+        return Inertia::render(
+            'Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/Response/ViewResponses',
+            [
+                'programId' => $program->program_id,
+                'courseId' => $course->course_id,
+                'assessment' => fn() => $assessment->load('assessmentType')->load('quiz')->loadCount(['assessmentSubmissions' => function ($query) {
+                    $query->whereNotNull('submitted_at');
+                }]),
+                'summary' => fn() => $this->assessmentResponseService->getAssessmentResponsesSummary($assessment),
+                'frequentlyMissedQuestions' => fn() =>  $this->assessmentResponseService->getFrequentlyMissedQuestion($assessment),
+                'responses' => fn() =>  $this->assessmentResponseService->getAssessmentResponses($request, $assessment)
+            ]
+        );
     }
 }

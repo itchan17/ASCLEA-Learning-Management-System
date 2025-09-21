@@ -89,10 +89,24 @@ class AssessmentSubmissionPolicy
 
     public function viewQuizResult(User $user, AssessmentSubmission $assessmentSubmission, Assessment $assessment): bool
     {
+        $isAssessmentAuthor = $assessment->author->user_id === $user->user_id;
         $isAssessmentSubmissionAuthor = $assessmentSubmission->submittedBy->member->user->user_id === $user->user_id;
         $isPublished = $assessment->status === "published";
 
-        $isAuthorized = $isAssessmentSubmissionAuthor && $isPublished;
+        $isAuthorized = false;
+
+        // Admin and faculty author of the assessment can only view the quiz result if its submitted
+        if ($user->role->role_name !== 'student' && $isAssessmentAuthor) {
+            $isAuthorized = !is_null($assessmentSubmission->submitted_at);
+        }
+        // Other admin that is not the author of the assessment can view quiz result only if its published and already submitted
+        else if ($user->role->role_name === 'admin' && !$isAssessmentAuthor) {
+            $isAuthorized = $isPublished && !is_null($assessmentSubmission->submitted_at);
+        }
+        // Students can view their result only if its published and ther're the one submitted 
+        else if ($user->role->role_name == 'student') {
+            $isAuthorized = $isPublished && $isAssessmentSubmissionAuthor;
+        }
 
         return $isAuthorized;
     }

@@ -37,4 +37,7 @@ Route::prefix('programs/{program}/courses/{course}')
 
         // ROute for downloading the file
         Route::get('/assessments/{assessment}/files/{file}/download', [AssessmentController::class, "downloadAssessmentFile"])->can('downloadAssessmentFile', ['assessment', 'course'])->name('program.course.file.download');
+
+        // Route for viewing assessment responses
+        Route::get('/assessments/{assessment}/responses', [AssessmentController::class, 'showAssessmentResponse'])->can('viewAssessmentResponses', 'assessment')->name('assessment.responses.view');
     });

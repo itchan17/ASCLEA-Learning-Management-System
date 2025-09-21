@@ -20,4 +20,13 @@ class StudentQuizAnswerPolicy
 
         return $isAuthorized;
     }
+
+    public function updateQuestionAnswer(User $user, AssessmentSubmission $assessmentSubmission): bool
+    {
+        $isAssessmentAuthor = $assessmentSubmission->assessment->author->user_id === $user->user_id;
+
+        $isAuthorized = $isAssessmentAuthor;
+
+        return $isAuthorized;
+    }
 }

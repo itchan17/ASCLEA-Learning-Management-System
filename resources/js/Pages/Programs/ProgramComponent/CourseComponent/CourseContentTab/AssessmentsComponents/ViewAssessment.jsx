@@ -94,7 +94,8 @@ export default function ViewAssessment({
                         </span>
                     </div>
 
-                    {auth.user.user_id === assessment.created_by && (
+                    {(auth.user.role_name === "admin" ||
+                        auth.user.user_id === assessment.created_by) && (
                         <RoleGuard allowedRoles={["admin", "faculty"]}>
                             <div className="dropdown dropdown-end cursor-pointer ">
                                 <div
@@ -114,12 +115,14 @@ export default function ViewAssessment({
                                             View responses
                                         </a>
                                     </li>
-
-                                    <li>
-                                        <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                            Reset assessment
-                                        </a>
-                                    </li>
+                                    {auth.user.user_id ===
+                                        assessment.created_by && (
+                                        <li>
+                                            <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                Reset assessment
+                                            </a>
+                                        </li>
+                                    )}
                                 </ul>
                             </div>
                         </RoleGuard>
