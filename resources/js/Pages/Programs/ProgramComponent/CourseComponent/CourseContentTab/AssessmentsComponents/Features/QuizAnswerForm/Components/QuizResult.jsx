@@ -8,7 +8,7 @@ import RoleGuard from "../../../../../../../../../Components/Auth/RoleGuard";
 
 export default function QuizResult({
     courseId,
-    assessmentId,
+    assessment,
     quiz,
     questions,
     assessmentSubmission,
@@ -16,7 +16,6 @@ export default function QuizResult({
     prevQuizAssessmentSubmitted,
     studentData,
 }) {
-    console.log(auth);
     return (
         <div className="font-nunito-sans space-y-5">
             <QuizAnswerFormNav />
@@ -51,6 +50,8 @@ export default function QuizResult({
                                 courseId={courseId}
                                 assessmentSubmission={assessmentSubmission}
                                 questionDetails={question}
+                                assessment={assessment}
+                                user={auth.user}
                             />
                         ))}
                 </div>

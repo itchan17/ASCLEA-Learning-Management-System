@@ -7,10 +7,12 @@ export default function QuestionResultItem({
     courseId,
     assessmentSubmission,
     questionDetails,
+    user,
+    assessment,
 }) {
     const [isAnswerCorrect, setIsAnswerCorrect] = useState(true);
     const [hasCorrectOption, setHasCorrectOption] = useState(false);
-    console.log(questionDetails);
+
     // Custom hook
     const { handleUpdate, isLoading } = useUpdateStudentAnswerStatus({
         courseId: courseId,
@@ -20,7 +22,7 @@ export default function QuestionResultItem({
             ? questionDetails.student_answer.student_quiz_answer_id
             : null,
     });
-
+    console.log(user);
     useEffect(() => {
         if (questionDetails.options) {
             const hasCorrectOption = questionDetails.options.some(
@@ -47,15 +49,17 @@ export default function QuestionResultItem({
                                 Correct
                             </h1>
                         </div>
-                        {questionDetails.student_answer && (
-                            <RoleGuard allowedRoles={["admin", "faculty"]}>
-                                <PrimaryButton
-                                    isDisabled={isLoading}
-                                    doSomething={() => handleUpdate(false)}
-                                    text={"Mark as Incorrect"}
-                                />
-                            </RoleGuard>
-                        )}
+                        {questionDetails.student_answer &&
+                            assessment.created_by === user.user_id && (
+                                <RoleGuard allowedRoles={["admin", "faculty"]}>
+                                    <PrimaryButton
+                                        isDisabled={isLoading}
+                                        isLoading={isLoading}
+                                        doSomething={() => handleUpdate(false)}
+                                        text={"Mark as Incorrect"}
+                                    />
+                                </RoleGuard>
+                            )}
                     </div>
                 ) : (
                     <div className="flex justify-between">
@@ -64,15 +68,17 @@ export default function QuestionResultItem({
                                 Incorrect
                             </h1>
                         </div>
-                        {questionDetails.student_answer && (
-                            <RoleGuard allowedRoles={["admin", "faculty"]}>
-                                <PrimaryButton
-                                    isDisabled={isLoading}
-                                    doSomething={() => handleUpdate(true)}
-                                    text={"Mark as Correct"}
-                                />
-                            </RoleGuard>
-                        )}
+                        {questionDetails.student_answer &&
+                            assessment.created_by === user.user_id && (
+                                <RoleGuard allowedRoles={["admin", "faculty"]}>
+                                    <PrimaryButton
+                                        isDisabled={isLoading}
+                                        isLoading={isLoading}
+                                        doSomething={() => handleUpdate(true)}
+                                        text={"Mark as Correct"}
+                                    />
+                                </RoleGuard>
+                            )}
                     </div>
                 ))}
             <div className="flex">

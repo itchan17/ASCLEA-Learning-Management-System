@@ -141,7 +141,7 @@ class AssessmentSubmissionController extends Controller
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/Components/QuizResult', [
             'courseId' => $course->course_id,
             'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'submitted_at', 'score', 'feedback', 'time_spent']),
-            'assessmentId' => $assessment->assessment_id,
+            'assessment' => $assessment->only('assessment_id', 'created_by'),
             'quiz' => $quiz,
             'questions' => fn() => $this->questionService->getQuestions($quiz, $assessmentSubmission->assessment_submission_id,  $optionSlectedFields, $studentAnswerSelectedFields, false),
             'prevQuizAssessmentSubmitted' => fn() => $this->assessmentSubmissionService->getPrevQuizAssessmentSubmitted($request->user(), $assessmentSubmission),
