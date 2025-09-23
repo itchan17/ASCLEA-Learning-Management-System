@@ -10,6 +10,7 @@ use Inertia\Inertia;
 use App\Models\PaymentHistory\Payment;
 use App\Models\PaymentHistory\PaymentFile;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class paymentHistoryController extends Controller
 {
@@ -60,10 +61,10 @@ class paymentHistoryController extends Controller
         $payments = Payment::withTrashed()
             ->where('user_id', $userId)
             ->latest('receipt_date')
-            ->paginate(10);
-
+            ->get(); 
+            
         // Transform the collection
-        $payments->getCollection()->transform(function ($payment) {
+        $payments = $payments->map(function ($payment) {
             return [
                 'payment_id'      => $payment->payment_id,
                 'payment_method'  => $payment->payment_method,
@@ -194,7 +195,8 @@ class paymentHistoryController extends Controller
         }
         
 
-        return redirect()->back()->with('success', 'Payment updated successfully!');
+    return back()->with('success', 'Payment updated successfully!');
+
     }
 
     public function viewPaymentFile($paymentId, $fileId)
@@ -358,4 +360,76 @@ class paymentHistoryController extends Controller
         return response()->file(storage_path("app/public/{$file->file_path}"));
     }
 
+public function exportPdf($userId)
+{
+    $payments = Payment::with('user.role')
+        ->where('user_id', $userId)
+        ->whereNull('deleted_at')
+        ->get();
+
+    if ($payments->isEmpty()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No payment records found for this user.'
+        ], 404);
+    }
+    // Get student name from the first payment record
+    $user = $payments->first()->user;
+    $studentName = $user ? ($user->first_name . '_' . $user->last_name) : 'Unknown_User';
+
+    $pdf = Pdf::loadView('paymenthistory.payments-pdf', compact('payments'));
+
+    return $pdf->download("PaymentHistory_{$studentName}.pdf");
 }
+
+
+public function exportCsv($userId)
+{
+    $payments = Payment::with('user.role')
+        ->where('user_id', $userId)
+        ->whereNull('deleted_at') // ignore soft deleted
+        ->get();
+
+    if ($payments->isEmpty()) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No payment records found for this user.'
+        ], 404);
+    }
+
+    $user = $payments->first()->user;
+    $studentName = $user ? ($user->first_name . '_' . $user->last_name) : 'Unknown_User';
+
+    $fileName = "PaymentHistory_{$studentName}.csv";
+
+    $headers = [
+        "Content-type" => "text/csv",
+        "Content-Disposition" => "attachment; filename=$fileName",
+        "Pragma" => "no-cache",
+        "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+        "Expires" => "0"
+    ];
+
+    $columns = ['Payment Method', 'Transaction ID', 'Receipt Date', 'Payment Amount', 'Action'];
+
+    $callback = function() use ($payments, $columns) {
+        $file = fopen('php://output', 'w');
+        fputcsv($file, $columns);
+
+        foreach ($payments as $payment) {
+            fputcsv($file, [
+                $payment->payment_method,
+                $payment->transaction_id,
+                $payment->receipt_date,
+                $payment->payment_amount,
+                'View',
+            ]);
+        }
+        fclose($file);
+    };
+
+    return response()->stream($callback, 200, $headers);
+}
+
+}
+

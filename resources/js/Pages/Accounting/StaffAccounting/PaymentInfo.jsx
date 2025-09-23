@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { usePage } from "@inertiajs/react";
 import { router } from "@inertiajs/react";
 import BackButton from "../../../Components/Button/BackButton";
@@ -12,6 +12,7 @@ import { ImCancelCircle } from "react-icons/im";
 import { GrRevert } from "react-icons/gr";
 import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToast";
 import { usePaymentTabs } from "../../../Stores/PaymentHistory/usePaymentTabs";
+import { route } from 'ziggy-js';
 
 
 const PaymentInfo = () => {
@@ -96,6 +97,19 @@ const validateForm = () => {
         "success"
       );
       setIsEditDisabled(true);
+      router.get(route("paymenthistory.paymentInfo.view", { paymentId: payment.paymentId }));
+      // Fetch the latest files after saving
+      router.get(
+        route("paymenthistory.paymentInfo.view", { paymentId: payment.paymentId }),
+        {},
+        {
+          preserveState: true,
+          only: ["files"],
+          onSuccess: (newPage) => {
+            setFiles(newPage.props.files || []);
+          },
+        }
+      );
     },
     onError: (serverErrors) => {
       setErrors(serverErrors);
@@ -135,16 +149,15 @@ const validateForm = () => {
   files.forEach(f => console.log(f.id, f.deleted_at, typeof f.deleted_at));
 
 
-  const filteredFiles = files.filter((file) => {
-    if (filefilter === "Active") {
-      // Active = deleted_at is undefined or null
-      return !file.deleted_at;
-    } else if (filefilter === "Removed") {
-      // Removed = deleted_at exists and has a value
-      return Boolean(file.deleted_at);
-    }
-    return true;
-  });
+const filteredFiles = files.filter((file) => {
+  const isDeleted = !!file.deleted_at; 
+  if (filefilter === "Active") {
+    return !isDeleted;
+  } else if (filefilter === "Removed") {
+    return isDeleted;
+  }
+  return true;
+});
 
 
   const handleRemoveFile = () => {
@@ -475,6 +488,8 @@ const validateForm = () => {
                 </div>
               ))}
             </div>
+          </div>
+        )}
 
           {!isEditDisabled && filefilter === "Active" && (
             <div className="flex justify-start mt-5">
@@ -485,8 +500,7 @@ const validateForm = () => {
               />
             </div>
           )}
-          </div>
-        )}
+
         {errors.proof && (
           <p className="text-ascend-red text-sm mt-3">
             {errors.proof}
@@ -501,6 +515,27 @@ const validateForm = () => {
           onChange={(e) => {
             const selectedFile = e.target.files[0];
             if (selectedFile) {
+              const maxLength = 50;
+
+              if (selectedFile.name.length > maxLength) {
+                displayToast(
+                  <DefaultCustomToast message={`File name should be at most ${maxLength} characters`} />,
+                  "error"
+                );
+                e.target.value = null;
+                return;
+              }
+
+              const fileExists = files.some(file => file.name === selectedFile.name);
+              if (fileExists) {
+                displayToast(
+                  <DefaultCustomToast message="File name already exists in the active file"/>,
+                  "error"
+                );
+                e.target.value = null;
+                return;
+              }
+
               const newFile = { id: Date.now(), name: selectedFile.name, type: selectedFile.type, file: selectedFile };
               setFiles([newFile]);
               setErrors((prev) => ({ ...prev, proof: "" })); // clear error if file added

@@ -23,7 +23,7 @@ export default function PaidStudentTable({ students, filters }) {
     () =>
       _.debounce((value) => {
         router.get(
-          route("paymenthistory.index"), // use your route name
+          route("paymenthistory.index"), 
           { search: value },
           { preserveState: true, replace: true }
         );
@@ -44,9 +44,6 @@ export default function PaidStudentTable({ students, filters }) {
           Paid Students
         </div>
         <div className="flex items-center justify-end">
-          <BiFilter className="text-size5" />
-          <div className="font-bold text-size2 pr-10">Filter</div>
-
           <div className="relative">
             <input
               className="w-full sm:w-50 border h-9 pl-10 p-2 border-ascend-black focus:outline-ascend-blue"

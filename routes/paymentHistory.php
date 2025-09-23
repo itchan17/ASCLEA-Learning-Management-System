@@ -18,6 +18,12 @@ Route::prefix('payment-history')
         Route::post('/payments', [paymentHistoryController::class, 'storePayment'])
             ->name('paymenthistory.payment.store');
 
+        Route::get('/payments/{userId}/export-csv', [paymentHistoryController::class, 'exportCsv'])
+            ->name('paymenthistory.export.csv');
+
+        Route::get('/payments/{userId}/export-pdf', [paymentHistoryController::class, 'exportPdf'])
+            ->name('paymenthistory.export.pdf');
+
         Route::get('/payment-info/{paymentId}', [paymentHistoryController::class, 'viewPaymentInfo'])
             ->name('paymenthistory.paymentInfo.view');
         

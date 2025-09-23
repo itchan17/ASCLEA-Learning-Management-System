@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { usePage, router } from '@inertiajs/react';
 import { route } from 'ziggy-js';
+import { displayToast } from "../../../Utils/displayToast";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
 import AddPaymentModal from './AddPaymentModal';
 import { usePaymentTabs } from "../../../Stores/PaymentHistory/usePaymentTabs";
+import { IoCaretDownOutline } from "react-icons/io5";
+import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToast";
 
 const PaymentHistoryPage = ({ PaymentList, student }) => {
   const handleRowClick = (paymentId) => {
@@ -12,20 +15,71 @@ const PaymentHistoryPage = ({ PaymentList, student }) => {
 
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false);
   const { activeTab, setActiveTab } = usePaymentTabs();
+  const [payments, setPayments] = useState(PaymentList || []);
 
   const toggleAddPayment = () => {
     setShowAddPaymentModal(!showAddPaymentModal);
   };
+  
 
-  useEffect(() => {
-    router.reload({ only: ['PaymentList'] }); // re-fetch only PaymentList
-  }, []);
+const handleExport = async (type) => {
+    try {
+        const url = route(
+            type === "pdf" ? "paymenthistory.export.pdf" : "paymenthistory.export.csv",
+            { userId: student.user_id }
+        );
+
+        const res = await fetch(url, { method: "GET" });
+
+        if (!res.ok) {
+            const data = await res.json();
+            displayToast(
+                <DefaultCustomToast message={data.message || "No payment records found for this user."} />,
+                "error"
+            );
+            return;
+        }
+
+        // extract filename from Content-Disposition if available
+        let filename = `PaymentHistory.${type}`;
+        const disposition = res.headers.get("Content-Disposition");
+
+        if (disposition && disposition.includes("filename=")) {
+            const match = disposition.match(/filename="?([^"]+)"?/);
+            if (match && match[1]) {
+                filename = match[1];
+            }
+        }
+
+        const blob = await res.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        link.href = downloadUrl;
+        link.download = filename;
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        // success toast
+        displayToast(
+            <DefaultCustomToast message={`Payment history downloaded as ${type.toUpperCase()}`} />,
+            "success"
+        );
+    } catch (error) {
+        displayToast(
+            <DefaultCustomToast message="Something went wrong while exporting." />,
+            "error"
+        );
+    }
+};
 
   // Filter payments based on active tab
   const filteredPayments =
-    activeTab === 0
-      ? PaymentList?.data?.filter((p) => p.deleted_at === null)
-      : PaymentList?.data?.filter((p) => p.deleted_at !== null);
+      activeTab === 0
+        ? PaymentList.filter((p) => p.deleted_at === null)
+        : PaymentList.filter((p) => p.deleted_at !== null);
 
   return (
     <>
@@ -60,9 +114,39 @@ const PaymentHistoryPage = ({ PaymentList, student }) => {
       </div>
 
       {activeTab === 0 && (
-        <div className="flex items-center justify-between mt-5">
-          <PrimaryButton text="Download" />
+        <div className="dropdown dropdown-end cursor-pointer mt-2">
+          <button
+            tabIndex={0}
+            role="button"
+            className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300 gap-2"
+          >
+            <span className="text-size2 font-semibold font-nunito-sans">Download</span>
+            <IoCaretDownOutline className="text-size1" />
+          </button>
+
+          <ul
+            tabIndex={0}
+            className="text-size2 dropdown-content menu space-y-2 font-bold bg-ascend-white min-w-30 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+          >
+            <li>
+              <button
+                onClick={() => handleExport("pdf")}
+                className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
+              >
+                Download as PDF
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => handleExport("csv")}
+                className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
+              >
+                Download as CSV
+              </button>
+            </li>
+          </ul>
         </div>
+
       )}
 
       {/* Table */}
@@ -78,7 +162,7 @@ const PaymentHistoryPage = ({ PaymentList, student }) => {
               <th>Action</th>
             </tr>
           </thead>
-          {filteredPayments?.length > 0 ? (
+          {filteredPayments.length > 0 ? (
             <tbody>
               {filteredPayments.map((ph) => (
                 <tr
