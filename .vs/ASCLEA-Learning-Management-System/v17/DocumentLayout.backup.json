@@ -1,0 +1,41 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Mark\\source\\repos\\itchan17\\ASCLEA-Learning-Management-System\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Mark\\source\\repos\\itchan17\\ASCLEA-Learning-Management-System\\resources\\js\\Pages\\LandingPage\\LandingPage.jsx||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:resources\\js\\Pages\\LandingPage\\LandingPage.jsx||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "LandingPage.jsx",
+              "DocumentMoniker": "C:\\Users\\Mark\\source\\repos\\itchan17\\ASCLEA-Learning-Management-System\\resources\\js\\Pages\\LandingPage\\LandingPage.jsx",
+              "RelativeDocumentMoniker": "resources\\js\\Pages\\LandingPage\\LandingPage.jsx",
+              "ToolTip": "C:\\Users\\Mark\\source\\repos\\itchan17\\ASCLEA-Learning-Management-System\\resources\\js\\Pages\\LandingPage\\LandingPage.jsx",
+              "RelativeToolTip": "resources\\js\\Pages\\LandingPage\\LandingPage.jsx",
+              "ViewState": "AgIAADUAAAAAAAAAAAAQwBEAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003663|",
+              "WhenOpened": "2025-09-01T13:40:13.012Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,16 +1,33 @@
 import { useState } from "react";
+import { useForm, usePage, router } from "@inertiajs/react";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
 import SecondaryButton from "../../Components/Button/SecondaryButton";
 import BackButton from "../../Components/Button/BackButton";
 import { handleClickBackBtn } from "../../Utils/handleClickBackBtn";
 import { BiSolidEditAlt } from "react-icons/bi";
-import useUserStore from "../../Stores/User/userStore";
 
 export default function Profile() {
-    const user = useUserStore((state) => state.user);
+    const { props } = usePage();
+    const profile = props.profile || {};
     const [isEdit, setIsEdit] = useState(false);
 
+    const { data, setData, processing, put } = useForm({
+        birthday: profile?.birthday || "",
+        gender: profile?.gender || "",
+        phone: profile?.phone || "",
+        houseNoSt: profile?.houseNoSt || "",
+        province: profile?.province || "",
+        city: profile?.city || "",
+        barangay: profile?.barangay || "",
+    });
+
     const toggleEdit = () => setIsEdit(!isEdit);
+    const handleSave = () => {
+        put(route("profile.update"), {
+            preserveScroll: true,
+            onSuccess: () => setIsEdit(false),
+        });
+    };
 
     return (
         <div className="space-y-5">
@@ -23,7 +40,7 @@ export default function Profile() {
                             doSomething={toggleEdit}
                             text={"Cancel"}
                         />
-                        <PrimaryButton doSomething={toggleEdit} text={"Save"} />
+                        <PrimaryButton doSomething={handleSave} text={"Save"} disabled={processing} />
                     </div>
                 ) : (
                     <PrimaryButton doSomething={toggleEdit} text={"Edit"} />
@@ -40,17 +57,18 @@ export default function Profile() {
                 <div className="flex flex-col ml-2">
                     <div className="flex items-center">
                         <div className="font-nunito-sans text-size4 ml-5 font-bold">
-                            {`${user?.firstName} ${user?.lastName}`}
+                            {`${profile?.firstName ?? ""} ${profile?.lastName ?? ""}`}
                         </div>
                     </div>
                     <div className="font-nunito-sans text-size2 ml-5">
-                        {user?.role.charAt(0).toUpperCase() +
-                            user?.role.slice(1)}
+                        {profile?.role
+                            ? profile?.role.charAt(0).toUpperCase() + profile?.role.slice(1)
+                            : ""}
                     </div>
                 </div>
             </div>
 
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
                     <div className="flex flex-col">
                         <label className="font-nunito-sans text-size2 text-ascend-black">
@@ -58,10 +76,10 @@ export default function Profile() {
                         </label>
                         <input
                             type="text"
-                            value={user?.lastName}
-                            disabled={!isEdit}
+                            value={profile?.lastName || ""}
+                            disabled
                             className={`border px-3 py-2 ${
-                                !isEdit ? "text-ascend-gray1" : ""
+                                "text-ascend-gray1"
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
                     </div>
@@ -71,10 +89,10 @@ export default function Profile() {
                         </label>
                         <input
                             type="text"
-                            value={user?.firstName}
-                            disabled={!isEdit}
+                            value={profile?.firstName || ""}
+                            disabled
                             className={`border px-3 py-2 ${
-                                !isEdit ? "text-ascend-gray1" : ""
+                                "text-ascend-gray1"
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
                     </div>
@@ -84,10 +102,10 @@ export default function Profile() {
                         </label>
                         <input
                             type="text"
-                            value={user?.middleName}
-                            disabled={!isEdit}
+                            value={profile?.middleName || ""}
+                            disabled
                             className={`border px-3 py-2 ${
-                                !isEdit ? "text-ascend-gray1" : ""
+                                "text-ascend-gray1"
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
                     </div>
@@ -100,7 +118,8 @@ export default function Profile() {
                         </label>
                         <input
                             type="text"
-                            value={user?.phone}
+                            value={data.phone}
+                            onChange={(e) => setData("phone", e.target.value)}
                             disabled={!isEdit}
                             className={`border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
@@ -113,10 +132,10 @@ export default function Profile() {
                         </label>
                         <input
                             type="text"
-                            value={user?.email}
-                            disabled={!isEdit}
+                            value={profile?.email || ""}
+                            disabled
                             className={`border px-3 py-2 ${
-                                !isEdit ? "text-ascend-gray1" : ""
+                                "text-ascend-gray1"
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
                     </div>
@@ -129,7 +148,8 @@ export default function Profile() {
                         </label>
                         <input
                             type="date"
-                            value={user?.birthday}
+                            value={data.birthday}
+                            onChange={(e) => setData("birthday", e.target.value)}
                             disabled={!isEdit}
                             className={`border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
@@ -141,7 +161,8 @@ export default function Profile() {
                             Gender
                         </label>
                         <select
-                            value={user?.gender}
+                            value={data.gender}
+                            onChange={(e) => setData("gender", e.target.value)}
                             className={`textField border px-3 py-2  ${
                                 !isEdit ? "text-ascend-gray1" : ""
                             }  border-ascend-gray1 focus:outline-ascend-blue`}
@@ -162,7 +183,8 @@ export default function Profile() {
                         </label>
                         <input
                             type="text"
-                            value={user?.houseNoSt}
+                            value={data.houseNoSt}
+                            onChange={(e) => setData("houseNoSt", e.target.value)}
                             disabled={!isEdit}
                             className={`border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
@@ -177,7 +199,8 @@ export default function Profile() {
                             Province
                         </label>
                         <select
-                            value={user?.province}
+                            value={data.province}
+                            onChange={(e) => setData("province", e.target.value)}
                             className={`textField border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
@@ -192,7 +215,8 @@ export default function Profile() {
                             City
                         </label>
                         <select
-                            value={user?.city}
+                            value={data.city}
+                            onChange={(e) => setData("city", e.target.value)}
                             className={`textField border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
@@ -208,7 +232,8 @@ export default function Profile() {
                             Barangay
                         </label>
                         <select
-                            value={user?.barangay}
+                            value={data.barangay}
+                            onChange={(e) => setData("barangay", e.target.value)}
                             className={`textField border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
