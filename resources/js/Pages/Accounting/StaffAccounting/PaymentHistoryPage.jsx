@@ -114,19 +114,22 @@ const handleExport = async (type) => {
       </div>
 
       {activeTab === 0 && (
-        <div className="dropdown dropdown-end cursor-pointer mt-2">
+        <div className="dropdown dropdown-end">
           <button
             tabIndex={0}
             role="button"
-            className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300 gap-2"
+            className="flex items-center justify-between bg-ascend-blue text-ascend-white hover:opacity-80 transition-all duration-300 font-nunito-sans font-semibold h-10 px-4 cursor-pointer"
           >
-            <span className="text-size2 font-semibold font-nunito-sans">Download</span>
+            <span>Download</span>
+
+            <span className="self-stretch border-l border-white mx-3"></span>
+
             <IoCaretDownOutline className="text-size1" />
           </button>
 
           <ul
             tabIndex={0}
-            className="text-size2 dropdown-content menu space-y-2 font-bold bg-ascend-white min-w-30 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+            className="text-size2 dropdown-content menu space-y-2 font-bold bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
           >
             <li>
               <button
@@ -146,7 +149,6 @@ const handleExport = async (type) => {
             </li>
           </ul>
         </div>
-
       )}
 
       {/* Table */}
@@ -159,7 +161,6 @@ const handleExport = async (type) => {
               <th>Receipt date</th>
               <th>Payment amount</th>
               {activeTab === 1 && <th>Deleted At</th>}
-              <th>Action</th>
             </tr>
           </thead>
           {filteredPayments.length > 0 ? (
@@ -168,7 +169,7 @@ const handleExport = async (type) => {
                 <tr
                   key={ph.payment_id}
                   onClick={() => handleRowClick(ph.payment_id)}
-                  className="hover:bg-ascend-lightblue cursor-pointer border-b border-ascend-gray1"
+                  className="hover:bg-ascend-lightblue transition-all duration-300 cursor-pointer"
                 >
                   <td className="py-5">{ph.payment_method}</td>
                   <td className="py-5">{ph.transaction_id}</td>
@@ -181,9 +182,6 @@ const handleExport = async (type) => {
                           : "-"}
                       </td>
                     )}
-                  <td className="py-5">
-                    <span className="text-ascend-blue underline">View More</span>
-                  </td>
                 </tr>
               ))}
             </tbody>

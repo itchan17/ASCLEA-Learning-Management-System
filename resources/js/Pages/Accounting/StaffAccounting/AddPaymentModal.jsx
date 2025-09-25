@@ -18,6 +18,7 @@ export default function AddPaymentModal({ togglePaymentForm, userId }) {
   });
 
   const [errors, setErrors] = useState({});
+  const [isValidating, setIsValidating] = useState(false);
   const fileInputRef = useRef(null);
   const { props } = usePage();
 
@@ -25,71 +26,65 @@ export default function AddPaymentModal({ togglePaymentForm, userId }) {
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "proof") {
-      setFormData({ ...formData, proof: files[0] });
-      setErrors((prev) => ({ ...prev, proof: "" })); // clear error
+      const file = files[0];
+      if (file) {
+        setFormData({ ...formData, proof: file });
+        setErrors((prev) => ({ ...prev, proof: "" })); // clear error
+      }
+      e.target.value = null; // Reset file input
+    } else {
+    if ((name === "transaction_id" || name === "payment_method") && value.trim() === "") {
+      setFormData({ ...formData, [name]: "" });
+      setErrors((prev) => ({ ...prev, [name]: "This field cannot be empty or spaces only." }));
     } else {
       setFormData({ ...formData, [name]: value });
-      setErrors((prev) => ({ ...prev, [name]: "" })); // clear error
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-  };
-
-  // Validate fields before submission
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.payment_method)
-      newErrors.payment_method = "Payment method is required";
-    if (!formData.transaction_id)
-      newErrors.transaction_id = "Transaction ID is required";
-    if (!formData.receipt_date)
-      newErrors.receipt_date = "Receipt date is required";
-    if (!formData.payment_amount)
-      newErrors.payment_amount = "Payment amount is required";
-    if (!formData.proof)
-      newErrors.proof = "Proof of payment is required";
-
-    if (formData.proof) {
-      const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
-      if (!allowedTypes.includes(formData.proof.type)) {
-        newErrors.proof = "Only JPG, PNG, and PDF files are allowed";
-      }
     }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   // Function to handle Add Payment
   const handleAddPayment = () => {
-    if (!validateForm()) return; // stop if validation fails
+  setIsValidating(true);
+  const data = new FormData();
+  data.append("payment_method", formData.payment_method);
+  data.append("transaction_id", formData.transaction_id);
+  data.append("receipt_date", formData.receipt_date);
+  data.append("payment_amount", formData.payment_amount);
+  data.append("user_id", userId);
 
-    const data = new FormData();
-    data.append("payment_method", formData.payment_method);
-    data.append("transaction_id", formData.transaction_id);
-    data.append("receipt_date", formData.receipt_date);
-    data.append("payment_amount", formData.payment_amount);
-    data.append("user_id", userId);
+  if (formData.proof) {
+    data.append("proof", formData.proof);
+  }
 
-    if (formData.proof) {
-      data.append("proof", formData.proof);
-    }
-
-    router.post(route("paymenthistory.payment.store"), data, {
-      onSuccess: (page) => {
-        displayToast(
-          <DefaultCustomToast
-            message={page.props.flash?.success || "Payment added successfully!"}
-          />,
-          "success"
-        );
-        togglePaymentForm();
-      },
-      onError: (serverErrors) => {
-        setErrors(serverErrors);
-      },
-      preserveState: true,
-    });
-  };
+  router.post(route("paymenthistory.payment.store"), data, {
+    showProgress: false,   
+    onSuccess: (page) => {
+      displayToast(
+        <DefaultCustomToast
+          message={page.props.flash?.success || "Payment added successfully!"}
+        />,
+        "success"
+      );
+      togglePaymentForm();
+      setIsValidating(false);
+    },
+    onError: (serverErrors) => {
+      setErrors(serverErrors); 
+      if (serverErrors.proof) {
+        setFormData((prev) => ({ ...prev, proof: null }));
+        if (fileInputRef.current) {
+          fileInputRef.current.value = null;
+        }
+      }
+      setIsValidating(false);
+    },
+    onFinish: () => {
+      setIsValidating(false); 
+    },
+    preserveState: true,
+  });
+};
 
   // Open file selector
   const handleAddFile = () => {
@@ -107,6 +102,10 @@ export default function AddPaymentModal({ togglePaymentForm, userId }) {
       const handleRemoveFile = () => {
         setFormData({ ...formData, proof: null });
         setErrors((prev) => ({ ...prev, proof: "" }));
+
+        if (fileInputRef.current) {
+          fileInputRef.current.value = null;
+        }
       };
 
       return (
@@ -243,7 +242,7 @@ export default function AddPaymentModal({ togglePaymentForm, userId }) {
         {/* Buttons */}
         <div className="flex justify-end gap-2">
           <SecondaryButton text={"Cancel"} doSomething={togglePaymentForm} />
-          <PrimaryButton text={"Add"} doSomething={handleAddPayment} />
+          <PrimaryButton text={"Add"} isDisabled={isValidating} isLoading={isValidating} doSomething={handleAddPayment} />
         </div>
       </form>
     </ModalContainer>

@@ -29,7 +29,8 @@ const PaymentInfo = () => {
   const [showArchiveAlert, setShowArchiveAlert] = useState(false);
   const [showRevertPaymentAlert, setShowRevertPaymentAlert] = useState(false);
   const { activeTab, setActiveTab } = usePaymentTabs();
-
+  const [isValidating, setIsValidating] = useState(false);
+  const [isValidatingEdit, setIsValidatingEdit] = useState(false);
 
   // Form data initialized from payment
   const [formData, setFormData] = useState({
@@ -45,36 +46,29 @@ const PaymentInfo = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    setErrors((prev) => ({ ...prev, [name]: "" })); // clear error when editing
+
+    // Validation for specific fields
+    if ((name === "transaction_id" || name === "payment_method") && value.trim() === "") {
+      setFormData((prev) => ({ ...prev, [name]: "" }));
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "This field cannot be empty or spaces only.",
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      setErrors((prev) => ({ ...prev, [name]: "" })); // clear error if valid
+    }
   };
 
-const validateForm = () => {
-  const newErrors = {};
-  if (!formData.payment_method)
-    newErrors.payment_method = "Payment method is required";
-  if (!formData.transaction_id)
-    newErrors.transaction_id = "Transaction ID is required";
-  if (!formData.receipt_date)
-    newErrors.receipt_date = "Receipt date is required";
-  if (!formData.payment_amount)
-    newErrors.payment_amount = "Payment amount is required";
-
-  if (files.length === 0) {
-    newErrors.proof = "A file must be attached";
-  } else {
-    const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
-    if (!allowedTypes.includes(files[0].type)) {
-      newErrors.proof = "Only JPG, PNG, and PDF files are allowed";
-    }
-  }
-
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
 
   const handleSave = () => {
-    if (!validateForm()) return;
+  setIsValidatingEdit(true);
+
+  if (files.length === 0 || (!files[0].file && !files[0].id)) {
+    setErrors((prev) => ({ ...prev, proof: "You must attach at least one file before saving." }));
+    setIsValidatingEdit(false);
+    return;
+  }
 
   const formDataObj = new FormData();
   formDataObj.append("_method", "PUT"); 
@@ -88,6 +82,7 @@ const validateForm = () => {
   }
 
   router.post(route("paymenthistory.payment.update", payment.paymentId), formDataObj, {
+    showProgress: false,
     forceFormData: true,
     onSuccess: (page) => {
       displayToast(
@@ -97,12 +92,14 @@ const validateForm = () => {
         "success"
       );
       setIsEditDisabled(true);
+      setIsValidatingEdit(false);
       router.get(route("paymenthistory.paymentInfo.view", { paymentId: payment.paymentId }));
       // Fetch the latest files after saving
       router.get(
         route("paymenthistory.paymentInfo.view", { paymentId: payment.paymentId }),
         {},
         {
+          showProgress: false,
           preserveState: true,
           only: ["files"],
           onSuccess: (newPage) => {
@@ -112,8 +109,15 @@ const validateForm = () => {
       );
     },
     onError: (serverErrors) => {
-      setErrors(serverErrors);
-    },
+        const formattedErrors = {};
+        for (const key in serverErrors) {
+          formattedErrors[key] = Array.isArray(serverErrors[key])
+            ? serverErrors[key][0]
+            : serverErrors[key];
+        }
+        setErrors(formattedErrors);
+        setIsValidatingEdit(false);
+      },
     preserveState: true,
   });
   };
@@ -194,9 +198,11 @@ const filteredFiles = files.filter((file) => {
   };
 
   const handleArchive = () => {
+    setIsValidating(true);
     router.delete(
       route("paymenthistory.payment.archive", payment.paymentId),
       {
+        showProgress: false,
         onSuccess: (page) => {
           displayToast(
             <DefaultCustomToast
@@ -205,6 +211,7 @@ const filteredFiles = files.filter((file) => {
             "success"
           );  
           setIsEditDisabled(true);
+          setIsValidating(false);
           router.reload({ only: ["PaymentList"] });
           setActiveTab(1);
 
@@ -214,16 +221,19 @@ const filteredFiles = files.filter((file) => {
             <DefaultCustomToast message="Failed to archive payment." />,
             "error"
           );
+          setIsValidating(false);
         },
       }
     );
   };
 
   const handleRestorePayment = () => {
+    setIsValidating(true);
     router.patch(
       route("paymenthistory.payment.restore", payment.paymentId), // use directly
       {},
       {
+        showProgress: false,
         onSuccess: (page) => {
           displayToast(
             <DefaultCustomToast
@@ -232,6 +242,7 @@ const filteredFiles = files.filter((file) => {
             "success"
           );
           router.reload({ only: ["PaymentList"] });
+          setIsValidating(false);
           setActiveTab(0);
         },
         onError: () => {
@@ -239,7 +250,9 @@ const filteredFiles = files.filter((file) => {
             <DefaultCustomToast message="Failed to restore payment." />,
             "error"
           );
+          setIsValidating(false);
         },
+        
       }
     );
   };
@@ -260,12 +273,16 @@ const filteredFiles = files.filter((file) => {
         {payment.deleted_at == null ? (
           <PrimaryButton
             text="Archive"
+            isDisabled={isValidating} 
+            isLoading={isValidating}
             btnColor={isEditDisabled ? "bg-ascend-red" : "bg-ascend-gray1"}
             doSomething={isEditDisabled ? () => setShowArchiveAlert(true) : undefined}
           />
         ) : (
           <PrimaryButton
             text="Restore"
+            isDisabled={isValidating} 
+            isLoading={isValidating}
             btnColor="bg-ascend-green"
             doSomething={() => setShowRevertPaymentAlert(true)}
           />
@@ -311,6 +328,8 @@ const filteredFiles = files.filter((file) => {
               />
               <PrimaryButton
                 text="Save"
+                isDisabled={isValidatingEdit} 
+                isLoading={isValidatingEdit}
                 btnColor="bg-ascend-blue"
                 doSomething={handleSave}
               />
@@ -501,11 +520,11 @@ const filteredFiles = files.filter((file) => {
             </div>
           )}
 
-        {errors.proof && (
-          <p className="text-ascend-red text-sm mt-3">
-            {errors.proof}
-          </p>
-        )}
+          {filefilter === "Active" && errors.proof && (
+            <p className="text-ascend-red text-sm mt-3">
+              {errors.proof}
+            </p>
+          )}
 
         <input
           type="file"

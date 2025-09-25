@@ -12,7 +12,7 @@ Route::prefix('payment-history')
             ->name('paymenthistory.index');
 
         // Payment history of a specific student
-        Route::get('/payment-history/{userId}', [paymentHistoryController::class, 'paymentHistory'])
+        Route::get('/{userId}', [paymentHistoryController::class, 'paymentHistory'])
             ->name('paymenthistory.payment.history');
 
         Route::post('/payments', [paymentHistoryController::class, 'storePayment'])

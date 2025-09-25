@@ -11,6 +11,7 @@ use App\Models\PaymentHistory\Payment;
 use App\Models\PaymentHistory\PaymentFile;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Validation\Rule;
 
 class paymentHistoryController extends Controller
 {
@@ -95,7 +96,7 @@ class paymentHistoryController extends Controller
             'transaction_id' => 'required|string|unique:payments,transaction_id',
             'receipt_date' => 'required|date',
             'payment_amount' => 'required|integer',
-            'proof' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'proof' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
         // Create the payment record

@@ -2,6 +2,7 @@ import React from "react";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import "@cyntler/react-doc-viewer/dist/index.css";
 import "../../../../css/docViewer.css";
+import BackButton from "../../../Components/Button/BackButton";
 
 export default function StudentDocumentViewerPayment({ fileUrl }) {
     // Sample pdf in public folder
@@ -9,6 +10,9 @@ export default function StudentDocumentViewerPayment({ fileUrl }) {
 
     return (
         <div className="flex flex-col justify-center items-center -mx-6 sm:mx-0 border-ascend-gray1">
+            <div className="w-full flex justify-start px-6 sm:px-0 mb-5">
+                <BackButton doSomething={() => window.history.back()} />
+            </div>
             <DocViewer
                 config={{
                     header: {

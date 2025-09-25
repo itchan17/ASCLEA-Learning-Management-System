@@ -46,7 +46,7 @@ export default function PaidStudentTable({ students, filters }) {
         <div className="flex items-center justify-end">
           <div className="relative">
             <input
-              className="w-full sm:w-50 border h-9 pl-10 p-2 border-ascend-black focus:outline-ascend-blue"
+              className="border w-full sm:w-60 pl-10 pr-3 py-2 border-ascend-black focus:outline-ascend-blue"
               type="text"
               placeholder="Search"
               value={search}
@@ -55,7 +55,7 @@ export default function PaidStudentTable({ students, filters }) {
                 setSearch(value);
                 debouncedSearch(value); // live search
               }}
-            />
+            /> {/* absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1 */}
             <IoSearch className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1" />
           </div>
         </div>
@@ -79,7 +79,7 @@ export default function PaidStudentTable({ students, filters }) {
               <tr
                 key={s.id}
                 onClick={() => handleRowClick(s.user_id)}
-                className="hover:bg-ascend-lightblue cursor-pointer"
+                className="hover:bg-ascend-lightblue transition-all duration-300 cursor-pointer"
               >
                 <td className="py-5">{s.name}</td>
                 <td className="py-5">{s.program}</td>
