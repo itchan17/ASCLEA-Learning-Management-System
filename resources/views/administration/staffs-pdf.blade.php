@@ -69,8 +69,8 @@
                 <tr>
                     <td>{{ $staff->user ? $staff->user->first_name . ' ' . $staff->user->last_name : 'N/A' }}</td>
                     <td>{{ $staff->user->email ?? 'N/A' }}</td>
-                    <td>{{ $staff->user->role->role_name ?? 'N/A' }}</td>
-                    <td>{{ $staff->status }}</td>
+                    <td>{{ $staff->user->role->role_name ? ucfirst($staff->user->role->role_name) : 'N/A' }}</td>
+                    <td>{{ $staff->status ? ucfirst($staff->status) : 'N/A' }}</td>
                 </tr>
             @endforeach
         </tbody>

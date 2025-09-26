@@ -11,7 +11,7 @@ export default function AssignedCourses() {
             <div className="flex justify-between items-center">
                 <h1 className="text-size6 font-bold">Assigned Courses</h1>
             </div>
-
+            {/*===========================Assigned Courses Table===========================*/}
             <div className="overflow-x-auto">
                 <table className="table w-full">
                     <thead>
@@ -47,9 +47,8 @@ export default function AssignedCourses() {
                     </tbody>
                 </table>
             </div>
-
-            {/* ✅ Pagination */}
-            {assignedCourses?.links && (
+            {/*===========================Pagination: only show if there are courses===========================*/}
+            {assignedCourses?.data && assignedCourses.data.length > 0 && assignedCourses?.links && (
                 <Pagination
                     links={assignedCourses.links}
                     currentPage={assignedCourses.current_page}

@@ -1,26 +1,24 @@
 import { useState, useEffect } from "react";
+import { usePage, useForm, router } from "@inertiajs/react";
+import { useRoute } from "ziggy-js";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
 import SecondaryButton from "../../../Components/Button/SecondaryButton";
 import BackButton from "../../../Components/Button/BackButton";
 import { handleClickBackBtn } from "../../../Utils/handleClickBackBtn";
 import { BiSolidEditAlt } from "react-icons/bi";
-import useAdministrationStore from "../../../Stores/Administration/administrationStore";
-import { usePage, useForm, router } from "@inertiajs/react";
-import { useRoute } from "ziggy-js";
-import AssignedCourses from "./AssignedCourses";
-import { regions, provinces, cities, barangays } from "select-philippines-address";
 import AlertModal from "../../../Components/AlertModal";
 import { displayToast } from "../../../Utils/displayToast";
 import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToast";
 import Loader from "../../../Components/Loader";
-
+import AssignedCourses from "./AssignedCourses";
+import { regions, provinces, cities, barangays } from "select-philippines-address";
 
 export default function ViewStaff() {
     const route = useRoute();
     const { props } = usePage();
     const { staffDetails } = props; 
-
-    //Updating Staff Information
+    
+    //===========================Updating Staff Information===========================//
     const [isEdit, setIsEdit] = useState(false);
     const { data, setData, put, processing, errors, delete: destroy } = useForm({
         first_name: staffDetails?.user?.first_name || "",
@@ -43,7 +41,7 @@ export default function ViewStaff() {
         role: staffDetails?.user?.role?.role_name || "",
     });
 
-    //Update Handle
+    //===========================Updating Handle===========================//
     const toggleEdit = () => setIsEdit(!isEdit);
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -57,8 +55,7 @@ export default function ViewStaff() {
             },
         });
     };
-
-    //Archive Information
+    //===========================Archive Handle===========================//
     const [openAlertModal, setOpenAlertModal] = useState(false);
     const [isArchiveLoading, setIsArchiveLoading] = useState(false);
 
@@ -67,22 +64,21 @@ export default function ViewStaff() {
     };
 
     const confirmArchive = () => {
-    setIsArchiveLoading(true);
-    destroy(route("staff.destroy", staffDetails.staff_id), {
-        onSuccess: (page) => {
-            displayToast(
-                <DefaultCustomToast message={page.props.flash.success} />,
-                "success"
-            );
-        },
-        onFinish: () => {
-            setIsArchiveLoading(false);
-            setOpenAlertModal(false);
-        },
-    });
-};
-
-    //Functions for Region, Province, City and Barangay
+        setIsArchiveLoading(true);
+        destroy(route("staff.destroy", staffDetails.staff_id), {
+            onSuccess: (page) => {
+                displayToast(
+                    <DefaultCustomToast message={page.props.flash.success} />,
+                    "success"
+                );
+            },
+            onFinish: () => {
+                setIsArchiveLoading(false);
+                setOpenAlertModal(false);
+            },
+        });
+    };
+    //===========================Functions for Region, Province, City and Barangay===========================//
     const [regionList, setRegionList] = useState([]);
     const [provinceList, setProvinceList] = useState([]);
     const [cityList, setCityList] = useState([]);
@@ -93,12 +89,12 @@ export default function ViewStaff() {
 
     async function initLocation() {
         try {
-            // Load regions
+            //===========================Load Regions===========================//
             const regRes = await regions();
             if (!mounted) return;
             setRegionList(regRes);
 
-            // --- Region ---
+            //=================Region=================//
             const foundRegion = regRes.find(
                 (r) =>
                     r.region_name?.toLowerCase().trim() ===
@@ -109,7 +105,7 @@ export default function ViewStaff() {
             setData("region_code", foundRegion.region_code);
             setData("region", foundRegion.region_name);
 
-            // --- Province ---
+            //=================Province=================//
             const provRes = await provinces(foundRegion.region_code);
             if (!mounted) return;
             setProvinceList(provRes);
@@ -124,7 +120,7 @@ export default function ViewStaff() {
             setData("province_code", foundProv.province_code);
             setData("province", foundProv.province_name);
 
-            // --- City ---
+            //=================City=================//
             const cityRes = await cities(foundProv.province_code);
             if (!mounted) return;
             setCityList(cityRes);
@@ -139,7 +135,7 @@ export default function ViewStaff() {
             setData("city_code", foundCity.city_code);
             setData("city", foundCity.city_name);
 
-            // --- Barangay ---
+            //=================Barangay=================//
             const brgyRes = await barangays(foundCity.city_code);
             if (!mounted) return;
             setBarangayList(brgyRes);
@@ -165,7 +161,8 @@ export default function ViewStaff() {
         };
     }, [staffDetails, setData]);
 
-    // Handler updates: set both code (for select control) and name (for DB)
+    //===========================Handler updates: set both code (for select control) and name (for DB)===========================//
+    //=================handle Region Change=================//
     const handleRegionChange = (regionCode) => {
         const selectedRegion = regionList.find((r) => r.region_code === regionCode);
         if (!selectedRegion) return;
@@ -173,7 +170,7 @@ export default function ViewStaff() {
         setData("region_code", selectedRegion.region_code);
         setData("region", selectedRegion.region_name);
 
-        // clear dependent selections
+        //=======Clear Dependent Selections=======//
         setData("province_code", "");
         setData("province", "");
         setData("city_code", "");
@@ -188,7 +185,7 @@ export default function ViewStaff() {
             setProvinceList(res);
         });
     };
-
+    //=================handle Province Change=================//
     const handleProvinceChange = (provinceCode) => {
         const selectedProvince = provinceList.find((p) => p.province_code === provinceCode);
         if (!selectedProvince) return;
@@ -196,7 +193,7 @@ export default function ViewStaff() {
         setData("province_code", selectedProvince.province_code);
         setData("province", selectedProvince.province_name);
 
-        // clear dependent selections
+        //=======Clear Dependent Selections=======//
         setData("city_code", "");
         setData("city", "");
         setData("barangay_code", "");
@@ -208,7 +205,7 @@ export default function ViewStaff() {
             setCityList(res);
         });
     };
-
+    //=================handle City Change=================//
     const handleCityChange = (cityCode) => {
         const selectedCity = cityList.find((c) => c.city_code === cityCode);
         if (!selectedCity) return;
@@ -216,7 +213,7 @@ export default function ViewStaff() {
         setData("city_code", selectedCity.city_code);
         setData("city", selectedCity.city_name);
 
-        // clear barangay selection
+        //=======Clear Dependent Selections=======//
         setData("barangay_code", "");
         setData("barangay", "");
         setBarangayList([]);
@@ -225,7 +222,7 @@ export default function ViewStaff() {
             setBarangayList(res);
         });
     };
-
+    //=================handle Barangay Change=================//
     const handleBarangayChange = (barangayCode) => {
         const selectedBarangay = barangayList.find((b) => b.brgy_code === barangayCode);
         if (!selectedBarangay) return;
@@ -233,41 +230,41 @@ export default function ViewStaff() {
         setData("barangay_code", selectedBarangay.brgy_code);
         setData("barangay", selectedBarangay.brgy_name);
     };
-
+    //===========================Handle Profile Change===========================//
     const [isProfileLoading, setIsProfileLoading] = useState(false);
     const [updateProfileError, setUpdateProfileError] = useState(null);
 
     const handleProfileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+        const file = e.target.files[0];
+        if (!file) return;
 
-    setIsProfileLoading(true);
+        setIsProfileLoading(true);
 
-    router.post(
-        route("staff.profile.update", staffDetails.staff_id), // make sure you have this route in Laravel
-        { _method: "put", profile_image: file },
-        {
-            showProgress: false,
-            onError: (error) => {
-                setUpdateProfileError(error);
-                setIsProfileLoading(false);
-            },
-            onFinish: () => {
-                setIsProfileLoading(false);
-            },
-        }
-    );
-};
-
+        router.post(
+            route("staff.profile.update", staffDetails.staff_id),
+            { _method: "put", profile_image: file },
+            {
+                showProgress: false,
+                onError: (error) => {
+                    setUpdateProfileError(error);
+                    setIsProfileLoading(false);
+                },
+                onFinish: () => {
+                    setIsProfileLoading(false);
+                },
+            }
+        );
+    };
+        //===========================Testing===========================//
         useEffect(() => {
         console.log("staffDetails:", staffDetails);
         console.log("role name:", staffDetails?.user?.role?.role_name);
         console.log("user role:", staffDetails.user?.role);
     }, []); 
-    //=============================================================================================//
+
     return (
         <div className="space-y-5 font-nunito-sans">
-            {/* Alert Modal */}
+            {/*===========================Alert Modal for Archiving Staff===========================*/}
             {openAlertModal && (
                 <AlertModal
                     title={"Archive Confirmation"}
@@ -277,7 +274,7 @@ export default function ViewStaff() {
                     isLoading={isArchiveLoading}
                 />
             )}
-
+            {/*===========================Back Button and Archive Button===========================*/}
             <div className="flex flex-wrap items-center justify-between">
                 <BackButton doSomething={handleClickBackBtn} />
                 <PrimaryButton
@@ -289,7 +286,8 @@ export default function ViewStaff() {
 
             <div className="flex flex-wrap gap-5 items-center justify-between">
                 <div className="justify-start flex items-center">
-                    <div className="relative w-18 h-18 bg-ascend-gray1 rounded-full shrink-0">
+                    {/*===========================Updating Staff Profile Photo===========================*/}
+                    <div className="relative w-18 h-18 bg-ascend-gray1 rounded-full shrink-0 group">
                         {isProfileLoading && (
                             <>
                                 <div className="absolute inset-0 bg-ascend-lightblue opacity-40 rounded-full"></div>
@@ -307,8 +305,11 @@ export default function ViewStaff() {
                             alt="Profile"
                             className="w-full h-full object-cover rounded-full"
                         />
-                        <label htmlFor="inputProfile">
-                            <BiSolidEditAlt className="text-size4 text-ascend-black absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer" />
+                        <label
+                            htmlFor="inputProfile"
+                            className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 text-ascend-white opacity-0 hover:opacity-50 cursor-pointer rounded-full transition-opacity duration-200"
+                        >
+                            <BiSolidEditAlt className="text-size4" />
                         </label>
                         <input
                             id="inputProfile"
@@ -318,6 +319,7 @@ export default function ViewStaff() {
                             onChange={handleProfileChange}
                         />
                     </div>
+                    {/*===========================Staff Name===========================*/}
                     <div className="flex flex-col ml-2">
                         <div className="flex items-center gap-2">
                             <div className="font-nunito-sans text-size4 ml-5 font-bold">
@@ -334,6 +336,7 @@ export default function ViewStaff() {
                         </div>
                     </div>
                 </div>
+                {/*===========================Edit Button and Functionality===========================*/}
                 {isEdit ? (
                     <div className="flex gap-2">
                         <SecondaryButton
@@ -366,13 +369,12 @@ export default function ViewStaff() {
                     Created by: <span className="font-normal">{staffDetails?.created_by?.first_name || ""}{" "}{staffDetails?.created_by?.last_name || ""}</span>
                 </h1>
             </div>
-
+            {/*===========================Staff Information Fields===========================*/}
             <form className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    {/*============Last Name============*/}
                     <div className="flex flex-col">
-                        <label className="font-nunito-sans text-size2 text-ascend-black">
-                            Last Name
-                        </label>
+                        <label className="font-nunito-sans text-size2 text-ascend-black">Last Name</label>
                         <input
                             type="text"
                             value={data.last_name}
@@ -382,10 +384,9 @@ export default function ViewStaff() {
                         />
                         {errors.last_name && <span className="text-red-500 text-sm">{errors.last_name}</span>}
                     </div>
+                    {/*============First Name============*/}
                     <div className="flex flex-col">
-                        <label className="font-nunito-sans text-size2 text-ascend-black">
-                            First Name
-                        </label>
+                        <label className="font-nunito-sans text-size2 text-ascend-black">First Name</label>
                         <input
                             type="text"
                             value={data.first_name}
@@ -395,10 +396,9 @@ export default function ViewStaff() {
                         />
                         {errors.first_name && <span className="text-red-500 text-sm">{errors.first_name}</span>}
                     </div>
+                    {/*============Middle Name============*/}
                     <div className="flex flex-col">
-                        <label className="font-nunito-sans text-size2 text-ascend-black">
-                            Middle Name
-                        </label>
+                        <label className="font-nunito-sans text-size2 text-ascend-black">Middle Name</label>
                         <input
                             type="text"
                             value={data.middle_name}
@@ -411,10 +411,9 @@ export default function ViewStaff() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5">
+                    {/*============Phone Number============*/}
                     <div className="flex flex-col">
-                        <label className="font-nunito-sans text-size2 text-ascend-black">
-                            Phone Number
-                        </label>
+                        <label className="font-nunito-sans text-size2 text-ascend-black">Phone Number</label>
                         <input
                             type="text"
                             value={data.contact_number}
@@ -427,10 +426,9 @@ export default function ViewStaff() {
                         />
                         {errors.contact_number && <span className="text-red-500 text-sm">{errors.contact_number}</span>}
                     </div>
+                    {/*============Email============*/}
                     <div className="flex flex-col">
-                        <label className="font-nunito-sans text-size2 text-ascend-black">
-                            Email
-                        </label>
+                        <label className="font-nunito-sans text-size2 text-ascend-black">Email</label>
                         <input
                             type="email"
                             value={data.email}
@@ -443,10 +441,9 @@ export default function ViewStaff() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5">
+                    {/*============Birthday============*/}
                     <div className="flex flex-col">
-                        <label className="font-nunito-sans text-size2 text-ascend-black">
-                            Birthday
-                        </label>
+                        <label className="font-nunito-sans text-size2 text-ascend-black">Birthday</label>
                         <input
                             type="date"
                             value={data.birthdate}
@@ -457,9 +454,8 @@ export default function ViewStaff() {
                         {errors.birthdate && <span className="text-red-500 text-sm">{errors.birthdate}</span>}
                     </div>
                     <div className="flex flex-col">
-                        <label className="font-nunito-sans text-size2 text-ascend-black">
-                            Gender
-                        </label>
+                        {/*============Gender============*/}
+                        <label className="font-nunito-sans text-size2 text-ascend-black">Gender</label>
                         <select
                             value={data.gender}
                             disabled={!isEdit}
@@ -474,10 +470,9 @@ export default function ViewStaff() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-1 gap-5 mt-5">
+                    {/*============House Number Street============*/}
                     <div className="flex flex-col">
-                        <label className="font-nunito-sans text-size2 text-ascend-black">
-                            House no. Street
-                        </label>
+                        <label className="font-nunito-sans text-size2 text-ascend-black">House no. Street</label>
                         <input
                             type="text"
                             value={data.house_no}
@@ -490,10 +485,9 @@ export default function ViewStaff() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5">
-                    <div className="flex flex-col">
-                        <label className="font-nunito-sans text-size2 text-ascend-black">
-                            Region
-                        </label>
+                    {/*============Region============*/}
+                    <div className="flex flex-col">                      
+                        <label className="font-nunito-sans text-size2 text-ascend-black">Region</label>
                         <select
                             value={data.region_code}
                             disabled={!isEdit}
@@ -509,10 +503,9 @@ export default function ViewStaff() {
                         </select>
                         {errors.region && <span className="text-red-500 text-sm">{errors.region}</span>}
                     </div>
+                    {/*============Province============*/}
                     <div className="flex flex-col">
-                        <label className="font-nunito-sans text-size2 text-ascend-black">
-                            Province
-                        </label>
+                        <label className="font-nunito-sans text-size2 text-ascend-black">Province</label>
                         <select
                             value={data.province_code}
                             disabled={!isEdit || !provinceList.length}
@@ -528,10 +521,9 @@ export default function ViewStaff() {
                         </select>
                         {errors.province && <span className="text-red-500 text-sm">{errors.province}</span>}
                     </div>
+                    {/*============City============*/}
                     <div className="flex flex-col">
-                        <label className="font-nunito-sans text-size2 text-ascend-black">
-                            City
-                        </label>
+                        <label className="font-nunito-sans text-size2 text-ascend-black">City</label>
                         <select
                             value={data.city_code}
                             disabled={!isEdit || !cityList.length}
@@ -547,11 +539,9 @@ export default function ViewStaff() {
                         </select>
                         {errors.city && <span className="text-red-500 text-sm">{errors.city}</span>}
                     </div>
-
+                    {/*============Barangay============*/}
                     <div className="flex flex-col">
-                        <label className="font-nunito-sans text-size2 text-ascend-black">
-                            Barangay
-                        </label>
+                        <label className="font-nunito-sans text-size2 text-ascend-black">Barangay</label>
                         <select
                             value={data.barangay_code}
                             disabled={!isEdit || !barangayList.length}
@@ -569,7 +559,7 @@ export default function ViewStaff() {
                     </div>
                 </div>
             </form>
-
+            {/*===========================View Assigned Courses===========================*/}
             {staffDetails?.user?.role?.role_name === "faculty" && (
                 <AssignedCourses staffId={staffDetails.staff_id} />
             )}

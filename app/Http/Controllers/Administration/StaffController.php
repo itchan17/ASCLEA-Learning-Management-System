@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Events\Registered; 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -25,9 +26,9 @@ class StaffController extends Controller
 
     /**
      * Display a listing of the resource.
+     * Show the administration dashboard
      */
 
-    // Show the administration dashboard
     public function administrationIndex(Request $request)
     {   
         $this->checkAdmin();
@@ -35,17 +36,18 @@ class StaffController extends Controller
         // Fetch role IDs for 'admin' and 'faculty'
         $roleIds = Role::whereIn('role_name', ['admin', 'faculty'])->pluck('role_id')->toArray();
 
-        // Query Staff with related user, filtered by role
+        // Query Staff with related user, filtered by role, lastlogin, and lastlogout
         $query = Staff::with(['user.role', 'user.lastLogin', 'user.lastLogout']) // load the user and their role
         ->whereHas('user', function($q) use ($roleIds) {
         $q->whereIn('role_id', $roleIds);
         });
 
-        // Search filter
+        // Search filter by first name, last name, middle name, and email
         if ($search = $request->input('search')) {
             $query->whereHas('user', function($q) use ($search) {
                 $q->where('users.first_name', 'like', "%{$search}%")
                 ->orWhere('users.last_name', 'like', "%{$search}%")
+                ->orWhere('users.middle_name', 'like', "%{$search}%")
                 ->orWhere('users.email', 'like', "%{$search}%");
             });
         }
@@ -54,9 +56,10 @@ class StaffController extends Controller
         if ($status = $request->input('status')) {
             $query->where('status', $status);
         }
-
+        
+        //Display 5 staff per page
         $staffs = $query->orderBy('created_at', 'desc')
-            ->paginate(5)
+            ->paginate(10)
             ->withQueryString();
 
         return Inertia::render('Administration/Administration', [
@@ -65,7 +68,7 @@ class StaffController extends Controller
         ]);
     }
 
-
+    // Load and Display Staff Displays and AssignedCourses
     public function administrationView($staffId)
     {
         $this->checkAdmin();
@@ -78,7 +81,7 @@ class StaffController extends Controller
         if ($staff->user->role->role_name === 'faculty') {
             $assignedCourses = $staff->assignedCourses()
                 ->with('course.program')
-                ->paginate(5)
+                ->paginate(10)
                 ->through(function ($assignedCourse) {
                     $course = $assignedCourse->course;
                     return [
@@ -100,7 +103,7 @@ class StaffController extends Controller
         ]);
     }
 
-
+    // Export list of Staff through CSV using exportCsv() function 
     public function exportCsv()
     {
         $this->checkAdmin();
@@ -127,8 +130,8 @@ class StaffController extends Controller
                 fputcsv($file, [
                     $staff->user ? $staff->user->first_name . ' ' . $staff->user->last_name : 'N/A',
                     $staff->user->email ?? 'N/A',
-                    $staff->user->role->role_name ?? 'N/A',
-                    $staff->status,
+                    $staff->user && $staff->user->role ? ucfirst($staff->user->role->role_name) : 'N/A',
+                    $staff->status ? ucfirst($staff->status) : 'N/A',
                 ]);
             }
             fclose($file);
@@ -137,21 +140,19 @@ class StaffController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
-
+    // Export list of Staff through pdf using exportPdf() function 
     public function exportPdf()
     {   
         $this->checkAdmin();
 
         $staffs = Staff::with('user.role')->get();
-
         $pdf = Pdf::loadView('administration.staffs-pdf', compact('staffs'));
-
         return $pdf->download('staffs.pdf');
     }
 
 
     /**
-     * Show the form for creating a new resource.
+     * Show the add staff form for creating a new resource.
      */
     public function create()
     {   
@@ -166,7 +167,7 @@ class StaffController extends Controller
 
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource or user in storage.
      */
     public function store(Request $request)
     {   
@@ -182,7 +183,7 @@ class StaffController extends Controller
 
         $role = Role::where('role_name', $request->role_name)->firstOrFail();
 
-        // create user
+        // create staff user
         $user = User::create([
             'user_id' => Str::uuid(),
             'first_name' => $request->first_name,
@@ -192,6 +193,9 @@ class StaffController extends Controller
             'role_id' => $role->role_id,
             'password' => bcrypt('password123'), // temporary password
         ]);
+
+        // Email Verification after Staff Creation
+        event(new Registered($user));
 
         // create staff
         Staff::create([
@@ -206,7 +210,7 @@ class StaffController extends Controller
 
 
     /**
-     * Display the specified resource.
+     * Display the specified resource or staff details.
      */
     public function show($id)
     {   
@@ -237,7 +241,7 @@ class StaffController extends Controller
 
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource or staff details in storage.
      */
     public function update(Request $request, $id)
     {   
@@ -287,15 +291,20 @@ class StaffController extends Controller
 
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource or staff user from storage.
      */
     public function destroy($id)
     {   
         $this->checkAdmin();
+        $staff = Staff::with('user')->findOrFail($id);
 
-        $staff = Staff::findOrFail($id);
-        $staff->delete(); // uses SoftDeletes
+        // Soft delete the staff
+        $staff->delete();
 
+        // Soft delete the user
+        if ($staff->user) {
+            $staff->user->delete();
+        }
         return redirect()->route('administration.index')->with('success', 'Staff archived successfully.');
     }
 
@@ -315,12 +324,7 @@ class StaffController extends Controller
             ]);
         }
 
-        return back()->with('success', 'Profile updated successfully!');
+        return back()->with('success', 'Profile updated successfully.');
     }
-
-
-    /**
-     * Display all assigned courses for a faculty staff member across all programs.
-     */
     
 }
