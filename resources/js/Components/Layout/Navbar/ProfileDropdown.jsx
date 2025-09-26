@@ -1,22 +1,32 @@
 import { forwardRef } from "react";
 import { router } from "@inertiajs/react";
 import { IoPersonCircle, IoLogOutSharp } from "react-icons/io5";
-import { useRoute } from "ziggy-js";
+import { route } from "ziggy-js";
 import { closeDropDown } from "../../../Utils/closeDropdown";
+import axios from "axios";
+import NProgress from "nprogress";
 
 const ProfileDropdown = forwardRef((props, ref) => {
-    console.log("Render Profile");
+    NProgress.configure({ showSpinner: false }); // Remove spinner
 
-    const route = useRoute();
     const handleProfileClick = () => {
         router.visit(route("profile"));
 
         props.setDropdown("");
     };
 
-    const handleLogout = () => {
-        router.post(route("logout.user"), {}, { replace: true });
-        props.setDropdown("");
+    const handleLogout = async () => {
+        try {
+            props.setDropdown("");
+            NProgress.start();
+            await axios.post(route("logout.user")).then(() => {
+                window.location.href = "/login"; // Redirect to login page
+            });
+        } catch (error) {
+            console.error(error);
+        } finally {
+            NProgress.done();
+        }
     };
 
     return (

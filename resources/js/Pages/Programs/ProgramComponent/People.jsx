@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
-import AddStudentForm from "./PeopleComponent/AddStudentForm";
+import AddMemberForm from "./PeopleComponent/AddMemberForm";
 import PeopleTable from "./PeopleComponent/PeopleTable";
 import RoleGuard from "../../../Components/Auth/RoleGuard";
 
@@ -20,13 +20,13 @@ export default function People() {
                     <RoleGuard allowedRoles={["admin"]}>
                         <PrimaryButton
                             doSomething={toggleModal}
-                            text={"Add Student"}
+                            text={"Add Member"}
                         />
                     </RoleGuard>
                 </div>
                 <PeopleTable />
             </div>
-            {isOpen && <AddStudentForm toggleModal={toggleModal} />}
+            {isOpen && <AddMemberForm toggleModal={toggleModal} />}
         </div>
     );
 }

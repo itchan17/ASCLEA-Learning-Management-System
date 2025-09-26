@@ -1,4 +1,5 @@
 import React from "react";
+import Loader from "../Loader";
 
 export default function PrimaryButton({
     doSomething,
@@ -8,6 +9,8 @@ export default function PrimaryButton({
     btnColor,
     btnType = "button",
     isDisabled = false,
+    isLoading = false,
+    fontWeight = "font-semibold",
 }) {
     return (
         <button
@@ -19,10 +22,10 @@ export default function PrimaryButton({
             } hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300`}
         >
             {icon && <div className="text-size5">{icon}</div>}
-            {isDisabled ? (
-                <span className="loading loading-bars loading-sm"></span>
+            {isLoading ? (
+                <Loader />
             ) : (
-                <span className={`font-semibold ${textColor}`}>{text}</span>
+                <span className={`${fontWeight} ${textColor}`}>{text}</span>
             )}
         </button>
     );

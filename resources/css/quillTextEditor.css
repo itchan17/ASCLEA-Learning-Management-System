@@ -26,7 +26,12 @@
 }
 
 .ql-editor {
-    padding: 8px !important;
+    padding: 8px 12px 8px 12px !important;
+}
+
+.ql-editor:focus {
+    outline: 1.8px solid #01007d !important;
+    border-radius: 2px;
 }
 
 /* Custome styling for the output */
