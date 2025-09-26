@@ -15,7 +15,7 @@ import { usePaymentTabs } from "../../../Stores/PaymentHistory/usePaymentTabs";
 import { route } from 'ziggy-js';
 
 
-const PaymentInfo = () => {
+const PaymentInfo = ({can}) => {
   const { props } = usePage(); // props come from Inertia
   const payment = props; // payment data sent from controller
   const fileInputRef = React.useRef(null);
@@ -270,23 +270,30 @@ const filteredFiles = files.filter((file) => {
             }
           }}
         />
-        {payment.deleted_at == null ? (
-          <PrimaryButton
-            text="Archive"
-            isDisabled={isValidating} 
-            isLoading={isValidating}
-            btnColor={isEditDisabled ? "bg-ascend-red" : "bg-ascend-gray1"}
-            doSomething={isEditDisabled ? () => setShowArchiveAlert(true) : undefined}
-          />
-        ) : (
-          <PrimaryButton
-            text="Restore"
-            isDisabled={isValidating} 
-            isLoading={isValidating}
-            btnColor="bg-ascend-green"
-            doSomething={() => setShowRevertPaymentAlert(true)}
-          />
-        )}
+        
+      {can.viewArchive && (
+        <div>
+          {payment.deleted_at === null ? (
+            <PrimaryButton
+              text="Archive"
+              isDisabled={isValidating}
+              isLoading={isValidating}
+              btnColor={isEditDisabled ? "bg-ascend-red" : "bg-ascend-gray1"}
+              doSomething={isEditDisabled ? () => setShowArchiveAlert(true) : undefined}
+            />
+          ) : (
+            <PrimaryButton
+              text="Restore"
+              isDisabled={isValidating}
+              isLoading={isValidating}
+              btnColor="bg-ascend-green"
+              doSomething={() => setShowRevertPaymentAlert(true)}
+            />
+          )}
+        </div>
+      )}
+
+
       </div>
 
       {/* Student Info */}
@@ -311,6 +318,7 @@ const filteredFiles = files.filter((file) => {
       </div>
       
       {/* Edit / Save Buttons */}
+      {can.edit && (
       <div className="flex justify-end items-center mt-5">
         {payment.deleted_at == null && (
           isEditDisabled ? (
@@ -337,6 +345,7 @@ const filteredFiles = files.filter((file) => {
           )
         )}
       </div>
+      )}
 
       {/* Payment Details */}
       <form autoComplete="off" className="mt-5">
@@ -438,15 +447,21 @@ const filteredFiles = files.filter((file) => {
           <div className="font-nunito-sans text-size6 font-bold">
             Attached File
           </div>
-
-          <CustomSelect
-            selectField={
-                <select className="w-35 rounded-none appearance-none border border-ascend-black p-2 h-9 text-size1  focus:outline-ascend-blue" value={filefilter} onChange={(e) => setFilefilter(e.target.value)}>
-                    <option value="Active">Active</option>
-                    <option value="Removed">Removed</option>
+          
+          {can.viewFilefilter && (
+            <CustomSelect
+              selectField={
+                <select
+                  className="w-35 rounded-none appearance-none border border-ascend-black p-2 h-9 text-size1 focus:outline-ascend-blue"
+                  value={filefilter}
+                  onChange={(e) => setFilefilter(e.target.value)}
+                >
+                  <option value="Active">Active</option>
+                  <option value="Removed">Removed</option>
                 </select>
-            }
-          />
+              }
+            />
+          )}
         </div>
 
         {filteredFiles.length > 0 && (

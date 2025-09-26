@@ -8,7 +8,7 @@ import { usePaymentTabs } from "../../../Stores/PaymentHistory/usePaymentTabs";
 import { IoCaretDownOutline } from "react-icons/io5";
 import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToast";
 
-const PaymentHistoryPage = ({ PaymentList, student }) => {
+const PaymentHistoryPage = ({ PaymentList, student, can }) => {
   const handleRowClick = (paymentId) => {
     router.visit(route('paymenthistory.paymentInfo.view', paymentId));
   };
@@ -83,37 +83,38 @@ const handleExport = async (type) => {
 
   return (
     <>
-      {/* Tabs */}
-      <div className="h-12 border-b border-ascend-gray1 w-full py-1 flex justify-center items-center overflow-x-auto space-x-1 font-nunito-sans text-ascend-black">
-        <div
-          onClick={() => setActiveTab(0)}
-          className={`py-1.5 px-8 cursor-pointer font-bold hover:bg-ascend-lightblue transition-all duration-300 ${
-            activeTab === 0 && "bg-ascend-lightblue text-ascend-blue"
-          }`}
-        >
-          Active 
+      {can.viewTabs && (
+        <div className="h-12 border-b border-ascend-gray1 w-full py-1 flex justify-center items-center overflow-x-auto space-x-1 font-nunito-sans text-ascend-black">
+          <div
+            onClick={() => setActiveTab(0)}
+            className={`py-1.5 px-8 cursor-pointer font-bold hover:bg-ascend-lightblue transition-all duration-300 ${
+              activeTab === 0 && "bg-ascend-lightblue text-ascend-blue"
+            }`}
+          >
+            Active 
+          </div>
+          <div
+            onClick={() => setActiveTab(1)}
+            className={`py-1.5 px-8 cursor-pointer font-bold hover:bg-ascend-lightblue transition-all duration-300 ${
+              activeTab === 1 && "bg-ascend-lightblue text-ascend-blue"
+            }`}
+          >
+            Archived 
+          </div>
         </div>
-        <div
-          onClick={() => setActiveTab(1)}
-          className={`py-1.5 px-8 cursor-pointer font-bold hover:bg-ascend-lightblue transition-all duration-300 ${
-            activeTab === 1 && "bg-ascend-lightblue text-ascend-blue"
-          }`}
-        >
-          Archived 
-        </div>
-      </div>
+      )}
 
       {/* Header Section */}
       <div className="flex items-center justify-between">
         <div className="font-nunito-sans text-size6 font-bold mt-5">
           {student.name}
         </div>
-        {activeTab === 0 && (
+        {can.addPayment && activeTab === 0 && (
           <PrimaryButton text="Add Payment" doSomething={toggleAddPayment} />
         )}
       </div>
 
-      {activeTab === 0 && (
+      {can.download && activeTab === 0 && (
         <div className="dropdown dropdown-end">
           <button
             tabIndex={0}
@@ -121,9 +122,7 @@ const handleExport = async (type) => {
             className="flex items-center justify-between bg-ascend-blue text-ascend-white hover:opacity-80 transition-all duration-300 font-nunito-sans font-semibold h-10 px-4 cursor-pointer"
           >
             <span>Download</span>
-
             <span className="self-stretch border-l border-white mx-3"></span>
-
             <IoCaretDownOutline className="text-size1" />
           </button>
 

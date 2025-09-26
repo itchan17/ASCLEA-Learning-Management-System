@@ -48,9 +48,9 @@ class PaymentFile extends Model
     // Relationships
     public function payment()
     {
-        return $this->belongsTo(Payment::class, 'payment_id', 'payment_id');
+        return $this->belongsTo(Payment::class, 'payment_id', 'payment_id')->withTrashed();
     }
-
+    
     public function uploader()
     {
         return $this->belongsTo(User::class, 'uploaded_by', 'user_id');

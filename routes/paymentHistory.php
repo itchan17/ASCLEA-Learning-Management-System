@@ -5,16 +5,18 @@ use Inertia\Inertia;
 use App\Http\Controllers\PaymentHistory\paymentHistoryController;
 
 Route::prefix('payment-history')
-    ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin'])
-    ->group(function () {   
-        // Initial accounting page (list of students)
+    ->middleware(['auth', 'verified', 'preventBack'])
+    ->group(function () {
+
+        // Admin: list of paid students
         Route::get('/', [paymentHistoryController::class, 'paidStudents'])
             ->name('paymenthistory.index');
 
-        // Payment history of a specific student
+        // Payment history for any user (admin or student)
         Route::get('/{userId}', [paymentHistoryController::class, 'paymentHistory'])
             ->name('paymenthistory.payment.history');
 
+        // Other payment-related routes (store, update, archive, files...)
         Route::post('/payments', [paymentHistoryController::class, 'storePayment'])
             ->name('paymenthistory.payment.store');
 
@@ -26,7 +28,7 @@ Route::prefix('payment-history')
 
         Route::get('/payment-info/{paymentId}', [paymentHistoryController::class, 'viewPaymentInfo'])
             ->name('paymenthistory.paymentInfo.view');
-        
+
         Route::put('/payments-info/{paymentId}', [paymentHistoryController::class, 'updatePayment'])
             ->name('paymenthistory.payment.update');
 
@@ -51,21 +53,25 @@ Route::prefix('payment-history')
     });
 
     Route::prefix('student-payment-history')
-        ->middleware(['auth', 'verified', 'preventBack', 'checkRole:student'])
+        ->middleware(['auth', 'verified', 'preventBack'])
         ->group(function () {
-            // Directly show logged-in student’s history
-            Route::get('/', [paymentHistoryController::class, 'studentPaymentHistory'])
-                ->name('paymenthistory.student.history');
+            Route::get('/', function() {
+                return redirect()->route('paymenthistory.payment.history', auth()->id());
+            })->name('student.paymenthistory.me');
 
             Route::get('/payment-info/{paymentId}', [paymentHistoryController::class, 'viewStudentPaymentInfo'])
-                ->name('paymenthistory.student.paymentInfo.view');
+                ->name('student.paymenthistory.paymentInfo.view');
 
             Route::get('/payment-info/{paymentId}/files/{fileId}', [paymentHistoryController::class, 'viewStudentPaymentFile'])
-                ->name('paymenthistory.student.payment.file.view');
+                ->name('student.paymenthistory.payment.file.view');
 
             Route::get('/payment-info/{paymentId}/files/{fileId}/stream', [paymentHistoryController::class, 'streamStudentPaymentFile'])
-                ->name('paymenthistory.student.payment.file.stream');
+                ->name('student.paymenthistory.payment.file.stream');
         });
+
+
+    
+
 
 
 

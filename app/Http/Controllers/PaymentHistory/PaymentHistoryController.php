@@ -12,11 +12,18 @@ use App\Models\PaymentHistory\PaymentFile;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Validation\Rule;
+use App\Policies\PaymentHistory\PaymentPolicy;
 
-class paymentHistoryController extends Controller
+class PaymentHistoryController extends Controller
 {
     public function paidStudents(Request $request)
     {
+        $user = auth()->user();
+
+        if ($user->role->role_name === 'student') {
+            abort(403, 'Unauthorized');
+        }
+
         $search = $request->input('search'); // search term from frontend
 
         $students = Student::where('payment', 'paid')
@@ -76,6 +83,19 @@ class paymentHistoryController extends Controller
             ];
         });
 
+        $policy = new PaymentPolicy();
+        $user = Auth::user();
+
+        $can = [
+            'view'     => true, 
+            'create'   => $policy->create($user), // admin only
+            'download' => $user->role->role_name === 'admin', // admin only
+            'viewTabs'    => $user->role->role_name === 'admin', // false for students
+            'addPayment'  => $user->role->role_name === 'admin', // false for students
+            'download'    => $user->role->role_name === 'admin',
+        ];
+
+
         return Inertia::render('Accounting/StaffAccounting/PaymentHistoryPage', [
             'student' => [
                 'id'      => $student->student_id,
@@ -84,12 +104,21 @@ class paymentHistoryController extends Controller
                 'email'   => $student->user->email,
             ],
             'PaymentList' => $payments,
+            'can'         => $can,
         ]);
     }
 
 
     public function storePayment(Request $request)
     {
+
+        $policy = new PaymentPolicy();
+        $user = auth()->user();
+
+        if (! $policy->create($user)) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $request->validate([
             'user_id' => 'required|exists:users,user_id',
             'payment_method' => 'required|string',
@@ -131,10 +160,31 @@ class paymentHistoryController extends Controller
 
     public function viewPaymentInfo($paymentId)
     {
-        $payment = Payment::withTrashed() 
+        $payment = Payment::withTrashed()
             ->where('payment_id', $paymentId)
             ->with(['user', 'files'])
             ->firstOrFail();
+
+        $user = auth()->user();
+        $policy = new PaymentPolicy();
+
+        // Check if the user is allowed to view this payment
+        if (! $policy->view($user, $payment)) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Only pass frontend permissions relevant to this user
+        $can = [
+            'view'     => true,                        // Everyone viewing this page can see
+            'download' => $user->role->role_name === 'admin', // Only admin can download
+            'edit'     => $user->role->role_name === 'admin', // Only admin can edit
+            'archive'  => $user->role->role_name === 'admin', // Only admin can archive
+            'restore'  => $user->role->role_name === 'admin', // Only admin can restore
+            'viewArchive'  => $user->role->role_name === 'admin', // false for students
+            'viewEdit' => $user->role->role_name === 'admin', // false for students
+            'viewFilefilter' => $user->role->role_name === 'admin', // false for students
+            
+        ];
 
         return Inertia::render('Accounting/StaffAccounting/PaymentInfo', [
             'paymentId'       => $payment->payment_id,
@@ -156,11 +206,22 @@ class paymentHistoryController extends Controller
                 'type' => $file->file_type,
                 'deleted_at' => $file->deleted_at,
             ]),
+            'can' => $can,
         ]);
     }
 
+
     public function updatePayment(Request $request, $paymentId)
     {
+        $payment = Payment::findOrFail($paymentId);
+        $user = auth()->user();
+        $policy = new PaymentPolicy();
+
+        // Check if user is allowed to update this payment
+        if (! $policy->update($user, $payment)) {
+            abort(403, 'Unauthorized action.');
+        }
+
         $request->validate([
             'payment_method' => 'required|string',
             'transaction_id' => 'required|string|unique:payments,transaction_id,' . $paymentId . ',payment_id',
@@ -169,13 +230,11 @@ class paymentHistoryController extends Controller
             'proof'          => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
-        $payment = Payment::findOrFail($paymentId);
-
         $payment->update([
-            'payment_method'  => $request->payment_method,
-            'transaction_id'  => $request->transaction_id,
-            'receipt_date'    => $request->receipt_date,
-            'payment_amount'  => $request->payment_amount,
+            'payment_method' => $request->payment_method,
+            'transaction_id' => $request->transaction_id,
+            'receipt_date'   => $request->receipt_date,
+            'payment_amount' => $request->payment_amount,
         ]);
 
         if ($request->hasFile('proof')) {
@@ -194,17 +253,32 @@ class paymentHistoryController extends Controller
                 'uploaded_at'     => now(),
             ]);
         }
-        
 
-    return back()->with('success', 'Payment updated successfully!');
-
+        return back()->with('success', 'Payment updated successfully!');
     }
+
 
     public function viewPaymentFile($paymentId, $fileId)
     {
-        $file = PaymentFile::where('payment_id', $paymentId)
+        // Load the file along with its payment (including soft-deleted payments)
+        $file = PaymentFile::with(['payment' => fn($q) => $q->withTrashed()])
+            ->where('payment_id', $paymentId)
             ->where('payment_file_id', $fileId)
             ->firstOrFail();
+
+        // Make sure the payment exists
+        if (! $file->payment) {
+            abort(404, 'Payment not found.');
+        }
+
+        // Policy check: both admin and student can view
+        $file = PaymentFile::where('payment_file_id', $fileId)->firstOrFail();
+        $policy = new PaymentPolicy();
+        $user = auth()->user();
+
+        if (! $policy->view($user, $file->payment)) {
+            abort(403, 'Unauthorized.');
+        }
 
         return Inertia::render('Accounting/StaffAccounting/ViewPaymentFile', [
             'fileName'  => $file->file_name,
@@ -217,13 +291,19 @@ class paymentHistoryController extends Controller
         ]);
     }
 
+
     public function streamPaymentFile($paymentId, $fileId)
     {
         $file = PaymentFile::where('payment_id', $paymentId)
             ->where('payment_file_id', $fileId)
             ->firstOrFail();
 
-        // Equivalent of HandlingPrivateFileService::retrieveFile()
+        $policy = new PaymentPolicy();
+        $user = auth()->user();
+        if (! $policy->view($user, $file->payment)) {
+            abort(403, 'Unauthorized.');
+        }
+
         return response()->file(storage_path("app/public/{$file->file_path}"));
     }
 
@@ -233,7 +313,14 @@ class paymentHistoryController extends Controller
             ->where('payment_file_id', $fileId)
             ->firstOrFail();
 
-        // Equivalent of HandlingPrivateFileService::downloadFile()
+        $policy = new PaymentPolicy();
+        $user = auth()->user();
+
+        // Only admin can download
+        if (! $user->role->role_name === 'admin') {
+            abort(403, 'Unauthorized.');
+        }
+
         return response()->download(
             storage_path("app/public/{$file->file_path}"),
             $file->file_name
@@ -242,13 +329,16 @@ class paymentHistoryController extends Controller
 
     public function restoreFile($paymentId, $fileId)
     {
-        // Restore the soft-deleted file
         $file = PaymentFile::withTrashed()
             ->where('payment_id', $paymentId)
             ->where('payment_file_id', $fileId)
             ->firstOrFail();
 
-        // Soft delete any currently active file for this payment (so only one stays active)
+        $user = auth()->user();
+        if ($user->role->role_name !== 'admin') {
+            abort(403, 'Unauthorized.');
+        }
+
         PaymentFile::where('payment_id', $paymentId)
             ->whereNull('deleted_at')
             ->update(['deleted_at' => now()]);
@@ -258,13 +348,15 @@ class paymentHistoryController extends Controller
         return redirect()
             ->route('paymenthistory.paymentInfo.view', $paymentId)
             ->with('success', 'File reverted successfully!');
-
     }
 
     public function archivePayment($paymentId)
     {
         $payment = Payment::findOrFail($paymentId);
-        $payment->delete(); // Soft delete the payment
+        if (auth()->user()->role->role_name !== 'admin') {
+            abort(403, 'Unauthorized.');
+        }
+        $payment->delete();
 
         return redirect()
             ->route('paymenthistory.payment.history', $payment->user_id)
@@ -274,6 +366,9 @@ class paymentHistoryController extends Controller
     public function restorePayment($paymentId)
     {
         $payment = Payment::withTrashed()->findOrFail($paymentId);
+        if (auth()->user()->role->role_name !== 'admin') {
+            abort(403, 'Unauthorized.');
+        }
 
         if ($payment->trashed()) {
             $payment->restore();
@@ -284,153 +379,88 @@ class paymentHistoryController extends Controller
             ->with('success', 'Payment restored successfully!');
     }
 
-    // ---------------- Student methods ----------------
-    public function studentPaymentHistory()
+    public function exportPdf($userId)
     {
-        $userId = auth()->id(); // logged-in user's UUID
+        $user = auth()->user();
 
-        $payments = Payment::where('user_id', $userId)->get();
-
-        return Inertia::render('Accounting/StudentPayment/StudentPaymentHistoryPage', [
-            'payments' => $payments,
-        ]);
-    }
-
-
-    public function viewStudentPaymentInfo($paymentId)
-    {
-        $payment = Payment::where('payment_id', $paymentId)
-            ->where('user_id', auth()->id()) // ensure only their payment
-            ->with(['user', 'files'])
-            ->firstOrFail();
-
-        return Inertia::render('Accounting/StudentPayment/StudentPaymentInfo', [
-            'paymentId'       => $payment->payment_id,
-            'studentId'       => $payment->user_id,
-            'payment_method'  => $payment->payment_method,
-            'transaction_id'  => $payment->transaction_id,
-            'receipt_date'    => $payment->receipt_date,
-            'payment_amount'  => $payment->payment_amount,
-            'deleted_at'      => $payment->deleted_at,
-            'user' => [
-                'name'   => $payment->user->first_name . ' ' . ($payment->user->last_name ?? ''),
-                'email'  => $payment->user->email,
-                'status' => $payment->user->student->enrollment_status ?? null,
-            ],
-            'files' => $payment->files->map(fn($file) => [
-                'id'        => $file->payment_file_id,
-                'name'      => $file->file_name,
-                'url'       => asset('storage/' . $file->file_path),
-                'type'      => $file->file_type,
-                'deleted_at'=> $file->deleted_at,
-            ]),
-        ]);
-    }
-
-    public function viewStudentPaymentFile($paymentId, $fileId)
-    {
-        $payment = Payment::where('payment_id', $paymentId)
-            ->where('user_id', auth()->id())
-            ->firstOrFail();
-
-        $file = PaymentFile::where('payment_id', $paymentId)
-            ->where('payment_file_id', $fileId)
-            ->firstOrFail();
-
-        return Inertia::render('Accounting/StudentPayment/StudentDocumentViewerPayment', [
-            'fileName'  => $file->file_name,
-            'paymentId' => $paymentId,
-            'fileId'    => $fileId,
-            'fileUrl'   => route('paymenthistory.student.payment.file.stream', [
-                'paymentId' => $paymentId,
-                'fileId'    => $fileId,
-            ]),
-        ]);
-    }
-
-    public function streamStudentPaymentFile($paymentId, $fileId)
-    {
-        $payment = Payment::where('payment_id', $paymentId)
-            ->where('user_id', auth()->id())
-            ->firstOrFail();
-
-        $file = PaymentFile::where('payment_id', $paymentId)
-            ->where('payment_file_id', $fileId)
-            ->firstOrFail();
-
-        return response()->file(storage_path("app/public/{$file->file_path}"));
-    }
-
-public function exportPdf($userId)
-{
-    $payments = Payment::with('user.role')
-        ->where('user_id', $userId)
-        ->whereNull('deleted_at')
-        ->get();
-
-    if ($payments->isEmpty()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'No payment records found for this user.'
-        ], 404);
-    }
-    // Get student name from the first payment record
-    $user = $payments->first()->user;
-    $studentName = $user ? ($user->first_name . '_' . $user->last_name) : 'Unknown_User';
-
-    $pdf = Pdf::loadView('paymenthistory.payments-pdf', compact('payments'));
-
-    return $pdf->download("PaymentHistory_{$studentName}.pdf");
-}
-
-
-public function exportCsv($userId)
-{
-    $payments = Payment::with('user.role')
-        ->where('user_id', $userId)
-        ->whereNull('deleted_at') // ignore soft deleted
-        ->get();
-
-    if ($payments->isEmpty()) {
-        return response()->json([
-            'success' => false,
-            'message' => 'No payment records found for this user.'
-        ], 404);
-    }
-
-    $user = $payments->first()->user;
-    $studentName = $user ? ($user->first_name . '_' . $user->last_name) : 'Unknown_User';
-
-    $fileName = "PaymentHistory_{$studentName}.csv";
-
-    $headers = [
-        "Content-type" => "text/csv",
-        "Content-Disposition" => "attachment; filename=$fileName",
-        "Pragma" => "no-cache",
-        "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-        "Expires" => "0"
-    ];
-
-    $columns = ['Payment Method', 'Transaction ID', 'Receipt Date', 'Payment Amount', 'Action'];
-
-    $callback = function() use ($payments, $columns) {
-        $file = fopen('php://output', 'w');
-        fputcsv($file, $columns);
-
-        foreach ($payments as $payment) {
-            fputcsv($file, [
-                $payment->payment_method,
-                $payment->transaction_id,
-                $payment->receipt_date,
-                $payment->payment_amount,
-                'View',
-            ]);
+        if ($user->role->role_name !== 'admin') {
+            abort(403, 'Unauthorized.');
         }
-        fclose($file);
-    };
 
-    return response()->stream($callback, 200, $headers);
-}
+        $payments = Payment::with('user.role')
+            ->where('user_id', $userId)
+            ->whereNull('deleted_at')
+            ->get();
+
+        if ($payments->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No payment records found for this user.'
+            ], 404);
+        }
+
+        $student = $payments->first()->user;
+        $studentName = $student ? ($student->first_name . '_' . $student->last_name) : 'Unknown_User';
+
+        $pdf = Pdf::loadView('paymenthistory.payments-pdf', compact('payments'));
+
+        return $pdf->download("PaymentHistory_{$studentName}.pdf");
+    }
+
+    public function exportCsv($userId)
+    {
+        $user = auth()->user();
+
+        if ($user->role->role_name !== 'admin') {
+            abort(403, 'Unauthorized.');
+        }
+
+        $payments = Payment::with('user.role')
+            ->where('user_id', $userId)
+            ->whereNull('deleted_at')
+            ->get();
+
+        if ($payments->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No payment records found for this user.'
+            ], 404);
+        }
+
+        $student = $payments->first()->user;
+        $studentName = $student ? ($student->first_name . '_' . $student->last_name) : 'Unknown_User';
+
+        $fileName = "PaymentHistory_{$studentName}.csv";
+
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+        $columns = ['Payment Method', 'Transaction ID', 'Receipt Date', 'Payment Amount', 'Action'];
+
+        $callback = function() use ($payments, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($payments as $payment) {
+                fputcsv($file, [
+                    $payment->payment_method,
+                    $payment->transaction_id,
+                    $payment->receipt_date,
+                    $payment->payment_amount,
+                    'View',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 
 }
 
