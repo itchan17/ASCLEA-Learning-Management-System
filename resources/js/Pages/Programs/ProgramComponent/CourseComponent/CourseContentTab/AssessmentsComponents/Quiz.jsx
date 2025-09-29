@@ -8,15 +8,26 @@ export default function Quiz({ quizDetails }) {
     const route = useRoute();
     console.log(quizDetails);
 
-    const { programId, courseId } = usePage().props;
+    console.log(usePage().props);
+
+    const { auth, courseId } = usePage().props;
     const handleQuizClick = () => {
-        router.visit(
-            route("program.course.quiz-form.edit", {
-                programId,
-                courseId,
-                quizFormId: quizDetails.id,
-            })
-        );
+        if (auth.user.role_name === "student") {
+            router.visit(
+                route("assessment.quiz.instruction", {
+                    course: courseId,
+                    assessment: quizDetails.assessment_id,
+                    quiz: quizDetails.quiz_id,
+                })
+            );
+        } else {
+            router.visit(
+                route("assessment.quiz-form.edit", {
+                    assessment: quizDetails.assessment_id,
+                    quiz: quizDetails.quiz_id,
+                })
+            );
+        }
     };
 
     return (
@@ -28,7 +39,7 @@ export default function Quiz({ quizDetails }) {
                 <SiGoogleforms
                     className={`shrink-0 text-ascend-blue text-size5`}
                 />
-                <h4 className="ml-2 truncate">{quizDetails.quizTitle}</h4>
+                <h4 className="ml-2 truncate">{quizDetails.quiz_title}</h4>
             </div>
         </div>
     );

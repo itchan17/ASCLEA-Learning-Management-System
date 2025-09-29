@@ -32,6 +32,11 @@ return Application::configure(basePath: dirname(__DIR__))
                 require base_path('routes/Programs/courses.php');
                 require base_path('routes/Programs/people.php');
                 require base_path('routes/Programs/assessments.php');
+                require base_path('routes/Programs/quizzes.php');
+                require base_path('routes/Programs/questions.php');
+                require base_path('routes/Programs/options.php');
+                require base_path('routes/Programs/assessmentSubmisisons.php');
+                require base_path('routes/Programs/studentQuizAnswer.php');
                 require base_path('routes/Programs/otherRoutes.php');
             });
         },
@@ -45,6 +50,9 @@ return Application::configure(basePath: dirname(__DIR__))
             '/logout',
             '/programs',
             'programs/*',
+            '/assessments',
+            'assessments/*',
+            'courses/*',
         ]);
         // ------ END ------
         $middleware->web(append: [

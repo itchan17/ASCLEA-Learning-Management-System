@@ -1,24 +1,7 @@
 import { create } from "zustand";
-import useCreateQuizStore from "./createQuizStore";
-import useUserStore from "../../User/userStore";
-import useModulesStore from "./modulesStore";
 
 const useAssessmentsStore = create((set) => ({
-    assessmentList: [],
-    setAssessmentList: (assessments) => {
-        set({ assessmentList: assessments });
-    },
-
-    page: 1,
-
-    hasMore: true,
-
-    setPagination: (page, hasMore) => {
-        set({ page, hasMore });
-    },
-
-    resetPagination: () => set({ page: 1, hasMore: true, lastPage: null }),
-
+    assessmentByCourse: {},
     assessmentDetails: {
         assessment_title: "",
         assessment_description: null,
@@ -28,11 +11,26 @@ const useAssessmentsStore = create((set) => ({
         total_points: 0,
         assessment_files: [],
         removed_files: [],
-        // sectionId: null,
-        // sortOrder: null,
-        // contentType: "assessment",
-        // assessmentQuiz: null,
-        // responseReceived: 0,
+    },
+
+    setAssessments: (courseId, list, page, hasMore) => {
+        const { assessmentByCourse } = useAssessmentsStore.getState();
+
+        // Map handle removing duplicate values based on the assessment id
+        const uniqueAssessments = [
+            ...new Map(list.map((a) => [a.assessment_id, a])).values(),
+        ];
+
+        set(() => ({
+            assessmentByCourse: {
+                ...assessmentByCourse,
+                [courseId]: {
+                    list: uniqueAssessments,
+                    page,
+                    hasMore,
+                },
+            },
+        }));
     },
 
     // Set the data of assessment thaw will be use to edit
@@ -57,96 +55,47 @@ const useAssessmentsStore = create((set) => ({
         });
     },
 
-    removeAssessment: (id) => {
-        const { assessmentList } = useAssessmentsStore.getState();
-        const newList = assessmentList.filter(
-            (assessment) => assessment.assessment_id !== id
-        );
+    addNewAssessment: (newAssessment, courseId) => {
+        const { assessmentByCourse } = useAssessmentsStore.getState();
+
+        const courseState = assessmentByCourse[courseId] || {
+            list: [],
+            page: 1,
+            hasMore: true,
+        };
+
         set({
-            assessmentList: newList,
+            assessmentByCourse: {
+                ...assessmentByCourse,
+                [courseId]: {
+                    ...courseState,
+                    list: [newAssessment, ...courseState.list],
+                },
+            },
         });
     },
 
-    addToAssessmentList: (newAssessments) => {
-        const { assessmentList } = useAssessmentsStore.getState();
+    updateAssessmentInList: (updatedAssessment, courseId) => {
+        const { assessmentByCourse } = useAssessmentsStore.getState();
 
-        const assmnts = [...assessmentList, ...newAssessments];
+        const courseState = assessmentByCourse[courseId];
 
-        // Map handle removing duplicate values based on the assessment id
-        const uniqueAssessments = [
-            ...new Map(assmnts.map((a) => [a.assessment_id, a])).values(),
-        ];
-
-        set({
-            assessmentList: uniqueAssessments,
-        });
-    },
-
-    addNewAssessment: (newAssessment) => {
-        const { assessmentList } = useAssessmentsStore.getState();
-
-        set({ assessmentList: [newAssessment, ...assessmentList] });
-    },
-
-    updateAssessmentInList: (updatedAssessment) => {
-        const { assessmentList } = useAssessmentsStore.getState();
-
-        const updatedAssessmentList = assessmentList.map((assessment) =>
+        const updatedAssessmentList = courseState.list.map((assessment) =>
             assessment.assessment_id === updatedAssessment.assessment_id
                 ? updatedAssessment
                 : assessment
         );
-        set({ assessmentList: updatedAssessmentList });
-    },
 
-    // assessmentList: [
-    //     {
-    //         id: 1,
-    //         sectionId: 1,
-    //         sortOrder: 2,
-    //         contentType: "assessment",
-    //         assessmentType: "quiz",
-    //         assessmentDueDateTime: "2025-07-15T23:59",
-    //         assessmentPoints: 100,
-    //         assessmentTitle: "Chapter 3 Quiz: Photosynthesis",
-    //         assessmentDescription:
-    //             "<h2>This quiz will cover all topics in Chapter 3, including light-dependent and light-independent reactions. Please review all diagrams and key concepts.</h2>",
-    //         assessmentFiles: [],
-    //         assessmentQuiz: {
-    //             id: 1,
-    //             quizTitle: "First quiz",
-    //             quizDescription: "",
-    //         },
-    //         assessmentPostDate: "2025-07-07",
-    //         userPosted: "John Doe",
-    //         responseReceived: 3,
-    //     },
-    //     {
-    //         id: 2,
-    //         sectionId: 2,
-    //         sortOrder: 1,
-    //         contentType: "assessment",
-    //         assessmentType: "activity",
-    //         assessmentDueDateTime: "2025-07-20T23:59",
-    //         assessmentPoints: 50,
-    //         assessmentTitle: "Lab Activity: Plant Cell Observation",
-    //         assessmentDescription: `
-    //                                     <h2>Instructions:</h2>
-    //                                     <ol>
-    //                                         <li>Obtain the prepared slides of plant cells from your instructor.</li>
-    //                                         <li>Set up the microscope and carefully observe the slides.</li>
-    //                                         <li>Draw and label the visible parts of the plant cells.</li>
-    //                                         <li>Complete the observation sheet provided.</li>
-    //                                         <li>Submit both the labeled diagram and the observation sheet before the deadline.</li>
-    //                                     </ol>
-    //                                 `,
-    //         assessmentFiles: [],
-    //         assessmentQuiz: null,
-    //         assessmentPostDate: "2025-07-08",
-    //         userPosted: "Jane Smith",
-    //         responseReceived: 5,
-    //     },
-    // ],
+        set({
+            assessmentByCourse: {
+                ...assessmentByCourse,
+                [courseId]: {
+                    ...courseState,
+                    list: updatedAssessmentList,
+                },
+            },
+        });
+    },
 
     handleAssessmentChange: (field, value) => {
         const { assessmentDetails } = useAssessmentsStore.getState();
@@ -209,60 +158,6 @@ const useAssessmentsStore = create((set) => ({
                 assessment_files: [],
             },
         });
-    },
-
-    hanndleAddAssessments: (sectionId) => {
-        const user = useUserStore.getState().user;
-        const { assessmentDetails, assessmentList, clearAssessmentDetails } =
-            useAssessmentsStore.getState();
-
-        const today = new Date().toISOString().slice(0, 10);
-
-        // temporarily  set the id
-        const newId =
-            assessmentList.length > 0
-                ? assessmentList[assessmentList.length - 1].id + 1
-                : 1;
-
-        if (sectionId) {
-            const sectionList = useModulesStore.getState().sectionList;
-
-            console.log(sectionList);
-            const sectionDetails = sectionList.find(
-                (section) => section.id === sectionId
-            );
-
-            const contentList = sectionDetails.sectionContentList;
-            const lastItem = contentList[contentList.length - 1];
-
-            const sortOrder = lastItem ? lastItem.sortOrder + 1 : 1;
-
-            const updatedAssessmentDetails = {
-                ...assessmentDetails,
-                id: newId, // temporarily set the id
-                sectionId,
-                sortOrder,
-                assessmentPostDate: today,
-                userPosted: `${user.firstName} ${user.lastName}`,
-            };
-            console.log(updatedAssessmentDetails);
-            set({
-                assessmentList: [updatedAssessmentDetails, ...assessmentList],
-            });
-        } else {
-            const updatedAssessmentDetails = {
-                ...assessmentDetails,
-                id: newId, // temporarily set the id
-                assessmentPostDate: today,
-                userPosted: `${user.firstName} ${user.lastName}`,
-            };
-            console.log(updatedAssessmentDetails);
-            set({
-                assessmentList: [updatedAssessmentDetails, ...assessmentList],
-            });
-        }
-
-        clearAssessmentDetails();
     },
 }));
 
