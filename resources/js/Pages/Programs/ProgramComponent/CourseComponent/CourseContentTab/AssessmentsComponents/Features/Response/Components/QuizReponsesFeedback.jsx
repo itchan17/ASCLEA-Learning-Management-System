@@ -1,8 +1,33 @@
-import React from "react";
+import { useState } from "react";
 import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
 import { RiFeedbackFill } from "react-icons/ri";
+import axios from "axios";
+import { route } from "ziggy-js";
+import { usePage } from "@inertiajs/react";
 
 export default function QuizReponsesFeedback() {
+    const { programId, courseId, assessment } = usePage().props;
+
+    const [feedback, setFeedback] = useState(null);
+    const [isLoading, setIsloading] = useState(false);
+    const handleGenerateFeedback = async () => {
+        setIsloading(true);
+        try {
+            const response = await axios.post(
+                route("generate.quiz.responses.feedback", {
+                    program: programId,
+                    course: courseId,
+                    assessment: assessment.assessment_id,
+                })
+            );
+            setFeedback(response.data.feedback);
+            console.log(response);
+        } catch (error) {
+        } finally {
+            setIsloading(false);
+        }
+    };
+
     return (
         <div className="space-y-5">
             <div className="flex flex-wrap gap-5 items-center justify-between">
@@ -15,49 +40,41 @@ export default function QuizReponsesFeedback() {
                     </span>
                 </div>
                 <PrimaryButton
+                    isDisabled={isLoading}
+                    isLoading={isLoading}
+                    doSomething={handleGenerateFeedback}
                     icon={<RiFeedbackFill />}
                     text={"Generate Feedback"}
                 />
             </div>
             <div className="space-y-2">
                 <h1 className="text-size3 break-words font-semibold">
+                    Performance Summary
+                </h1>
+                <p className="text-justify">
+                    {feedback ? feedback.performance_summary : ""}
+                </p>
+            </div>
+            <div className="space-y-2">
+                <h1 className="text-size3 break-words font-semibold">
                     Performance Analysis
                 </h1>
                 <p className="text-justify">
-                    The class performed well overall, achieving an average score
-                    of 88%. Time spent was consistent at 2.5 hours, suggesting
-                    that most students worked through the exam at a steady pace.
-                    The score range—from 98/150 (65%) to 125/150 (83%)—indicates
-                    moderate variation in mastery. However, several commonly
-                    missed questions pointed to conceptual gaps. Notably,
-                    students struggled to distinguish between subjective and
-                    objective assessments, often misidentifying tools like
-                    concept mapping as objective when they are typically used
-                    for exploratory or reflective tasks. There was also frequent
-                    confusion between instructional approaches—especially
-                    differentiating between reflective and inquiry-based
-                    methods.
+                    {feedback ? feedback.performance_analysis : ""}
                 </p>
             </div>
             <div className="space-y-2">
                 <h1 className="text-size3 break-words font-semibold">
                     Suggestions
                 </h1>
-                <p className="text-justify">
-                    To improve conceptual clarity, conduct targeted reviews
-                    focused on assessment types and pedagogical frameworks. Use
-                    side-by-side comparison charts to contrast reflective,
-                    inquiry-based, and constructivist approaches. Reinforce
-                    assessment method distinctions with scenario-based quizzes
-                    and group activities. For example, ask students to match
-                    classroom situations to appropriate teaching strategies or
-                    assessment tools. Additionally, providing exemplars of
-                    objective (e.g., matching, multiple-choice) vs. subjective
-                    (e.g., essays, portfolios) formats can help clarify
-                    misunderstandings. These strategies will reinforce key
-                    concepts and better prepare students for practical
-                    application.
-                </p>
+
+                <ol className="list-decimal ml-5">
+                    {feedback &&
+                        feedback.suggestions.length > 0 &&
+                        feedback.suggestions.map((suggestion) => (
+                            <li>{suggestion}</li>
+                        ))}
+                </ol>
             </div>
         </div>
     );

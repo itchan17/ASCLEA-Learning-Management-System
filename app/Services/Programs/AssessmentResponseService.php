@@ -9,8 +9,7 @@ use App\Models\Programs\StudentQuizAnswer;
 use App\Services\CalculationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-
-use function PHPSTORM_META\map;
+use Illuminate\Support\Facades\Http;
 
 class AssessmentResponseService
 {
@@ -95,7 +94,7 @@ class AssessmentResponseService
                     'question_number' => $row->question->sort_order,
                     'missed_count' => $row->missed_count,
                     'missed_rate' => $row->miss_rate = $row->total_attempts > 0
-                        ? round(($row->missed_count / $row->total_attempts) * 100, 0)
+                        ? intval(round(($row->missed_count / $row->total_attempts) * 100, 0))
                         : 0,
                 ];
             });
@@ -136,5 +135,69 @@ class AssessmentResponseService
                 'submitted_by' => $response->submittedBy->member->user,
             ];
         });
+    }
+
+    public function formatInputData(Assessment $assessment, array $summary, array $frequentlyMissedQuestion)
+    {
+        // Map the array and return only the quesiton and the missed rate
+        $updatedFrequentlyMissedQuestion = array_map(fn($question) => ['question' => $question['question'], 'missed_rate' => $question['missed_rate']], $frequentlyMissedQuestion);
+
+        // Format the input data
+        $assessment = [
+            'assessment_title' => $assessment->assessment_title,
+            'total_points' => $assessment->quiz->quiz_total_points,
+            'summary' => $summary,
+            'frequently_missed_question' => $updatedFrequentlyMissedQuestion
+        ];
+
+        return $assessment;
+        // return json_encode($assessment);
+    }
+
+    public function generateQuestionFeedback(array $inputData)
+    {
+        $payload = [
+            "prompt" => "Analyze the provided assessment data and generate a JSON response. 
+            Fill in the 'feedback' object exactly in this structure:
+
+            \"feedback\": {
+            \"performance_analysis\": \"string\",
+            \"performance_summary\": \"string\",
+            \"suggestions\": [\"string\", \"string\", ...]
+            }
+
+            - 'performance_analysis': a detailed analysis of class performance,
+            - 'performance_summary': a concise summary of key findings,
+            - 'suggestions': an array of actionable recommendations.
+
+            Return ONLY valid JSON in the exact same structure, without explanations, markdown, or extra text.",
+            "assessment" => $inputData
+        ];
+
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . env('GEMINI_API_KEY'), [
+            "contents" => [[
+                "parts" => [[
+                    // IMPORTANT: force JSON output
+                    "text" => json_encode($payload)
+                ]]
+            ]]
+        ]);
+
+        $res = $response->json()['candidates'][0]['content']["parts"][0]["text"];
+
+        // Remove markdown fences or any leading/trailing whitespace
+        $res = trim($res);
+        $res = preg_replace('/^```json|```$/m', '', $res);
+
+        // Decode safely
+        $data = json_decode($res, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            dd("JSON Error: " . json_last_error_msg(), $res);
+        }
+
+        return $data;
     }
 }

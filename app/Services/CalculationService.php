@@ -6,7 +6,7 @@ class CalculationService
 {
     public function calculatePercentage(int $score, int $totalScore)
     {
-        return $totalScore > 0 ? intval(($score / $totalScore) * 100) : 0;
+        return $totalScore > 0 ? intval(round(($score / $totalScore) * 100, 0)) : 0;
     }
 
     // Method for getting the hours and minutes based on the minutes provided
