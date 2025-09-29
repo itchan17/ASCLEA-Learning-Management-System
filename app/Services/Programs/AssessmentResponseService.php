@@ -6,6 +6,7 @@ use App\Models\Programs\Assessment;
 use App\Models\Programs\AssessmentSubmission;
 use App\Models\Programs\Question;
 use App\Models\Programs\StudentQuizAnswer;
+use App\Services\CalculationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -13,6 +14,14 @@ use function PHPSTORM_META\map;
 
 class AssessmentResponseService
 {
+
+    protected CalculationService $calculationService;
+
+    public function __construct(CalculationService $calculationService)
+    {
+        $this->calculationService = $calculationService;
+    }
+
     public function getAssessmentResponsesSummary(Assessment $assessment)
     {
         $submissions = $assessment->assessmentSubmissions()->whereNotNull('submitted_at')->get();
@@ -43,10 +52,19 @@ class AssessmentResponseService
         $lowestScore = $submissions->min('score') ?? 0;
 
         return [
-            'average_score' => $averageScore,
-            'average_time' => $averageTime,
-            'highest_score' => $highestScore,
-            'lowest_score' => $lowestScore,
+            'average_score' => [
+                "score" => $averageScore,
+                "percentage" => $this->calculationService->calculatePercentage($averageScore, $assessment->quiz->quiz_total_points)
+            ],
+            'average_time' => $this->calculationService->calculateHoursAndMins($averageTime),
+            'highest_score' => [
+                "score" => $highestScore,
+                "percentage" =>  $this->calculationService->calculatePercentage($highestScore, $assessment->quiz->quiz_total_points)
+            ],
+            'lowest_score' => [
+                "score" => $lowestScore,
+                "percentage" =>  $this->calculationService->calculatePercentage($lowestScore, $assessment->quiz->quiz_total_points)
+            ],
         ];
     }
 
