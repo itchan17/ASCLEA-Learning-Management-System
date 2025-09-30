@@ -33,19 +33,22 @@ export default function QuizSubmitted({
                     imgSrc={"/images/illustrations/completed.svg"}
                     text={`“You've already completed this quiz. You can go ahead and review your responses”`}
                 />
-                <div className="flex justify-center w-full">
-                    <PrimaryButton
-                        doSomething={() =>
-                            handleViewResult(
-                                courseId,
-                                assessmentId,
-                                quiz.quiz_id,
-                                assessmentSubmission.assessment_submission_id
-                            )
-                        }
-                        text={"View Results"}
-                    />
-                </div>
+
+                {quiz && quiz.show_answers_after && (
+                    <div className="flex justify-center w-full">
+                        <PrimaryButton
+                            doSomething={() =>
+                                handleViewResult(
+                                    courseId,
+                                    assessmentId,
+                                    quiz.quiz_id,
+                                    assessmentSubmission.assessment_submission_id
+                                )
+                            }
+                            text={"View Results"}
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );
