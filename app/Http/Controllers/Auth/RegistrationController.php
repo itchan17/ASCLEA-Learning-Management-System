@@ -39,7 +39,7 @@ class RegistrationController extends Controller
 
         $data = $request->only([
         'first_name', 'last_name', 'middle_name', 'birthdate',
-        'gender', 'contact_number', 'email',
+        'gender', 'contact_number', 'email', 'password',
         'house_no'
     ]);
 
