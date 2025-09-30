@@ -123,7 +123,6 @@ class AssessmentSubmissionController extends Controller
 
     public function showQuizResult(Request $request, Course $course, Assessment $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
     {
-
         // Redirect use to quiz instruction page
         // this is to ensure they cant access the result without submitting the page
         if (!$assessmentSubmission->submitted_at) {
@@ -138,6 +137,17 @@ class AssessmentSubmissionController extends Controller
         $optionSlectedFields = ['question_option_id', 'question_id', 'option_text', 'is_correct'];
         $studentAnswerSelectedFields = ['student_quiz_answer_id', 'assessment_submission_id', 'question_id', 'answer_id', 'answer_text', 'is_correct', 'feedback'];
 
+        $feedback = null;
+
+        // This is for generating the quiz result feedback
+        if ($assessmentSubmission->submitted_at && $quiz->show_answers_after && is_null($assessmentSubmission->feedback) && $request->user()->role->role_name === "student") {
+            $questions = $this->questionService->getQuestions($quiz, $assessmentSubmission->assessment_submission_id,  $optionSlectedFields, $studentAnswerSelectedFields, false);
+
+            $inputData =  $this->assessmentSubmissionService->formatInputData($questions)->toArray();
+
+            $feedback = $this->assessmentSubmissionService->generateStudentQuizResultFeedback($inputData);
+        }
+
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/Components/QuizResult', [
             'courseId' => $course->course_id,
             'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'submitted_at', 'score', 'feedback', 'time_spent']),
@@ -151,8 +161,8 @@ class AssessmentSubmissionController extends Controller
                 },
             ])->submittedBy
                 ->member
-                ->user
-
+                ->user,
+            'feedback'  => fn() => $feedback,
         ]);
     }
 }

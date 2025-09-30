@@ -3,6 +3,7 @@
 namespace App\Services\Programs;
 
 use App\Models\Programs\Question;
+use App\Models\Programs\QuestionOption;
 use App\Models\Programs\StudentQuizAnswer;
 
 class StudentQuizAnswerService
@@ -33,6 +34,8 @@ class StudentQuizAnswerService
                 $answer['answer_text'] = $studentAnswer;
             } else {
                 $answer['answer_id'] = $studentAnswer;
+                $answer['answer_text'] = QuestionOption::where('question_option_id', $studentAnswer)
+                    ->value('option_text');
             }
 
             return StudentQuizAnswer::updateOrCreate(

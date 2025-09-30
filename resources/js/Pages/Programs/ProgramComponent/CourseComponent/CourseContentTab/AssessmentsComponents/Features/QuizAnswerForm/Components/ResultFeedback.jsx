@@ -4,7 +4,13 @@ import { getElapsedTime } from "../../../../../../../../../Utils/getElapsedTime"
 import { Doughnut } from "react-chartjs-2";
 import { MdOutlineAccessTimeFilled } from "react-icons/md";
 
-export default function ResultFeedback({ quiz, assessmentSubmission }) {
+export default function ResultFeedback({
+    quiz,
+    assessmentSubmission,
+    feedback,
+}) {
+    console.log(feedback);
+    console.log(quiz);
     const percentage = calcPercentage(
         assessmentSubmission.score,
         quiz.quiz_total_points
@@ -84,60 +90,56 @@ export default function ResultFeedback({ quiz, assessmentSubmission }) {
                             AI Generated
                         </span>
                     </h1>
-                    <div className="space-y-5">
-                        <div>
-                            <h1 className="font-bold text-size4">Strengths</h1>
-                            <ul className="list-disc list-outside ml-5">
-                                <li>
-                                    You demonstrated a solid understanding of
-                                    the 4A’s of facilitating learning,
-                                    specifically identifying the correct steps
-                                    for both starting a lesson (Activity) and
-                                    relating ideas to real life (Application).
-                                </li>
-                                <li>
-                                    This shows that you are familiar with
-                                    effective instructional strategies and how
-                                    to structure lessons for meaningful
-                                    learning.
-                                </li>
-                            </ul>
+                    {feedback && (
+                        <div className="space-y-5">
+                            {feedback.strengths.length > 0 && (
+                                <div>
+                                    <h1 className="font-bold text-size4">
+                                        Strengths
+                                    </h1>
+                                    <ol className="list-decimal ml-5">
+                                        {feedback.strengths.map(
+                                            (strength, index) => (
+                                                <li key={index}>{strength}</li>
+                                            )
+                                        )}
+                                    </ol>
+                                </div>
+                            )}
+
+                            {feedback.weaknesses && (
+                                <div>
+                                    <h1 className="font-bold text-size4">
+                                        Weaknesses
+                                    </h1>
+                                    <ol className="list-decimal ml-5">
+                                        {feedback.weaknesses.map(
+                                            (weakness, index) => (
+                                                <li key={index}>{weakness}</li>
+                                            )
+                                        )}
+                                    </ol>
+                                </div>
+                            )}
+
+                            {feedback.suggestions && (
+                                <div>
+                                    <h1 className="font-bold text-size4">
+                                        Suggestions
+                                    </h1>
+                                    <ol className="list-decimal ml-5">
+                                        {feedback.suggestions.map(
+                                            (suggestion, index) => (
+                                                <li key={index}>
+                                                    {suggestion}
+                                                </li>
+                                            )
+                                        )}
+                                    </ol>
+                                </div>
+                            )}
                         </div>
-                        <div>
-                            <h1 className="font-bold text-size4">Weaknesses</h1>
-                            <ul className="list-disc list-outside ml-5">
-                                <li>
-                                    There’s some confusion in distinguishing
-                                    between teaching approaches, such as
-                                    reflective vs. inquiry-based.
-                                </li>
-                                <li>
-                                    Understanding of assessment types also needs
-                                    improvement, especially in terms of
-                                    identifying subjective vs. objective formats
-                                    and recognizing tools used to connect ideas
-                                    (e.g., mapping).
-                                </li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h1 className="font-bold text-size4">
-                                Suggestions
-                            </h1>
-                            <p>
-                                Focus on reviewing the different types of
-                                assessment methods and teaching approaches. Make
-                                a comparison chart or flashcards to
-                                differentiate terms like reflective,
-                                inquiry-based, constructivist, and assessment
-                                tools like mapping, essay, matching. Practice by
-                                analyzing sample scenarios and matching them to
-                                the correct teaching or assessment strategy.
-                                This will help reinforce key concepts and reduce
-                                confusion during exams.
-                            </p>
-                        </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>

@@ -22,7 +22,7 @@ export default function QuestionResultItem({
             ? questionDetails.student_answer.student_quiz_answer_id
             : null,
     });
-    console.log(user);
+
     useEffect(() => {
         if (questionDetails.options) {
             const hasCorrectOption = questionDetails.options.some(

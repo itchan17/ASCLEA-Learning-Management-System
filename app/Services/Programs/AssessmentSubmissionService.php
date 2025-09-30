@@ -6,6 +6,9 @@ use App\Models\Programs\AssessmentSubmission;
 use App\Models\Programs\Quiz;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
 
 class AssessmentSubmissionService
 {
@@ -115,5 +118,62 @@ class AssessmentSubmissionService
     public function updateQuizAssessmentSubmissionScore(AssessmentSubmission $assessmentSubmission, int $totalScore)
     {
         $assessmentSubmission->update(["score" => $totalScore]);
+    }
+
+    public function formatInputData(Collection $questions)
+    {
+
+        $data = $questions->map(
+            function ($question) {
+
+                if (!is_null($question->studentAnswer)) {
+                    $correctAnswers = $question->options->where('is_correct', true)->pluck('option_text')->map(function ($option) {
+                        return Str::squish($option); // Str::squish() removes whites spaces and tabs 
+                    });
+
+                    return [
+                        "question" => $question->question,
+                        "correct_answers" => $correctAnswers,
+                        "student_answer" => Str::squish($question->studentAnswer->answer_text)
+                    ];
+                }
+            }
+        )->filter()->values();
+
+        return $data;
+    }
+
+    public function generateStudentQuizResultFeedback(array $inputData)
+    {
+        $payload = [
+            "prompt" => "You are a teaching assistant that gives personalized feedback based on student quiz performance. Return the feedback in this structure:\n\n\"feedback\": {\n  \"strengths\": [\"string\", \"string\", ...],\n  \"weaknesses\": [\"string\", \"string\", ...],\n  \"suggestions\": [\"string\", \"string\", ...]\n}",
+            "assessment" => $inputData
+        ];
+
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+        ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . env('GEMINI_API_KEY'), [
+            "contents" => [[
+                "parts" => [[
+                    // IMPORTANT: force JSON output
+                    "text" => json_encode($payload)
+                ]]
+            ]]
+        ]);
+
+        $res = $response->json()['candidates'][0]['content']["parts"][0]["text"];
+
+        // Remove markdown fences or any leading/trailing whitespace
+        $res = trim($res);
+        $res = preg_replace('/^```json|```$/m', '', $res);
+
+        // Decode safely
+        $data = json_decode($res, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            dd("JSON Error: " . json_last_error_msg(), $res);
+        }
+
+        return $data['feedback'];
     }
 }

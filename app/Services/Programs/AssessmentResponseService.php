@@ -154,7 +154,7 @@ class AssessmentResponseService
         // return json_encode($assessment);
     }
 
-    public function generateQuestionFeedback(array $inputData)
+    public function generateFeedback(array $inputData)
     {
         $payload = [
             "prompt" => "Analyze the provided assessment data and generate a JSON response. 

@@ -15,6 +15,7 @@ export default function QuizResult({
     auth,
     prevQuizAssessmentSubmitted,
     studentData,
+    feedback,
 }) {
     return (
         <div className="font-nunito-sans space-y-5">
@@ -26,6 +27,7 @@ export default function QuizResult({
                         <ResultFeedback
                             quiz={quiz}
                             assessmentSubmission={assessmentSubmission}
+                            feedback={feedback}
                         />
                     </RoleGuard>
 
