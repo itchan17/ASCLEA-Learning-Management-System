@@ -28,10 +28,7 @@ export default function CourseContent() {
         { name: "Home", onlyData: [] },
         { name: "Modules", onlyData: [] },
         { name: "Assessments", onlyData: ["assessments"] },
-        {
-            name: `${user?.role !== "student" ? "Grades" : null}`,
-            onlyData: [],
-        },
+        ...(user?.role !== "student" ? [{ name: "Grades", onlyData: [] }] : []),
     ];
 
     const handleClickTab = (tabIndex, onlyData) => {
@@ -79,7 +76,9 @@ export default function CourseContent() {
             {!isLoading && activeTab === 0 && <Home />}
             {!isLoading && activeTab === 1 && <Materials />}
             {!isLoading && activeTab === 2 && <Assessments />}
-            {!isLoading && activeTab === 3 && <Grades />}
+            {!isLoading && user?.role !== "student" && activeTab === 3 && (
+                <Grades />
+            )}
         </div>
     );
 }

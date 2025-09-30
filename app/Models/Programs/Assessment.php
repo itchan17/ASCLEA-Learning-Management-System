@@ -57,4 +57,9 @@ class Assessment extends Model
     {
         return $this->hasMany(AssessmentFile::class, 'assessment_id');
     }
+
+    public function assessmentSubmissions(): HasMany
+    {
+        return $this->hasMany(AssessmentSubmission::class, 'assessment_id');
+    }
 }

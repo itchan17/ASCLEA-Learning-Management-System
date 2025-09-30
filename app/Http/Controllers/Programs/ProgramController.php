@@ -166,11 +166,13 @@ class ProgramController extends Controller
 
         // FIlter based on search
         if ($search) {
+
             // Get suers based on search query
             $members->whereHas('user', function ($query) use ($search) {
                 $query->whereLike('first_name', "%$search%")
                     ->orWhereLike('last_name', "%$search%")
-                    ->orWhereLike('email', "%$search%");
+                    ->orWhereLike('email', "%$search%")
+                    ->orwhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]); // Allows searching for both first and last name
             });
         }
 

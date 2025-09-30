@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreign('assessment_id')->references('assessment_id')->on('assessments')->onDelete('cascade');
             $table->string('quiz_title');
             $table->longText('quiz_description')->nullable();
-            $table->integer('quiz_total_points')->nullable();;
-            $table->integer('duration')->nullable();
+            $table->integer('quiz_total_points')->nullable();
+            $table->integer('duration')->default(0);
             $table->boolean("cheating_mitigation")->default(false);
             $table->boolean('show_answers_after')->default(false);
             $table->timestamps();
