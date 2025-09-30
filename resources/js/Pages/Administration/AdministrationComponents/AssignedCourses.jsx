@@ -47,12 +47,14 @@ export default function AssignedCourses() {
                             ))}
                     </tbody>
                 </table>
-                {courseList?.length === 0 && (
-                    <EmptyState
-                        imgSrc={"/images/illustrations/not_assigned.svg"}
-                        text={`No assigned courses found. Head over to Programs to assign a course.`}
-                    />
-                )}
+                <div className="justify-center">
+                    {courseList?.length === 0 && (
+                        <EmptyState
+                            imgSrc={"/images/illustrations/not_assigned.svg"}
+                            text={``}
+                        />
+                    )}
+                </div>
             </div>
         </div>
     );

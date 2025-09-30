@@ -25,10 +25,6 @@ export default function AssessmentItem({
     const setAssessmentDetails = useAssessmentsStore(
         (state) => state.setAssessmentDetails
     );
-    const assessmentList = useAssessmentsStore((state) => state.assessmentList);
-    const setAssessmentList = useAssessmentsStore(
-        (state) => state.setAssessmentList
-    );
     const updateAssessmentInList = useAssessmentsStore(
         (state) => state.updateAssessmentInList
     );
@@ -64,14 +60,24 @@ export default function AssessmentItem({
 
     const handleQuizClick = () => {
         if (!assessmentDetails.deleted_at) {
-            router.visit(
-                route("program.course.quiz-form.edit", {
-                    program: program.program_id,
-                    course: course.course_id,
-                    assessment: assessmentDetails.assessment_id,
-                    quiz: assessmentDetails.quiz.quiz_id,
-                })
-            );
+            // Check if the user is student, if true it will navigate the user to quiz instruction page
+            // instead of the edit quiz form
+            if (auth.user.role_name === "student") {
+                router.visit(
+                    route("assessment.quiz.instruction", {
+                        course: course.course_id,
+                        assessment: assessmentDetails.assessment_id,
+                        quiz: assessmentDetails.quiz.quiz_id,
+                    })
+                );
+            } else {
+                router.visit(
+                    route("assessment.quiz-form.edit", {
+                        assessment: assessmentDetails.assessment_id,
+                        quiz: assessmentDetails.quiz.quiz_id,
+                    })
+                );
+            }
         }
     };
 
@@ -94,13 +100,8 @@ export default function AssessmentItem({
                 })
             );
 
-            const updatedAssessmentList = assessmentList.map((assessment) =>
-                assessment.assessment_id === response.data.data.assessment_id
-                    ? response.data.data
-                    : assessment
-            );
+            updateAssessmentInList(response.data.data, course.course_id);
 
-            setAssessmentList(updatedAssessmentList);
             displayToast(
                 <DefaultCustomToast message={response.data.success} />,
                 "success"
@@ -128,7 +129,10 @@ export default function AssessmentItem({
                 })
             );
             console.log(response);
-            updateAssessmentInList(response.data.archivedAssessment);
+            updateAssessmentInList(
+                response.data.archivedAssessment,
+                course.course_id
+            );
 
             displayToast(
                 <DefaultCustomToast message={response.data.success} />,
@@ -157,7 +161,10 @@ export default function AssessmentItem({
                 })
             );
             console.log(response);
-            updateAssessmentInList(response.data.restoredAssessment);
+            updateAssessmentInList(
+                response.data.restoredAssessment,
+                course.course_id
+            );
 
             displayToast(
                 <DefaultCustomToast message={response.data.success} />,

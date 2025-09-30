@@ -4,11 +4,12 @@ import PrimaryButton from "./Button/PrimaryButton";
 
 export default function AlertModal({
     title,
-    description,
+    description = null,
     closeModal,
     onConfirm,
     nested = false,
     isLoading,
+    customBody,
 }) {
     return (
         <div
@@ -28,9 +29,14 @@ export default function AlertModal({
                         </h1>
                     </div>
                     <div className="space-y-5 px-5 pb-5">
-                        <p className="text-size3 text-ascend-black">
-                            {description}
-                        </p>
+                        {description ? (
+                            <p className="text-size3 text-ascend-black">
+                                {description}
+                            </p>
+                        ) : (
+                            customBody
+                        )}
+
                         <div className="flex gap-2 justify-end">
                             <SecondaryButton
                                 isDisabled={isLoading}

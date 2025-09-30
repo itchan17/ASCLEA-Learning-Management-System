@@ -3,21 +3,30 @@ import { create } from "zustand";
 const useCreateQuizStore = create((set) => ({
     isFormOpen: false,
     editForm: false,
+    timeoutId: null,
+    isChanged: false,
+    setIsChanged: (val) => {
+        set({ isChanged: val });
+    },
 
     quizDetails: {
-        id: null,
-        quizTitle: "First quiz",
-        quizDescription: "",
-        quizDuration: 0,
+        quiz_title: "",
+        quiz_description: null,
+        quiz_total_points: 0,
+        duration: "",
+        show_answers_after: false,
+        cheating_mitigation: false,
+        quiz_total_points: 0,
+        cv_options: [],
     },
+
     questionDetails: {
-        id: null,
-        questionType: "",
         question: "",
-        questionChoices: [],
-        questionAnswer: [],
-        questionPoints: 0,
-        required: false,
+        question_type: "",
+        question_choices: [],
+        correct_answers: [],
+        question_points: 0,
+        is_required: false,
     },
 
     questionList: [
@@ -50,52 +59,152 @@ const useCreateQuizStore = create((set) => ({
         },
     ],
 
+    setQuizDetails: (quizDetails) => {
+        set({
+            quizDetails: {
+                quiz_title: quizDetails.quiz_title,
+                quiz_description: quizDetails.quiz_description,
+                quiz_total_points: quizDetails.quiz_total_points || 0,
+                duration: quizDetails.duration || 0,
+                show_answers_after: quizDetails.show_answers_after,
+                cheating_mitigation: quizDetails.cheating_mitigation,
+                quiz_total_points: quizDetails.quiz_total_points,
+                cv_options:
+                    quizDetails.options.length > 0
+                        ? quizDetails.options.map((option) => option.options) // return only the option value
+                        : [],
+            },
+        });
+    },
+
+    handleQuizDetailsChange: (field, value) => {
+        console.log("CHANGING" + field);
+        const { quizDetails, timeoutId, setIsChanged } =
+            useCreateQuizStore.getState();
+
+        if (field === "cv_options") {
+            const updatedCvOptions = quizDetails.cv_options.some(
+                (option) => option === value
+            )
+                ? quizDetails.cv_options.filter((option) => option != value) // Filter out the options from the list/uncheck the option
+                : [...quizDetails.cv_options, value]; // Add the new option to list
+
+            set({
+                quizDetails: {
+                    ...quizDetails,
+                    [field]: updatedCvOptions,
+                },
+            });
+        } else if (field === "duration") {
+            set({
+                quizDetails: {
+                    ...quizDetails,
+                    [field]: value.length > 4 ? value.slice(0, 4) : value, // Limit the input to 4 char
+                },
+            });
+        } else if (field === "cheating_mitigation" && !value) {
+            // Reset the value of cv_opions if cheating_mitigation is off
+            set({
+                quizDetails: {
+                    ...quizDetails,
+                    [field]: value,
+                    ["cv_options"]: [],
+                },
+            });
+        } else if (field === "quiz_title") {
+            set({
+                quizDetails: {
+                    ...quizDetails,
+                    [field]: value,
+                },
+            });
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+            if (value.trim() === "") {
+                const newTimeout = setTimeout(() => {
+                    set({
+                        quizDetails: {
+                            ...quizDetails,
+                            [field]: "Edit Quiz",
+                        },
+                    });
+                }, 1000);
+
+                set({ timeoutId: newTimeout });
+            }
+        } else {
+            set({
+                quizDetails: {
+                    ...quizDetails,
+                    [field]: value,
+                },
+            });
+        }
+
+        setIsChanged(true);
+    },
+
+    // else if (field === "duration") {
+    //         set({
+    //             quizDetails: {
+    //                 ...quizDetails,
+    //                 [field]: value,
+    //             },
+    //         });
+    //         if (timeoutId) {
+    //             clearTimeout(timeoutId);
+    //         }
+    //         if (value.includes("") || !value) {
+    //             const newTimeout = setTimeout(
+    //                 () =>
+    //                     set({
+    //                         quizDetails: {
+    //                             ...quizDetails,
+    //                             [field]: 0,
+    //                         },
+    //                     }),
+    //                 1000
+    //             );
+    //             set({ timeoutId: newTimeout });
+    //         }
+    //     }
+
     setQuestionList: (newOrder) => {
         set({
             questionList: [...newOrder],
         });
     },
 
-    handleQuestionDetailsChange: (field, value) => {
-        const { questionDetails } = useCreateQuizStore.getState();
+    // handleQuestionDetailsChange: (field, value) => {
+    //     const { questionDetails } = useCreateQuizStore.getState();
 
-        if (field === "questionChoices" || field === "questionAnswer") {
-            if (Array.isArray(value)) {
-                console.log(value);
-                set({
-                    questionDetails: {
-                        ...questionDetails,
-                        [field]: [...value],
-                    },
-                });
-            } else {
-                set({
-                    questionDetails: {
-                        ...questionDetails,
-                        [field]: [...questionDetails[field], value],
-                    },
-                });
-            }
-        } else {
-            set({
-                questionDetails: {
-                    ...questionDetails,
-                    [field]: value,
-                },
-            });
-        }
-    },
-
-    handleQuizDetailsChange: (field, value) => {
-        const { quizDetails } = useCreateQuizStore.getState();
-
-        set({
-            quizDetails: {
-                ...quizDetails,
-                [field]: value,
-            },
-        });
-    },
+    //     if (field === "questionChoices" || field === "questionAnswer") {
+    //         if (Array.isArray(value)) {
+    //             console.log(value);
+    //             set({
+    //                 questionDetails: {
+    //                     ...questionDetails,
+    //                     [field]: [...value],
+    //                 },
+    //             });
+    //         } else {
+    //             set({
+    //                 questionDetails: {
+    //                     ...questionDetails,
+    //                     [field]: [...questionDetails[field], value],
+    //                 },
+    //             });
+    //         }
+    //     } else {
+    //         set({
+    //             questionDetails: {
+    //                 ...questionDetails,
+    //                 [field]: value,
+    //             },
+    //         });
+    //     }
+    // },
 
     clearQuestionDetails: () => {
         set({

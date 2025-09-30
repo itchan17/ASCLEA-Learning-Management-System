@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Student;
+use App\Models\Payment;
+
 
 class UserSeeder extends Seeder
 {
@@ -31,13 +33,15 @@ class UserSeeder extends Seeder
                     ->state(function (array $attributes, User $user) {
                         return [
                             'user_id' => $user->user_id,
-                            'enrollment_status' => 'enrolled'
+                            'enrollment_status' => 'enrolled',
+                            'payment' => 'paid'
                         ];
                     })
             )
             ->create([
                 'role_id' =>  $studentRoleId,
             ]);
+            
 
         // Create 5 users with faculty role
         User::factory()
