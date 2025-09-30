@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuid('student_id')->primary();
             $table->uuid('user_id');
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
-            $table->string('enrollment_status')->nullable();
+            $table->enum('enrollment_status', ['enrolled', 'pending', 'dropout']) ->default('pending');
             $table->timestamp('approved_at')->nullable();
             $table->timestamps();
         });

@@ -52,6 +52,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'contact_number',
         'email',
         'house_no',
+        'region',
         'province',
         'city',
         'barangay',
@@ -95,8 +96,18 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Student::class, 'user_id');
     }
 
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'user_id', 'user_id');
+    }
+
     public function assessments(): HasMany
     {
         return $this->hasMany(Assessment::class, 'created_by', 'user_id');
+    }
+
+    public function uploadedPaymentFiles()
+    {
+        return $this->hasMany(PaymentFile::class, 'uploaded_by', 'user_id');
     }
 }
