@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Student;
+use App\Models\Payment;
+
 
 class UserSeeder extends Seeder
 {
@@ -31,13 +33,15 @@ class UserSeeder extends Seeder
                     ->state(function (array $attributes, User $user) {
                         return [
                             'user_id' => $user->user_id,
-                            'enrollment_status' => 'enrolled'
+                            'enrollment_status' => 'enrolled',
+                            'payment' => 'paid'
                         ];
                     })
             )
             ->create([
                 'role_id' =>  $studentRoleId,
             ]);
+            
 
         // Create 5 users with faculty role
         User::factory()
@@ -57,6 +61,7 @@ class UserSeeder extends Seeder
                 'contact_number' => '09192345678',
                 'email' => 'carlos.garcia@example.com',
                 'house_no' => '789',
+                'region' => 'Region XI – Davao Region',   // Added region
                 'province' => 'Davao del Sur',
                 'city' => 'Davao City',
                 'barangay' => 'Barangay Matina',
@@ -76,6 +81,7 @@ class UserSeeder extends Seeder
                 'contact_number' => '09171234567',
                 'email' => 'juan.delacruz@example.com',
                 'house_no' => '123',
+                'region' => 'NCR – National Capital Region', // Added region
                 'province' => 'Metro Manila',
                 'city' => 'Quezon City',
                 'barangay' => 'Barangay Commonwealth',
@@ -95,6 +101,7 @@ class UserSeeder extends Seeder
                 'contact_number' => '09181234567',
                 'email' => 'maria.reyes@example.com',
                 'house_no' => '456',
+                'region' => 'Region VII – Central Visayas', // Added region
                 'province' => 'Cebu',
                 'city' => 'Cebu City',
                 'barangay' => 'Barangay Lahug',

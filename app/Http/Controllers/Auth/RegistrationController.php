@@ -38,10 +38,16 @@ class RegistrationController extends Controller
         $roleId = DB::table('roles')->where('role_name', 'student')->value('role_id');
 
         $data = $request->only([
-            'first_name', 'last_name', 'middle_name', 'birthdate',
-            'gender', 'contact_number', 'email','password',
-            'house_no', 'province', 'city', 'barangay'
-        ]);
+        'first_name', 'last_name', 'middle_name', 'birthdate',
+        'gender', 'contact_number', 'email', 'password',
+        'house_no'
+    ]);
+
+        // Save the names directly
+        $data['region'] = $request->region_name;
+        $data['province'] = $request->province_name;
+        $data['city'] = $request->city_name;
+        $data['barangay'] = $request->barangay_name;
 
         $data['role_id'] = $roleId;
         
@@ -71,7 +77,8 @@ class RegistrationController extends Controller
             'contact_number' => 'required|string|min:11|max:15',
             'email' => 'required|email|unique:users,email',
             'house_no' => 'required|string|max:255',
-            'province' => 'required|string|max:255',
+            'region' => 'required|string|max:255', // added region
+            'province' => 'required|string|max:255', 
             'city' => 'required|string|max:255',
             'barangay' => 'required|string|max:255',
             'password' => [

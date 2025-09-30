@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Programs\AssessmentSubmission;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AssignedCourse extends Model
 {
-     use HasUuids;
+    use HasUuids;
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -36,13 +38,18 @@ class AssignedCourse extends Model
         'course_id',
     ];
 
-     public function member(): BelongsTo
+    public function member(): BelongsTo
     {
-        return $this->belongsTo(LearningMember::class, 'leaniing_member_id');
+        return $this->belongsTo(LearningMember::class, 'learning_member_id');
     }
 
-    public function course(): BelongsTo 
+    public function course(): BelongsTo
     {
         return $this->belongsTo(Course::class, 'course_id');
+    }
+
+    public function assessmentSubmissions(): HasMany
+    {
+        return $this->hasMany(AssessmentSubmission::class, 'submitted_by', 'assigned_course_id');
     }
 }

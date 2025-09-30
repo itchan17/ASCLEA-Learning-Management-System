@@ -23,10 +23,11 @@ return new class extends Migration
             $table->string('birthdate')->nullable(); 
             $table->string('gender')->nullable();
             $table->string('contact_number')->nullable();
-
+          
             $table->string('email')->unique();
 
             $table->string('house_no')->nullable();
+            $table->string('region')->nullable(); // added region
             $table->string('province')->nullable();
             $table->string('city')->nullable();
             $table->string('barangay')->nullable();

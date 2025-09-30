@@ -51,4 +51,6 @@ class LearningMember extends Model
     {
         return $this->hasMany(AssignedCourse::class, 'learning_member_id');
     }
+
+    
 }

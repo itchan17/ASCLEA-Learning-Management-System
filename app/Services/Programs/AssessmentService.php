@@ -82,12 +82,15 @@ class AssessmentService
         AssessmentFile::insert($uploadedFiles);
     }
 
+    // Quiz form will only be created when the user creates an assessment with a type of quiz,
+    // since we need the id of the created assessment to use it as reference in the quiz table
+    // other opretaions related to quiz will be handled in the QuizService
     public function createInitialQuizForm(Assessment $assessment)
     {
         // Create the inital quiz that will be used to start form editing with initial quiz title
         $initialQuizDta = [
             'assessment_id' => $assessment->assessment_id,
-            'quiz_title' => "New Quiz"
+            'quiz_title' => "Edit Quiz"
         ];
 
         Quiz::create($initialQuizDta);
@@ -100,15 +103,46 @@ class AssessmentService
         // Query for getting all related data of the assessment
         // also get soft deleted assessment but with conditon
         // that it only displays assessment deleted by the user
-        return Assessment::where('course_id', $courseId)->with('assessmentType')->with(['author' => function ($query) {
-            $query->select('user_id', 'first_name', 'last_name');
-        }])->where('created_by', $user->user_id)->orWhere('status', 'published')->with(['quiz' => function ($query) {
-            $query->select('assessment_id', 'quiz_id', 'quiz_title');
-        }])->with(['files' => function ($query) {
-            $query->select('assessment_id', 'assessment_file_id', 'file_name', 'file_path');
-        }])->withTrashed()->where(function ($query) use ($user) {
-            $query->whereNull('deleted_at')->orWhere('created_by', $user->user_id);
-        })->select('assessment_id', 'assessment_type_id', 'created_by', 'assessment_title', 'assessment_description', 'status', 'course_id', 'due_datetime', 'total_points', 'created_at', 'updated_at', 'deleted_at')->orderBy('created_at', 'desc')->orderBy('assessment_id', 'desc')->paginate(5);
+        $assessmentList = Assessment::where('course_id', $courseId)
+            ->with('assessmentType')
+            ->with(['author' => function ($query) {
+                $query->select('user_id', 'first_name', 'last_name');
+            }])
+            ->where(function ($query) use ($user) {
+                $query->where('created_by', $user->user_id)
+                    ->orWhere('status', 'published');
+            })
+            ->with(['quiz' => function ($query) {
+                $query->select('assessment_id', 'quiz_id', 'quiz_title');
+            }])
+            ->with(['files' => function ($query) {
+                $query->select('assessment_id', 'assessment_file_id', 'file_name', 'file_path');
+            }])
+            ->withTrashed()
+            ->where(function ($query) use ($user) {
+                $query->whereNull('deleted_at')
+                    ->orWhere('created_by', $user->user_id);
+            })
+            ->select(
+                'assessment_id',
+                'assessment_type_id',
+                'created_by',
+                'assessment_title',
+                'assessment_description',
+                'status',
+                'course_id',
+                'due_datetime',
+                'total_points',
+                'created_at',
+                'updated_at',
+                'deleted_at'
+            )
+            ->orderBy('created_at', 'desc')
+            ->orderBy('assessment_id', 'desc')
+            ->paginate(5);
+
+
+        return $assessmentList;
     }
 
     public function updateAssessment(Assessment $assessment, array $updatedData, bool $isUnpublish = false)
