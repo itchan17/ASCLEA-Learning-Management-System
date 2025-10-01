@@ -1,16 +1,27 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { calcPercentage } from "../../../../../../../../../Utils/calcPercentage";
 import { getElapsedTime } from "../../../../../../../../../Utils/getElapsedTime";
 import { Doughnut } from "react-chartjs-2";
 import { MdOutlineAccessTimeFilled } from "react-icons/md";
+import Loader from "../../../../../../../../../Components/Loader";
+import useGetQUizResultFeedback from "../Hooks/useGetQUizResultFeedback";
 
 export default function ResultFeedback({
+    courseId,
+    assessment,
     quiz,
     assessmentSubmission,
-    feedback,
 }) {
-    console.log(feedback);
-    console.log(quiz);
+    // Custom hook
+    const { handdleGetFeedback, isLoading, error, feedback } =
+        useGetQUizResultFeedback({
+            courseId: courseId,
+            assessmentId: assessment.assessment_id,
+            quizId: quiz.quiz_id,
+            assessmentSubmissionId:
+                assessmentSubmission.assessment_submission_id,
+        });
+
     const percentage = calcPercentage(
         assessmentSubmission.score,
         quiz.quiz_total_points
@@ -20,6 +31,11 @@ export default function ResultFeedback({
         assessmentSubmission.created_at,
         assessmentSubmission.submitted_at
     );
+
+    // Get ai feedback once the component was rendered
+    useEffect(() => {
+        handdleGetFeedback();
+    }, []);
 
     return (
         <div className="w-full space-y-5 border border-ascend-gray1 shadow-shadow1 p-5">
@@ -90,55 +106,88 @@ export default function ResultFeedback({
                             AI Generated
                         </span>
                     </h1>
-                    {feedback && (
-                        <div className="space-y-5">
-                            {feedback.strengths.length > 0 && (
-                                <div>
-                                    <h1 className="font-bold text-size4">
-                                        Strengths
-                                    </h1>
-                                    <ol className="list-decimal ml-5">
-                                        {feedback.strengths.map(
-                                            (strength, index) => (
-                                                <li key={index}>{strength}</li>
-                                            )
-                                        )}
-                                    </ol>
-                                </div>
-                            )}
 
-                            {feedback.weaknesses && (
-                                <div>
-                                    <h1 className="font-bold text-size4">
-                                        Weaknesses
-                                    </h1>
-                                    <ol className="list-decimal ml-5">
-                                        {feedback.weaknesses.map(
-                                            (weakness, index) => (
-                                                <li key={index}>{weakness}</li>
-                                            )
-                                        )}
-                                    </ol>
-                                </div>
-                            )}
+                    {/* Displays error message */}
+                    {error && (
+                        <div
+                            className={`w-full flex flex-col justify-center items-center h-full `}
+                        >
+                            <div className="w-[300px] h-[200px] overflow-hidden rounded-lg">
+                                <img
+                                    src={"/images/illustrations/error.svg"}
+                                    alt="Image"
+                                    className="w-full h-full object-cover object-center"
+                                />
+                            </div>
 
-                            {feedback.suggestions && (
-                                <div>
-                                    <h1 className="font-bold text-size4">
-                                        Suggestions
-                                    </h1>
-                                    <ol className="list-decimal ml-5">
-                                        {feedback.suggestions.map(
-                                            (suggestion, index) => (
-                                                <li key={index}>
-                                                    {suggestion}
-                                                </li>
-                                            )
-                                        )}
-                                    </ol>
-                                </div>
-                            )}
+                            <p className="text-size3 md:text-size5 sm:w-100 text-wrap text-center italic">
+                                {error}
+                            </p>
                         </div>
+                    )}
+
+                    {isLoading ? (
+                        <div className="h-full flex flex-col items-center justify-center">
+                            <Loader color="text-ascend-blue" />
+                        </div>
+                    ) : (
+                        feedback && (
+                            <div className="space-y-5">
+                                {feedback.strengths &&
+                                    feedback.strengths.length > 0 && (
+                                        <div>
+                                            <h1 className="font-bold text-size4">
+                                                Strengths
+                                            </h1>
+                                            <ol className="list-decimal ml-5">
+                                                {feedback.strengths.map(
+                                                    (strength, index) => (
+                                                        <li key={index}>
+                                                            {strength}
+                                                        </li>
+                                                    )
+                                                )}
+                                            </ol>
+                                        </div>
+                                    )}
+
+                                {feedback.weaknesses &&
+                                    feedback.weaknesses.length > 0 && (
+                                        <div>
+                                            <h1 className="font-bold text-size4">
+                                                Weaknesses
+                                            </h1>
+                                            <ol className="list-decimal ml-5">
+                                                {feedback.weaknesses.map(
+                                                    (weakness, index) => (
+                                                        <li key={index}>
+                                                            {weakness}
+                                                        </li>
+                                                    )
+                                                )}
+                                            </ol>
+                                        </div>
+                                    )}
+
+                                {feedback.suggestions &&
+                                    feedback.suggestions.length > 0 && (
+                                        <div>
+                                            <h1 className="font-bold text-size4">
+                                                Suggestions
+                                            </h1>
+                                            <ol className="list-decimal ml-5">
+                                                {feedback.suggestions.map(
+                                                    (suggestion, index) => (
+                                                        <li key={index}>
+                                                            {suggestion}
+                                                        </li>
+                                                    )
+                                                )}
+                                            </ol>
+                                        </div>
+                                    )}
+                            </div>
+                        )
                     )}
                 </div>
             </div>

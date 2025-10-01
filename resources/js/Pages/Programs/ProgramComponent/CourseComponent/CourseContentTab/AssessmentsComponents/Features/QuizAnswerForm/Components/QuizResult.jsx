@@ -15,7 +15,6 @@ export default function QuizResult({
     auth,
     prevQuizAssessmentSubmitted,
     studentData,
-    feedback,
 }) {
     return (
         <div className="font-nunito-sans space-y-5">
@@ -25,9 +24,10 @@ export default function QuizResult({
                 <div className="w-full max-w-235 space-y-5">
                     <RoleGuard allowedRoles={["student"]}>
                         <ResultFeedback
+                            courseId={courseId}
+                            assessment={assessment}
                             quiz={quiz}
                             assessmentSubmission={assessmentSubmission}
-                            feedback={feedback}
                         />
                     </RoleGuard>
 

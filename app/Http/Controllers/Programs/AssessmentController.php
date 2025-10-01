@@ -152,14 +152,14 @@ class AssessmentController extends Controller
         );
     }
 
-    public function generateQuizResponsesFeedback(Request $request, Program $program, Course $course, Assessment $assessment)
+    public function quizResponsesFeedback(Request $request, Program $program, Course $course, Assessment $assessment)
     {
         $summary = $this->assessmentResponseService->getAssessmentResponsesSummary($assessment);
         $frequentlyMissedQuestions = $this->assessmentResponseService->getFrequentlyMissedQuestion($assessment)->toArray();
 
         $inputData = $this->assessmentResponseService->formatInputData($assessment, $summary, $frequentlyMissedQuestions);
 
-        $feedback = $this->assessmentResponseService->generateQuestionFeedback($inputData);
+        $feedback = $this->assessmentResponseService->generateFeedback($inputData);
 
         return response()->json($feedback);
     }
