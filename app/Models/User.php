@@ -58,6 +58,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'barangay',
         'password',
         'role_id',
+        'profile_image', //added profile image
     ];
 
     /**
@@ -109,5 +110,20 @@ class User extends Authenticatable implements MustVerifyEmail
     public function uploadedPaymentFiles()
     {
         return $this->hasMany(PaymentFile::class, 'uploaded_by', 'user_id');
+    }
+
+    public function logins()
+    {
+        return $this->hasMany(UserLogin::class, 'user_id', 'user_id'); 
+    }
+
+    public function lastLogin()
+    {
+        return $this->hasOne(UserLogin::class, 'user_id', 'user_id')->latestOfMany('login_at');
+    }
+
+    public function lastLogout()
+    {
+        return $this->hasOne(UserLogin::class, 'user_id', 'user_id')->latestOfMany('logout_at');
     }
 }
