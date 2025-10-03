@@ -137,6 +137,7 @@ class AssessmentController extends Controller
 
     public function showAssessmentResponse(Request $request, Program $program, Course $course, Assessment $assessment)
     {
+
         return Inertia::render(
             'Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/Response/ViewResponses',
             [
@@ -147,7 +148,8 @@ class AssessmentController extends Controller
                 }]),
                 'summary' => fn() => $this->assessmentResponseService->getAssessmentResponsesSummary($assessment),
                 'frequentlyMissedQuestions' => fn() =>  $this->assessmentResponseService->getFrequentlyMissedQuestion($assessment),
-                'responses' => fn() =>  $this->assessmentResponseService->getAssessmentResponses($request, $assessment)
+                'responses' => fn() =>  $this->assessmentResponseService->getAssessmentResponses($request, $assessment),
+                'responsesCount' => fn() => $assessment->assessmentSubmissions()->count()
             ]
         );
     }
@@ -159,7 +161,7 @@ class AssessmentController extends Controller
 
         $inputData = $this->assessmentResponseService->formatInputData($assessment, $summary, $frequentlyMissedQuestions);
 
-        $feedback = $this->assessmentResponseService->generateFeedback($inputData);
+        $feedback = $this->assessmentResponseService->generateAndSaveFeedback($inputData, $assessment);
 
         return response()->json($feedback);
     }

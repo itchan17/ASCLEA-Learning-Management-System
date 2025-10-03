@@ -53,10 +53,9 @@ class StudentQuizAnswerController extends Controller
         if (is_null($studentQuizAnswer->feedback)) {
             $data = $this->studentQuizAnswerService->formatInputData($studentQuizAnswer);
 
-            $feedback = $this->studentQuizAnswerService->generateStudentPerQuestionFeedback($data);
+            $feedback = $this->studentQuizAnswerService->generateAndSaveStudentPerQuestionFeedback($data, $studentQuizAnswer);
 
-            // Save the feedback in the assessment submission data
-            $studentQuizAnswer->update(['feedback' => $feedback]);
+            return response()->json($feedback);
         }
     }
 }

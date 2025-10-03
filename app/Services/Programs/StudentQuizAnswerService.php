@@ -59,7 +59,7 @@ class StudentQuizAnswerService
         ];
     }
 
-    public function generateStudentPerQuestionFeedback(array $inputData)
+    public function generateAndSaveStudentPerQuestionFeedback(array $inputData, StudentQuizAnswer $studentQuizAnswer)
     {
         $userContent = $inputData;
         $systemContent = "You are a teaching assistant that gives personalized feedback on student answers. Return the feedback in this structure:\n\n\"feedback\": \"string\"";
@@ -67,6 +67,9 @@ class StudentQuizAnswerService
 
         $data = AIFeedbackService::getFeedback($userContent, $systemContent, $model);
 
-        return $data;
+        // Save the feedback in the assessment submission data
+        $studentQuizAnswer->update(['feedback' => $data]);
+
+        return json_decode($studentQuizAnswer->feedback, true);
     }
 }

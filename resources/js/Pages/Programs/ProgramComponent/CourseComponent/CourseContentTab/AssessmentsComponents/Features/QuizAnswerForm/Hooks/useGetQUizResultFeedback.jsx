@@ -16,6 +16,7 @@ export default function useGetQUizResultFeedback({
 
     const handdleGetFeedback = async () => {
         try {
+            setError(null);
             setIsLoading(true);
             const res = await axios.post(
                 route("generate.quiz.result.feedback", {

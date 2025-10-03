@@ -154,50 +154,18 @@ class AssessmentResponseService
         // return json_encode($assessment);
     }
 
-    public function generateFeedback(array $inputData)
+    public function generateAndSaveFeedback(array $inputData, Assessment $assessment)
     {
-        $payload = [
-            "prompt" => "Analyze the provided assessment data and generate a JSON response. 
-            Fill in the 'feedback' object exactly in this structure:
-
-            \"feedback\": {
-            \"performance_analysis\": \"string\",
-            \"performance_summary\": \"string\",
-            \"suggestions\": [\"string\", \"string\", ...]
-            }
-
-            - 'performance_analysis': a detailed analysis of class performance,
-            - 'performance_summary': a concise summary of key findings,
-            - 'suggestions': an array of actionable recommendations.
-
-            Return ONLY valid JSON in the exact same structure, without explanations, markdown, or extra text.",
-            "assessment" => $inputData
+        $userContent = [
+            'assessment' => $inputData
         ];
+        $systemContent = "You are a teaching assistant that gives personalized feedback based on class assessment performance. Return the feedback in this structure:\n\n\"feedback\": {\n  \"performance_summary\": \"string\",\n  \"performance_analysis\": \"string\",\n  \"suggestions\": [\"string\", \"string\", ...]\n}";
+        $model = "ft:gpt-4.1-mini-2025-04-14:asclea:admin-student-analytics-feedback:CMURmSbq";
 
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-        ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" . env('GEMINI_API_KEY'), [
-            "contents" => [[
-                "parts" => [[
-                    // IMPORTANT: force JSON output
-                    "text" => json_encode($payload)
-                ]]
-            ]]
-        ]);
+        $data = AIFeedbackService::getFeedback($userContent, $systemContent, $model);
 
-        $res = $response->json()['candidates'][0]['content']["parts"][0]["text"];
+        $assessment->update(['feedback' => $data]);
 
-        // Remove markdown fences or any leading/trailing whitespace
-        $res = trim($res);
-        $res = preg_replace('/^```json|```$/m', '', $res);
-
-        // Decode safely
-        $data = json_decode($res, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            dd("JSON Error: " . json_last_error_msg(), $res);
-        }
-
-        return $data;
+        return json_decode($assessment->feedback, true);
     }
 }

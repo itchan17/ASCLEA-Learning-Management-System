@@ -145,7 +145,7 @@ class AssessmentSubmissionService
         return $data;
     }
 
-    public function generateStudentQuizResultFeedback(array $inputData)
+    public function generateAndSaveStudentQuizResultFeedback(array $inputData, AssessmentSubmission $assessmentSubmission)
     {
         // Content that will be used to make request 
         $userContent = [
@@ -155,7 +155,9 @@ class AssessmentSubmissionService
         $model = "ft:gpt-4.1-mini-2025-04-14:asclea:student-quiz-result-feedback:CLgTtEyF";
 
         $data = AIFeedbackService::getFeedback($userContent, $systemContent, $model);
-        return $data;
+
+        // Save the feedback in the assessment submission data
+        $assessmentSubmission->update(['feedback' => $data]);
     }
 
     public function saveQuizResultFeedback($data, AssessmentSubmission $assessmentSubmission) {}

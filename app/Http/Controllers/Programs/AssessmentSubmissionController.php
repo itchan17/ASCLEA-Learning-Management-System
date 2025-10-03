@@ -167,10 +167,7 @@ class AssessmentSubmissionController extends Controller
 
             $inputData =  $this->assessmentSubmissionService->formatInputData($questions)->toArray();
 
-            $data = $this->assessmentSubmissionService->generateStudentQuizResultFeedback($inputData);
-
-            // Save the feedback in the assessment submission data
-            $assessmentSubmission->update(['feedback' => $data]);
+            $this->assessmentSubmissionService->generateAndSaveStudentQuizResultFeedback($inputData, $assessmentSubmission);
         }
 
         // Get the feedback from the database and convert in into an array

@@ -14,6 +14,12 @@ export default function QuestionResultItem({
 }) {
     const [isAnswerCorrect, setIsAnswerCorrect] = useState(true);
     const [hasCorrectOption, setHasCorrectOption] = useState(false);
+    const [feedback, setFeedBack] = useState(() => {
+        if (questionDetails?.student_answer?.feedback) {
+            return JSON.parse(questionDetails.student_answer.feedback).feedback;
+        }
+        return null;
+    });
 
     // Custom hook
     const { handleUpdate, isLoading } = useUpdateStudentAnswerStatus({
@@ -193,19 +199,21 @@ export default function QuestionResultItem({
                             </div>
                         )}
 
-                    {!questionDetails?.student_answer?.feedback && (
+                    {!feedback && questionDetails.student_answer && (
                         <div className="flex justify-end">
                             <PrimaryButton
                                 isDisabled={isGetFeedbackLoading}
                                 isLoading={isGetFeedbackLoading}
-                                doSomething={handleGetFeedback}
+                                doSomething={() =>
+                                    handleGetFeedback(setFeedBack)
+                                }
                                 icon={<RiFeedbackFill />}
                                 text={"Generate Feedback"}
                             />
                         </div>
                     )}
 
-                    {questionDetails?.student_answer?.feedback && (
+                    {feedback && (
                         <div className="flex flex-col p-5 text-ascend-black space-y-5 shadow-shadow1 border border-ascend-gray1">
                             <div className="flex items-center space-x-2">
                                 <RiFeedbackFill className="text-size5 text-ascend-blue" />
@@ -214,13 +222,7 @@ export default function QuestionResultItem({
                                 </h1>
                                 <span className="text-size1">AI Generated</span>
                             </div>
-                            <p>
-                                {
-                                    JSON.parse(
-                                        questionDetails.student_answer.feedback
-                                    ).feedback
-                                }
-                            </p>
+                            <p>{feedback}</p>
                         </div>
                     )}
                 </>
