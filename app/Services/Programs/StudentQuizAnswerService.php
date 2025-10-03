@@ -49,4 +49,24 @@ class StudentQuizAnswerService
     {
         $studentQuizAnswer->update(["is_correct" => $isAnswerCorrect]);
     }
+
+    public function formatInputData(StudentQuizAnswer $studentQuizAnswer)
+    {
+        return [
+            'question' => $studentQuizAnswer->question->question,
+            'student_answer' => $studentQuizAnswer->answer_text,
+            'correct_answers' => $studentQuizAnswer->question->options->where('is_correct', true)->pluck('option_text')->toArray()
+        ];
+    }
+
+    public function generateStudentPerQuestionFeedback(array $inputData)
+    {
+        $userContent = $inputData;
+        $systemContent = "You are a teaching assistant that gives personalized feedback on student answers. Return the feedback in this structure:\n\n\"feedback\": \"string\"";
+        $model = "ft:gpt-4.1-mini-2025-04-14:asclea:student-per-question-feedback:CMRBuDAW";
+
+        $data = AIFeedbackService::getFeedback($userContent, $systemContent, $model);
+
+        return $data;
+    }
 }

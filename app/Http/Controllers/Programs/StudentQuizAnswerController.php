@@ -46,4 +46,17 @@ class StudentQuizAnswerController extends Controller
         $totalScore = $this->assessmentSubmissionService->getTotalScore($assessmentSubmission);
         $this->assessmentSubmissionService->updateQuizAssessmentSubmissionScore($assessmentSubmission, $totalScore);
     }
+
+    public function questionAnswerFeedback(Request $request, Course $course, AssessmentSubmission $assessmentSubmission, Question $question, StudentQuizAnswer $studentQuizAnswer)
+    {
+
+        if (is_null($studentQuizAnswer->feedback)) {
+            $data = $this->studentQuizAnswerService->formatInputData($studentQuizAnswer);
+
+            $feedback = $this->studentQuizAnswerService->generateStudentPerQuestionFeedback($data);
+
+            // Save the feedback in the assessment submission data
+            $studentQuizAnswer->update(['feedback' => $feedback]);
+        }
+    }
 }

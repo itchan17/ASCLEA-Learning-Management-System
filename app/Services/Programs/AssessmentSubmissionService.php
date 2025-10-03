@@ -151,51 +151,11 @@ class AssessmentSubmissionService
         $userContent = [
             "responses" => $inputData
         ];
-
         $systemContent = "You are a teaching assistant that gives personalized feedback based on student quiz performance. Return the feedback in this structure:\n\n\"feedback\": {\n  \"strengths\": [\"string\", \"string\", ...],\n  \"weaknesses\": [\"string\", \"string\", ...],\n  \"suggestions\": [\"string\", \"string\", ...]\n}";
+        $model = "ft:gpt-4.1-mini-2025-04-14:asclea:student-quiz-result-feedback:CLgTtEyF";
 
-        try {
-            // Makes request to the api
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer ' . env('GPT_API_KEY'),
-            ])->post("https://api.openai.com/v1/chat/completions", [
-                "model" => "ft:gpt-4.1-mini-2025-04-14:asclea:student-quiz-result-feedback:CLgTtEyF",
-                "messages" => [
-                    [
-                        "role" => "system",
-                        "content" => $systemContent
-                    ],
-                    [
-                        "role" => "user",
-                        "content" => json_encode($userContent, JSON_UNESCAPED_UNICODE)
-                    ]
-                ]
-            ]);
-
-            $rawData = $response->json('choices.0.message.content');
-
-            if ($response->failed()) {
-
-                throw new Exception("Request failed");
-            }
-
-            if (!$rawData) {
-                throw new Exception("No content returned from model.");
-            }
-
-            $decoded = json_decode($rawData, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                throw new Exception("Invalid JSON format");
-            }
-
-            // Return the raw data which is a json string
-            // since it the type of data accepted in the database
-            return $rawData;
-        } catch (Exception $e) {
-            throw $e;
-            return null;
-        }
+        $data = AIFeedbackService::getFeedback($userContent, $systemContent, $model);
+        return $data;
     }
 
     public function saveQuizResultFeedback($data, AssessmentSubmission $assessmentSubmission) {}
