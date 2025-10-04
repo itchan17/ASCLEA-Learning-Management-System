@@ -49,13 +49,24 @@ class StudentQuizAnswerController extends Controller
 
     public function questionAnswerFeedback(Request $request, Course $course, AssessmentSubmission $assessmentSubmission, Question $question, StudentQuizAnswer $studentQuizAnswer)
     {
-
-        if (is_null($studentQuizAnswer->feedback)) {
-            $data = $this->studentQuizAnswerService->formatInputData($studentQuizAnswer);
-
-            $feedback = $this->studentQuizAnswerService->generateAndSaveStudentPerQuestionFeedback($data, $studentQuizAnswer);
-
-            return response()->json($feedback);
+        // Ensure the assessment is submitted
+        if (is_null($assessmentSubmission->submitted_at)) {
+            return response()->json([
+                'message' => 'You can only generate feedback after submitting the assessment.'
+            ], 400);
         }
+
+        // Prevent regenerating existing feedback
+        if (!is_null($studentQuizAnswer->feedback)) {
+            return response()->json([
+                'message' => 'Feedback has already been generated for this question.'
+            ], 400);
+        }
+
+        $data = $this->studentQuizAnswerService->formatInputData($studentQuizAnswer);
+
+        $feedback = $this->studentQuizAnswerService->generateAndSaveStudentPerQuestionFeedback($data, $studentQuizAnswer);
+
+        return response()->json($feedback);
     }
 }

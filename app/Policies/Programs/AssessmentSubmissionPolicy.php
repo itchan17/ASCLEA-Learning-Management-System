@@ -111,4 +111,11 @@ class AssessmentSubmissionPolicy
 
         return $isAuthorized;
     }
+
+    public function generateQuizResultFeedback(User $user, AssessmentSubmission $assessmentSubmission)
+    {
+        $isAssessmentSubmissionAuthor = $assessmentSubmission->submittedBy->member->user->user_id === $user->user_id;
+
+        return $isAssessmentSubmissionAuthor;
+    }
 }

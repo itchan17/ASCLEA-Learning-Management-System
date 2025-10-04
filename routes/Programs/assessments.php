@@ -42,5 +42,5 @@ Route::prefix('programs/{program}/courses/{course}')
         Route::get('/assessments/{assessment}/responses', [AssessmentController::class, 'showAssessmentResponse'])->can('viewAssessmentResponses', 'assessment')->name('assessment.responses.view');
 
         // Route for geferating student analytics feedback
-        Route::post('/assessments/{assessment}/responses/ai/feedback', [AssessmentController::class, 'quizResponsesFeedback'])->name('generate.quiz.responses.feedback');
+        Route::post('/assessments/{assessment}/responses/ai/feedback', [AssessmentController::class, 'quizResponsesFeedback'])->can('generateQuizResponsesFeedback', 'assessment')->name('generate.quiz.responses.feedback');
     });

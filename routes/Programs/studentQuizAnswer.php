@@ -17,5 +17,5 @@ Route::prefix('courses/{course}/assessment-submission/{assessmentSubmission}/que
         Route::put('{question}/student-answers/{studentQuizAnswer}', [StudentQuizAnswerController::class, 'markAnswerCorrectIncorrect'])->can('updateQuestionAnswer', [StudentQuizAnswer::class, 'assessmentSubmission'])->name('assessment.quiz.question.answer.update');
 
         // Route gor generaiting feedback for each question
-        Route::post('{question}/student-answers/{studentQuizAnswer}/ai/feedback', [StudentQuizAnswerController::class, 'questionAnswerFeedback'])->name('generate.question.answer.feedback');
+        Route::post('{question}/student-answers/{studentQuizAnswer}/ai/feedback', [StudentQuizAnswerController::class, 'questionAnswerFeedback'])->can('generateQuestionFeedback', [StudentQuizAnswer::class, 'assessmentSubmission'])->name('generate.question.answer.feedback');
     });
