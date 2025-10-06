@@ -95,14 +95,13 @@ export default function LandingPage({ text }) {
                         </p>
                     </div>
 
-                    <button
+                    <PrimaryButton
+                        doSomething={() => router.visit('/register')}
                         className="w-60 py-3 space-x-1 bg-ascend-blue
                         hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
-                    >
-                        <span className="font-semibold text-2xl">
-                            Enroll Now
-                        </span>
-                    </button>
+                        text="Enroll Now"
+                        textStyle="font-semibold text-2xl"
+                    />
                 </div>
             </header>
 
