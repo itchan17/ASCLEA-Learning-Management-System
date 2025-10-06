@@ -6,8 +6,7 @@ import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryB
 import { handleClickBackBtn } from "../../../../../../../../../Utils/handleClickBackBtn";
 import { IoCaretDownOutline } from "react-icons/io5";
 
-export default function ActivityReponses({ responsesData }) {
-    console.log(responsesData);
+export default function ActivityReponses() {
     // People Store
     const peopleList = usePeopleStore((state) => state.peopleList);
     return (
@@ -21,15 +20,11 @@ export default function ActivityReponses({ responsesData }) {
             </div>
             <div className="w-full min-w-0">
                 <h1 className="text-size6 break-words font-semibold">
-                    {responsesData.assessmentTitle}
+                    First activity
                 </h1>
                 <div className="space-x-5">
-                    <span className="font-medium">
-                        Possible Points: {responsesData.assessmentPoints}
-                    </span>
-                    <span className="font-medium">
-                        Response Received: {responsesData.responseReceived}
-                    </span>
+                    <span className="font-medium">Possible Points: 100</span>
+                    <span className="font-medium">Response Received: 3</span>
                 </div>
             </div>
 

@@ -175,4 +175,19 @@ class AssessmentSubmissionController extends Controller
 
         return response()->json($feedback);
     }
+
+    public function uploadActivityFiles(Request $request, Course $course, Assessment $assessment)
+    {
+        if ($request->hasFile('activity_files')) {
+            $assignedCourseId =  $this->assessmentSubmissionService->getAssignedCourseId($request->user(), $course->course_id);
+
+            // Find or Create assessment submission when the user upload a file
+            $assessmentSubmission = AssessmentSubmission::firstOrCreate([
+                'assessment_id' => $assessment->assessment_id,
+                'submitted_by' => $assignedCourseId
+            ]);
+
+            $this->assessmentSubmissionService->saveActivityFiles($request->activity_files, $assessmentSubmission);
+        }
+    }
 }

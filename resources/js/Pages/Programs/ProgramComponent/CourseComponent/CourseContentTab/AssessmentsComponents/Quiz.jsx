@@ -33,7 +33,7 @@ export default function Quiz({ quizDetails }) {
     return (
         <div
             onClick={handleQuizClick}
-            className="flex h-15 items-center space-x-4 p-2 border border-ascend-gray1 bg-ascend-white cursor-pointer hover-change-bg-color shadow-shadow2"
+            className="flex h-15 items-center space-x-4 p-2 border border-ascend-gray1 bg-ascend-white cursor-pointer hover-change-bg-color"
         >
             <div className="w-full flex overflow-hidden font-semibold font-nunito-sans text-ascebd-black">
                 <SiGoogleforms

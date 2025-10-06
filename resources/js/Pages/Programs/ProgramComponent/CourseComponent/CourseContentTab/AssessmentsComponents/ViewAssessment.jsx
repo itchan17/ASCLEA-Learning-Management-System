@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import BackButton from "../../../../../../Components/Button/BackButton";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import ReactQuill from "react-quill-new";
@@ -10,13 +10,13 @@ import File from "../File";
 import Quiz from "./Quiz";
 import { handleClickBackBtn } from "../../../../../../Utils/handleClickBackBtn";
 import { router, usePage } from "@inertiajs/react";
-import { useRoute } from "ziggy-js";
-import useAssessmentsStore from "../../../../../../Stores/Programs/CourseContent/assessmentsStore";
+import { route } from "ziggy-js";
 import { formatFullDate } from "../../../../../../Utils/formatFullDate";
 import { formatDueDateTime } from "../../../../../../Utils/formatDueDateTime";
 import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
 import { hasText } from "../../../../../../Utils/hasText";
 import { closeDropDown } from "../../../../../../Utils/closeDropdown";
+import AcitivityMyWork from "./Features/Response/Components/AcitivityMyWork";
 
 export default function ViewAssessment({
     programId,
@@ -24,36 +24,6 @@ export default function ViewAssessment({
     assessment,
     auth,
 }) {
-    const route = useRoute();
-
-    // Assessment store
-    const assessmentList = useAssessmentsStore((state) => state.assessmentList);
-
-    const [assessmentDetails, setAssessmentDetails] = useState(null);
-
-    // temporarily get the data of slected assessment
-    // useEffect(() => {
-    //     // check if id is true
-    //     if (assessmentId) {
-    //         // find the assessment details in asssessment list based on the id in url
-    //         // this in temporary only as there's currently data passed from backend
-    //         // the data will come from the backend and here's we're it will be set
-    //         const details = assessmentList.find(
-    //             (detail) => detail.id === Number(assessmentId)
-    //         );
-
-    //         // set the data
-    //         setAssessmentDetails(details);
-    //     }
-    // }, [assessmentId]);
-
-    //     // Close the dropdown after clicked
-    //     const elem = document.activeElement;
-    //     if (elem) {
-    //         elem?.blur();
-    //     }
-    // };
-
     const handleClickViewResponses = () => {
         router.visit(
             route("assessment.responses.view", {
@@ -163,6 +133,10 @@ export default function ViewAssessment({
                         />
                     ))}
             </div>
+
+            {/* The section for student to upload their works for the activity */}
+            {assessment.assessment_type.assessment_type === "activity" &&
+                auth.user.role_name === "student" && <AcitivityMyWork />}
         </div>
     );
 }

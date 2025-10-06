@@ -41,4 +41,9 @@ class AssessmentSubmission extends Model
     {
         return $this->belongsTo(AssignedCourse::class, 'submitted_by', 'assigned_course_id');
     }
+
+    public function activityFiles(): HasMany
+    {
+        return $this->hasMany(ActivityFile::class, 'assessment_submission_id');
+    }
 }

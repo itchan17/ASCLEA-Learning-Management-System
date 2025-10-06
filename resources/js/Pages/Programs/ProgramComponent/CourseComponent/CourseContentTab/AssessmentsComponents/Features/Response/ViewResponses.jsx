@@ -78,9 +78,9 @@ export default function ViewResponses({ programId, courseId, assessment }) {
             {assessment &&
                 (assessment.assessment_type.assessment_type === "quiz" ? (
                     <QuizResponses />
-                ) : assessmentDetails.assessmentType === "activity" ? (
-                    <ActivityReponses responsesData={assessmentDetails} />
-                ) : null)}
+                ) : (
+                    <ActivityReponses />
+                ))}
         </div>
     );
 }

@@ -2,9 +2,11 @@
 
 namespace App\Services\Programs;
 
+use App\Models\Programs\ActivityFile;
 use App\Models\Programs\AssessmentSubmission;
 use App\Models\Programs\Quiz;
 use App\Models\User;
+use App\Services\PdfConverter;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
@@ -160,5 +162,52 @@ class AssessmentSubmissionService
         $assessmentSubmission->update(['feedback' => $data]);
     }
 
-    public function saveQuizResultFeedback($data, AssessmentSubmission $assessmentSubmission) {}
+    public function saveActivityFiles(array $activityFiles, AssessmentSubmission $assessmentSubmission)
+    {
+        $uploadedFiles = [];
+        $now = Carbon::now(); // Get current to use for timesptamps
+
+        foreach ($activityFiles as $index => $file) {
+
+            // Store the files in private storage
+            $originalFilePath = $file->store('activityFiles');
+
+            $mimeType = $file->getMimeType();
+            $newFilePath = null;
+
+            // Check if the file is pptx or docx type
+            if (in_array($mimeType, [
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+            ])) {
+
+                $inputFile = storage_path('app/private/' . $originalFilePath); // Get the complete file path
+                $fileName = pathinfo($originalFilePath, PATHINFO_FILENAME); // Get the file name
+                $outputFile = storage_path('app/private/activityFiles/' . $fileName); // Set the file path and file name of the converted file
+
+                // Custom fucntion that handle pdf conversion
+                PdfConverter::convertToPdf($inputFile, $outputFile);
+
+                // Set the new file path for the converted file
+                $newFilePath = "activityFiles/" . $fileName . ".pdf";
+            }
+
+            $data = [
+                'activity_file_id' => (string) Str::uuid(),
+                'assessment_submission_id' => $assessmentSubmission->assessment_submission_id,
+                'file_path' => $newFilePath ?? $originalFilePath, // Check for new file path, indicates the files was converted to pdf
+                'original_file_path' => $originalFilePath, // Always save the original file path
+                'file_name' => $file->getClientOriginalName(),
+                'file_type' => $file->getClientMimeType(),
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+
+            // Add the file data inside this array
+            $uploadedFiles[$index] = $data;
+        }
+
+        // Save the files data in the table
+        ActivityFile::insert($uploadedFiles);
+    }
 }

@@ -2,11 +2,8 @@ import React, { useCallback } from "react";
 import { FiUploadCloud } from "react-icons/fi";
 import { useDropzone } from "react-dropzone";
 
-export default function DropFiles({
-    toggleDropFiles,
-    handleFileChange,
-    fieldName,
-    withCancel = true,
+export default function ActivityDropFiles({
+    setFiles,
     allowedFiles = {
         "image/png": [".png"],
         "image/jpeg": [".jpeg", ".jpg"],
@@ -21,7 +18,7 @@ export default function DropFiles({
     const onDrop = useCallback((acceptedFiles) => {
         if (acceptedFiles.length > 0) {
             // save the files in array
-            handleFileChange(fieldName, acceptedFiles);
+            setFiles((prev) => [...prev, ...acceptedFiles]);
         }
         // acceptedFiles.forEach((file) => {
         //     const reader = new FileReader();
@@ -57,18 +54,6 @@ export default function DropFiles({
 
     return (
         <div className="space-y-5">
-            <div className="flex items-center justify-between">
-                <label className="font-bold">Upload Files</label>
-                {withCancel && (
-                    <span
-                        onClick={toggleDropFiles}
-                        className="cursor-pointer text-ascend-red"
-                    >
-                        Cancel
-                    </span>
-                )}
-            </div>
-
             {/* File Dropzone */}
             <section className="">
                 <div
