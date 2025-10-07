@@ -33,10 +33,10 @@ Route::prefix('programs/{program}/courses/{course}')
         Route::get('/assessments/{assessment}/files/{file}', [AssessmentController::class, "viewFile"])->can('viewAssessmentFile', ['assessment', 'course'])->name('program.course.file.view');
 
         // Route for displaying the file
-        Route::get('/assessments/{assessment}/files/{file}/stream', [AssessmentController::class, "streamAssessmentFile"])->can('viewAssessmentFile', ['assessment', 'course'])->name('program.course.file.stream');
+        Route::get('/assessments/{assessment}/assessment-files/{file}/stream', [AssessmentController::class, "streamAssessmentFile"])->can('viewAssessmentFile', ['assessment', 'course'])->name('program.course.file.stream');
 
         // ROute for downloading the file
-        Route::get('/assessments/{assessment}/files/{file}/download', [AssessmentController::class, "downloadAssessmentFile"])->can('downloadAssessmentFile', ['assessment', 'course'])->name('program.course.file.download');
+        Route::get('/assessments/{assessment}/assessment-files/{file}/download', [AssessmentController::class, "downloadAssessmentFile"])->can('downloadAssessmentFile', ['assessment', 'course'])->name('program.course.file.download');
 
         // Route for viewing assessment responses
         Route::get('/assessments/{assessment}/responses', [AssessmentController::class, 'showAssessmentResponse'])->can('viewAssessmentResponses', 'assessment')->name('assessment.responses.view');

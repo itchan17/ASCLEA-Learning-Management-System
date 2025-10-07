@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Programs;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Programs\RequiredQuestionRequest;
 use App\Models\Course;
+use App\Models\Programs\ActivityFile;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\AssessmentSubmission;
 use App\Models\Programs\Quiz;
+use App\Services\HandlingPrivateFileService;
 use App\Services\Programs\AssessmentSubmissionService;
 use App\Services\Programs\QuestionService;
 use Illuminate\Http\Request;
@@ -189,5 +191,10 @@ class AssessmentSubmissionController extends Controller
 
             $this->assessmentSubmissionService->saveActivityFiles($request->activity_files, $assessmentSubmission);
         }
+    }
+
+    public function streamAcitvityFiles(Course $course, Assessment $assessment, ActivityFile $file)
+    {
+        return HandlingPrivateFileService::retrieveFile($file->file_path);
     }
 }

@@ -35,4 +35,7 @@ Route::prefix('courses/{course}/assessments/{assessment}/')
 
         // Route for uploading activity files
         Route::put('activity/files', [AssessmentSubmissionController::class, 'uploadActivityFiles'])->name('upload.activity.files');
+
+        // Route for displaying the activity files
+        Route::get('activity-files/{file}/stream', [AssessmentSubmissionController::class, "streamAcitvityFiles"])->name('activity.file.stream');
     });

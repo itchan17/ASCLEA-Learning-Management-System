@@ -3,13 +3,24 @@ import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryB
 import ActivityDropFiles from "./ActivityDropFiles";
 import Loader from "../../../../../../../../../Components/Loader";
 import File from "../../../../File";
-import useUploadActivityFiles from "../Hooks/useUploadActivityFiles";
+import useActivityFiles from "../Hooks/useActivityFiles";
 import { usePage } from "@inertiajs/react";
+import ModalContainer from "../../../../../../../../../Components/ModalContainer";
+import DocumentViewer from "../../../../MaterialsComponents/DocumentViewer";
+import ModalDocViewer from "../../../../../../../../../Components/ModalDocViewer";
 
 export default function AcitivityMyWork() {
     const { courseId, assessment, assessmentSubmission } = usePage().props;
     // Custom hooks
-    const { files, setFiles, isLoading } = useUploadActivityFiles({
+    const {
+        files,
+        setFiles,
+        isLoading,
+        fileUrl,
+        handleViewingFile,
+        closeViewFile,
+        fileName,
+    } = useActivityFiles({
         courseId,
         assessmentId: assessment.assessment_id,
     });
@@ -22,7 +33,16 @@ export default function AcitivityMyWork() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                         {/* display the uploaded file */}
                         {assessmentSubmission.activity_files.map((file) => (
-                            <File withRemove={true} fileName={file.file_name} />
+                            <File
+                                onClick={() =>
+                                    handleViewingFile(
+                                        file.activity_file_id,
+                                        file.file_name
+                                    )
+                                }
+                                withRemove={true}
+                                fileName={file.file_name}
+                            />
                         ))}
 
                         {/* Displays uploading of file */}
@@ -51,6 +71,14 @@ export default function AcitivityMyWork() {
                     <PrimaryButton text={"Submit"} />
                 </div>
             </div>
+
+            {fileUrl && (
+                <ModalDocViewer
+                    fileUrl={fileUrl}
+                    onClose={closeViewFile}
+                    fileName={fileName}
+                />
+            )}
         </>
     );
 }

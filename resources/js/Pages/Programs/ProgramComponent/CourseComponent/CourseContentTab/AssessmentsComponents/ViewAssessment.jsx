@@ -17,6 +17,7 @@ import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
 import { hasText } from "../../../../../../Utils/hasText";
 import { closeDropDown } from "../../../../../../Utils/closeDropdown";
 import AcitivityMyWork from "./Features/Response/Components/AcitivityMyWork";
+import ModalDocViewer from "../../../../../../Components/ModalDocViewer";
 
 export default function ViewAssessment({
     programId,
@@ -24,6 +25,10 @@ export default function ViewAssessment({
     assessment,
     auth,
 }) {
+    const [fileUrl, setFileUrl] = useState(null);
+    const [fileDownload, setFileDownload] = useState(null);
+    const [fileName, setFileName] = useState(null);
+
     const handleClickViewResponses = () => {
         router.visit(
             route("assessment.responses.view", {
@@ -35,15 +40,30 @@ export default function ViewAssessment({
         closeDropDown();
     };
 
-    const handleFileClick = (fileId) => {
-        router.get(
-            route("program.course.file.view", {
-                program: programId,
-                course: courseId,
-                assessment: assessment.assessment_id,
-                file: fileId,
-            })
-        );
+    const handleFileClick = (fileId, fileName) => {
+        const url = route("program.course.file.stream", {
+            program: programId,
+            course: courseId,
+            assessment: assessment.assessment_id,
+            file: fileId,
+        });
+
+        const fileDownload = route("program.course.file.download", {
+            program: programId,
+            course: courseId,
+            assessment: assessment.assessment_id,
+            file: fileId,
+        });
+
+        setFileUrl(url);
+        setFileDownload(fileDownload);
+        setFileName(fileName);
+    };
+
+    const handleViewFileClose = () => {
+        setFileUrl(null);
+        setFileName(null);
+        setFileDownload(null);
     };
 
     return (
@@ -128,11 +148,23 @@ export default function ViewAssessment({
                             key={file.assessment_file_id}
                             fileName={file.file_name}
                             onClick={() =>
-                                handleFileClick(file.assessment_file_id)
+                                handleFileClick(
+                                    file.assessment_file_id,
+                                    file.file_name
+                                )
                             }
                         />
                     ))}
             </div>
+
+            {fileUrl && (
+                <ModalDocViewer
+                    fileName={fileName}
+                    fileUrl={fileUrl}
+                    onClose={handleViewFileClose}
+                    fileDownload={fileDownload}
+                />
+            )}
 
             {/* The section for student to upload their works for the activity */}
             {assessment.assessment_type.assessment_type === "activity" &&
