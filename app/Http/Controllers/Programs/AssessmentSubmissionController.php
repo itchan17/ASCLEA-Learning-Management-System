@@ -197,4 +197,11 @@ class AssessmentSubmissionController extends Controller
     {
         return HandlingPrivateFileService::retrieveFile($file->file_path);
     }
+
+    public function removeUploadedFile(Request $request, Course $course, Assessment $assessment, AssessmentSubmission $assessmentSubmission,  ActivityFile $file)
+    {
+        $this->assessmentSubmissionService->removeActivityFile($file);
+
+        $this->assessmentSubmissionService->removeAssessmentSubmission($assessmentSubmission);
+    }
 }

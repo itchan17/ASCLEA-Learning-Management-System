@@ -3,7 +3,7 @@ import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryB
 import ActivityDropFiles from "./ActivityDropFiles";
 import Loader from "../../../../../../../../../Components/Loader";
 import File from "../../../../File";
-import useActivityFiles from "../Hooks/useActivityFiles";
+import useActivitySubmission from "../Hooks/useActivitySubmission";
 import { usePage } from "@inertiajs/react";
 import ModalContainer from "../../../../../../../../../Components/ModalContainer";
 import DocumentViewer from "../../../../MaterialsComponents/DocumentViewer";
@@ -11,6 +11,7 @@ import ModalDocViewer from "../../../../../../../../../Components/ModalDocViewer
 
 export default function AcitivityMyWork() {
     const { courseId, assessment, assessmentSubmission } = usePage().props;
+
     // Custom hooks
     const {
         files,
@@ -20,7 +21,8 @@ export default function AcitivityMyWork() {
         handleViewingFile,
         closeViewFile,
         fileName,
-    } = useActivityFiles({
+        handleRemoveFile,
+    } = useActivitySubmission({
         courseId,
         assessmentId: assessment.assessment_id,
     });
@@ -34,6 +36,8 @@ export default function AcitivityMyWork() {
                         {/* display the uploaded file */}
                         {assessmentSubmission.activity_files.map((file) => (
                             <File
+                                key={file.activity_file_id}
+                                isDisabled={isLoading}
                                 onClick={() =>
                                     handleViewingFile(
                                         file.activity_file_id,
@@ -42,6 +46,12 @@ export default function AcitivityMyWork() {
                                 }
                                 withRemove={true}
                                 fileName={file.file_name}
+                                onRemove={() =>
+                                    handleRemoveFile(
+                                        assessmentSubmission.assessment_submission_id,
+                                        file.activity_file_id
+                                    )
+                                }
                             />
                         ))}
 
@@ -67,8 +77,11 @@ export default function AcitivityMyWork() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 <div className="flex flex-col gap-2">
-                    <ActivityDropFiles setFiles={setFiles} />
-                    <PrimaryButton text={"Submit"} />
+                    <ActivityDropFiles
+                        disabled={isLoading}
+                        setFiles={setFiles}
+                    />
+                    <PrimaryButton isDisabled={isLoading} text={"Submit"} />
                 </div>
             </div>
 

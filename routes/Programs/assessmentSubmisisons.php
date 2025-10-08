@@ -38,4 +38,7 @@ Route::prefix('courses/{course}/assessments/{assessment}/')
 
         // Route for displaying the activity files
         Route::get('activity-files/{file}/stream', [AssessmentSubmissionController::class, "streamAcitvityFiles"])->name('activity.file.stream');
+
+        // Route for deleting the uploaded activity files
+        Route::delete('assessment-submission/{assessmentSubmission}/activity-files/{file}', [AssessmentSubmissionController::class, "removeUploadedFile"])->name('activity.file.remove');
     });

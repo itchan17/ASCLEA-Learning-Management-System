@@ -18,14 +18,28 @@ export default function PrimaryButton({
             onClick={doSomething}
             disabled={isDisabled}
             className={`px-5 h-10 space-x-1 ${
-                btnColor || "bg-ascend-blue"
+                btnColor
+                    ? btnColor
+                    : isDisabled
+                    ? "bg-ascend-gray1/15"
+                    : "bg-ascend-blue"
             } hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300`}
         >
             {icon && !isLoading && <div className="text-size5">{icon}</div>}
             {isLoading ? (
                 <Loader />
             ) : (
-                <span className={`${fontWeight} ${textColor}`}>{text}</span>
+                <span
+                    className={`${fontWeight} ${
+                        textColor
+                            ? textColor
+                            : isDisabled
+                            ? "text-ascend-black"
+                            : "text-ascend-white"
+                    } `}
+                >
+                    {text}
+                </span>
             )}
         </button>
     );

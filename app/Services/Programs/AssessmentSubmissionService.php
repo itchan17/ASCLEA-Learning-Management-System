@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class AssessmentSubmissionService
 {
@@ -209,5 +210,27 @@ class AssessmentSubmissionService
 
         // Save the files data in the table
         ActivityFile::insert($uploadedFiles);
+    }
+
+    public function removeActivityFile(ActivityFile $file)
+    {
+        // If file_path is not equal to original_file_path, it means it was converted to pdf
+        // And we have to delete the original file
+        if ($file->file_path !== $file->original_file_path) {
+            // Remove the two files
+            Storage::delete($file->original_file_path);
+        }
+
+        Storage::delete($file->file_path);
+
+        $file->delete();
+    }
+
+    // Delete the assesmsent submission when the user remove all the uploaded activity files
+    public function removeAssessmentSubmission(AssessmentSubmission $assessmentSubmission)
+    {
+        if ($assessmentSubmission->activityFiles->count() === 0) {
+            $assessmentSubmission->delete();
+        }
     }
 }

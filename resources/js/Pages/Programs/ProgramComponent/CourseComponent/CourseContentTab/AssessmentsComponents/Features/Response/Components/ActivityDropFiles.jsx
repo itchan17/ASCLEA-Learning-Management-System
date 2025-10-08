@@ -1,8 +1,10 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { FiUploadCloud } from "react-icons/fi";
 import { useDropzone } from "react-dropzone";
+import { FaBullseye } from "react-icons/fa";
 
 export default function ActivityDropFiles({
+    disabled = false,
     setFiles,
     allowedFiles = {
         "image/png": [".png"],
@@ -14,48 +16,45 @@ export default function ActivityDropFiles({
             [".docx"],
     },
 }) {
-    // callback function for handling drop files
-    const onDrop = useCallback((acceptedFiles) => {
+    const [errors, setErrors] = useState([]);
+
+    // Callback function for handling drop files
+    const onDrop = useCallback((acceptedFiles, fileRejections) => {
+        if (fileRejections.length > 0) {
+            const uniqueErrorMessages = fileRejections
+                .flatMap((r) => r.errors.map((e) => e.code))
+                .filter((code, i, a) => a.indexOf(code) === i)
+                .map((code) => errorMessages[code] || "Unknown error");
+
+            setErrors(uniqueErrorMessages);
+        }
+
         if (acceptedFiles.length > 0) {
-            // save the files in array
+            // Save the files in array
             setFiles((prev) => [...prev, ...acceptedFiles]);
         }
-        // acceptedFiles.forEach((file) => {
-        //     const reader = new FileReader();
-
-        //     reader.onabort = () => console.log("file reading was aborted");
-        //     reader.onerror = () => console.log("file reading has failed");
-        //     reader.onload = () => {
-        //         // Do whatever you want with the file contents
-        //         const binaryStr = reader.result;
-        //         console.log(binaryStr);
-        //     };
-        //     reader.readAsArrayBuffer(file);
-        // });
     }, []);
 
     const { acceptedFiles, getRootProps, getInputProps, fileRejections } =
         useDropzone({
             onDrop,
+            disabled,
             accept: allowedFiles,
+            maxFiles: 10,
+            maxSize: 204800,
         });
 
-    // for file typ valdiation
-    const fileRejectionItems = fileRejections.map(({ file, errors }) => (
-        <li key={file.path}>
-            {file.path} - {file.size} bytes
-            <ul>
-                {errors.map((e) => (
-                    <li key={e.code}>{e.message}</li>
-                ))}
-            </ul>
-        </li>
-    ));
+    const errorMessages = {
+        "file-invalid-type":
+            "Only PNG, JPG, PDF, PPTX, or DOCX files are allowed",
+        "too-many-files": "Maximum of 10 files can be uploaded",
+        "file-too-large": "Maximum file size is 200MB",
+    };
 
     return (
-        <div className="space-y-5">
+        <div className="relative">
             {/* File Dropzone */}
-            <section className="">
+            <div>
                 <div
                     {...getRootProps()}
                     className="flex flex-wrap items-center justify-center border-2 border-dashed border-ascend-gray1 min-h-15  w-full cursor-pointer hover:bg-ascend-lightblue transition-colors duration-300 gap-2"
@@ -64,12 +63,27 @@ export default function ActivityDropFiles({
                     <FiUploadCloud className="shrink-0 text-size4" />
                     <span className=" text-size1 text-center">
                         Drop files here or{" "}
-                        <span className="text-ascend-blue font-bold">
+                        <span
+                            className={`${
+                                disabled
+                                    ? "text-ascend-black"
+                                    : "text-ascend-blue"
+                            } font-bold`}
+                        >
                             Browse files
                         </span>
                     </span>
                 </div>
-            </section>
+                {errors.length > 0 && (
+                    <p className="text-size1 text-ascend-red">
+                        {errors.join(", ")}
+                    </p>
+                )}
+            </div>
+
+            {disabled && (
+                <div className="absolute inset-0 bg-ascend-gray1/15 border"></div>
+            )}
         </div>
     );
 }

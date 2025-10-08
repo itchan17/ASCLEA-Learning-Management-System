@@ -2,11 +2,17 @@ import { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import { route } from "ziggy-js";
 
-export default function useActivityFiles({ courseId, assessmentId }) {
+export default function useActivitySubmission({ courseId, assessmentId }) {
     const [files, setFiles] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [fileUrl, setFileUrl] = useState(null);
     const [fileName, setFileName] = useState(null);
+
+    useEffect(() => {
+        if (files.length > 0) {
+            handleUploadFile();
+        }
+    }, [files]);
 
     const handleUploadFile = () => {
         setIsLoading(true);
@@ -42,11 +48,24 @@ export default function useActivityFiles({ courseId, assessmentId }) {
         setFileUrl(null);
     };
 
-    useEffect(() => {
-        if (files.length > 0) {
-            handleUploadFile();
-        }
-    }, [files]);
+    const handleRemoveFile = (assessmentSubmissionId, fileId) => {
+        setIsLoading(true);
+        router.delete(
+            route("activity.file.remove", {
+                course: courseId,
+                assessment: assessmentId,
+                assessmentSubmission: assessmentSubmissionId,
+                file: fileId,
+            }),
+            {
+                showProgress: false,
+                preserveScroll: true,
+                onFinish: () => {
+                    setIsLoading(false);
+                },
+            }
+        );
+    };
 
     return {
         files,
@@ -56,5 +75,6 @@ export default function useActivityFiles({ courseId, assessmentId }) {
         fileUrl,
         closeViewFile,
         fileName,
+        handleRemoveFile,
     };
 }
