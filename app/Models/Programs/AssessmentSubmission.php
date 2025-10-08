@@ -21,6 +21,7 @@ class AssessmentSubmission extends Model
     protected $fillable = [
         'assessment_id',
         'submitted_by',
+        'submission_status',
         'submitted_at',
         'end_at',
         'score',

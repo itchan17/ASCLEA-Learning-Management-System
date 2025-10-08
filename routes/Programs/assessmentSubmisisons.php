@@ -41,4 +41,7 @@ Route::prefix('courses/{course}/assessments/{assessment}/')
 
         // Route for deleting the uploaded activity files
         Route::delete('assessment-submission/{assessmentSubmission}/activity-files/{file}', [AssessmentSubmissionController::class, "removeUploadedFile"])->name('activity.file.remove');
+
+        // Route for submitting the activity
+        Route::put('activity/submit', [AssessmentSubmissionController::class, 'submitActivity'])->name('activity.submit');
     });

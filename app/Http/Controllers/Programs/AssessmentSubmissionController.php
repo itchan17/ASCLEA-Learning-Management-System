@@ -12,6 +12,7 @@ use App\Models\Programs\Quiz;
 use App\Services\HandlingPrivateFileService;
 use App\Services\Programs\AssessmentSubmissionService;
 use App\Services\Programs\QuestionService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -203,5 +204,12 @@ class AssessmentSubmissionController extends Controller
         $this->assessmentSubmissionService->removeActivityFile($file);
 
         $this->assessmentSubmissionService->removeAssessmentSubmission($assessmentSubmission);
+    }
+
+    public function submitActivity(Request $request, Course $course, Assessment $assessment)
+    {
+        $assignedCourseId =  $this->assessmentSubmissionService->getAssignedCourseId($request->user(), $course->course_id);
+
+        $this->assessmentSubmissionService->submitActivity($assignedCourseId, $assessment->assessment_id);
     }
 }

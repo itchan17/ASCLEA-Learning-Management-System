@@ -67,6 +67,25 @@ export default function useActivitySubmission({ courseId, assessmentId }) {
         );
     };
 
+    const handleSubmitActivity = () => {
+        setIsLoading(true);
+        router.put(
+            route("activity.submit", {
+                course: courseId,
+                assessment: assessmentId,
+            }),
+            {},
+            {
+                showProgress: false,
+                preserveScroll: true,
+                only: ["assessmentSubmission"],
+                onFinish: () => {
+                    setIsLoading(false);
+                },
+            }
+        );
+    };
+
     return {
         files,
         setFiles,
@@ -76,5 +95,6 @@ export default function useActivitySubmission({ courseId, assessmentId }) {
         closeViewFile,
         fileName,
         handleRemoveFile,
+        handleSubmitActivity,
     };
 }

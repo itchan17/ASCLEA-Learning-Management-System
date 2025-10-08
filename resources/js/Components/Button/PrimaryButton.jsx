@@ -21,13 +21,13 @@ export default function PrimaryButton({
                 btnColor
                     ? btnColor
                     : isDisabled
-                    ? "bg-ascend-gray1/15"
+                    ? "bg-ascend-gray1/15 border-ascend-blue border"
                     : "bg-ascend-blue"
             } hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300`}
         >
             {icon && !isLoading && <div className="text-size5">{icon}</div>}
             {isLoading ? (
-                <Loader />
+                <Loader color="text-ascend-blue" />
             ) : (
                 <span
                     className={`${fontWeight} ${

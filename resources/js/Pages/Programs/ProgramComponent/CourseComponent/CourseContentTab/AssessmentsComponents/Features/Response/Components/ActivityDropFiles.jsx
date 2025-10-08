@@ -82,7 +82,7 @@ export default function ActivityDropFiles({
             </div>
 
             {disabled && (
-                <div className="absolute inset-0 bg-ascend-gray1/15 border"></div>
+                <div className="absolute inset-0 bg-ascend-gray1/15"></div>
             )}
         </div>
     );
