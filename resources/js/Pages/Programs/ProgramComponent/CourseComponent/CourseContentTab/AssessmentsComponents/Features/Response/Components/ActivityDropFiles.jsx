@@ -20,6 +20,7 @@ export default function ActivityDropFiles({
 
     // Callback function for handling drop files
     const onDrop = useCallback((acceptedFiles, fileRejections) => {
+        setErrors([]);
         if (fileRejections.length > 0) {
             const uniqueErrorMessages = fileRejections
                 .flatMap((r) => r.errors.map((e) => e.code))
@@ -41,7 +42,7 @@ export default function ActivityDropFiles({
             disabled,
             accept: allowedFiles,
             maxFiles: 10,
-            maxSize: 204800,
+            maxSize: 209715200,
         });
 
     const errorMessages = {

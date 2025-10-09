@@ -109,32 +109,53 @@ class AssessmentResponseService
             $query->select('user_id', 'first_name', 'last_name', 'profile_image');
         });
 
-        if ($search = $request->input('search')) {
-            $responses->whereHas('submittedBy.member.user', function ($query) use ($search) {
-                $query->whereLike('first_name', "%$search%")
-                    ->orWhereLike('last_name', "%$search%")
-                    ->orwhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]); // Allows searching for both first and last name
+        if ($assessment->assessmentType->assessment_type === "quiz") {
+            if ($search = $request->input('search')) {
+                $responses->whereHas('submittedBy.member.user', function ($query) use ($search) {
+                    $query->whereLike('first_name', "%$search%")
+                        ->orWhereLike('last_name', "%$search%")
+                        ->orwhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]); // Allows searching for both first and last name
+                });
+            }
+
+            if ($sortScore = $request->input('sortScore')) {
+                $responses->orderBy('score', $sortScore);
+            }
+
+            if ($sortTime = $request->input('sortTime')) {
+                $responses->orderBy('time_spent', $sortTime);
+            }
+
+            return $responses->paginate(10, ['*'], 'page')->withQueryString()->through(function ($response) {
+                return [
+                    'assessment_submission_id' => $response->assessment_submission_id,
+                    'created_at' => $response->created_at->format('Y-m-d H:i:s'),
+                    'submitted_at' => $response->submitted_at,
+                    'time_spent' => $response->time_spent,
+                    'score' => $response->score,
+                    'submitted_by' => $response->submittedBy->member->user,
+                ];
             });
         }
 
-        if ($sortScore = $request->input('sortScore')) {
-            $responses->orderBy('score', $sortScore);
-        }
+        if ($assessment->assessmentType->assessment_type === "activity") {
 
-        if ($sortTime = $request->input('sortTime')) {
-            $responses->orderBy('time_spent', $sortTime);
-        }
+            $responses->with('activityFiles', function ($query) {
+                $query->select('activity_file_id', 'assessment_submission_id', 'file_path', 'file_name');
+            });
 
-        return $responses->paginate(10, ['*'], 'page')->withQueryString()->through(function ($response) {
-            return [
-                'assessment_submission_id' => $response->assessment_submission_id,
-                'created_at' => $response->created_at->format('Y-m-d H:i:s'),
-                'submitted_at' => $response->submitted_at,
-                'time_spent' => $response->time_spent,
-                'score' => $response->score,
-                'submitted_by' => $response->submittedBy->member->user,
-            ];
-        });
+            return $responses->paginate(10, ['*'], 'page')->withQueryString()->through(function ($response) {
+                return [
+                    'assessment_submission_id' => $response->assessment_submission_id,
+                    'created_at' => $response->created_at->format('Y-m-d H:i:s'),
+                    'submitted_at' => $response->submitted_at,
+                    'submission_status' => $response->submission_status,
+                    'score' => $response->score,
+                    'submitted_by' => $response->submittedBy->member->user,
+                    'activityFiles' => $response->activityFiles
+                ];
+            });
+        }
     }
 
     public function formatInputData(Assessment $assessment, array $summary, array $frequentlyMissedQuestion)
