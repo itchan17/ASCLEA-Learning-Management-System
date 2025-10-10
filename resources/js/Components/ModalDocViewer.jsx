@@ -13,8 +13,8 @@ export default function ModalDocViewer({
     fileDownload = null,
 }) {
     return (
-        <div className="fixed inset-0 bg-ascend-black z-[999] flex flex-col h-screen overflow-y-auto font-nunito-sans">
-            <div className="sticky z-999 top-0 flex items-center justify-between px-5 py-2 w-full bg-ascend-white text-ascend-black gap-2 shadow">
+        <div className="fixed inset-0 z-[999] flex flex-col h-screen overflow-auto font-nunito-sans bg-ascend-lightblue">
+            <div className="sticky z-999 top-0 left-0 flex items-center justify-between px-5 py-2 w-full  bg-ascend-white text-ascend-black gap-2 shadow">
                 <div className="flex items-center gap-5 flex-1 min-w-0">
                     <h1 className="text-size-4 font-semibold truncate">
                         {fileName}
