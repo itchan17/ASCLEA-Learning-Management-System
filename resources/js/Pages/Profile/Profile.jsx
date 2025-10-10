@@ -12,8 +12,6 @@ export default function Profile() {
     const [isEdit, setIsEdit] = useState(false);
 
     const { data, setData, processing, put } = useForm({
-        birthday: profile?.birthday || "",
-        gender: profile?.gender || "",
         phone: profile?.phone || "",
         houseNoSt: profile?.houseNoSt || "",
         province: profile?.province || "",
@@ -148,31 +146,21 @@ export default function Profile() {
                         </label>
                         <input
                             type="date"
-                            value={data.birthday}
-                            onChange={(e) => setData("birthday", e.target.value)}
-                            disabled={!isEdit}
-                            className={`border px-3 py-2 ${
-                                !isEdit ? "text-ascend-gray1" : ""
-                            } border-ascend-gray1 focus:outline-ascend-blue`}
+                            value={profile?.birthday || ""}
+                            disabled
+                            className="border px-3 py-2 text-ascend-gray1 border-ascend-gray1 focus:outline-ascend-blue"
                         />
                     </div>
                     <div className="flex flex-col">
                         <label className="font-nunito-sans text-size2 text-ascend-black">
                             Gender
                         </label>
-                        <select
-                            value={data.gender}
-                            onChange={(e) => setData("gender", e.target.value)}
-                            className={`textField border px-3 py-2  ${
-                                !isEdit ? "text-ascend-gray1" : ""
-                            }  border-ascend-gray1 focus:outline-ascend-blue`}
-                            disabled={!isEdit}
-                        >
-                            <option value="">Select Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
+                        <input
+                            type="text"
+                            value={profile?.gender || ""}
+                            disabled
+                            className="border px-3 py-2 text-ascend-gray1 border-ascend-gray1 focus:outline-ascend-blue"
+                        />
                     </div>
                 </div>
 
