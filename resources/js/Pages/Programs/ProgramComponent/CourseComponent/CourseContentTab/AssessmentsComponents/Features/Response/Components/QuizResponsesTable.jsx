@@ -1,5 +1,5 @@
 import React from "react";
-import useSearchSortQuizResponses from "../Hooks/useSearchSortQuizResponses";
+import useSearchSortResponses from "../Hooks/useSearchSortResponses";
 import { IoSearch } from "react-icons/io5";
 import { BiSortUp } from "react-icons/bi";
 import { FaSort } from "react-icons/fa";
@@ -20,7 +20,7 @@ export default function QuizResponsesTable({
         sortScore,
         handleSortTime,
         sortTime,
-    } = useSearchSortQuizResponses({
+    } = useSearchSortResponses({
         programId,
         courseId,
         assessmentId: assessment.assessment_id,

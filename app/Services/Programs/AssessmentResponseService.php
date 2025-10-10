@@ -109,24 +109,32 @@ class AssessmentResponseService
             $query->select('user_id', 'first_name', 'last_name', 'profile_image');
         });
 
+        if ($search = $request->input('search')) {
+            $responses->whereHas('submittedBy.member.user', function ($query) use ($search) {
+                $query->whereLike('first_name', "%$search%")
+                    ->orWhereLike('last_name', "%$search%")
+                    ->orwhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]); // Allows searching for both first and last name
+            });
+        }
+
+        if ($sortScore = $request->input('sortScore')) {
+            $responses->orderBy('score', $sortScore);
+        }
+
+        if ($sortTime = $request->input('sortTime')) {
+            $responses->orderBy('time_spent', $sortTime);
+        }
+
+        if ($sortSubmittedDate = $request->input('sortSubmittedDate')) {
+            $responses->orderBy('submitted_at', $sortSubmittedDate);
+        }
+
+        if ($submissionStatus = $request->input('submissionStatus')) {
+            $responses->where('submission_status', $submissionStatus);
+        }
+
         if ($assessment->assessmentType->assessment_type === "quiz") {
-            if ($search = $request->input('search')) {
-                $responses->whereHas('submittedBy.member.user', function ($query) use ($search) {
-                    $query->whereLike('first_name', "%$search%")
-                        ->orWhereLike('last_name', "%$search%")
-                        ->orwhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]); // Allows searching for both first and last name
-                });
-            }
-
-            if ($sortScore = $request->input('sortScore')) {
-                $responses->orderBy('score', $sortScore);
-            }
-
-            if ($sortTime = $request->input('sortTime')) {
-                $responses->orderBy('time_spent', $sortTime);
-            }
-
-            return $responses->paginate(10, ['*'], 'page')->withQueryString()->through(function ($response) {
+            return $responses->orderBy('assessment_submission_id', 'desc')->paginate(10, ['*'], 'page')->withQueryString()->through(function ($response) {
                 return [
                     'assessment_submission_id' => $response->assessment_submission_id,
                     'created_at' => $response->created_at->format('Y-m-d H:i:s'),
@@ -144,7 +152,7 @@ class AssessmentResponseService
                 $query->select('activity_file_id', 'assessment_submission_id', 'file_path', 'file_name');
             });
 
-            return $responses->paginate(10, ['*'], 'page')->withQueryString()->through(function ($response) {
+            return $responses->orderBy('assessment_submission_id', 'desc')->paginate(10, ['*'], 'page')->withQueryString()->through(function ($response) {
                 return [
                     'assessment_submission_id' => $response->assessment_submission_id,
                     'created_at' => $response->created_at->format('Y-m-d H:i:s'),

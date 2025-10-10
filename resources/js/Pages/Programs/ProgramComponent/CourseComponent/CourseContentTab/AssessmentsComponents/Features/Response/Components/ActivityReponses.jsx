@@ -6,17 +6,30 @@ import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryB
 import { handleClickBackBtn } from "../../../../../../../../../Utils/handleClickBackBtn";
 import { IoCaretDownOutline } from "react-icons/io5";
 import { FaSort } from "react-icons/fa";
+import { BiSortUp } from "react-icons/bi";
 import { usePage } from "@inertiajs/react";
 import { capitalize } from "lodash";
 import { formatDueDateTime } from "../../../../../../../../../Utils/formatDueDateTime";
 import Pagination from "../../../../../../../../../Components/Pagination";
 import ResponseAttachedFiles from "./ResponseAttachedFiles";
+import useSearchSortResponses from "../Hooks/useSearchSortResponses";
 
 export default function ActivityReponses() {
-    const { assessment, responses, responsesCount } = usePage().props;
-    console.log(responses);
-    // People Store
-    const peopleList = usePeopleStore((state) => state.peopleList);
+    const { programId, courseId, assessment, responses, responsesCount } =
+        usePage().props;
+
+    // Custom hook
+    const {
+        debouncedSearch,
+        handleSortSubmittedDate,
+        sortSubmittedDate,
+        handleFilterSubmissionStatus,
+    } = useSearchSortResponses({
+        programId,
+        courseId,
+        assessmentId: assessment.assessment_id,
+    });
+
     return (
         <div className="space-y-5 font-nunito-sans">
             <div className="flex items-center w-full justify-between">
@@ -30,12 +43,16 @@ export default function ActivityReponses() {
                 <h1 className="text-size6 break-words font-semibold">
                     First activity
                 </h1>
-                <div className="space-x-5">
-                    <span className="font-medium">
+                <div className="space-x-5 flex flex-wrap">
+                    <span className="font-medium text-nowrap">
                         Total Points: {assessment.total_points}
                     </span>
-                    <span className="font-medium">
+                    <span className="font-medium text-nowrap">
                         Responses Received: {responsesCount}
+                    </span>
+                    <span className="font-medium text-nowrap">Graded: 10</span>
+                    <span className="font-medium text-nowrap">
+                        Returned: 20
                     </span>
                 </div>
             </div>
@@ -47,6 +64,7 @@ export default function ActivityReponses() {
 
                 <div className="flex flex-wrap w-full sm:w-fit gap-2">
                     <select
+                        onChange={handleFilterSubmissionStatus}
                         className={`textField border w-full sm:w-40 px-3 py-2  focus:outline-ascend-blue`}
                     >
                         <option value="">Submitted</option>
@@ -58,6 +76,7 @@ export default function ActivityReponses() {
                             className="border w-full pl-10 pr-3 py-2 border-ascend-black focus:outline-ascend-blue"
                             type="text"
                             placeholder="Search name"
+                            onChange={debouncedSearch}
                         />
                         <IoSearch className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1" />
                     </div>
@@ -71,7 +90,7 @@ export default function ActivityReponses() {
                                 <div className="flex items-center mb-0 gap-2 text-ascend-black font-black">
                                     <input
                                         type="checkbox"
-                                        className="accent-ascend-blue w-4 h-4"
+                                        className="accent-ascend-blue w-4 h-4 cursor-pointer"
                                     />
                                     <span>Select all</span>
                                 </div>
@@ -84,12 +103,28 @@ export default function ActivityReponses() {
                                 Status
                             </th>
                             <th className="text-ascend-black font-black">
-                                <div className="flex space-x-1 items-center hover:bg-ascend-lightblue transition-all duration-300 w-fit p-2 cursor-pointer">
-                                    <p>Date of submission</p>
+                                <div
+                                    onClick={handleSortSubmittedDate}
+                                    className="flex space-x-1 items-center hover:bg-ascend-lightblue transition-all duration-300 w-fit p-2 cursor-pointer"
+                                >
+                                    <p>Date of Submission</p>
 
-                                    <span className="text-size4 ">
-                                        <FaSort />
-                                    </span>
+                                    {!sortSubmittedDate ? (
+                                        <span className="text-size4 ">
+                                            <FaSort />
+                                        </span>
+                                    ) : (
+                                        <span
+                                            className={`text-size4 ${
+                                                sortSubmittedDate &&
+                                                sortSubmittedDate === "desc"
+                                                    ? "transform scale-y-[-1]"
+                                                    : ""
+                                            } transition-all duration-300`}
+                                        >
+                                            <BiSortUp />
+                                        </span>
+                                    )}
                                 </div>
                             </th>
 
@@ -104,12 +139,12 @@ export default function ActivityReponses() {
                                 <>
                                     <tr
                                         key={index}
-                                        className="hover:bg-ascend-lightblue cursor-pointer"
+                                        className="hover:bg-ascend-lightblue"
                                     >
                                         <td>
                                             <input
                                                 type="checkbox"
-                                                className="accent-ascend-blue w-4 h-4"
+                                                className="accent-ascend-blue w-4 h-4 cursor-pointer"
                                             />
                                         </td>
                                         <td>
@@ -162,13 +197,13 @@ export default function ActivityReponses() {
                         </tbody>
                     )}
                 </table>
-                {peopleList?.length === 0 && (
+                {/* {responses.data.length > 0 && (
                     <EmptyState
                         paddingY="py-0"
                         imgSrc={"/images/illustrations/grades.svg"}
                         text={`“Oops! No one to hand an A+ to. Add your first student to get started.”`}
                     />
-                )}
+                )} */}
             </div>
             <div className="flex flex-wrap-reverse items-center justify-between gap-5">
                 <div className="flex space-x-[0.5px]">
@@ -203,14 +238,16 @@ export default function ActivityReponses() {
                         </ul>
                     </div>
                 </div>
-                <div className="w-full sm:w-fit">
-                    <Pagination
-                        links={responses.links}
-                        currentPage={responses.current_page}
-                        lastPage={responses.last_page}
-                        only={["responses"]}
-                    />
-                </div>
+                {responses.data.length > 0 && responses.total > 10 && (
+                    <div className="w-full sm:w-fit">
+                        <Pagination
+                            links={responses.links}
+                            currentPage={responses.current_page}
+                            lastPage={responses.last_page}
+                            only={["responses"]}
+                        />
+                    </div>
+                )}
             </div>
         </div>
     );
