@@ -1,4 +1,5 @@
 import React from "react";
+import { cleanDecimal } from "../../../../../../../../../Utils/cleanDecimal";
 
 export default function QuizResponsesSummary({ summary, assessment }) {
     return (
@@ -42,7 +43,9 @@ export default function QuizResponsesSummary({ summary, assessment }) {
                 <div className="flex flex-col items-start justify-center border border-ascend-gray1 shadow-shadow1 p-4 font-bold">
                     <div className="w-full min-w-0">
                         <h1 className="text-size7 break-words text-ascend-black">
-                            {`${summary.highest_score.score}/${assessment.quiz.quiz_total_points}`}
+                            {`${cleanDecimal(summary.highest_score.score)}/${
+                                assessment.quiz.quiz_total_points
+                            }`}
                         </h1>
                     </div>
 
@@ -56,7 +59,9 @@ export default function QuizResponsesSummary({ summary, assessment }) {
                 <div className="flex flex-col items-start justify-center border border-ascend-gray1 shadow-shadow1 p-4 font-bold">
                     <div className="w-full min-w-0">
                         <h1 className="text-size7 break-words text-ascend-black">
-                            {`${summary.lowest_score.score}/${assessment.quiz.quiz_total_points}`}
+                            {`${cleanDecimal(summary.lowest_score.score)}/${
+                                assessment.quiz.quiz_total_points
+                            }`}
                         </h1>
                     </div>
 

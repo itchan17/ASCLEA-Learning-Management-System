@@ -7,6 +7,7 @@ import { convertDurationMinutes } from "../../../../../../../../../Utils/convert
 import Pagination from "../../../../../../../../../Components/Pagination";
 import { router } from "@inertiajs/react";
 import { route } from "ziggy-js";
+import { cleanDecimal } from "../../../../../../../../../Utils/cleanDecimal";
 
 export default function QuizResponsesTable({
     programId,
@@ -144,7 +145,7 @@ export default function QuizResponsesTable({
                                         }
                                     </td>
                                     <td>
-                                        {response.score}/
+                                        {cleanDecimal(response.score)}/
                                         {assessment.quiz.quiz_total_points}
                                     </td>
                                     <td className="text-ascend-red">6</td>

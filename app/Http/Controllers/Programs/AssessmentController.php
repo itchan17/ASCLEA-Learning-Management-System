@@ -162,7 +162,9 @@ class AssessmentController extends Controller
                 'responses' => fn() =>  $this->assessmentResponseService->getAssessmentResponses($request, $assessment),
                 'summary' => fn() => $assessmentType === "quiz" ? $this->assessmentResponseService->getAssessmentResponsesSummary($assessment) : null,
                 'frequentlyMissedQuestions' => fn() =>  $assessmentType === "quiz" ? $this->assessmentResponseService->getFrequentlyMissedQuestion($assessment) : null,
-                'responsesCount' => fn() => $assessment->assessmentSubmissions()->count()
+                'responsesCount' => fn() => $assessment->assessmentSubmissions()->count(),
+                'gradedResponsesCount' => fn() => $assessmentType === "activity" ? $assessment->assessmentSubmissions()->where('submission_status', 'graded')->count() : null,
+                'returnedResponsesCount' => fn() => $assessmentType === "activity" ? $assessment->assessmentSubmissions()->where('submission_status', 'returned')->count() : null
             ]
         );
     }

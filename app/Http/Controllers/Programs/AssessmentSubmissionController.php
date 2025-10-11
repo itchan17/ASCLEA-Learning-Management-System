@@ -212,4 +212,29 @@ class AssessmentSubmissionController extends Controller
 
         $this->assessmentSubmissionService->submitActivity($assignedCourseId, $assessment->assessment_id);
     }
+
+    public function gradeActivity(Request $request, Course $course, Assessment $assessment, AssessmentSubmission $assessmentSubmission)
+    {
+        $validated = $request->validate([
+            'grade' => 'required|numeric',
+        ]);
+
+        $assessmentSubmission->update(['score' => $validated['grade'], 'submission_status' => 'graded']);
+    }
+
+    public function returnActivity(Request $request, Course $course, Assessment $assessment)
+    {
+        $validated = $request->validate([
+            'selectAll' => 'required|boolean',
+            'selectedSubmittedActivities' => 'array',
+            'unselectedSubmittedActivities' => 'array',
+        ]);
+
+        $this->assessmentSubmissionService->returnSubmittedActivities(
+            $validated['selectAll'],
+            $validated['selectedSubmittedActivities'] ?? [],
+            $validated['unselectedSubmittedActivities'] ?? [],
+            $assessment->assessment_id
+        );
+    }
 }

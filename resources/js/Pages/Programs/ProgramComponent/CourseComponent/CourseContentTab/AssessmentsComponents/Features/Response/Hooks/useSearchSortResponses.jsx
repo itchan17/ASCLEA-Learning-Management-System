@@ -111,6 +111,13 @@ export default function useSearchSortResponses({
         }
     }, [search, sortScore, sortTime, sortSubmittedDate, submissionStatus]);
 
+    useEffect(() => {
+        // Cleanup when component unmounts
+        return () => {
+            debouncedSearch.cancel();
+        };
+    }, [debouncedSearch]);
+
     return {
         debouncedSearch,
         handleSortScore,

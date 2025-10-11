@@ -10,6 +10,7 @@ use App\Services\PdfConverter;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -248,5 +249,29 @@ class AssessmentSubmissionService
             // For unsubmititng
             $assessmentSubmission->update(['submission_status' => 'not_submitted', 'submitted_at' => null]);
         }
+    }
+
+    public function returnSubmittedActivities(
+        bool $selectAll,
+        array $selectedSubmittedActivities,
+        array $unselectedSubmittedActivities,
+        string $assessmentId
+    ) {
+        $assessmentSubmissions = AssessmentSubmission::where('assessment_id', $assessmentId)
+            ->where('submission_status', '!=', 'not_submitted');
+
+        if ($selectAll) {
+            if (!empty($unselectedSubmittedActivities)) {
+                $assessmentSubmissions->whereNotIn('assessment_submission_id', $unselectedSubmittedActivities);
+            }
+        } else {
+            if (!empty($selectedSubmittedActivities)) {
+                $assessmentSubmissions->whereIn('assessment_submission_id', $selectedSubmittedActivities);
+            }
+        }
+
+        $assessmentSubmissions->update([
+            'submission_status' => 'returned',
+        ]);
     }
 }

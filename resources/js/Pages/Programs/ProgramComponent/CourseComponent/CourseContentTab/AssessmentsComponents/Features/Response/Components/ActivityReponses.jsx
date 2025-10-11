@@ -1,5 +1,4 @@
-import React from "react";
-import usePeopleStore from "../../../../../../../../../Stores/Programs/peopleStore";
+import { useState } from "react";
 import { IoSearch } from "react-icons/io5";
 import BackButton from "../../../../../../../../../Components/Button/BackButton";
 import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
@@ -8,15 +7,22 @@ import { IoCaretDownOutline } from "react-icons/io5";
 import { FaSort } from "react-icons/fa";
 import { BiSortUp } from "react-icons/bi";
 import { usePage } from "@inertiajs/react";
-import { capitalize } from "lodash";
-import { formatDueDateTime } from "../../../../../../../../../Utils/formatDueDateTime";
 import Pagination from "../../../../../../../../../Components/Pagination";
 import ResponseAttachedFiles from "./ResponseAttachedFiles";
 import useSearchSortResponses from "../Hooks/useSearchSortResponses";
+import ActivityResponseRow from "./ActivityResponseRow";
+import useReturnActivity from "../Hooks/useReturnActivity";
 
 export default function ActivityReponses() {
-    const { programId, courseId, assessment, responses, responsesCount } =
-        usePage().props;
+    const {
+        programId,
+        courseId,
+        assessment,
+        responses,
+        responsesCount,
+        gradedResponsesCount,
+        returnedResponsesCount,
+    } = usePage().props;
 
     // Custom hook
     const {
@@ -30,6 +36,19 @@ export default function ActivityReponses() {
         assessmentId: assessment.assessment_id,
     });
 
+    const {
+        selectAll,
+        selectedSubmittedActivities,
+        handleSelectAll,
+        handleSelectSubmittedActivity,
+        handlePostGrades,
+        isLoading,
+    } = useReturnActivity({
+        courseId,
+        assessmentId: assessment.assessment_id,
+        responses,
+    });
+
     return (
         <div className="space-y-5 font-nunito-sans">
             <div className="flex items-center w-full justify-between">
@@ -37,7 +56,16 @@ export default function ActivityReponses() {
                     <BackButton doSomething={handleClickBackBtn} />
                 </div>
 
-                <PrimaryButton text={"Post Grades"} />
+                <PrimaryButton
+                    isDisabled={
+                        (!selectAll &&
+                            selectedSubmittedActivities.length === 0) ||
+                        isLoading
+                    }
+                    isLoading={isLoading}
+                    doSomething={handlePostGrades}
+                    text={"Post Grades"}
+                />
             </div>
             <div className="w-full min-w-0">
                 <h1 className="text-size6 break-words font-semibold">
@@ -50,9 +78,11 @@ export default function ActivityReponses() {
                     <span className="font-medium text-nowrap">
                         Responses Received: {responsesCount}
                     </span>
-                    <span className="font-medium text-nowrap">Graded: 10</span>
                     <span className="font-medium text-nowrap">
-                        Returned: 20
+                        Graded: {gradedResponsesCount}
+                    </span>
+                    <span className="font-medium text-nowrap">
+                        Returned: {returnedResponsesCount}
                     </span>
                 </div>
             </div>
@@ -90,7 +120,9 @@ export default function ActivityReponses() {
                                 <div className="flex items-center mb-0 gap-2 text-ascend-black font-black">
                                     <input
                                         type="checkbox"
+                                        checked={selectAll}
                                         className="accent-ascend-blue w-4 h-4 cursor-pointer"
+                                        onChange={handleSelectAll}
                                     />
                                     <span>Select all</span>
                                 </div>
@@ -135,58 +167,28 @@ export default function ActivityReponses() {
                     </thead>
                     {responses.data.length > 0 && (
                         <tbody>
-                            {responses.data.map((response, index) => (
+                            {responses.data.map((response) => (
                                 <>
-                                    <tr
-                                        key={index}
-                                        className="hover:bg-ascend-lightblue"
-                                    >
-                                        <td>
-                                            <input
-                                                type="checkbox"
-                                                className="accent-ascend-blue w-4 h-4 cursor-pointer"
-                                            />
-                                        </td>
-                                        <td>
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl shrink-0"></div>
-                                                <div className="font-bold">
-                                                    {
-                                                        response.submitted_by
-                                                            .first_name
-                                                    }{" "}
-                                                    {
-                                                        response.submitted_by
-                                                            .last_name
-                                                    }
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            {capitalize(
-                                                response.submission_status
-                                            )}
-                                        </td>
-                                        <td>
-                                            {formatDueDateTime(
-                                                response.submitted_at
-                                            )}
-                                        </td>
-                                        <td className="space-x-2 flex items-center flex-nowrap">
-                                            <input
-                                                type="number"
-                                                className="w-12 h-8 p-2 border border-ascend-black focus:outline-ascend-blue appearance-none"
-                                            />
-                                            <span className="text-nowrap">
-                                                / {assessment.total_points}
-                                            </span>
-                                        </td>
-                                    </tr>
+                                    <ActivityResponseRow
+                                        key={response.assessmentsubmission_id}
+                                        response={response}
+                                        assessment={assessment}
+                                        courseId={courseId}
+                                        selectedSubmittedActivities={
+                                            selectedSubmittedActivities
+                                        }
+                                        handleSelectSubmittedActivity={
+                                            handleSelectSubmittedActivity
+                                        }
+                                    />
 
                                     {/* extra row below */}
                                     {response.activityFiles &&
                                         response.activityFiles.length > 0 && (
                                             <ResponseAttachedFiles
+                                                key={
+                                                    response.assessmentsubmission_id
+                                                }
                                                 activityFiles={
                                                     response.activityFiles
                                                 }
