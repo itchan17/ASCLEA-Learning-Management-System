@@ -47,6 +47,7 @@ export default function AcitivityMyWork() {
                             isDisabled={isLoading}
                             onClick={() =>
                                 handleViewingFile(
+                                    assessmentSubmission.assessment_submission_id,
                                     file.activity_file_id,
                                     file.file_name
                                 )

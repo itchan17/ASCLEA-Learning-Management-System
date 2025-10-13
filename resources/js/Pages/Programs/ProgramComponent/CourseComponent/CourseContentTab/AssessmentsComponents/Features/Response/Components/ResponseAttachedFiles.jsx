@@ -5,7 +5,10 @@ import useActivitySubmission from "../Hooks/useActivitySubmission";
 import { usePage } from "@inertiajs/react";
 import ModalDocViewer from "../../../../../../../../../Components/ModalDocViewer";
 
-export default function ResponseAttachedFiles({ activityFiles }) {
+export default function ResponseAttachedFiles({
+    activityFiles,
+    assessmentSubmissionId,
+}) {
     const { courseId, assessment } = usePage().props;
 
     // Custom hooks
@@ -50,6 +53,7 @@ export default function ResponseAttachedFiles({ activityFiles }) {
                             <File
                                 onClick={() =>
                                     handleViewingFile(
+                                        assessmentSubmissionId,
                                         file.activity_file_id,
                                         file.file_name
                                     )
@@ -60,15 +64,15 @@ export default function ResponseAttachedFiles({ activityFiles }) {
                         ))}
                     </div>
                 </div>
-            </td>
 
-            {fileUrl && (
-                <ModalDocViewer
-                    fileUrl={fileUrl}
-                    onClose={closeViewFile}
-                    fileName={fileName}
-                />
-            )}
+                {fileUrl && (
+                    <ModalDocViewer
+                        fileUrl={fileUrl}
+                        onClose={closeViewFile}
+                        fileName={fileName}
+                    />
+                )}
+            </td>
         </tr>
     );
 }

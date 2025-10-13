@@ -202,7 +202,7 @@ class AssessmentSubmissionController extends Controller
         }
     }
 
-    public function streamAcitvityFiles(Course $course, Assessment $assessment, ActivityFile $file)
+    public function streamAcitvityFiles(Course $course, Assessment $assessment, AssessmentSubmission $assessmentSubmission, ActivityFile $file)
     {
         return HandlingPrivateFileService::retrieveFile($file->file_path);
     }

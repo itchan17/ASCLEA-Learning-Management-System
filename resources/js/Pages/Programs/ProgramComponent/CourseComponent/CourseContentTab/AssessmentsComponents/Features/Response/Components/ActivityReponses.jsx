@@ -170,7 +170,7 @@ export default function ActivityReponses() {
                             {responses.data.map((response) => (
                                 <>
                                     <ActivityResponseRow
-                                        key={response.assessmentsubmission_id}
+                                        key={response.assessment_submission_id}
                                         response={response}
                                         assessment={assessment}
                                         courseId={courseId}
@@ -186,11 +186,11 @@ export default function ActivityReponses() {
                                     {response.activityFiles &&
                                         response.activityFiles.length > 0 && (
                                             <ResponseAttachedFiles
-                                                key={
-                                                    response.assessmentsubmission_id
-                                                }
                                                 activityFiles={
                                                     response.activityFiles
+                                                }
+                                                assessmentSubmissionId={
+                                                    response.assessment_submission_id
                                                 }
                                             />
                                         )}

@@ -34,20 +34,20 @@ Route::prefix('courses/{course}/assessments/{assessment}/')
         Route::post('quizzes/{quiz}/assessment-submissions/{assessmentSubmission}/result/ai/feedback', [AssessmentSubmissionController::class, 'quizResultFeedback'])->can('generateQuizResultFeedback', 'assessmentSubmission')->name('generate.quiz.result.feedback');
 
         // Route for uploading activity files
-        Route::put('activity/files', [AssessmentSubmissionController::class, 'uploadActivityFiles'])->name('upload.activity.files');
+        Route::put('activity/files', [AssessmentSubmissionController::class, 'uploadActivityFiles'])->can('uploadActivityFile', [AssessmentSubmission::class, 'course'])->name('upload.activity.files');
 
         // Route for displaying the activity files
-        Route::get('activity-files/{file}/stream', [AssessmentSubmissionController::class, "streamAcitvityFiles"])->name('activity.file.stream');
+        Route::get('assessment-submissions/{assessmentSubmission}/activity-files/{file}/stream', [AssessmentSubmissionController::class, "streamAcitvityFiles"])->can('viewActivityFile', ['assessmentSubmission', 'assessment'])->name('activity.file.stream');
 
         // Route for deleting the uploaded activity files
-        Route::delete('assessment-submissions/{assessmentSubmission}/activity-files/{file}', [AssessmentSubmissionController::class, "removeUploadedFile"])->name('activity.file.remove');
+        Route::delete('assessment-submissions/{assessmentSubmission}/activity-files/{file}', [AssessmentSubmissionController::class, "removeUploadedFile"])->can('removeActivityFile', 'assessmentSubmission')->name('activity.file.remove');
 
         // Route for submitting the activity
-        Route::put('activity/submit', [AssessmentSubmissionController::class, 'submitActivity'])->name('activity.submit');
+        Route::put('activity/submit', [AssessmentSubmissionController::class, 'submitActivity'])->can('submitActivity', [AssessmentSubmission::class, 'course'])->name('activity.submit');
 
-        // Route for submitting the activity
-        Route::put('assessment-submissions/{assessmentSubmission}/activity/grade', [AssessmentSubmissionController::class, 'gradeActivity'])->name('grade.activity');
+        // Route for grading activity
+        Route::put('assessment-submissions/{assessmentSubmission}/activity/grade', [AssessmentSubmissionController::class, 'gradeActivity'])->can('gradeActivity', [AssessmentSubmission::class, 'assessment'])->name('grade.activity');
 
-        // Route for submitting the activity
-        Route::put('/activity/return', [AssessmentSubmissionController::class, 'returnActivity'])->name('return.activity');
+        // Route for returning graded activity
+        Route::put('/activity/return', [AssessmentSubmissionController::class, 'returnActivity'])->can('returnGradedActivity', [AssessmentSubmission::class, 'assessment'])->name('return.activity');
     });

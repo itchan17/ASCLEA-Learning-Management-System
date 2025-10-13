@@ -33,11 +33,12 @@ export default function useActivitySubmission({ courseId, assessmentId }) {
         );
     };
 
-    const handleViewingFile = (fileId, fileName) => {
+    const handleViewingFile = (assessmentSubmissionId, fileId, fileName) => {
         const url = route("activity.file.stream", {
             course: courseId,
             assessment: assessmentId,
             file: fileId,
+            assessmentSubmission: assessmentSubmissionId,
         });
 
         setFileUrl(url);
