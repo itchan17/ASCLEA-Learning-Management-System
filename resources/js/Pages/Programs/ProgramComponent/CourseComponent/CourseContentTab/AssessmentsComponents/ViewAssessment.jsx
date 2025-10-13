@@ -18,11 +18,13 @@ import { hasText } from "../../../../../../Utils/hasText";
 import { closeDropDown } from "../../../../../../Utils/closeDropdown";
 import AcitivityMyWork from "./Features/Response/Components/AcitivityMyWork";
 import ModalDocViewer from "../../../../../../Components/ModalDocViewer";
+import { cleanDecimal } from "../../../../../../Utils/cleanDecimal";
 
 export default function ViewAssessment({
     programId,
     courseId,
     assessment,
+    assessmentSubmission,
     auth,
 }) {
     const [fileUrl, setFileUrl] = useState(null);
@@ -130,9 +132,18 @@ export default function ViewAssessment({
                 )}
             </div>
             <div className="flex flex-wrap justify-between">
-                <h1 className="font-bold">
-                    Possible Points: {assessment.total_points}
-                </h1>
+                {assessmentSubmission &&
+                assessmentSubmission.submission_status === "returned" ? (
+                    <h1 className="font-bold">
+                        Graded: {cleanDecimal(assessmentSubmission.score)} /{" "}
+                        {assessment.total_points}
+                    </h1>
+                ) : (
+                    <h1 className="font-bold">
+                        Possible Points: {assessment.total_points}
+                    </h1>
+                )}
+
                 <h1 className="font-bold">
                     {assessment.due_datetime
                         ? `Due on

@@ -11,6 +11,11 @@ import ModalDocViewer from "../../../../../../../../../Components/ModalDocViewer
 
 export default function AcitivityMyWork() {
     const { courseId, assessment, assessmentSubmission } = usePage().props;
+    const [isOverDueDate, setIsOverDueDate] = useState(
+        assessment.due_datetime
+            ? new Date() > new Date(assessment.due_datetime)
+            : null
+    );
 
     // Custom hooks
     const {
@@ -27,10 +32,6 @@ export default function AcitivityMyWork() {
         courseId,
         assessmentId: assessment.assessment_id,
     });
-
-    useEffect(() => {
-        console.log(files);
-    }, [files]);
 
     return (
         <>
@@ -93,13 +94,13 @@ export default function AcitivityMyWork() {
                         ""
                     ) : (
                         <ActivityDropFiles
-                            disabled={isLoading}
+                            disabled={isLoading || isOverDueDate}
                             setFiles={setFiles}
                         />
                     )}
                     <PrimaryButton
                         doSomething={handleSubmitActivity}
-                        isDisabled={isLoading}
+                        isDisabled={isLoading || isOverDueDate}
                         isLoading={isLoading}
                         text={
                             assessmentSubmission &&

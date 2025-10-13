@@ -30,10 +30,13 @@ class AssessmentSubmissionController extends Controller
 
     public function showQuizInstruction(Request $request, Course $course, Assessment $assessment, Quiz $quiz)
     {
+        $assignedCourseId =  $this->assessmentSubmissionService->getAssignedCourseId($request->user(), $course->course_id);
+
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/QuizInstruction', [
             'courseId' => $course->course_id,
-            'assessmentId' => $assessment->assessment_id,
-            'quiz' => $quiz
+            'assessment' => $assessment,
+            'quiz' => $quiz,
+            'assessmentSubmission' => $this->assessmentSubmissionService->getAssessmentSubmission($assignedCourseId, $assessment->assessment_id) // For checking the due date
         ]);
     }
 
