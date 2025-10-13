@@ -123,7 +123,6 @@ class AssessmentSubmissionController extends Controller
 
     public function showQuizResult(Request $request, Course $course, Assessment $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
     {
-
         // Redirect use to quiz instruction page
         // this is to ensure they cant access the result without submitting the page
         if (!$assessmentSubmission->submitted_at) {
@@ -151,8 +150,29 @@ class AssessmentSubmissionController extends Controller
                 },
             ])->submittedBy
                 ->member
-                ->user
-
+                ->user,
         ]);
+    }
+
+    public function quizResultFeedback(Request $request, Course $course, Assessment $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
+    {
+        // Fields to be selected in student quiz answer data
+        $optionSlectedFields = ['question_option_id', 'question_id', 'option_text', 'is_correct'];
+        $studentAnswerSelectedFields = ['student_quiz_answer_id', 'assessment_submission_id', 'question_id', 'answer_id', 'answer_text', 'is_correct', 'feedback'];
+
+        // This is for generating the quiz result feedback
+        if (!is_null($assessmentSubmission->submitted_at) && is_null($assessmentSubmission->feedback)) {
+
+            $questions = $this->questionService->getQuestions($quiz, $assessmentSubmission->assessment_submission_id,  $optionSlectedFields, $studentAnswerSelectedFields, false);
+
+            $inputData =  $this->assessmentSubmissionService->formatInputData($questions)->toArray();
+
+            $this->assessmentSubmissionService->generateAndSaveStudentQuizResultFeedback($inputData, $assessmentSubmission);
+        }
+
+        // Get the feedback from the database and convert in into an array
+        $feedback = json_decode($assessmentSubmission->feedback, true);
+
+        return response()->json($feedback);
     }
 }

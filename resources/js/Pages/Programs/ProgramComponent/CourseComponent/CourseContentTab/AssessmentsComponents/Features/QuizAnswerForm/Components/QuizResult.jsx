@@ -24,6 +24,8 @@ export default function QuizResult({
                 <div className="w-full max-w-235 space-y-5">
                     <RoleGuard allowedRoles={["student"]}>
                         <ResultFeedback
+                            courseId={courseId}
+                            assessment={assessment}
                             quiz={quiz}
                             assessmentSubmission={assessmentSubmission}
                         />

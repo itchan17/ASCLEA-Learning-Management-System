@@ -31,6 +31,7 @@ class Assessment extends Model
         'created_by',
         'assessment_type_id',
         'course_id',
+        'feedback',
     ];
 
     public function assessmentType(): BelongsTo

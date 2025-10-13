@@ -6,6 +6,11 @@ use App\Models\Programs\AssessmentSubmission;
 use App\Models\Programs\Quiz;
 use App\Models\User;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AssessmentSubmissionService
 {
@@ -116,4 +121,44 @@ class AssessmentSubmissionService
     {
         $assessmentSubmission->update(["score" => $totalScore]);
     }
+
+    public function formatInputData(Collection $questions)
+    {
+
+        $data = $questions->map(
+            function ($question) {
+
+                if (!is_null($question->studentAnswer)) {
+                    $correctAnswers = $question->options->where('is_correct', true)->pluck('option_text')->map(function ($option) {
+                        return Str::squish($option); // Str::squish() removes whites spaces and tabs 
+                    });
+
+                    return [
+                        "question" => $question->question,
+                        "correct_answers" => $correctAnswers,
+                        "student_answer" => Str::squish($question->studentAnswer->answer_text)
+                    ];
+                }
+            }
+        )->filter()->values();
+
+        return $data;
+    }
+
+    public function generateAndSaveStudentQuizResultFeedback(array $inputData, AssessmentSubmission $assessmentSubmission)
+    {
+        // Content that will be used to make request 
+        $userContent = [
+            "responses" => $inputData
+        ];
+        $systemContent = "You are a teaching assistant that gives personalized feedback based on student quiz performance. Return the feedback in this structure:\n\n\"feedback\": {\n  \"strengths\": [\"string\", \"string\", ...],\n  \"weaknesses\": [\"string\", \"string\", ...],\n  \"suggestions\": [\"string\", \"string\", ...]\n}";
+        $model = "ft:gpt-4.1-mini-2025-04-14:asclea:student-quiz-result-feedback:CLgTtEyF";
+
+        $data = AIFeedbackService::getFeedback($userContent, $systemContent, $model);
+
+        // Save the feedback in the assessment submission data
+        $assessmentSubmission->update(['feedback' => $data]);
+    }
+
+    public function saveQuizResultFeedback($data, AssessmentSubmission $assessmentSubmission) {}
 }

@@ -21,7 +21,7 @@ export default function PrimaryButton({
                 btnColor || "bg-ascend-blue"
             } hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300`}
         >
-            {icon && <div className="text-size5">{icon}</div>}
+            {icon && !isLoading && <div className="text-size5">{icon}</div>}
             {isLoading ? (
                 <Loader />
             ) : (

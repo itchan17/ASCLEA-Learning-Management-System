@@ -3,6 +3,7 @@
 namespace App\Services\Programs;
 
 use App\Models\Programs\Question;
+use App\Models\Programs\QuestionOption;
 use App\Models\Programs\StudentQuizAnswer;
 
 class StudentQuizAnswerService
@@ -33,6 +34,8 @@ class StudentQuizAnswerService
                 $answer['answer_text'] = $studentAnswer;
             } else {
                 $answer['answer_id'] = $studentAnswer;
+                $answer['answer_text'] = QuestionOption::where('question_option_id', $studentAnswer)
+                    ->value('option_text');
             }
 
             return StudentQuizAnswer::updateOrCreate(
@@ -45,5 +48,28 @@ class StudentQuizAnswerService
     public function updateAnswerCorrectness(StudentQuizAnswer $studentQuizAnswer, bool $isAnswerCorrect)
     {
         $studentQuizAnswer->update(["is_correct" => $isAnswerCorrect]);
+    }
+
+    public function formatInputData(StudentQuizAnswer $studentQuizAnswer)
+    {
+        return [
+            'question' => $studentQuizAnswer->question->question,
+            'student_answer' => $studentQuizAnswer->answer_text,
+            'correct_answers' => $studentQuizAnswer->question->options->where('is_correct', true)->pluck('option_text')->toArray()
+        ];
+    }
+
+    public function generateAndSaveStudentPerQuestionFeedback(array $inputData, StudentQuizAnswer $studentQuizAnswer)
+    {
+        $userContent = $inputData;
+        $systemContent = "You are a teaching assistant that gives personalized feedback on student answers. Return the feedback in this structure:\n\n\"feedback\": \"string\"";
+        $model = "ft:gpt-4.1-mini-2025-04-14:asclea:student-per-question-feedback:CMRBuDAW";
+
+        $data = AIFeedbackService::getFeedback($userContent, $systemContent, $model);
+
+        // Save the feedback in the assessment submission data
+        $studentQuizAnswer->update(['feedback' => $data]);
+
+        return json_decode($studentQuizAnswer->feedback, true);
     }
 }

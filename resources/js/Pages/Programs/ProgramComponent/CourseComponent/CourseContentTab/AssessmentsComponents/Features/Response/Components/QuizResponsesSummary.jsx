@@ -1,6 +1,4 @@
 import React from "react";
-import { calcPercentage } from "../../../../../../../../../Utils/calcPercentage";
-import { convertDurationMinutes } from "../../../../../../../../../Utils/convertDurationMinutes";
 
 export default function QuizResponsesSummary({ summary, assessment }) {
     return (
@@ -10,14 +8,10 @@ export default function QuizResponsesSummary({ summary, assessment }) {
                 <div className="flex flex-col items-start justify-center border border-ascend-gray1 shadow-shadow1 p-4 font-bold">
                     <div className="w-full min-w-0">
                         <h1 className="text-size7 break-words text-ascend-black">
-                            {summary.average_score}
+                            {summary.average_score.score}
                         </h1>
                         <span className="text-size4 text-ascend-gray2">
-                            {calcPercentage(
-                                summary.average_score,
-                                assessment.quiz.quiz_total_points
-                            )}
-                            %
+                            {summary.average_score.percentage}%
                         </span>
                     </div>
 
@@ -28,10 +22,16 @@ export default function QuizResponsesSummary({ summary, assessment }) {
                 <div className="flex flex-col items-start justify-center border border-ascend-gray1 shadow-shadow1 p-4 font-bold">
                     <div className="w-full min-w-0">
                         <h1 className="text-size7 break-words text-ascend-black">
-                            {
-                                convertDurationMinutes(summary.average_time)
-                                    .formattedTime
-                            }
+                            {!summary.average_time ? (
+                                "0"
+                            ) : (
+                                <>
+                                    {summary.average_time.hours > 0 &&
+                                        `${summary.average_time.hours}h `}
+                                    {summary.average_time.minutes > 0 &&
+                                        `${summary.average_time.minutes}m`}
+                                </>
+                            )}
                         </h1>
                     </div>
 
@@ -42,16 +42,12 @@ export default function QuizResponsesSummary({ summary, assessment }) {
                 <div className="flex flex-col items-start justify-center border border-ascend-gray1 shadow-shadow1 p-4 font-bold">
                     <div className="w-full min-w-0">
                         <h1 className="text-size7 break-words text-ascend-black">
-                            {`${summary.highest_score}/${assessment.quiz.quiz_total_points}`}
+                            {`${summary.highest_score.score}/${assessment.quiz.quiz_total_points}`}
                         </h1>
                     </div>
 
                     <span className="text-size4 text-ascend-gray2">
-                        {calcPercentage(
-                            summary.highest_score,
-                            assessment.quiz.quiz_total_points
-                        )}
-                        %
+                        {summary.highest_score.percentage}%
                     </span>
                     <div className="flex items-center justify-center space-x-2">
                         <span className="text-ascend-black">Highest Score</span>
@@ -60,16 +56,12 @@ export default function QuizResponsesSummary({ summary, assessment }) {
                 <div className="flex flex-col items-start justify-center border border-ascend-gray1 shadow-shadow1 p-4 font-bold">
                     <div className="w-full min-w-0">
                         <h1 className="text-size7 break-words text-ascend-black">
-                            {`${summary.highest_score}/${assessment.quiz.quiz_total_points}`}
+                            {`${summary.lowest_score.score}/${assessment.quiz.quiz_total_points}`}
                         </h1>
                     </div>
 
                     <span className="text-size4 text-ascend-gray2">
-                        {calcPercentage(
-                            summary.lowest_score,
-                            assessment.quiz.quiz_total_points
-                        )}
-                        %
+                        {summary.lowest_score.percentage}%
                     </span>
                     <div className="flex items-center justify-center space-x-2">
                         <span className="text-ascend-black">Lowest Score</span>
