@@ -184,7 +184,12 @@ class AssessmentSubmissionController extends Controller
 
     public function uploadActivityFiles(Request $request, Course $course, Assessment $assessment)
     {
-        if ($request->hasFile('activity_files')) {
+        $validatedFiles = $request->validate([
+            'activity_files' => 'nullable|array|max:10',
+            'activity_files.*' => 'file|mimes:pdf,docx,pptx,png,jpg,jpeg|max:204800'
+        ]);
+
+        if (!empty($validatedFiles['activity_files'])) {
             $assignedCourseId =  $this->assessmentSubmissionService->getAssignedCourseId($request->user(), $course->course_id);
 
             // Find or Create assessment submission when the user upload a file
@@ -193,7 +198,7 @@ class AssessmentSubmissionController extends Controller
                 'submitted_by' => $assignedCourseId
             ]);
 
-            $this->assessmentSubmissionService->saveActivityFiles($request->activity_files, $assessmentSubmission);
+            $this->assessmentSubmissionService->saveActivityFiles($validatedFiles['activity_files'], $assessmentSubmission);
         }
     }
 
