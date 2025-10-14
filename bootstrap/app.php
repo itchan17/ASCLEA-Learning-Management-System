@@ -22,7 +22,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 require base_path('routes/admission.php');
                 require base_path('routes/dashboard.php');
                 require base_path('routes/grades.php');
-                require base_path('routes/accounting.php');
                 require base_path('routes/paymentHistory.php');
                 require base_path('routes/administration.php');
                 require base_path('routes/archives.php');
@@ -50,6 +49,8 @@ return Application::configure(basePath: dirname(__DIR__))
             '/logout',
             '/programs',
             'programs/*',
+            '/administration',
+            'administration/*',
             '/assessments',
             'assessments/*',
             'courses/*',

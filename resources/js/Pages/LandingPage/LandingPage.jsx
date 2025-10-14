@@ -9,6 +9,7 @@ import {
     AiOutlineMail,
     AiOutlineFacebook,
 } from "react-icons/ai";
+import { Link } from "@inertiajs/react";
 import { Link as ReactScrollLink } from "react-scroll";
 
 export default function LandingPage({ text }) {
@@ -43,14 +44,15 @@ export default function LandingPage({ text }) {
                         </p>
                     </div>
 
+                    <Link href={"/register"}>
                     <button
                         className="w-60 py-3 space-x-1 bg-ascend-blue
                         hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
                     >
                         <span className="font-semibold text-2xl">
-                            Enroll Now
+                            Register Now
                         </span>
-                    </button>
+                    </button></Link>
                 </div>
             </header>
 
@@ -362,7 +364,7 @@ export default function LandingPage({ text }) {
                                     { label: "Home", href: "home" },
                                     { label: "About Us", href: "about-us" },
                                     { label: "Programs", href: "programs" },
-                                    { label: "Admission", href: "admission" },
+                                    { label: "FAQ", href: "frequently-asked-questions" },
                                     { label: "Contact", href: "contact" },
                                 ].map((item) => (
                                     <li key={item.href}>
