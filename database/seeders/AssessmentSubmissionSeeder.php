@@ -28,9 +28,9 @@ class AssessmentSubmissionSeeder extends Seeder
     public function run(): void
     {
         // Must be a valid course and assessment
-        $courseId = '01990ee0-96b6-70cd-b4e7-622d64d9acfd';
-        $quizAssessmentId = '01995b9c-a26e-71b9-8684-c661b0ec38c1'; // Replace with a valid quiz assessment id
-        $activityAssessmentId = "0199370f-b408-72f1-bd58-02b1c888fe38"; // Replace with a valid activity assessment id
+        $courseId = '0199e04f-aa4c-7263-86cb-2872a2cd767b';
+        $quizAssessmentId = '0199e050-7c3e-708e-8f50-b4a86db42971'; // Replace with a valid quiz assessment id
+        $activityAssessmentId = "0199e067-32dc-730b-ac35-6da759c16daa"; // Replace with a valid activity assessment id
 
         $studentsAssignedToCourse = AssignedCourse::where('course_id', $courseId)->whereHas('member.user.role', function ($q) {
             $q->where('role_name', 'student');

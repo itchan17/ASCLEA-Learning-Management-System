@@ -19,8 +19,6 @@ export default function QuizReponses() {
         responses,
     } = usePage().props;
 
-    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-    const [isEvidenceOpen, setIsEvidenceOpen] = useState(false);
     const [
         frequentlyMissedQuestionsWithColors,
         setFrequentlyMissedQuestionsWithColors,
@@ -83,14 +81,6 @@ export default function QuizReponses() {
                 assessment={assessment}
                 responses={responses}
             />
-
-            {isDetailsOpen && (
-                <StudentQuizDetails setIsDetailsOpen={setIsDetailsOpen} />
-            )}
-
-            {isEvidenceOpen && (
-                <ViewEvidence setIsEvidenceOpen={setIsEvidenceOpen} />
-            )}
         </div>
     );
 }

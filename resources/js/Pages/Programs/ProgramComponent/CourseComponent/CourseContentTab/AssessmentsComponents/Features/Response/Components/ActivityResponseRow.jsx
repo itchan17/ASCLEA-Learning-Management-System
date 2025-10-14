@@ -40,7 +40,14 @@ export default function ActivityResponseRow({
             </td>
             <td>
                 <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl shrink-0"></div>
+                    <img
+                        src={
+                            response.submitted_by.profile_image &&
+                            `/storage/${response.submitted_by.profile_image}`
+                        }
+                        alt="Profile image"
+                        className="w-12 h-12 bg-ascend-gray1/20 rounded-4xl shrink-0"
+                    ></img>
                     <div className="font-bold">
                         {response.submitted_by.first_name}{" "}
                         {response.submitted_by.last_name}
