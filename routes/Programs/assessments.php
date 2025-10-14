@@ -43,4 +43,10 @@ Route::prefix('programs/{program}/courses/{course}')
 
         // Route for geferating student analytics feedback
         Route::post('/assessments/{assessment}/responses/ai/feedback', [AssessmentController::class, 'quizResponsesFeedback'])->can('generateQuizResponsesFeedback', 'assessment')->name('generate.quiz.responses.feedback');
+
+        // Route for exporting activity reponses to pdf
+        Route::get('/assessments/{assessment}/activity/export/pdf', [AssessmentController::class, 'exportActivityResponsesToPdf'])->name('activity.responses.export.pdf');
+
+        // Route for exporting activity reponses to csv
+        Route::get('/assessments/{assessment}/activity/export/csv', [AssessmentController::class, 'exportActivityResponsesToCsv'])->name('activity.responses.export.csv');
     });

@@ -7,6 +7,7 @@ use App\Models\Programs\AssessmentSubmission;
 use App\Models\Programs\Question;
 use App\Models\Programs\StudentQuizAnswer;
 use App\Services\CalculationService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -103,7 +104,7 @@ class AssessmentResponseService
         return $frequentMisses;
     }
 
-    public function getAssessmentResponses(Request $request, Assessment $assessment)
+    public function getAssessmentResponses(Request $request, Assessment $assessment, bool $isPaginated = true)
     {
         $responses = $assessment->assessmentSubmissions()->whereNotNull('submitted_at')->with('submittedBy.member.user', function ($query) {
             $query->select('user_id', 'first_name', 'last_name', 'profile_image');
@@ -134,7 +135,8 @@ class AssessmentResponseService
         }
 
         if ($assessment->assessmentType->assessment_type === "quiz") {
-            return $responses->orderBy('assessment_submission_id', 'desc')->paginate(10, ['*'], 'page')->withQueryString()->through(function ($response) {
+
+            $transformed = function ($response) {
                 return [
                     'assessment_submission_id' => $response->assessment_submission_id,
                     'created_at' => $response->created_at->format('Y-m-d H:i:s'),
@@ -143,7 +145,7 @@ class AssessmentResponseService
                     'score' => $response->score,
                     'submitted_by' => $response->submittedBy->member->user,
                 ];
-            });
+            };
         }
 
         if ($assessment->assessmentType->assessment_type === "activity") {
@@ -152,7 +154,7 @@ class AssessmentResponseService
                 $query->select('activity_file_id', 'assessment_submission_id', 'file_path', 'file_name');
             });
 
-            return $responses->orderBy('assessment_submission_id', 'desc')->paginate(10, ['*'], 'page')->withQueryString()->through(function ($response) {
+            $transformed = function ($response) {
                 return [
                     'assessment_submission_id' => $response->assessment_submission_id,
                     'created_at' => $response->created_at->format('Y-m-d H:i:s'),
@@ -162,8 +164,14 @@ class AssessmentResponseService
                     'submitted_by' => $response->submittedBy->member->user,
                     'activityFiles' => $response->activityFiles
                 ];
-            });
+            };
         }
+
+        if ($isPaginated) {
+            return $responses->orderBy('assessment_submission_id', 'desc')->paginate(10, ['*'], 'page')->withQueryString()->through($transformed);
+        }
+
+        return $responses->orderBy('assessment_submission_id', 'desc')->get();
     }
 
     public function formatInputData(Assessment $assessment, array $summary, array $frequentlyMissedQuestion)
@@ -196,5 +204,34 @@ class AssessmentResponseService
         $assessment->update(['feedback' => $data]);
 
         return json_decode($assessment->feedback, true);
+    }
+
+    public function handleExportActivityResponsesToPdf($responses, Assessment $assessment)
+    {
+        return $pdf = Pdf::loadView('programs.activityResponsesPdf', compact('responses', 'assessment'));
+    }
+
+    public function handleExportActivityResponsesToCsv($responses, Assessment $assessment)
+    {
+
+        $columns = ['Name', 'Status', 'Date of submission', 'Grade', 'Total points'];
+
+        $callback = function () use ($responses, $columns, $assessment) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($responses as $response) {
+                fputcsv($file, [
+                    $response->submittedBy->member->user ? $response->submittedBy->member->user->first_name . ' ' . $response->submittedBy->member->user->last_name : 'N/A',
+                    $response->submission_status ?? 'N/A',
+                    $response->submitted_at ?? 'N/A',
+                    $response->score,
+                    $assessment->total_points,
+                ]);
+            }
+            fclose($file);
+        };
+
+        return $callback;
     }
 }

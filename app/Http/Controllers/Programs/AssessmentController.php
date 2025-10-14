@@ -180,4 +180,31 @@ class AssessmentController extends Controller
 
         return response()->json($feedback);
     }
+
+    public function exportActivityResponsesToPdf(Request $request, Program $program, Course $course, Assessment $assessment)
+    {
+        $responses = $this->assessmentResponseService->getAssessmentResponses($request, $assessment, false);
+        $pdf = $this->assessmentResponseService->handleExportActivityResponsesToPdf($responses, $assessment);
+        return $pdf->download($assessment->assessment_title . ' responses.pdf');
+    }
+
+    public function exportActivityResponsesToCsv(Request $request, Program $program, Course $course, Assessment $assessment)
+    {
+        $responses = $this->assessmentResponseService->getAssessmentResponses($request, $assessment, false);
+
+        $fileName = $assessment->assessment_title . ' responses.csv';
+
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+
+        $callback = $this->assessmentResponseService->handleExportActivityResponsesToCsv($responses, $assessment);
+
+        return response()->stream($callback, 200, $headers);
+    }
 }
