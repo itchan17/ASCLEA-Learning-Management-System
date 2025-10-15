@@ -5,6 +5,7 @@ namespace App\Policies\Programs;
 use App\Models\Course;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\AssessmentSubmission;
+use App\Models\Programs\Quiz;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\Response;
@@ -87,12 +88,12 @@ class AssessmentSubmissionPolicy
         return $isAuthorized;
     }
 
-    public function viewQuizResult(User $user, AssessmentSubmission $assessmentSubmission, Assessment $assessment): bool
+    public function viewQuizResult(User $user, AssessmentSubmission $assessmentSubmission, Assessment $assessment, Quiz $quiz): bool
     {
         $isAssessmentAuthor = $assessment->author->user_id === $user->user_id;
         $isAssessmentSubmissionAuthor = $assessmentSubmission->submittedBy->member->user->user_id === $user->user_id;
         $isPublished = $assessment->status === "published";
-
+        $isAllowedToShow = $quiz->show_answers_after;
         $isAuthorized = false;
 
         // Admin and faculty author of the assessment can only view the quiz result if its submitted
@@ -105,9 +106,16 @@ class AssessmentSubmissionPolicy
         }
         // Students can view their result only if its published and ther're the one submitted 
         else if ($user->role->role_name == 'student') {
-            $isAuthorized = $isPublished && $isAssessmentSubmissionAuthor;
+            $isAuthorized = $isPublished && $isAssessmentSubmissionAuthor && $isAllowedToShow;
         }
 
         return $isAuthorized;
+    }
+
+    public function generateQuizResultFeedback(User $user, AssessmentSubmission $assessmentSubmission)
+    {
+        $isAssessmentSubmissionAuthor = $assessmentSubmission->submittedBy->member->user->user_id === $user->user_id;
+
+        return $isAssessmentSubmissionAuthor;
     }
 }

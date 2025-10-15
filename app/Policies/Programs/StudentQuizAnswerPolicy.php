@@ -29,4 +29,11 @@ class StudentQuizAnswerPolicy
 
         return $isAuthorized;
     }
+
+    public function generateQuestionFeedback(User $user, AssessmentSubmission $assessmentSubmission)
+    {
+        $isAssessmentSubmissionAuthor = $assessmentSubmission->submittedBy->member->user->user_id === $user->user_id;
+
+        return $isAssessmentSubmissionAuthor;
+    }
 }

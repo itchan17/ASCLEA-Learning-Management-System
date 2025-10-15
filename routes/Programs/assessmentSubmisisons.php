@@ -30,10 +30,14 @@ Route::prefix('courses/{course}/assessments/{assessment}/quizzes/')
         Route::post('{quiz}/assessment-submission/{assessmentSubmission}', [AssessmentSubmissionController::class, 'submitQuiz'])->can('submitQuiz', ['assessmentSubmission', 'assessment'])->name('quizzes.quiz.submit');
 
         // Route for showing the quiz result 
-        Route::get('{quiz}/assessment-submission/{assessmentSubmission}/result', [AssessmentSubmissionController::class, 'showQuizResult'])->can('viewQuizResult', ['assessmentSubmission', 'assessment'])->name('quizzes.quiz.result');
+        Route::get('{quiz}/assessment-submission/{assessmentSubmission}/result', [AssessmentSubmissionController::class, 'showQuizResult'])->can('viewQuizResult', ['assessmentSubmission', 'assessment', 'quiz'])->name('quizzes.quiz.result');
 
+        // Route for showing the quiz result 
+        Route::post('{quiz}/assessment-submission/{assessmentSubmission}/result/ai/feedback', [AssessmentSubmissionController::class, 'quizResultFeedback'])->can('generateQuizResultFeedback', 'assessmentSubmission')->name('generate.quiz.result.feedback');
     });
 
 Route::post('/detected-cheatings', [DetectedCheatingController::class, 'store'])
     ->name('detected-cheatings.store')
     ->middleware(['auth', 'verified']);
+
+    

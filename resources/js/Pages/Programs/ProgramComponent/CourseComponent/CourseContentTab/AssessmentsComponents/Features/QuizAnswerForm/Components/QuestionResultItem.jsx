@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
 import RoleGuard from "../../../../../../../../../Components/Auth/RoleGuard";
 import useUpdateStudentAnswerStatus from "../Hooks/useUpdateStudentAnswerStatus";
+import { RiFeedbackFill } from "react-icons/ri";
+import useGetPerQuestionFeedback from "../Hooks/useGetPerQuestionFeedback";
 
 export default function QuestionResultItem({
     courseId,
@@ -12,6 +14,12 @@ export default function QuestionResultItem({
 }) {
     const [isAnswerCorrect, setIsAnswerCorrect] = useState(true);
     const [hasCorrectOption, setHasCorrectOption] = useState(false);
+    const [feedback, setFeedBack] = useState(() => {
+        if (questionDetails?.student_answer?.feedback) {
+            return JSON.parse(questionDetails.student_answer.feedback).feedback;
+        }
+        return null;
+    });
 
     // Custom hook
     const { handleUpdate, isLoading } = useUpdateStudentAnswerStatus({
@@ -22,7 +30,17 @@ export default function QuestionResultItem({
             ? questionDetails.student_answer.student_quiz_answer_id
             : null,
     });
-    console.log(user);
+    const { handleGetFeedback, isGetFeedbackLoading } =
+        useGetPerQuestionFeedback({
+            courseId: courseId,
+            assessmentSubmissionId:
+                assessmentSubmission.assessment_submission_id,
+            questionId: questionDetails.question_id,
+            studentQuizAnswerId: questionDetails.student_answer
+                ? questionDetails.student_answer.student_quiz_answer_id
+                : null,
+        });
+
     useEffect(() => {
         if (questionDetails.options) {
             const hasCorrectOption = questionDetails.options.some(
@@ -164,20 +182,51 @@ export default function QuestionResultItem({
                 </div>
             </div>
 
-            {questionDetails.question_type === "identification" &&
-                !isAnswerCorrect && (
-                    <div className="flex flex-wrap">
-                        <h1 className="mr-2 font-bold text-ascend-green">
-                            Correct answers:
-                        </h1>
-                        <p>
-                            {questionDetails.options
-                                .filter((option) => option.is_correct)
-                                .map((option) => option.option_text)
-                                .join(", ")}
-                        </p>
-                    </div>
-                )}
+            <RoleGuard allowedRoles={["student"]}>
+                <>
+                    {questionDetails.question_type === "identification" &&
+                        isAnswerCorrect && (
+                            <div className="flex flex-wrap">
+                                <h1 className="mr-2 font-bold text-ascend-green">
+                                    Correct answers:
+                                </h1>
+                                <p>
+                                    {questionDetails.options
+                                        .filter((option) => option.is_correct)
+                                        .map((option) => option.option_text)
+                                        .join(", ")}
+                                </p>
+                            </div>
+                        )}
+
+                    {!feedback && questionDetails.student_answer && (
+                        <div className="flex justify-end">
+                            <PrimaryButton
+                                isDisabled={isGetFeedbackLoading}
+                                isLoading={isGetFeedbackLoading}
+                                doSomething={() =>
+                                    handleGetFeedback(setFeedBack)
+                                }
+                                icon={<RiFeedbackFill />}
+                                text={"Generate Feedback"}
+                            />
+                        </div>
+                    )}
+
+                    {feedback && (
+                        <div className="flex flex-col p-5 text-ascend-black space-y-5 shadow-shadow1 border border-ascend-gray1">
+                            <div className="flex items-center space-x-2">
+                                <RiFeedbackFill className="text-size5 text-ascend-blue" />
+                                <h1 className="text-size4 font-bold">
+                                    Feedback
+                                </h1>
+                                <span className="text-size1">AI Generated</span>
+                            </div>
+                            <p>{feedback}</p>
+                        </div>
+                    )}
+                </>
+            </RoleGuard>
         </div>
     );
 }

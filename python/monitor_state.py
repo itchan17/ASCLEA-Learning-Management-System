@@ -7,5 +7,4 @@ cv_state = {
     "running": False,
     "close_camera": False,
     "initial_Screenshot": False,
-    
 }
