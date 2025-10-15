@@ -49,4 +49,10 @@ Route::prefix('programs/{program}/courses/{course}')
 
         // Route for exporting activity reponses to csv
         Route::get('/assessments/{assessment}/activity/export/csv', [AssessmentController::class, 'exportActivityResponsesToCsv'])->name('activity.responses.export.csv');
+
+        // Route for exporting quiz reponses to pdf
+        Route::get('/assessments/{assessment}/quiz/export/pdf', [AssessmentController::class, 'exportQuizResponsesToPdf'])->name('quiz.responses.export.pdf');
+
+        // Route for exporting quiz reponses to csv
+        Route::get('/assessments/{assessment}/quiz/export/csv', [AssessmentController::class, 'exportQuizResponsesToCsv'])->name('quiz.responses.export.csv');
     });

@@ -8,6 +8,9 @@ import Pagination from "../../../../../../../../../Components/Pagination";
 import { router } from "@inertiajs/react";
 import { route } from "ziggy-js";
 import { cleanDecimal } from "../../../../../../../../../Utils/cleanDecimal";
+import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
+import { IoCaretDownOutline } from "react-icons/io5";
+import { closeDropDown } from "../../../../../../../../../Utils/closeDropdown";
 
 export default function QuizResponsesTable({
     programId,
@@ -175,13 +178,74 @@ export default function QuizResponsesTable({
                 </table>
             </div>
 
-            {responses.data.length > 0 && responses.total > 10 && (
-                <Pagination
-                    links={responses.links}
-                    currentPage={responses.current_page}
-                    lastPage={responses.last_page}
-                    only={["responses"]}
-                />
+            {responses.data.length > 0 && (
+                <div className="flex flex-wrap-reverse items-center justify-between gap-5">
+                    <div className="flex space-x-[0.5px]">
+                        <PrimaryButton text={"Download"} />
+
+                        {/* Dropdown button */}
+                        <div className="dropdown dropdown-end cursor-pointer ">
+                            <button
+                                tabIndex={0}
+                                role="button"
+                                className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
+                            >
+                                <div className="text-size1 ">
+                                    {<IoCaretDownOutline />}
+                                </div>
+                            </button>
+
+                            <ul
+                                tabIndex={0}
+                                className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                            >
+                                <li onClick={closeDropDown}>
+                                    <a
+                                        href={route(
+                                            "quiz.responses.export.pdf",
+                                            {
+                                                program: programId,
+                                                course: courseId,
+                                                assessment:
+                                                    assessment.assessment_id,
+                                            }
+                                        )}
+                                        className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
+                                    >
+                                        Download as PDF
+                                    </a>
+                                </li>
+                                <li onClick={closeDropDown}>
+                                    <a
+                                        href={route(
+                                            "quiz.responses.export.csv",
+                                            {
+                                                program: programId,
+                                                course: courseId,
+                                                assessment:
+                                                    assessment.assessment_id,
+                                            }
+                                        )}
+                                        className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
+                                    >
+                                        Download as CSV
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    {responses.total > 10 && (
+                        <div className="w-full sm:w-fit">
+                            <Pagination
+                                links={responses.links}
+                                currentPage={responses.current_page}
+                                lastPage={responses.last_page}
+                                only={["responses"]}
+                            />
+                        </div>
+                    )}
+                </div>
             )}
         </>
     );

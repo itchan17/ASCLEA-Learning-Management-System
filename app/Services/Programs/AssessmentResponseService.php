@@ -68,7 +68,7 @@ class AssessmentResponseService
         ];
     }
 
-    public function getFrequentlyMissedQuestion(Assessment $assessment)
+    public function getFrequentlyMissedQuestion(Assessment $assessment, $numOfQuestions = 10)
     {
 
         // Get the misses of each question
@@ -85,7 +85,7 @@ class AssessmentResponseService
             ->with('question')
             ->orderByDesc('missed_count')
             ->orderBy('question_id')
-            ->take(10)
+            ->take($numOfQuestions)
             ->get()
             ->map(function ($row) {
 
@@ -206,11 +206,6 @@ class AssessmentResponseService
         return json_decode($assessment->feedback, true);
     }
 
-    public function handleExportActivityResponsesToPdf($responses, Assessment $assessment)
-    {
-        return $pdf = Pdf::loadView('programs.activityResponsesPdf', compact('responses', 'assessment'));
-    }
-
     public function handleExportActivityResponsesToCsv($responses, Assessment $assessment)
     {
 
@@ -229,6 +224,73 @@ class AssessmentResponseService
                     $assessment->total_points,
                 ]);
             }
+            fclose($file);
+        };
+
+        return $callback;
+    }
+
+    public function handleExportQuizResponsesToCsv($responses, Assessment $assessment, $summary, $frequentlyMissedQuestions, $feedback)
+    {
+        $responsesColumns = ['Name', 'Time Spent', 'Score', 'Total Points', 'Warnings'];
+
+        $callback = function () use ($responses, $responsesColumns, $assessment, $summary, $frequentlyMissedQuestions, $feedback) {
+            $file = fopen('php://output', 'w');
+
+            // === Section 1: Quiz Summary ===
+            fputcsv($file, ['Summary']);
+            fputcsv($file, ['Average Score', $summary['average_score']['score'] ?? 'N/A']);
+            fputcsv($file, ['Average Time', $summary['average_time'] == 0 ? '0' : $summary['average_time']['hours'] . 'h ' . $summary['average_time']['minutes'] . 'm']);
+            fputcsv($file, ['Highest Score', $summary['highest_score']['score'] ?? 'N/A']);
+            fputcsv($file, ['Lowest Score', $summary['lowest_score']['score'] ?? 'N/A']);
+            fputcsv($file, []); // Empty line
+
+            // === Section 2: Frequently Missed Questions ===
+            fputcsv($file, ['Frequently Missed Questions']);
+            fputcsv($file, ['Question No.', 'Question', 'Missed Count', 'Missed Rate']);
+            foreach ($frequentlyMissedQuestions as $q) {
+                fputcsv($file, [
+                    $q['question_number'] ?? '',
+                    $q['question'] ?? '',
+                    $q['missed_count'] ?? '',
+                    ($q['missed_rate'] ?? '') . '%',
+                ]);
+            }
+            fputcsv($file, []); // Empty line
+
+            // === Section 3: Feedback ===
+            fputcsv($file, ['Feedback']);
+            if ($feedback && isset($feedback->feedback)) {
+                fputcsv($file, ['Performance Summary', $feedback->feedback->performance_summary ?? '']);
+                fputcsv($file, ['Performance Analysis', $feedback->feedback->performance_analysis ?? '']);
+                if (!empty($feedback->feedback->suggestions)) {
+                    fputcsv($file, ['Suggestions']);
+                    foreach ($feedback->feedback->suggestions as $suggestion) {
+                        fputcsv($file, ['', $suggestion]);
+                    }
+                }
+            } else {
+                fputcsv($file, ['No feedback available.']);
+            }
+            fputcsv($file, []); // Empty line
+
+            // === Section 4: Student Responses ===
+            fputcsv($file, ['Responses']);
+            fputcsv($file, $responsesColumns);
+            foreach ($responses as $response) {
+                // Calculate  minutes into hours and minutes
+                $timeSpent = $this->calculationService->calculateHoursAndMins($response->time_spent ?? 0);
+                fputcsv($file, [
+                    $response->submittedBy->member->user
+                        ? $response->submittedBy->member->user->first_name . ' ' . $response->submittedBy->member->user->last_name
+                        : 'N/A',
+                    $timeSpent == 0 ? '0' : $timeSpent['hours'] . 'h ' . $timeSpent['minutes'] . 'm',
+                    $response->score ?? 'N/A',
+                    $assessment->quiz->quiz_total_points ?? 'N/A',
+                    'N/A'
+                ]);
+            }
+
             fclose($file);
         };
 

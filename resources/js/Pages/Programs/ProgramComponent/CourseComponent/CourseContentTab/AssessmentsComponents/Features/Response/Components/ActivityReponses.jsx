@@ -98,7 +98,8 @@ export default function ActivityReponses() {
                         onChange={handleFilterSubmissionStatus}
                         className={`textField border w-full sm:w-40 px-3 py-2  focus:outline-ascend-blue`}
                     >
-                        <option value="">Submitted</option>
+                        <option value="">All</option>
+                        <option value="submitted">Submitted</option>
                         <option value="graded">Graded</option>
                         <option value="returned">Returned</option>
                     </select>

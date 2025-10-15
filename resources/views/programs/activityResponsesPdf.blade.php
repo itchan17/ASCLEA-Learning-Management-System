@@ -9,9 +9,14 @@
             /* Built-in font */
         }
 
-        h2 {
+        h1 {
             text-align: center;
-            font-weight: 700;
+        }
+
+        h2,
+        h3 {
+            font-weight: 500;
+
         }
 
         table {
@@ -58,7 +63,7 @@
 </head>
 
 <body>
-    <h2>{{$assessment->assessment_title}} Responses</h2>
+    <h1>{{$assessment->assessment_title}} Responses</h1>
     <table>
         <thead>
             <tr>

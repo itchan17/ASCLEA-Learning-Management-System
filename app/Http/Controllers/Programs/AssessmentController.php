@@ -12,6 +12,7 @@ use App\Services\HandlingPrivateFileService;
 use App\Services\Programs\AssessmentResponseService;
 use App\Services\Programs\AssessmentService;
 use App\Services\Programs\AssessmentSubmissionService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -184,7 +185,7 @@ class AssessmentController extends Controller
     public function exportActivityResponsesToPdf(Request $request, Program $program, Course $course, Assessment $assessment)
     {
         $responses = $this->assessmentResponseService->getAssessmentResponses($request, $assessment, false);
-        $pdf = $this->assessmentResponseService->handleExportActivityResponsesToPdf($responses, $assessment);
+        $pdf = Pdf::loadView('programs.activityResponsesPdf', compact('responses', 'assessment'));
         return $pdf->download($assessment->assessment_title . ' responses.pdf');
     }
 
@@ -204,6 +205,39 @@ class AssessmentController extends Controller
 
 
         $callback = $this->assessmentResponseService->handleExportActivityResponsesToCsv($responses, $assessment);
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function exportQuizResponsesToPdf(Request $request, Program $program, Course $course, Assessment $assessment)
+    {
+        $summary =  $this->assessmentResponseService->getAssessmentResponsesSummary($assessment);
+        $frequentlyMissedQuestions = $this->assessmentResponseService->getFrequentlyMissedQuestion($assessment, null);
+        $feedback = json_decode($assessment->feedback);
+        $responses = $this->assessmentResponseService->getAssessmentResponses($request, $assessment, false);
+
+        $pdf = Pdf::loadView('programs.quizResponsesPdf', compact('assessment', 'summary', 'frequentlyMissedQuestions', 'feedback', 'responses'));
+        return $pdf->download($assessment->assessment_title . ' responses.pdf');
+    }
+
+    public function exportQuizResponsesToCsv(Request $request, Program $program, Course $course, Assessment $assessment)
+    {
+        $summary = $this->assessmentResponseService->getAssessmentResponsesSummary($assessment);
+        $frequentlyMissedQuestions = $this->assessmentResponseService->getFrequentlyMissedQuestion($assessment, null);
+        $feedback = json_decode($assessment->feedback);
+        $responses = $this->assessmentResponseService->getAssessmentResponses($request, $assessment, false);
+
+        $fileName = $assessment->assessment_title . ' responses.csv';
+
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+        $callback = $this->assessmentResponseService->handleExportQuizResponsesToCsv($responses, $assessment, $summary, $frequentlyMissedQuestions, $feedback);
 
         return response()->stream($callback, 200, $headers);
     }
