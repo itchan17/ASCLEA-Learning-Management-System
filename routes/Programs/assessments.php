@@ -45,14 +45,14 @@ Route::prefix('programs/{program}/courses/{course}')
         Route::post('/assessments/{assessment}/responses/ai/feedback', [AssessmentController::class, 'quizResponsesFeedback'])->can('generateQuizResponsesFeedback', 'assessment')->name('generate.quiz.responses.feedback');
 
         // Route for exporting activity reponses to pdf
-        Route::get('/assessments/{assessment}/activity/export/pdf', [AssessmentController::class, 'exportActivityResponsesToPdf'])->name('activity.responses.export.pdf');
+        Route::get('/assessments/{assessment}/activity/export/pdf', [AssessmentController::class, 'exportActivityResponsesToPdf'])->can('downloadAssessmentResponsesData', 'assessment')->name('activity.responses.export.pdf');
 
         // Route for exporting activity reponses to csv
-        Route::get('/assessments/{assessment}/activity/export/csv', [AssessmentController::class, 'exportActivityResponsesToCsv'])->name('activity.responses.export.csv');
+        Route::get('/assessments/{assessment}/activity/export/csv', [AssessmentController::class, 'exportActivityResponsesToCsv'])->can('downloadAssessmentResponsesData', 'assessment')->name('activity.responses.export.csv');
 
         // Route for exporting quiz reponses to pdf
-        Route::get('/assessments/{assessment}/quiz/export/pdf', [AssessmentController::class, 'exportQuizResponsesToPdf'])->name('quiz.responses.export.pdf');
+        Route::get('/assessments/{assessment}/quiz/export/pdf', [AssessmentController::class, 'exportQuizResponsesToPdf'])->can('downloadAssessmentResponsesData', 'assessment')->name('quiz.responses.export.pdf');
 
         // Route for exporting quiz reponses to csv
-        Route::get('/assessments/{assessment}/quiz/export/csv', [AssessmentController::class, 'exportQuizResponsesToCsv'])->name('quiz.responses.export.csv');
+        Route::get('/assessments/{assessment}/quiz/export/csv', [AssessmentController::class, 'exportQuizResponsesToCsv'])->can('downloadAssessmentResponsesData', 'assessment')->name('quiz.responses.export.csv');
     });
