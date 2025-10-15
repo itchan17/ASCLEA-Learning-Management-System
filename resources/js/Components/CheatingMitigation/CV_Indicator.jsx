@@ -4,9 +4,12 @@ import { FaCheckCircle, FaExclamationTriangle, FaCamera } from "react-icons/fa";
 import Webcam from 'react-webcam';
 import { ToastContainer, toast, Bounce } from 'react-toastify'; 
 import 'react-toastify/dist/ReactToastify.css';
+import { update } from 'lodash';
+import { router } from "@inertiajs/react";
+import { registerStopCV } from "@/utils/cvController";
 
 
-const Monitoring = () => {
+const Monitoring = ({onFaceDetected, options, assessmentSubmissionId}) => {
   const [cameraStarted, setCameraStarted] = React.useState(false);
   const [faceDetected, setFaceDetected] = React.useState(false);
   const [objectDetected, setObjectDetected] = React.useState(false);
@@ -17,15 +20,63 @@ const Monitoring = () => {
   const [minimized, setMinimized] = useState(false);
   const webcamRef = useRef(null);
   const [webcamReady, setWebcamReady] = useState(false);
+  const [latestScreenshot, setLatestScreenshot] = useState(null);
+  const isRunningRef = useRef(false);
 
 
   const [count, setCount] = React.useState(0);
   const [warningLogs, setWarningLogs] = React.useState([]);
   
-
   const detectionIntervalRef = React.useRef(null);
 
-  const itemsDetection = [73, 63, 67];
+  const detectionHeadMap = {
+    up: "Looking Up",
+    down: "Looking Down",
+    left: "Looking Left",
+    right: "Looking Right",
+  };
+
+  const detectionItemsMap = {
+    book: 73,
+    laptop: 63,
+    cellphone: 67,
+  };
+
+  const baseItems = [73, 63, 67];
+
+  function processOptions(options) {
+    if (!Array.isArray(options)) {
+      return {
+        itemsDetection: baseItems,
+        allowedHeadDetection: [],
+      };
+    }
+
+    // normalize input (remove plural "s", lowercase)
+    const normalized = options.map(opt =>
+      opt.toLowerCase().replace(/s$/, "")
+    );
+
+    // separate into items vs directions
+    const selectedItems = normalized.filter(opt => opt in detectionItemsMap);
+    const selectedDirections = normalized.filter(opt => opt in detectionHeadMap);
+
+    // filter base items if they are excluded
+    const itemsDetection = baseItems.filter(
+      id => !selectedItems.includes(
+        Object.keys(detectionItemsMap).find(
+          key => detectionItemsMap[key] === id
+        )
+      )
+    );
+
+    // map directions to dictionary
+    const allowedHeadDetection = selectedDirections.map(dir => detectionHeadMap[dir]);
+
+    return { itemsDetection, allowedHeadDetection };
+  }
+
+  const { itemsDetection, allowedHeadDetection } = processOptions(options);
 
   // Show modal on first mount
   React.useEffect(() => {
@@ -34,52 +85,83 @@ const Monitoring = () => {
 
   // Close modal when face is detected
   React.useEffect(() => {
+    let timer;
     if (faceDetected) {
-      setShowTestModal(false);
+      timer = setTimeout(() => {
+        setShowTestModal(false);
+        onFaceDetected?.(); 
+      }, 3000);
     }
+    return () => clearTimeout(timer);
   }, [faceDetected]);
 
   // Update warning count and logs
   React.useEffect(() => {
-    const time = new Date().toLocaleTimeString().toLowerCase();
-    let warning = "";
+    const timeout = setTimeout(() => {
+      let warning = "";
 
-    if (objectDetected && missingFace && lookingAway) {
-      warning = `${time} - Multiple violations: Object, Face Missing, Looking Away`;
-    } else if (objectDetected && missingFace) {
-      warning = `${time} - Object and Face Missing`;
-    } else if (objectDetected && lookingAway) {
-      warning = `${time} - Object and Looking Away`;
-    } else if (missingFace && lookingAway) {
-      warning = `${time} - Face Missing and Looking Away`;
-    } else if (objectDetected) {
-      warning = `${time} - Object-like detected`;
-    } else if (missingFace) {
-      warning = `${time} - Missing face`;
-    } else if (lookingAway) {
-      warning = `${time} - Looking away`;
-    }
+      if (objectDetected && missingFace && lookingAway) {
+        warning = "Multiple violations: Object, Face Missing, Looking Away";
+      } else if (objectDetected && missingFace) {
+        warning = "Object and Face Missing";
+      } else if (objectDetected && lookingAway) {
+        warning = "Object and Looking Away";
+      } else if (missingFace && lookingAway) {
+        warning = "Face Missing and Looking Away";
+      } else if (objectDetected) {
+        warning = "Object-like detected";
+      } else if (missingFace) {
+        warning = "Missing face";
+      } else if (lookingAway) {
+        warning = "Looking away";
+      }
 
-    if (warning) {
-      setWarningLogs(prevLogs => [...prevLogs, warning]);
-      setCount(prevCount => prevCount + 1);
-      console.log("WarningLogs:", [...warningLogs, warning]);
+      if (warning) {
+        setWarningLogs(prevLogs => {
+          if (prevLogs[prevLogs.length - 1] === warning) return prevLogs; // avoid duplicates
+          return [...prevLogs, warning];
+        });
 
-      toast.warn(warning, {
-      position: "top-left",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: false,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "light",
-      transition: Bounce,
-      style: { fontSize: "16px", padding: "8px" },
-      })
-    }
+        setCount(prev => prev + 1);
 
+        toast.warn(warning, {
+          position: "top-left",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "light",
+          transition: Bounce,
+          style: { fontSize: "16px", padding: "8px" },
+        });
 
+        const fileInfo = {
+          file_name: latestScreenshot?.file_name || null,
+          file_path: latestScreenshot?.file_path || null,
+          file_type: latestScreenshot?.file_type || "image/jpeg",
+        };
+
+        if (assessmentSubmissionId) {
+          router.post(
+            route("detected-cheatings.store"),
+            {
+              assessment_submission_id: assessmentSubmissionId,
+              message: warning,
+              ...fileInfo,
+            },
+            {
+              preserveScroll: true,
+              preserveState: true,
+              onError: (errors) => console.error("Cheating log error:", errors),
+              onSuccess: () => console.log("Cheating log submitted successfully!"),
+            }
+          );
+        }
+      }
+    }, 300); // 300ms delay to allow state stabilization
+
+    return () => clearTimeout(timeout);
   }, [objectDetected, missingFace, lookingAway]);
 
 
@@ -95,6 +177,7 @@ const startCV = async () => {
         setWarningLogs([]);
         setCount(0);
         setCameraStarted(true);
+        isRunningRef.current = true; 
 
         await fetch("http://127.0.0.1:5000/reset_cv", {
             method: "POST",
@@ -102,6 +185,12 @@ const startCV = async () => {
         });
 
         const detectLoop = async () => {
+          
+        if (!isRunningRef.current) { 
+          console.log("Detection loop stopped.");
+          return;
+        }
+
         if (!webcamRef.current) {
             setTimeout(detectLoop, 1000); // Retry
             return;
@@ -121,7 +210,7 @@ const startCV = async () => {
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ image: imageSrc, target_classes: itemsDetection }),
+            body: JSON.stringify({ image: imageSrc, target_classes: itemsDetection, allowedPositions: allowedHeadDetection }),
             });
 
             if (!response.ok) {
@@ -134,6 +223,13 @@ const startCV = async () => {
             setObjectDetected(data.detected_object);
             setMissingFace(data.missing_face);
             setLookingAway(data.looking_away);
+            
+            setLatestScreenshot({
+              file_name: data.file_name,
+              file_path: data.file_path,
+              file_type: "image/jpeg",
+            });
+            
         } catch (err) {
             console.error("Error fetching detection data:", err);
         }
@@ -150,23 +246,28 @@ const startCV = async () => {
     }
     };
 
+  const stopCV = async () => {
+    console.log("endCV triggered");
+    isRunningRef.current = false; 
+    setCameraStarted(false);
+    setWebcamReady(false);
 
-  {/*const handleStop = async () => {
     try {
-      await fetch("http://127.0.0.1:5000/end-cv", {
+      await fetch("http://127.0.0.1:5000/end_cv", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
       });
-
-      if (detectionIntervalRef.current) {
-        clearInterval(detectionIntervalRef.current);
-        detectionIntervalRef.current = null;
-      }
-
-      setCameraStarted(false);
+      console.log("Flask CV stopped successfully.");
     } catch (error) {
-      console.error("Failed to stop cv:", error);
+      console.error("Error stopping CV:", error);
     }
-  };*/}
+  };
+
+  // Registered globally
+  React.useEffect(() => {
+    registerStopCV(stopCV);
+  }, []);
+
 
 return (
   <>
@@ -188,52 +289,59 @@ return (
       </div>
     </div>
 
-{cameraStarted && (
-  <div
-    className={`fixed z-[60] transition-all duration-300 rounded-md overflow-hidden bg-black
-      ${showTestModal
-        ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -mt-7 w-82 h-82 border-4 border-ascend-blue'
-        : minimized
-          ? 'bottom-4 right-4 w-12 h-12 border border-ascend-blue rounded-full'
-          : 'top-4 right-4 w-40 h-40 border-4 border-ascend-blue'}
-    `}
-  >
-    {/* Minimize Button */}
-    <button
-      onClick={() => setMinimized(!minimized)}
-      className="absolute top-1 right-1 z-10 bg-ascend-blue bg-opacity-50 text-white text-xs px-2 py-1 rounded"
-    >
-      {minimized ? '⤢' : '—'}
-    </button>
+    {cameraStarted && (
+      <>
+        <div
+          className={`fixed z-[60] transition-all duration-300 rounded-md overflow-hidden bg-black
+            ${showTestModal
+              ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -mt-7 w-82 h-82 border-4 border-ascend-blue'
+              : 'top-20 right-4 w-40 h-40 border-4 border-ascend-blue'}
+            ${minimized ? 'hidden' : ''}   // hide container when minimized
+          `}
+        >
+          {/* Minimize Button */}
+          {!showTestModal && (
+            <button
+              onClick={() => setMinimized(true)}
+              className="absolute top-1 right-1 z-10 bg-ascend-blue bg-opacity-50 text-white text-xs px-2 py-1 rounded"
+            >
+              —
+            </button>
+          )}
 
-    {/* Webcam always running */}
-    <Webcam
-      audio={false}
-      ref={webcamRef}
-      screenshotFormat="image/jpeg"
-      className={`w-full h-full object-cover pointer-events-none transition-opacity duration-300 ${
-        minimized ? 'opacity-50' : 'opacity-100'
-      }`}
-      videoConstraints={{
-        width: 160,
-        height: 160,
-        facingMode: "user",
-      }}
+          {/* Webcam*/}
+          <Webcam
+            audio={false}
+            ref={webcamRef}
+            screenshotFormat="image/jpeg"
+            className="w-full h-full object-cover pointer-events-none"
+            videoConstraints={{
+              width: 160,
+              height: 160,
+              facingMode: "user",
+            }}
+            onUserMedia={() => { 
+              console.log("Webcam started successfully"); 
+              setWebcamReady(true); 
+            }} 
+            onUserMediaError={(err) => { 
+              console.error("Webcam error:", err); 
+              setWebcamReady(false); 
+            }}
+          />
+        </div>
 
-      onUserMedia={() => { 
-        console.log("Webcam started successfully"); 
-        setWebcamReady(true); 
-      }} 
-
-      onUserMediaError={(err) => { 
-        console.error("Webcam error:", err); 
-        setWebcamReady(false); 
-      }}
-      
-    />
-
-  </div>
-)}
+        {/* Floating expand button */}
+          {minimized && (
+            <button
+              onClick={() => setMinimized(false)}
+              className="fixed md:bottom-8 right-4 z-[70] w-10 h-10 flex items-center justify-center rounded bg-ascend-blue text-white text-sm shadow-lg"
+            >
+              ⤢
+            </button>
+          )}
+      </>
+    )}
       <InitialCV_Modal
         show={showTestModal} 
         toggleModal={() => setShowTestModal(false)}

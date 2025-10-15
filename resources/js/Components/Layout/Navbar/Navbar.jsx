@@ -37,7 +37,7 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
         } else if (url.includes("/programs")) {
             setPageTitle("Programs");
         } else if (url.includes("/accounting")) {
-            setPageTitle("Accounting");
+            setPageTitle("Payment History");
         } else if (url.includes("/archives")) {
             setPageTitle("Archives");
         } else if (url.includes("/grades")) {

@@ -6,9 +6,11 @@ import useQuizAnswerStore from "../Stores/quizAnswerStore";
 import BackButton from "../../../../../../../../../Components/Button/BackButton";
 import { handleClickBackBtn } from "../../../../../../../../../Utils/handleClickBackBtn";
 import RoleGuard from "../../../../../../../../../Components/Auth/RoleGuard";
+import CvMonitor from "../../../../../../../../../Components/CheatingMitigation/CV_Indicator";
+import { endCV } from "@/utils/cvController";
 
 export default function QuizAnswerFormNav() {
-    const { courseId, assessmentId, assessmentSubmission, quiz } =
+    const { courseId, assessmentId, assessmentSubmission, quiz, quizOptions } =
         usePage().props;
 
     // States
@@ -17,19 +19,29 @@ export default function QuizAnswerFormNav() {
     // Custom hook
     const { submitQuiz } = useQuizAnswerForm();
 
-    // QUiz answer store
+    // Timer to start quiz with cv
+    const [startTimer, setStartTimer] = useState(false);
+    const cvOptions = quizOptions?.map(o => o.options) || [];
+    
+
+    // Quiz answer store
     const remainingTime = useQuizAnswerStore((state) => state.remainingTime);
     const setRemainingTime = useQuizAnswerStore(
         (state) => state.setRemainingTime
     );
 
     const timer = (end) => {
-        const interval = setInterval(() => {
+        const interval = setInterval(async () => {
             const now = new Date().getTime() / 1000;
             const diff = end - now;
 
             if (diff <= 0) {
                 clearInterval(interval);
+
+                if (quiz.cheating_mitigation == 1 && typeof endCV === "function") {
+                    await endCV();
+                } // Stopping CV if after time ends
+
                 submitQuiz({
                     courseId,
                     assessmentId,
@@ -56,14 +68,23 @@ export default function QuizAnswerFormNav() {
     };
 
     useEffect(() => {
-        if (quiz.duration > 0 && !assessmentSubmission.submitted_at) {
+        if (quiz.cheating_mitigation == 0 && quiz.duration > 0 && !assessmentSubmission.submitted_at) {
             const end = new Date(assessmentSubmission.end_at).getTime() / 1000;
 
             const interval = timer(end);
 
             return () => clearInterval(interval);
         }
-    }, []);
+
+        if (quiz.cheating_mitigation == 1 && startTimer && quiz.duration > 0 && !assessmentSubmission.submitted_at) {
+            const end = new Date(assessmentSubmission.end_at).getTime() / 1000;
+
+            const interval = timer(end);
+
+            return () => clearInterval(interval);
+        } 
+
+    }, [startTimer]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -101,15 +122,19 @@ export default function QuizAnswerFormNav() {
 
                     {/* Only display when the quiz hasnt been submitted */}
                     {!assessmentSubmission.submitted_at && (
-                        <div className="flex flex-wrap space-x-5">
-                            <h1 className="flex font-bold">
-                                Camera Status:{" "}
-                                <span className="flex items-center ml-2 text-ascend-green">
-                                    <AiFillCheckCircle className="mr-1" />
-                                    Active
-                                </span>
-                            </h1>
-                            <h1 className="font-bold">{remainingTime || ""}</h1>
+                        <div className="flex flex-wrap items-center space-x-5">
+
+                            {quiz.cheating_mitigation == 1 && ( // Only show CV indicator if cheating mitigation is enabled
+                                <div className="flex items-center">
+                                    <CvMonitor 
+                                        onFaceDetected={() => setStartTimer(true)}
+                                        options={cvOptions}
+                                        assessmentSubmissionId={assessmentSubmission.assessment_submission_id}
+                                    />
+                                </div>
+                            )}
+
+                            <span className="font-bold">{remainingTime || ""}</span>
                         </div>
                     )}
                 </div>

@@ -10,5 +10,5 @@ Route::get('/', function () {
 
 
 Route::get('/MockQuiz', function () {
-    return Inertia::render('CheatingMitigation/MockQuiz');
+    return Inertia::render('MockQuiz/MockQuiz');
 })->middleware('guest', 'preventBack');

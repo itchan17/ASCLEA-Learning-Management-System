@@ -22,13 +22,6 @@ export default function TestModal({ show, toggleModal, startCV, faceDetected, ca
     }
   }
 
-  React.useEffect(() => {
-    // Automatically close the modal when face is detected
-    if (faceDetected) {
-      toggleModal();
-    }
-  }, [faceDetected]);
-
 return (
 <div
   className={`fixed inset-0 bg-black/25 z-50 flex items-center justify-center transition-all duration-300 ${
@@ -55,11 +48,23 @@ return (
       )}
     </div>
 
-    {error && (
-      <div className="flex justify-center">
+    <div className="flex justify-center font-nunito-sans text-size2">
+      <PrimaryButton
+        doSomething={callCV}
+        isDisabled={processing}
+        text="Open Camera"
+      />
+    </div>
+
+    <div className="">
+      {!cameraStarted ? (
+        <p className="text-ascend-gray1 font-medium text-size2">
+          Make sure camera permission is enabled in your browser.
+        </p>
+      ) : error ? (
         <div
           role="alert"
-          className="alert alert-error rounded-none font-nunito-sans mt-4 w-auto max-w-lg px-4 py-3 text-sm"
+          className="alert alert-error rounded-none font-nunito-sans w-auto max-w-lg px-4 py-1 text-sm flex items-center"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -76,32 +81,17 @@ return (
           </svg>
           <span className="ml-2 break-words">{error}</span>
         </div>
-      </div>
-    )}
-
-    <div className="flex justify-center font-nunito-sans text-size2">
-      <PrimaryButton
-        doSomething={callCV}
-        isDisabled={processing}
-        text="Open Camera"
-      />
-    </div>
-
-    <div className="">
-      {!cameraStarted ? (
-        <p className="text-ascend-gray1 font-medium text-size2">
-          Make sure camera permission is enabled in your browser.
-        </p>
       ) : faceDetected ? (
-        <p className="text-ascend-gray1 font-medium text-size2">
-          Face detected! The quiz will begin.
+        <p className="text-ascend-green font-medium text-size2">
+          Face detected! The quiz will begin shortly...
         </p>
       ) : (
-        <p className="text-ascend-gray1 font-medium text-size2">
+        <p className="text-ascend-blue font-medium text-size2">
           Face the camera directly with your full face visible.
         </p>
       )}
     </div>
+
     
   </div>
 </div>

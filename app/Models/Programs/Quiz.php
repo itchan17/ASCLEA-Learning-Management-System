@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\CV\DetectedCheating;
+
 
 class Quiz extends Model
 {
@@ -51,4 +53,5 @@ class Quiz extends Model
     {
         return $this->hasMany(Question::class, 'quiz_id');
     }
+
 }

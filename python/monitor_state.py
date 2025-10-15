@@ -5,5 +5,7 @@ cv_state = {
     "detected_object": False,
     "open_camera": False, 
     "running": False,
-    "close_camera": False
+    "close_camera": False,
+    "initial_Screenshot": False,
+    
 }

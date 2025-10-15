@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\Programs\AssessmentSubmissionController;
+use App\Http\Controllers\CV\DetectedCheatingController;
 use App\Http\Middleware\EnsureValidChildParentModel;
 use App\Models\Programs\AssessmentSubmission;
 use App\Models\Programs\Quiz;
+use App\Models\CV\DetectedCheating;
 use Illuminate\Support\Facades\Route;
 use Inertia\EncryptHistoryMiddleware;
 
@@ -29,4 +31,9 @@ Route::prefix('courses/{course}/assessments/{assessment}/quizzes/')
 
         // Route for showing the quiz result 
         Route::get('{quiz}/assessment-submission/{assessmentSubmission}/result', [AssessmentSubmissionController::class, 'showQuizResult'])->can('viewQuizResult', ['assessmentSubmission', 'assessment'])->name('quizzes.quiz.result');
+
     });
+
+Route::post('/detected-cheatings', [DetectedCheatingController::class, 'store'])
+    ->name('detected-cheatings.store')
+    ->middleware(['auth', 'verified']);
