@@ -1,20 +1,13 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Chart as ChartJS } from "chart.js/auto";
 import { Line, Bar, Pie } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 
-export default function StaffCharts({ studentsPerProgram }) {
+function StaffCharts({ studentsPerProgram, dailyLogins, avgTimePerDay }) {
     const programLabels = studentsPerProgram.map(p => p.program_name);
     const programData = studentsPerProgram.map(p => p.total_students);
 
-    const backgroundColors = [
-        "#f9a502",
-        "#01007d",
-        "#ff6384",
-        "#36a2eb",
-        "#4caf50",
-        "#ff9800",
-    ];
+    const backgroundColors = ["#f9a502","#01007d","#ff6384","#36a2eb","#4caf50","#ff9800",];
     
     return (
         <div className="flex flex-col md:flex-row justify-between">
@@ -27,23 +20,15 @@ export default function StaffCharts({ studentsPerProgram }) {
                     </div>
                     <Line
                         data={{
-                            labels: [
-                                "May 5",
-                                "May 6",
-                                "May 7",
-                                "May 8",
-                                "May 9",
-                                "May 10",
-                                "May 11",
-                            ],
-                            datasets: [
-                                {
-                                    label: "",
-                                    data: [5, 6, 1, 3, 5, 8, 3],
-                                    borderColor: "#01007d",
-                                    backgroundColor: "#e4e4ff",
-                                },
-                            ],
+                            labels: Object.keys(avgTimePerDay).map(d =>
+                            new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                            ),
+                            datasets: [{
+                            label: "Avg Time Spent",
+                            data: Object.values(avgTimePerDay),
+                            borderColor: "#01007d",
+                            backgroundColor: "#e4e4ff",
+                            }],
                         }}
                         options={{
                             plugins: {
@@ -72,31 +57,27 @@ export default function StaffCharts({ studentsPerProgram }) {
                     </div>
                     <Bar
                         data={{
-                            labels: [
-                                "May 5",
-                                "May 6",
-                                "May 7",
-                                "May 8",
-                                "May 9",
-                                "May 10",
-                                "May 11",
-                            ],
+                            labels: dailyLogins.dates.map(d =>
+                                new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                            ),
                             datasets: [
                                 {
-                                    label: "",
-                                    data: [5, 6, 1, 3, 5, 8, 3],
+                                    label: "Student Logins",
+                                    data: dailyLogins.counts,
                                     backgroundColor: "#01007d",
                                 },
                             ],
                         }}
                         options={{
-                            plugins: {
-                                legend: {
-                                    display: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { precision: 0 },
                                 },
                             },
                         }}
-                    ></Bar>
+                    />
                 </div>
             </div>
             <div className="w-full md:w-1/3 md:pl-5 pt-5 md:pt-0">
@@ -140,3 +121,4 @@ export default function StaffCharts({ studentsPerProgram }) {
         </div>
     );
 }
+export default React.memo(StaffCharts);

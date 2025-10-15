@@ -8,10 +8,10 @@ import useUserStore from "../../Stores/User/userStore";
 export default function Dashboard() {
     const [isStudent, setIsStudent] = useState(false);
     const user = useUserStore((state) => state.user);
-    const { authUser, stats, studentsPerProgram } = usePage().props;
+    const { authUser, stats, studentsPerProgram, dailyLogins, avgTimePerDay } = usePage().props;
+    const role = authUser?.role;
 
     console.log("Render Dashboard");
-    console.log("Render Dashboard - user:", user);
 
     return (
         <div className="w-full space-y-5 font-nunito-sans text-ascend-black">
@@ -28,12 +28,12 @@ export default function Dashboard() {
                 <h1 className="text-size6 font-bold">Analytics Overview</h1>
             </div>
 
-            {user && user?.role === "student" ? (
+            {role === "student" ? (
                 <StudentDashboard />
-            ) : user?.role === "admin" ? (
-                <AdminDashboard stats={stats} studentsPerProgram={studentsPerProgram}/>
+            ) : role === "admin" ? (
+                <AdminDashboard stats={stats} studentsPerProgram={studentsPerProgram} dailyLogins={dailyLogins} avgTimePerDay={avgTimePerDay} />
             ) : (
-                <FacultyDashboard />
+                <FacultyDashboard stats={stats}/>
             )}
         </div>
     );
