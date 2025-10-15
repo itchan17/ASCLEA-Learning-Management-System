@@ -11,6 +11,7 @@ import { cleanDecimal } from "../../../../../../../../../Utils/cleanDecimal";
 import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
 import { IoCaretDownOutline } from "react-icons/io5";
 import { closeDropDown } from "../../../../../../../../../Utils/closeDropdown";
+import EmptyState from "../../../../../../../../../Components/EmptyState/EmptyState";
 
 export default function QuizResponsesTable({
     programId,
@@ -24,6 +25,8 @@ export default function QuizResponsesTable({
         sortScore,
         handleSortTime,
         sortTime,
+        search,
+        isSearchSortLoading,
     } = useSearchSortResponses({
         programId,
         courseId,
@@ -160,22 +163,26 @@ export default function QuizResponsesTable({
                                         {assessment.quiz.quiz_total_points}
                                     </td>
                                     <td className="text-ascend-red">6</td>
-                                    {/* <td>
-                                        <span
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setIsEvidenceOpen(true);
-                                            }}
-                                            className="hover:text-ascend-blue underline"
-                                        >
-                                            View detection results
-                                        </span>
-                                    </td> */}
                                 </tr>
                             ))}
                         </tbody>
                     )}
                 </table>
+
+                {/* For displaying no data in the table*/}
+                {!isSearchSortLoading &&
+                    (responses.data.length === 0 && !search ? (
+                        <EmptyState
+                            imgSrc={"/images/illustrations/empty.svg"}
+                            text={`“No responses have been submitted for this quiz yet.”`}
+                        />
+                    ) : responses.data.length === 0 && search ? (
+                        <div className="flex justify-center py-5">
+                            <p className="text-ascend-black">No data found</p>
+                        </div>
+                    ) : (
+                        ""
+                    ))}
             </div>
 
             {responses.data.length > 0 && (

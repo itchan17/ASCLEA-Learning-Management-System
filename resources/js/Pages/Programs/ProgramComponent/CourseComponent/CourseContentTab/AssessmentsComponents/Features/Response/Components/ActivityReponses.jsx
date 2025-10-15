@@ -13,8 +13,11 @@ import useSearchSortResponses from "../Hooks/useSearchSortResponses";
 import ActivityResponseRow from "./ActivityResponseRow";
 import useReturnActivity from "../Hooks/useReturnActivity";
 import { closeDropDown } from "../../../../../../../../../Utils/closeDropdown";
+import EmptyState from "../../../../../../../../../Components/EmptyState/EmptyState";
+import AlertModal from "../../../../../../../../../Components/AlertModal";
 
 export default function ActivityReponses() {
+    const [openAlertModal, setOpenAlertModal] = useState(false);
     const {
         programId,
         courseId,
@@ -31,6 +34,9 @@ export default function ActivityReponses() {
         handleSortSubmittedDate,
         sortSubmittedDate,
         handleFilterSubmissionStatus,
+        search,
+        submissionStatus,
+        isSearchSortLoading,
     } = useSearchSortResponses({
         programId,
         courseId,
@@ -50,8 +56,27 @@ export default function ActivityReponses() {
         responses,
     });
 
+    const handlePostGradesClick = () => {
+        setOpenAlertModal(true);
+    };
+
     return (
         <div className="space-y-5 font-nunito-sans">
+            {/* Display alert modal */}
+            {openAlertModal && (
+                <AlertModal
+                    title={"Post Grades Confirmation"}
+                    description={
+                        "Once posted, grades will be visible to students. Are you sure you want to continue?"
+                    }
+                    closeModal={() => setOpenAlertModal(false)}
+                    onConfirm={() => {
+                        handlePostGrades(setOpenAlertModal);
+                    }}
+                    isLoading={isLoading}
+                />
+            )}
+
             <div className="flex items-center w-full justify-between">
                 <div className="flex">
                     <BackButton doSomething={handleClickBackBtn} />
@@ -63,8 +88,7 @@ export default function ActivityReponses() {
                             selectedSubmittedActivities.length === 0) ||
                         isLoading
                     }
-                    isLoading={isLoading}
-                    doSomething={handlePostGrades}
+                    doSomething={handlePostGradesClick}
                     text={"Post Grades"}
                 />
             </div>
@@ -201,14 +225,26 @@ export default function ActivityReponses() {
                         </tbody>
                     )}
                 </table>
-                {/* {responses.data.length > 0 && (
-                    <EmptyState
-                        paddingY="py-0"
-                        imgSrc={"/images/illustrations/grades.svg"}
-                        text={`“Oops! No one to hand an A+ to. Add your first student to get started.”`}
-                    />
-                )} */}
+
+                {/* For displaying no data in the table*/}
+                {!isSearchSortLoading &&
+                    (responses.data.length === 0 &&
+                    !search &&
+                    !submissionStatus ? (
+                        <EmptyState
+                            imgSrc={"/images/illustrations/empty.svg"}
+                            text={`“No responses have been submitted for this activity yet.”`}
+                        />
+                    ) : (responses.data.length === 0 && search) ||
+                      submissionStatus ? (
+                        <div className="flex justify-center py-5">
+                            <p className="text-ascend-black">No data found</p>
+                        </div>
+                    ) : (
+                        ""
+                    ))}
             </div>
+
             {responses.data.length > 0 && (
                 <div className="flex flex-wrap-reverse items-center justify-between gap-5">
                     <div className="flex space-x-[0.5px]">

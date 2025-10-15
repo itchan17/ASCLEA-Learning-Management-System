@@ -14,6 +14,7 @@ export default function useSearchSortResponses({
     const [sortSubmittedDate, setSortSubmittedDate] = useState(null);
     const [initalRender, setInitialRender] = useState(true);
     const [submissionStatus, setSubmissionStatus] = useState(null);
+    const [isSearchSortLoading, setIsSearchSortLoading] = useState(false);
 
     const debouncedSearch = useMemo(() => {
         return debounce((e) => {
@@ -74,6 +75,7 @@ export default function useSearchSortResponses({
     };
 
     const handleGetResponses = (query) => {
+        setIsSearchSortLoading(true);
         router.get(
             route("assessment.responses.view", {
                 program: programId,
@@ -87,6 +89,9 @@ export default function useSearchSortResponses({
                 preserveScroll: true,
                 preserveState: true,
                 only: ["responses"],
+                onFinish: () => {
+                    setIsSearchSortLoading(false);
+                },
             }
         );
     };
@@ -127,5 +132,8 @@ export default function useSearchSortResponses({
         handleSortSubmittedDate,
         sortSubmittedDate,
         handleFilterSubmissionStatus,
+        search,
+        submissionStatus,
+        isSearchSortLoading,
     };
 }

@@ -79,7 +79,7 @@ export default function useReturnActivity({
         }
     }, [responses]);
 
-    const handlePostGrades = () => {
+    const handlePostGrades = (setOpenAlertModal) => {
         setIsLoading(true);
         router.put(
             route("return.activity", {
@@ -106,6 +106,7 @@ export default function useReturnActivity({
                 },
                 onFinish: () => {
                     setIsLoading(false);
+                    setOpenAlertModal(false);
                 },
             }
         );
