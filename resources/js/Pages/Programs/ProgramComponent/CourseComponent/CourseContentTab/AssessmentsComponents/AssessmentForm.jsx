@@ -364,6 +364,7 @@ export default function AssessmentForm({
             {/* Display drop files */}
             {assessmentDetails.assessment_type === "activity" && (
                 <DropFiles
+                    disabled={isLoading}
                     handleFileChange={handleAssessmentChange}
                     fieldName={"assessment_files"}
                     withCancel={false}
@@ -459,7 +460,7 @@ export default function AssessmentForm({
                         text={"Cancel"}
                     />
 
-                    <div className="flex space-x-[2px]">
+                    <div className="flex space-x-[0.5px]">
                         {assessmentDetails.assessment_type && (
                             <PrimaryButton
                                 isDisabled={isLoading}

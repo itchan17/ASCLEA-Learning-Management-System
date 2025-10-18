@@ -103,6 +103,7 @@ export default function Materials() {
             {isMaterialFormOpen ? (
                 <div ref={targetForm}>
                     <MaterialForm
+                        setIsMaterialFormOpen={setIsMaterialFormOpen}
                         toggleOpenMaterialForm={toggleOpenMaterialForm}
                     />
                 </div>
