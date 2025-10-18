@@ -1,9 +1,9 @@
 import React from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import "../../../../../../../css/global.css";
+import "../../../../../../../../css/global.css";
 import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
-import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
+import RoleGuard from "../../../../../../../Components/Auth/RoleGuard";
 
 export default function MaterialItem({ materialDetails }) {
     const route = useRoute();

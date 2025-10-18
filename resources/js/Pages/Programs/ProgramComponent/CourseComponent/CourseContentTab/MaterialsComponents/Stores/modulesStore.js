@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import useAssessmentsStore from "./assessmentsStore";
+import useAssessmentsStore from "../../../../../../../Stores/Programs/CourseContent/assessmentsStore";
 
 const useModulesStore = create((set) => ({
     materialList: [

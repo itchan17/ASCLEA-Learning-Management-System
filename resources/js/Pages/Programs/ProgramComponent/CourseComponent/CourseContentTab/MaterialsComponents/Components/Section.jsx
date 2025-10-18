@@ -3,7 +3,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
 import SectionContentList from "./SectionContentList";
 import MaterialForm from "./MaterialForm";
-import AssessmentForm from "../AssessmentsComponents/AssessmentForm";
+import AssessmentForm from "../../AssessmentsComponents/AssessmentForm";
 import {
     closestCorners,
     DndContext,
@@ -14,11 +14,11 @@ import {
     useSensor,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
-import SecondaryButton from "../../../../../../Components/Button/SecondaryButton";
+import PrimaryButton from "../../../../../../../Components/Button/PrimaryButton";
+import SecondaryButton from "../../../../../../../Components/Button/SecondaryButton";
 import { isEqual, cloneDeep } from "lodash";
-import useModulesStore from "../../../../../../Stores/Programs/CourseContent/modulesStore";
-import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
+import useModulesStore from "../Stores/modulesStore";
+import RoleGuard from "../../../../../../../Components/Auth/RoleGuard";
 
 export default function Section({ sectionDetails }) {
     // Modules store

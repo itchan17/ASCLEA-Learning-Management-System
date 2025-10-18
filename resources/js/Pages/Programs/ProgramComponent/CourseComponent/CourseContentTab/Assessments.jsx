@@ -30,7 +30,10 @@ export default function Assessments() {
     // Scroll into the form once opened
     useEffect(() => {
         if (isAssessmentFormOpen) {
-            targetForm.current?.scrollIntoView({ behavior: "smooth" });
+            targetForm.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
         }
     }, [isAssessmentFormOpen]);
 

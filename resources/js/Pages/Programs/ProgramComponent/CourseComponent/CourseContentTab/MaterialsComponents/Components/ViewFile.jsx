@@ -1,8 +1,8 @@
 import { useState } from "react";
-import BackButton from "../../../../../../Components/Button/BackButton";
+import BackButton from "../../../../../../../Components/Button/BackButton";
 import { MdOutlineCloseFullscreen, MdOutlineFullscreen } from "react-icons/md";
 import DocumentViewer from "./DocumentViewer";
-import { handleClickBackBtn } from "../../../../../../Utils/handleClickBackBtn";
+import { handleClickBackBtn } from "../../../../../../../Utils/handleClickBackBtn";
 import { MdOutlineFileDownload } from "react-icons/md";
 import { usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";

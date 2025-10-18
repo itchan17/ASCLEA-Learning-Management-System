@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import SecondaryButton from "../../../../../../Components/Button/SecondaryButton";
-import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
-import useModulesStore from "../../../../../../Stores/Programs/CourseContent/modulesStore";
+import SecondaryButton from "../../../../../../../Components/Button/SecondaryButton";
+import PrimaryButton from "../../../../../../../Components/Button/PrimaryButton";
+import useModulesStore from "../Stores/modulesStore";
 
 export default function SectionForm({ toggleOpenSectionForm }) {
     // Module Store

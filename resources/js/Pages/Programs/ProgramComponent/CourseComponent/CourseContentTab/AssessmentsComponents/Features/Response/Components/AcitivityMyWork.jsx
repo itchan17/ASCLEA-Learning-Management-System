@@ -5,8 +5,6 @@ import Loader from "../../../../../../../../../Components/Loader";
 import File from "../../../../File";
 import useActivitySubmission from "../Hooks/useActivitySubmission";
 import { usePage } from "@inertiajs/react";
-import ModalContainer from "../../../../../../../../../Components/ModalContainer";
-import DocumentViewer from "../../../../MaterialsComponents/DocumentViewer";
 import ModalDocViewer from "../../../../../../../../../Components/ModalDocViewer";
 
 export default function AcitivityMyWork() {

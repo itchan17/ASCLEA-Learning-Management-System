@@ -55,7 +55,7 @@ export default function MainLayout({ children }) {
                     isMdScreen={isMdScreen}
                 />
                 <main
-                    className="flex-1 flex justify-center items-start px-6 py-5 sm:px-8 w-full overflow-y-auto"
+                    className="flex-1 flex justify-center items-start px-6 py-5 sm:px-8 w-full"
                     scroll-region=""
                 >
                     <div className="w-full max-w-[1400px]">{children}</div>

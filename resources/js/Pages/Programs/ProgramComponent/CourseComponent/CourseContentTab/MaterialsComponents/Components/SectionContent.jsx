@@ -5,7 +5,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import { MdOutlineDragIndicator } from "react-icons/md";
-import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
+import RoleGuard from "../../../../../../../Components/Auth/RoleGuard";
 
 export default function SectionContent({ disabled, contentDetails }) {
     const route = useRoute();
