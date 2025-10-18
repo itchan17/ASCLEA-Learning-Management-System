@@ -44,5 +44,30 @@ class DetectedCheatingController extends Controller
         return back()->with('success', 'Cheating log recorded successfully.');
     }
 
+public function fetchBySubmission($assessment_submission_id)
+{
+    $cheatings = DetectedCheating::with(['files'])
+        ->where('assessment_submission_id', $assessment_submission_id)
+        ->get();
+
+    $submission = \DB::table('assessment_submissions')
+        ->join('assigned_courses', 'assessment_submissions.submitted_by', '=', 'assigned_courses.assigned_course_id')
+        ->join('learning_members', 'assigned_courses.learning_member_id', '=', 'learning_members.learning_member_id')
+        ->join('users', 'learning_members.user_id', '=', 'users.user_id')
+        ->where('assessment_submissions.assessment_submission_id', $assessment_submission_id)
+        ->first();
+
+    if ($cheatings->isEmpty()) {
+        return response()->json([
+            'message' => 'No cheating records found.',
+        ], 404);
+    }
+
+    return response()->json([
+        'cheatings' => $cheatings,
+    ]);
+}
+
+
 }
 

@@ -29,5 +29,6 @@ class DetectedCheatingFile extends Model
     {
         return $this->belongsTo(DetectedCheating::class, 'detected_cheating_id', 'cheating_id');
     }
+    
 }
 

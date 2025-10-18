@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Programs\AssessmentSubmission; 
 
 class DetectedCheating extends Model
 {
@@ -30,5 +31,10 @@ class DetectedCheating extends Model
     public function assessmentSubmission(): BelongsTo
     {
         return $this->belongsTo(AssessmentSubmission::class, 'assessment_submission_id', 'assessment_submission_id');
+    }
+
+    public function files()
+    {
+        return $this->hasMany(DetectedCheatingFile::class, 'detected_cheating_id', 'cheating_id');
     }
 }

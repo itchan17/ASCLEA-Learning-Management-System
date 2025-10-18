@@ -60,6 +60,22 @@ class AssessmentSubmissionService
         return $assessmentSubmission;
     }
 
+    public function startQuizCV(Request $request) {
+        $assessmentSubmission = AssessmentSubmission::find($request->assessmentSubmissionId);
+        $quiz = Quiz::find($request->quizId);
+
+        if ($quiz->cheating_mitigation == 1 && !$assessmentSubmission->end_at) {
+            $assessmentSubmission->update([
+                'end_at' => Carbon::now()->addMinutes($quiz->duration)
+            ]);
+        }
+
+        return response()->json([
+            'end_at' => $assessmentSubmission->end_at
+        ]);
+    }
+
+
     public function getTotalScore(AssessmentSubmission $assessmentSubmission)
     {
         $answers = $assessmentSubmission->quizAnswers()->with('question')->get();

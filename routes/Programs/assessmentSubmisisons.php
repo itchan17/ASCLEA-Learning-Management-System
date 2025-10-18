@@ -40,4 +40,9 @@ Route::post('/detected-cheatings', [DetectedCheatingController::class, 'store'])
     ->name('detected-cheatings.store')
     ->middleware(['auth', 'verified']);
 
+Route::get('/detected-cheatings/{assessment_submission_id}', [DetectedCheatingController::class, 'fetchBySubmission'])
+    ->name('detected-cheatings.fetch')
+    ->middleware(['auth', 'verified']);
+
+
     
