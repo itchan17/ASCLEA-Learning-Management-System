@@ -3,7 +3,7 @@ import Tabs from "../../../../Components/Tabs/Tabs";
 import BackButton from "../../../../Components/Button/BackButton";
 import useCourseStore from "../../../../Stores/Programs/courseStore";
 import Home from "./CourseContentTab/Home";
-import Materials from "./CourseContentTab/Materials";
+import Modules from "./CourseContentTab/Modules";
 import Assessments from "./CourseContentTab/Assessments";
 import Grades from "./CourseContentTab/Grades";
 import { handleClickBackBtn } from "../../../../Utils/handleClickBackBtn";
@@ -74,7 +74,7 @@ export default function CourseContent() {
 
             {/* isloading prevents component to render while navigation is still loading */}
             {!isLoading && activeTab === 0 && <Home />}
-            {!isLoading && activeTab === 1 && <Materials />}
+            {!isLoading && activeTab === 1 && <Modules />}
             {!isLoading && activeTab === 2 && <Assessments />}
             {!isLoading && user?.role !== "student" && activeTab === 3 && (
                 <Grades />

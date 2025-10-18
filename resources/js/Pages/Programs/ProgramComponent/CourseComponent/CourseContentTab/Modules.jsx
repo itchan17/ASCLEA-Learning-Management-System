@@ -1,22 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import PrimaryButton from "../../../../../Components/Button/PrimaryButton";
-import MaterialForm from "./MaterialsComponents/Components/MaterialForm";
-import useModulesStore from "./MaterialsComponents/Stores/modulesStore";
-import EmptyState from "../../../../../Components/EmptyState/EmptyState";
-import MaterialItem from "./MaterialsComponents/Components/MaterialItem";
-import { IoCaretDownOutline } from "react-icons/io5";
-import SectionForm from "./MaterialsComponents/Components/SectionForm";
-import Section from "./MaterialsComponents/Components/Section";
-import { IoIosArrowDown } from "react-icons/io";
+import MaterialForm from "./ModulesComponents/Components/MaterialForm";
+import useModulesStore from "./ModulesComponents/Stores/modulesStore";
+import SectionForm from "./ModulesComponents/Components/SectionForm";
 import RoleGuard from "../../../../../Components/Auth/RoleGuard";
-import MaterialList from "./MaterialsComponents/Components/MaterialList";
-import SectionList from "./MaterialsComponents/Components/SectionList";
+import MaterialList from "./ModulesComponents/Components/MaterialList";
+import SectionList from "./ModulesComponents/Components/SectionList";
 
-export default function Materials() {
-    // Materials Store
-    const materialList = useModulesStore((state) => state.materialList);
-    const sectionList = useModulesStore((state) => state.sectionList);
-
+export default function Modules() {
     const [isMaterialFormOpen, setIsMaterialFormOpen] = useState(false);
     const [isSectionFormOpen, setIsSectionFormOpen] = useState(false);
     const [activetab, setActiveTab] = useState("materials");
