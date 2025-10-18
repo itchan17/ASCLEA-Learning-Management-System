@@ -8,9 +8,12 @@ import MaterialList from "./ModulesComponents/Components/MaterialList";
 import SectionList from "./ModulesComponents/Components/SectionList";
 
 export default function Modules() {
+    // Module store
+    const activeTab = useModulesStore((state) => state.activeTab);
+    const setActiveTab = useModulesStore((state) => state.setActiveTab);
+
     const [isMaterialFormOpen, setIsMaterialFormOpen] = useState(false);
     const [isSectionFormOpen, setIsSectionFormOpen] = useState(false);
-    const [activetab, setActiveTab] = useState("materials");
     const targetForm = useRef(null);
 
     // Toggle Material form through button
@@ -27,6 +30,7 @@ export default function Modules() {
     };
 
     const handleClickTab = (tab) => {
+        console.log(activeTab);
         setActiveTab(tab);
 
         // Always close the form when switching tab
@@ -52,13 +56,13 @@ export default function Modules() {
                     <div className="flex space-x-[0.5px]">
                         <PrimaryButton
                             doSomething={
-                                activetab === "materials"
+                                activeTab === "materials"
                                     ? toggleOpenMaterialForm
                                     : toggleOpenSectionForm
                             }
                             isDisabled={isMaterialFormOpen || isSectionFormOpen}
                             text={
-                                activetab === "materials"
+                                activeTab === "materials"
                                     ? "Add Material"
                                     : "Add Sections"
                             }
@@ -71,7 +75,7 @@ export default function Modules() {
                 <div
                     onClick={() => handleClickTab("materials")}
                     className={`py-1.5 px-6 cursor-pointer font-bold hover:text-ascend-blue transition-all duration-300 border-b-3 ${
-                        activetab === "materials"
+                        activeTab === "materials"
                             ? "border-ascend-blue text-ascend-blue"
                             : "border-ascend-white"
                     } hover:border-b-3 hover:border-ascend-blue`}
@@ -81,7 +85,7 @@ export default function Modules() {
                 <div
                     onClick={() => handleClickTab("sections")}
                     className={`py-1.5 px-6 cursor-pointer font-bold hover:text-ascend-blue transition-all duration-300 border-b-3 ${
-                        activetab === "sections"
+                        activeTab === "sections"
                             ? "border-ascend-blue text-ascend-blue"
                             : "border-ascend-white"
                     } hover:border-b-3 hover:border-ascend-blue`}
@@ -107,7 +111,7 @@ export default function Modules() {
             ) : null}
 
             {/* For displaying the tab content */}
-            {activetab === "materials" ? <MaterialList /> : <SectionList />}
+            {activeTab === "materials" ? <MaterialList /> : <SectionList />}
         </div>
     );
 }

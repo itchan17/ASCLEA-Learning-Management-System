@@ -3,8 +3,12 @@ import { route } from "ziggy-js";
 import axios from "axios";
 import { displayToast } from "../../../../../../../Utils/displayToast";
 import DefaultCustomToast from "../../../../../../../Components/CustomToast/DefaultCustomToast";
+import useModulesStore from "../Stores/modulesStore";
 
 export default function useMaterialForm({ programId, courseId }) {
+    // Module store
+    const addNewMaterial = useModulesStore((state) => state.addNewMaterial);
+
     const [materialDetails, setMaterialDetails] = useState({
         material_title: "",
         material_description: null,
@@ -75,13 +79,18 @@ export default function useMaterialForm({ programId, courseId }) {
                 }
             );
 
+            addNewMaterial(reponse.data.data, courseId);
             setIsMaterialFormOpen(false);
+            displayToast(
+                <DefaultCustomToast message={reponse.data.success} />,
+                "success"
+            );
         } catch (error) {
             console.error(error);
             // Check for value in response.data.errors
             // This is where the valdiation errors located
             // So we have to set it in the state that will display error
-            if (error.response.data.errors) {
+            if (error.response?.data.errors) {
                 setErrors(error.response.data.errors);
             } else {
                 displayToast(

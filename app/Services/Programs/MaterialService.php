@@ -60,4 +60,31 @@ class MaterialService
         // Save the files data in the table
         MaterialFile::insert($uploadedFiles);
     }
+
+    public function getMaterialList(string $userId, string  $courseId)
+    {
+        $materialList = Material::where('course_id', $courseId)
+            ->with(['author' => function ($query) {
+                $query->select('user_id', 'first_name', 'last_name');
+            }])
+            ->where(function ($query) use ($userId) {
+                // Display material added by the user or material that was publsiehd
+                $query->where('created_by', $userId)
+                    ->orWhere('status', 'published');
+            })
+            ->with(['materialFiles' => function ($query) {
+                $query->select('material_id', 'material_file_id', 'file_name', 'file_path');
+            }])
+            ->withTrashed()
+            ->where(function ($query) use ($userId) {
+                // Display not deleted materials or if deleted the user  must be t he owmner
+                $query->whereNull('deleted_at')
+                    ->orWhere('created_by', $userId);
+            })
+            ->orderBy('created_at', 'desc')
+            ->orderBy('material_id', 'desc')
+            ->paginate(5);
+
+        return $materialList;
+    }
 }

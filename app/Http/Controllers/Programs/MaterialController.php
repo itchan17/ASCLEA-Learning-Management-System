@@ -32,5 +32,18 @@ class MaterialController extends Controller
         if ($request->hasFile("material_files")) {
             $this->materialService->saveMaterialFiles($request->material_files, $material);
         }
+        $material->load([
+            'author:user_id,first_name,last_name',
+            'materialFiles:material_id,material_file_id,file_name,file_path',
+        ]);
+
+        return response()->json(['success' => "Material added successfully.", 'data' => $material]);
+    }
+
+    public function getMaterials(Request $request, Program $program, Course $course)
+    {
+        $materialList = $this->materialService->getMaterialList($request->user()->user_id, $course->course_id);
+
+        return response()->json($materialList);
     }
 }

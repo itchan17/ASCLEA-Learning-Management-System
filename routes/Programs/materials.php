@@ -8,5 +8,8 @@ Route::prefix('programs/{program}/courses/{course}')
     ->group(function () {
 
         // Create assesmsent
-        Route::post('/materials/add', [MaterialController::class, 'addMaterial'])->name('material.add');
+        Route::post('/materials', [MaterialController::class, 'addMaterial'])->name('material.add');
+
+        // Get  all the materials
+        Route::get('/materials', [MaterialController::class, 'getMaterials'])->name('materials.get');
     });

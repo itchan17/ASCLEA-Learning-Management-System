@@ -4,6 +4,7 @@ import "../../../../../../../../css/global.css";
 import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import RoleGuard from "../../../../../../../Components/Auth/RoleGuard";
+import { formatFullDate } from "../../../../../../../Utils/formatFullDate";
 
 export default function MaterialItem({ materialDetails }) {
     const route = useRoute();
@@ -20,7 +21,7 @@ export default function MaterialItem({ materialDetails }) {
             route("program.course.material.view", {
                 programId,
                 courseId,
-                materialId: materialDetails.id,
+                materialId: materialDetails.material_id,
             }),
             {
                 preserveScroll: false,
@@ -72,12 +73,17 @@ export default function MaterialItem({ materialDetails }) {
                 </RoleGuard>
             </div>
             <h1 className="flex-1 min-w-0 text-size4 truncate font-bold">
-                {materialDetails.materialTitle}
+                {materialDetails.material_title}
             </h1>
 
             <div className="flex flex-wrap-reverse justify-between items-baseline font-nunito-sans gap-2">
-                <span className="text-size1">Posted on March 29, 2025</span>
-                <span className="font-bold">John Doe</span>
+                <span className="text-size1">
+                    Posted on {formatFullDate(materialDetails.updated_at)}
+                </span>
+                <span className="font-bold">
+                    {materialDetails.author.first_name}{" "}
+                    {materialDetails.author.last_name}
+                </span>
             </div>
         </div>
     );

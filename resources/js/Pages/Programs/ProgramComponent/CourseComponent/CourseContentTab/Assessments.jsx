@@ -163,8 +163,7 @@ export default function Assessments() {
                     )
                 )}
 
-            {/* Display only when assessmentList has value
-            preventing to be displayed in inital render of component */}
+            {/* Display loader if assessment list for the course  has no value or has more */}
             {(!assessmentByCourse[course.course_id] ||
                 assessmentByCourse[course.course_id].hasMore) && (
                 <div ref={loaderRef} className=" w-full flex justify-center">

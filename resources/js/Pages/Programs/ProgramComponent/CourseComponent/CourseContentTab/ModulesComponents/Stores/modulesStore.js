@@ -2,6 +2,56 @@ import { create } from "zustand";
 import useAssessmentsStore from "../../../../../../../Stores/Programs/CourseContent/assessmentsStore";
 
 const useModulesStore = create((set) => ({
+    activeTab: "materials",
+    materialsByCourse: [],
+
+    setActiveTab: (tab) => {
+        set({
+            activeTab: tab,
+        });
+    },
+
+    setMaterials: (courseId, list, page, hasMore) => {
+        const { materialsByCourse } = useModulesStore.getState();
+
+        // Map handle removing duplicate values based on the  id
+        const uniqueMaterials = [
+            ...new Map(list.map((a) => [a.material_id, a])).values(),
+        ];
+
+        set(() => ({
+            materialsByCourse: {
+                ...materialsByCourse,
+                [courseId]: {
+                    list: uniqueMaterials,
+                    page,
+                    hasMore,
+                },
+            },
+        }));
+    },
+
+    addNewMaterial: (newMaterial, courseId) => {
+        const { materialsByCourse } = useModulesStore.getState();
+
+        // Check if  a list already exist
+        const courseState = materialsByCourse[courseId] || {
+            list: [],
+            page: 1,
+            hasMore: true,
+        };
+
+        set({
+            materialsByCourse: {
+                ...materialsByCourse,
+                [courseId]: {
+                    ...courseState,
+                    list: [newMaterial, ...courseState.list],
+                },
+            },
+        });
+    },
+
     materialList: [
         {
             id: 1,
