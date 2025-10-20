@@ -1,21 +1,72 @@
 import AOS from "aos";
 import "aos/dist/aos.css";
 import "../../../css/animation.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
+import { router } from "@inertiajs/react";
 import LandingpageNav from "./LandingpageNav";
 import {
     AiOutlinePhone,
     AiOutlineMail,
     AiOutlineFacebook,
 } from "react-icons/ai";
-import { Link } from "@inertiajs/react";
 import { Link as ReactScrollLink } from "react-scroll";
 
 export default function LandingPage({ text }) {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        message: ''
+    });
+
     useEffect(() => {
         AOS.init({ duration: 1000 });
     }, []);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState({ success: null, message: '' });
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setSubmitStatus({ success: null, message: '' });
+
+        // Submit the form using Inertia.js
+        router.post('/contact', formData, {
+            onSuccess: () => {
+                // Show success message
+                setSubmitStatus({
+                    success: true,
+                    message: 'Thank you for your message! We will get back to you soon.'
+                });
+                
+                // Reset form
+                setFormData({
+                    name: '',
+                    email: '',
+                    message: ''
+                });
+            },
+            onError: (errors) => {
+                // Show error message
+                setSubmitStatus({
+                    success: false,
+                    message: Object.values(errors).join(' ')
+                });
+            },
+            onFinish: () => {
+                setIsSubmitting(false);
+            }
+        });
+    };
     return (
         <div className="landing-page overflow-x-hidden">
             <LandingpageNav />
@@ -44,15 +95,13 @@ export default function LandingPage({ text }) {
                         </p>
                     </div>
 
-                    <Link href={"/register"}>
-                    <button
+                    <PrimaryButton
+                        doSomething={() => router.visit('/register')}
                         className="w-60 py-3 space-x-1 bg-ascend-blue
                         hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
-                    >
-                        <span className="font-semibold text-2xl">
-                            Register Now
-                        </span>
-                    </button></Link>
+                        text="Enroll Now"
+                        textStyle="font-semibold text-2xl"
+                    />
                 </div>
             </header>
 
@@ -315,26 +364,48 @@ export default function LandingPage({ text }) {
                             </div>
                         </div>
                         <div className="w-full md:w-1/2 space-y-6">
-                            <form className="flex flex-col space-y-4">
+                            <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
                                 <input
                                     type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
                                     placeholder="Your name"
                                     className="border border-ascend-black py-3 px-5 focus:outline-ascend-blue"
+                                    required
                                 />
                                 <input
                                     type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
                                     placeholder="Your email"
                                     className="border border-ascend-black py-3 px-5 focus:outline-ascend-blue"
+                                    required
                                 />
                                 <textarea
-                                    name=""
-                                    id=""
+                                    name="message"
+                                    value={formData.message}
+                                    onChange={handleInputChange}
                                     placeholder="Write a message"
                                     className="border border-ascend-black py-3 px-5 focus:outline-ascend-blue"
                                     rows={6}
+                                    required
                                 ></textarea>
+                                <div className="w-full">
+                                    <PrimaryButton 
+                                        text={isSubmitting ? 'Sending...' : 'Submit'} 
+                                        type="submit" 
+                                        disabled={isSubmitting}
+                                        className={`w-full ${isSubmitting ? 'opacity-75 cursor-not-allowed' : ''}`}
+                                    />
+                                    {submitStatus.message && (
+                                        <div className={`mt-3 p-3 rounded ${submitStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                            {submitStatus.message}
+                                        </div>
+                                    )}
+                                </div>
                             </form>
-                            <PrimaryButton text={"Submit"} />
                         </div>
                     </div>
                 </div>
@@ -364,7 +435,7 @@ export default function LandingPage({ text }) {
                                     { label: "Home", href: "home" },
                                     { label: "About Us", href: "about-us" },
                                     { label: "Programs", href: "programs" },
-                                    { label: "FAQ", href: "frequently-asked-questions" },
+                                    { label: "Admission", href: "admission" },
                                     { label: "Contact", href: "contact" },
                                 ].map((item) => (
                                     <li key={item.href}>
