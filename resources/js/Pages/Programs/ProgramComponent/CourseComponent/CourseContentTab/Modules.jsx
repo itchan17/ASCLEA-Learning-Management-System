@@ -57,8 +57,8 @@ export default function Modules() {
                         <PrimaryButton
                             doSomething={
                                 activeTab === "materials"
-                                    ? toggleOpenMaterialForm
-                                    : toggleOpenSectionForm
+                                    ? () => setIsMaterialFormOpen(true)
+                                    : () => setIsSectionFormOpen(true)
                             }
                             isDisabled={isMaterialFormOpen || isSectionFormOpen}
                             text={
@@ -99,7 +99,6 @@ export default function Modules() {
                 <div ref={targetForm}>
                     <MaterialForm
                         setIsMaterialFormOpen={setIsMaterialFormOpen}
-                        toggleOpenMaterialForm={toggleOpenMaterialForm}
                     />
                 </div>
             ) : isSectionFormOpen ? (

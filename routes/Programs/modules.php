@@ -12,4 +12,10 @@ Route::prefix('programs/{program}/courses/{course}')
 
         // Get  all the materials
         Route::get('/materials', [MaterialController::class, 'getMaterials'])->name('materials.get');
+
+        // Update material
+        Route::put('/material/{material}', [MaterialController::class, 'updateMaterial'])->name('material.update');
+
+        // Unpublish material
+        Route::put('/materials/{material}/unpublish', [MaterialController::class, 'unpublishMaterial'])->name('material.unpublish');
     });

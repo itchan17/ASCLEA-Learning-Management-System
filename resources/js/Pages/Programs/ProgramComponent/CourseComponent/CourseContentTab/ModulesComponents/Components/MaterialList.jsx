@@ -1,10 +1,10 @@
 import { useEffect, useCallback, useRef } from "react";
 import useModulesStore from "../Stores/modulesStore";
 import MaterialItem from "./MaterialItem";
-import useMaterialList from "../Hooks/useMaterialList";
 import { usePage } from "@inertiajs/react";
 import EmptyState from "../../../../../../../Components/EmptyState/EmptyState";
 import Loader from "../../../../../../../Components/Loader";
+import useMaterial from "../Hooks/useMaterial";
 
 export default function MaterialList() {
     const { program, course } = usePage().props;
@@ -15,7 +15,7 @@ export default function MaterialList() {
     );
 
     // Custom hooks
-    const { isLoading, handleFetchMaterials } = useMaterialList({
+    const { isLoading, handleFetchMaterials } = useMaterial({
         programId: program.program_id,
         courseId: course.course_id,
     });

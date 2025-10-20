@@ -185,9 +185,9 @@ class AssessmentService
                 if ($file->file_path !== $file->original_file_path) {
                     // Remove the two files
                     Storage::delete([$file->file_path, $file->original_file_path]);
+                } else {
+                    Storage::delete($file->file_path);
                 }
-
-                Storage::delete($file->file_path);
             }
 
             $file->delete();

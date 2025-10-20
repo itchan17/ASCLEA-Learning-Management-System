@@ -2,33 +2,38 @@ import { useState, useEffect } from "react";
 import TextEditor from "../../../TextEditor";
 import SecondaryButton from "../../../../../../../Components/Button/SecondaryButton";
 import PrimaryButton from "../../../../../../../Components/Button/PrimaryButton";
-import { AiFillFileAdd } from "react-icons/ai";
-import useModulesStore from "../Stores/modulesStore";
 import FileCard from "../../../FileCard";
 import DropFiles from "../../../../../../../Components/DragNDropFiles/DropFiles";
-import useMaterialForm from "../Hooks/useMaterialForm";
+import useMaterial from "../Hooks/useMaterial";
 import { usePage } from "@inertiajs/react";
 import { IoCaretDownOutline } from "react-icons/io5";
 import { closeDropDown } from "../../../../../../../Utils/closeDropdown";
+import useModulesStore from "../Stores/modulesStore";
 
 export default function MaterialForm({
-    toggleOpenMaterialForm,
     formTitle,
-    formWidth,
     sectionId,
     setIsMaterialFormOpen,
+    isEdit = false,
+    formWidth,
+    materialId = null,
 }) {
     const { program, course } = usePage().props;
 
+    // Module  store
+    const materialDetails = useModulesStore((state) => state.materialDetails);
+    const handleMaterialDetailsChange = useModulesStore(
+        (state) => state.handleMaterialDetailsChange
+    );
+    const handleRemoveAttachedFiles = useModulesStore(
+        (state) => state.handleRemoveAttachedFiles
+    );
+    const handlelRemoveUploadedFile = useModulesStore(
+        (state) => state.handlelRemoveUploadedFile
+    );
+
     // Custom hooks
-    const {
-        materialDetails,
-        handleMaterialDetailsChange,
-        handleRemoveAttachedFiles,
-        handleAddMaterial,
-        errors,
-        isLoading,
-    } = useMaterialForm({
+    const { handleAddUpdateMaterial, errors, isLoading } = useMaterial({
         programId: program.program_id,
         courseId: course.course_id,
     });
@@ -41,8 +46,10 @@ export default function MaterialForm({
     useEffect(() => console.log(materialDetails), [materialDetails]);
 
     return (
-        <div
-            className={`border ${formWidth} font-nunito-sans border-ascend-gray1 shadow-shadow1 p-5 space-y-5 bg-ascend-white`}
+        <form
+            className={`border w-full ${formWidth} border-ascend-gray1 ${
+                isEdit ? "" : "shadow-shadow1"
+            } p-5 space-y-5 bg-ascend-white`}
         >
             <h1 className="text-size4 font-bold">
                 {formTitle || "Add Material"}
@@ -99,7 +106,8 @@ export default function MaterialForm({
             />
 
             {/* Attached Files */}
-            {materialDetails.material_files?.length > 0 && (
+            {(materialDetails.material_files?.length > 0 ||
+                (isEdit && materialDetails?.uploaded_files?.length > 0)) && (
                 <div>
                     <div>
                         <label className="font-bold pb-5">Attached Files</label>
@@ -114,6 +122,24 @@ export default function MaterialForm({
                                 : ""
                         }`}
                     >
+                        {/* List the uploaded files for editing*/}
+
+                        {isEdit &&
+                            materialDetails?.uploaded_files?.map((file) => (
+                                <div key={file.material_file_id}>
+                                    {console.log(file)}
+                                    <FileCard
+                                        removeAttachedFile={() =>
+                                            handlelRemoveUploadedFile(
+                                                file.material_file_id
+                                            )
+                                        }
+                                        fileId={file.material_file_id}
+                                        fileName={file.file_name}
+                                    />
+                                </div>
+                            ))}
+
                         {/* List the attached files */}
                         {materialDetails.material_files.map((file, index) => {
                             return (
@@ -150,7 +176,7 @@ export default function MaterialForm({
             <div className="flex flex-wrap gap-5 items-center justify-end">
                 <div className="flex flex-wrap justify-end gap-2">
                     <SecondaryButton
-                        doSomething={toggleOpenMaterialForm}
+                        doSomething={() => setIsMaterialFormOpen(false)}
                         isDisabled={isLoading}
                         text={"Cancel"}
                     />
@@ -158,7 +184,11 @@ export default function MaterialForm({
                     <div className="flex space-x-[0.5px]">
                         <PrimaryButton
                             doSomething={() =>
-                                handleAddMaterial(setIsMaterialFormOpen)
+                                handleAddUpdateMaterial(
+                                    setIsMaterialFormOpen,
+                                    isEdit,
+                                    materialId
+                                )
                             }
                             isDisabled={isLoading}
                             isLoading={isLoading}
@@ -206,6 +236,6 @@ export default function MaterialForm({
                     </div>
                 </div>
             </div>
-        </div>
+        </form>
     );
 }

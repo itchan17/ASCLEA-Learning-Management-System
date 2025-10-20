@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class MaterialService
 {
@@ -86,5 +87,47 @@ class MaterialService
             ->paginate(5);
 
         return $materialList;
+    }
+
+    public function getmaterialCompleteDetails(Material $material)
+    {
+        return $material->load([
+            'author:user_id,first_name,last_name',
+            'materialFiles:material_id,material_file_id,file_name,file_path',
+        ]);
+    }
+
+    public function updateMaterial(Material $material, array $updatedData, bool $isUnpublish = false)
+    {
+        // Check if the request is only for unpublishing the material
+        if ($isUnpublish) {
+            // Only udpates the material status
+            $material->update(['status' => 'draft']);
+        } else {
+            $material->update($updatedData);
+        }
+
+        return $material->refresh();
+    }
+
+    public function removeMaterialFiles(array $removedFiles)
+    {
+        // Loop through each file and remove it
+        foreach ($removedFiles as $removedFileId) {
+            $file = MaterialFile::find($removedFileId);
+
+            if (Storage::disk('local')->exists($file->file_path)) {
+                // Check if file is not equal to original
+                // If not it means the files was converted and it also has to deleted the original file
+                if ($file->file_path !== $file->original_file_path) {
+                    // Remove the two files
+                    Storage::delete([$file->file_path, $file->original_file_path]);
+                } else {
+                    Storage::delete($file->file_path);
+                }
+            }
+
+            $file->delete();
+        }
     }
 }
