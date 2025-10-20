@@ -31,6 +31,7 @@ class Assessment extends Model
         'created_by',
         'assessment_type_id',
         'course_id',
+        'feedback',
     ];
 
     public function assessmentType(): BelongsTo
@@ -56,5 +57,10 @@ class Assessment extends Model
     public function files(): HasMany
     {
         return $this->hasMany(AssessmentFile::class, 'assessment_id');
+    }
+
+    public function assessmentSubmissions(): HasMany
+    {
+        return $this->hasMany(AssessmentSubmission::class, 'assessment_id');
     }
 }

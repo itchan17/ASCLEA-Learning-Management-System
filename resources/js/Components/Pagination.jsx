@@ -24,6 +24,7 @@ export default function Pagination({ links, currentPage, lastPage, only }) {
                         href={link.url || ""}
                         preserveState
                         preserveScroll
+                        replace
                         only={only}
                         className={`join-item btn rounded-none border-ascend-gray1 ${
                             link.active

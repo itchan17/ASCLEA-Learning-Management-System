@@ -1,12 +1,10 @@
 import React from "react";
-import { router } from "@inertiajs/react";
-import { useRoute } from "ziggy-js";
-import useUserStore from "../../Stores/User/userStore";
+import { usePage } from "@inertiajs/react";
 
 export default function RoleGuard({ allowedRoles, children }) {
-    const user = useUserStore((state) => state.user);
+    const user = usePage().props.auth.user;
 
-    if (user && !allowedRoles.includes(user.role || "")) return;
+    if (user && !allowedRoles.includes(user.role_name || "")) return;
 
     return children;
 }

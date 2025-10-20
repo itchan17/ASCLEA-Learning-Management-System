@@ -16,14 +16,10 @@ export default function Assessments() {
     const { course, program } = usePage().props;
 
     // Assessment Store
-    const assessmentList = useAssessmentsStore((state) => state.assessmentList);
-    const addToAssessmentList = useAssessmentsStore(
-        (state) => state.addToAssessmentList
+    const assessmentByCourse = useAssessmentsStore(
+        (state) => state.assessmentByCourse
     );
-    const page = useAssessmentsStore((state) => state.page);
-    const hasMore = useAssessmentsStore((state) => state.hasMore);
-    const setPagination = useAssessmentsStore((state) => state.setPagination);
-
+    const setAssessments = useAssessmentsStore((state) => state.setAssessments);
     const [isAssessmentFormOpen, setIsAssessmentFormOpen] = useState(false);
 
     // States related for fetching data and inifnite scrolling
@@ -44,39 +40,62 @@ export default function Assessments() {
 
     const fetchAssessments = async () => {
         setIsLoading(true);
+
         try {
-            const response = await axios.get(
-                route("program.course.assessments", {
-                    program: program.program_id,
-                    course: course.course_id,
-                    _query: {
-                        page,
-                    },
-                })
-            );
-            console.log(response);
+            let response;
+            let pageNum;
+            let assessmentList;
 
-            addToAssessmentList(response.data.data);
+            if (!assessmentByCourse[course.course_id]) {
+                response = await axios.get(
+                    route("program.course.assessments", {
+                        program: program.program_id,
+                        course: course.course_id,
+                        _query: {
+                            page: 1,
+                        },
+                    })
+                );
 
-            const pageNum = page + 1;
+                pageNum = 2;
+                assessmentList = response.data.data;
+            } else {
+                response = await axios.get(
+                    route("program.course.assessments", {
+                        program: program.program_id,
+                        course: course.course_id,
+                        _query: {
+                            page: assessmentByCourse[course.course_id].page,
+                        },
+                    })
+                );
+
+                pageNum = assessmentByCourse[course.course_id].page + 1;
+                assessmentList = [
+                    ...assessmentByCourse[course.course_id].list,
+                    ...response.data.data,
+                ];
+            }
+
             const hasMoreAssessment =
                 response.data.current_page < response.data.last_page;
 
-            // Set the pagination using zustand
-            // so it wont get reset whenver user navigate to another page
-            // helps to preserve the state of loaded assessments
-            setPagination(pageNum, hasMoreAssessment);
-
-            setIsLoading(false);
+            setAssessments(
+                course.course_id,
+                assessmentList,
+                pageNum,
+                hasMoreAssessment
+            );
         } catch (error) {
             console.error(error);
 
             displayToast(
                 <DefaultCustomToast
-                    message={"Something went wrong. PLease reload the page."}
+                    message={"Something went wrong. Please reload the page."}
                 />,
                 "error"
             );
+        } finally {
             setIsLoading(false);
         }
     };
@@ -85,11 +104,11 @@ export default function Assessments() {
         (entries) => {
             const target = entries[0];
 
-            if (target.isIntersecting && !isLoading && hasMore) {
+            if (target.isIntersecting && !isLoading) {
                 fetchAssessments();
             }
         },
-        [isLoading, hasMore]
+        [isLoading]
     );
 
     useEffect(() => {
@@ -107,12 +126,6 @@ export default function Assessments() {
             observer.disconnect();
         };
     }, [handleObserver]);
-
-    // This will be used to intially fetch the assessments
-    // instead of using the observer
-    useEffect(() => {
-        fetchAssessments();
-    }, []);
 
     return (
         <div className="font-nunito-sans text-ascend-black space-y-5">
@@ -135,29 +148,35 @@ export default function Assessments() {
             )}
 
             {/* <AssessmentItem /> */}
-            {assessmentList.length > 0 &&
-                assessmentList.map((assessment, i) => (
-                    <AssessmentItem
-                        setIsAssessmentFormOpen={setIsAssessmentFormOpen}
-                        key={assessment.assessment_id}
-                        assessmentDetails={assessment}
-                    />
-                ))}
+            {assessmentByCourse[course.course_id] &&
+                assessmentByCourse[course.course_id].list.length > 0 &&
+                assessmentByCourse[course.course_id].list.map(
+                    (assessment, i) => (
+                        <AssessmentItem
+                            setIsAssessmentFormOpen={setIsAssessmentFormOpen}
+                            key={assessment.assessment_id}
+                            assessmentDetails={assessment}
+                        />
+                    )
+                )}
 
             {/* Display only when assessmentList has value
             preventing to be displayed in inital render of component */}
-            {hasMore && assessmentList.length > 0 && (
+            {(!assessmentByCourse[course.course_id] ||
+                assessmentByCourse[course.course_id].hasMore) && (
                 <div ref={loaderRef} className=" w-full flex justify-center">
                     <Loader color="bg-ascend-blue" />
                 </div>
             )}
 
-            {assessmentList.length === 0 && !hasMore && (
-                <EmptyState
-                    imgSrc={"/images/illustrations/empty.svg"}
-                    text={`“There’s a whole lot of nothing going on—time to make something happen!”`}
-                />
-            )}
+            {assessmentByCourse[course.course_id] &&
+                assessmentByCourse[course.course_id].list.length === 0 &&
+                !assessmentByCourse[course.course_id].hasMore && (
+                    <EmptyState
+                        imgSrc={"/images/illustrations/empty.svg"}
+                        text={`“There’s a whole lot of nothing going on—time to make something happen!”`}
+                    />
+                )}
         </div>
     );
 }
