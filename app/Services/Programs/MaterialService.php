@@ -34,7 +34,7 @@ class MaterialService
 
                 $inputFile = storage_path('app/private/' . $originalFilePath); // Get the complete file path
                 $fileName = pathinfo($originalFilePath, PATHINFO_FILENAME); // Get the file name
-                $outputFile = storage_path('app/private/assessmentFiles/' . $fileName); // Set the file path and file name of the converted file
+                $outputFile = storage_path('app/private/materialFiles/' . $fileName); // Set the file path and file name of the converted file
 
                 // Custom fucntion that handle pdf conversion
                 PdfConverter::convertToPdf($inputFile, $outputFile);
@@ -129,5 +129,23 @@ class MaterialService
 
             $file->delete();
         }
+    }
+
+    public function archiveMaterial(Material $material)
+    {
+        $material->delete(); // Soft delete the material
+
+        return  $this->getmaterialCompleteDetails($material);
+    }
+
+    public function restoreMaterial(string $materialId)
+    {
+        // Get the instace of model since model binding
+        // is not working for soft deleted data
+        $material = Material::withTrashed()->findOrFail($materialId);
+
+        $material->restore();
+
+        return  $this->getmaterialCompleteDetails($material);
     }
 }

@@ -16,9 +16,16 @@ const useAssessmentsStore = create((set) => ({
     setAssessments: (courseId, list, page, hasMore) => {
         const { assessmentByCourse } = useAssessmentsStore.getState();
 
+        // Check if the list for the course if it does mix the previous list to new ones
+        const assessmentList = assessmentByCourse[courseId]
+            ? [...assessmentByCourse[courseId].list, ...list]
+            : [...list];
+
         // Map handle removing duplicate values based on the assessment id
         const uniqueAssessments = [
-            ...new Map(list.map((a) => [a.assessment_id, a])).values(),
+            ...new Map(
+                assessmentList.map((a) => [a.assessment_id, a])
+            ).values(),
         ];
 
         set(() => ({

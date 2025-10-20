@@ -7,8 +7,11 @@ use App\Http\Requests\Programs\AddMaterialRequest;
 use App\Models\Course;
 use App\Models\Program;
 use App\Models\Programs\Material;
+use App\Models\Programs\MaterialFile;
+use App\Services\HandlingPrivateFileService;
 use App\Services\Programs\MaterialService;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class MaterialController extends Controller
 {
@@ -72,5 +75,40 @@ class MaterialController extends Controller
         $materialCompleteDetails = $this->materialService->getmaterialCompleteDetails($unpublishedmaterial);
 
         return response()->json(['success' => "Assessment unpublished sucessfully.", 'data' => $materialCompleteDetails]);
+    }
+
+    public function archiveMaterial(Program $program, Course $course, Material $material)
+    {
+        $archivedMaterial = $this->materialService->archiveMaterial($material);
+
+        return response()->json(["success" => "Material archived successfully.", "data" => $archivedMaterial]);
+    }
+
+    public function restoreMaterial(Program $program, Course $course, $material)
+    {
+        $restoredMaterial = $this->materialService->restoreMaterial($material);
+
+        return response()->json(["success" => "Material restored successfully.", "data" => $restoredMaterial]);
+    }
+
+    public function viewMaterial(Program $program, Course $course, Material $material)
+    {
+        $materialCompleteDetails = $this->materialService->getmaterialCompleteDetails($material);
+
+        return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/ModulesComponents/Components/ViewMaterial', [
+            'programId' => $program->program_id,
+            'courseId' => $course->course_id,
+            'material' => $materialCompleteDetails,
+        ]);
+    }
+
+    public function streamMaterialFile(Program $program, Course $course, Material $material, MaterialFile $file)
+    {
+        return HandlingPrivateFileService::retrieveFile($file->file_path);
+    }
+
+    public function downloadMaterialFile(Program $program, Course $course, Material $material, MaterialFile $file)
+    {
+        return HandlingPrivateFileService::downloadFile($file->original_file_path,  $file->file_name);
     }
 }

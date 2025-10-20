@@ -19,7 +19,12 @@ export default function MaterialItem({ materialDetails }) {
     );
 
     // Custom hook
-    const { handleUnpublishMaterial } = useMaterial({
+    const {
+        handleUnpublishMaterial,
+        handleArchiveMaterial,
+        handleRestoreMaterial,
+        handleViewMaterial,
+    } = useMaterial({
         programId: program.program_id,
         courseId: course.course_id,
     });
@@ -32,19 +37,6 @@ export default function MaterialItem({ materialDetails }) {
         e.stopPropagation();
     };
 
-    // const handleCardClick = () => {
-    //     router.visit(
-    //         route("program.course.material.view", {
-    //             programId,
-    //             courseId,
-    //             materialId: materialDetails.material_id,
-    //         }),
-    //         {
-    //             preserveScroll: false,
-    //         }
-    //     );
-    // };
-
     const handleClickEdit = () => {
         setIsEditMaterialFormOpen(true);
         setMaterialDetails(materialDetails);
@@ -53,7 +45,10 @@ export default function MaterialItem({ materialDetails }) {
 
     return (
         <>
-            <div className="flex flex-col justify-between border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 cursor-pointer card-hover">
+            <div
+                onClick={() => handleViewMaterial(materialDetails.material_id)}
+                className="flex flex-col justify-between border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 cursor-pointer card-hover"
+            >
                 <div className="flex items-center gap-2 md:gap-20">
                     <div className="flex-1 min-w-0 flex flex-wrap gap-5">
                         <h1 className="text-size2 truncate font-bold">
@@ -112,7 +107,14 @@ export default function MaterialItem({ materialDetails }) {
                                         className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-45 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                                     >
                                         {materialDetails.deleted_at ? (
-                                            <li>
+                                            <li
+                                                onClick={() => {
+                                                    handleRestoreMaterial(
+                                                        materialDetails.material_id
+                                                    );
+                                                    closeDropDown();
+                                                }}
+                                            >
                                                 <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                                     Restore material
                                                 </a>
@@ -121,18 +123,33 @@ export default function MaterialItem({ materialDetails }) {
                                             <>
                                                 {materialDetails.status ===
                                                 "published" ? (
-                                                    <li
-                                                        onClick={() => {
-                                                            handleUnpublishMaterial(
-                                                                materialDetails.material_id
-                                                            );
-                                                            closeDropDown();
-                                                        }}
-                                                    >
-                                                        <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                            Unpublish material
-                                                        </a>
-                                                    </li>
+                                                    <>
+                                                        <li
+                                                            onClick={() => {
+                                                                handleUnpublishMaterial(
+                                                                    materialDetails.material_id
+                                                                );
+                                                                closeDropDown();
+                                                            }}
+                                                        >
+                                                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                                Unpublish
+                                                                material
+                                                            </a>
+                                                        </li>
+                                                        <li
+                                                            onClick={() => {
+                                                                handleArchiveMaterial(
+                                                                    materialDetails.material_id
+                                                                );
+                                                                closeDropDown();
+                                                            }}
+                                                        >
+                                                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                                Archive material
+                                                            </a>
+                                                        </li>
+                                                    </>
                                                 ) : (
                                                     <>
                                                         <li
@@ -144,7 +161,14 @@ export default function MaterialItem({ materialDetails }) {
                                                                 Edit material
                                                             </a>
                                                         </li>
-                                                        <li>
+                                                        <li
+                                                            onClick={() => {
+                                                                handleArchiveMaterial(
+                                                                    materialDetails.material_id
+                                                                );
+                                                                closeDropDown();
+                                                            }}
+                                                        >
                                                             <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                                                 Archive material
                                                             </a>

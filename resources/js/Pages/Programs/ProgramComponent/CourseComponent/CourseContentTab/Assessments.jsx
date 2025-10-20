@@ -61,7 +61,6 @@ export default function Assessments() {
                 );
 
                 pageNum = 2;
-                assessmentList = response.data.data;
             } else {
                 response = await axios.get(
                     route("program.course.assessments", {
@@ -74,11 +73,9 @@ export default function Assessments() {
                 );
 
                 pageNum = assessmentByCourse[course.course_id].page + 1;
-                assessmentList = [
-                    ...assessmentByCourse[course.course_id].list,
-                    ...response.data.data,
-                ];
             }
+
+            assessmentList = response.data.data;
 
             const hasMoreAssessment =
                 response.data.current_page < response.data.last_page;

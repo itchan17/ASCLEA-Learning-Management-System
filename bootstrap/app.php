@@ -37,7 +37,6 @@ return Application::configure(basePath: dirname(__DIR__))
                 require base_path('routes/Programs/assessmentSubmisisons.php');
                 require base_path('routes/Programs/studentQuizAnswer.php');
                 require base_path('routes/Programs/modules.php');
-                require base_path('routes/Programs/otherRoutes.php');
             });
         },
     )

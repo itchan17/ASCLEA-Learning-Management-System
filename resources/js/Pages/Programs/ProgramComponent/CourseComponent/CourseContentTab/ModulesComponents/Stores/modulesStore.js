@@ -85,9 +85,14 @@ const useModulesStore = create((set) => ({
     setMaterials: (courseId, list, page, hasMore) => {
         const { materialsByCourse } = useModulesStore.getState();
 
+        // Check if the list for the course if it does mix the previous list to new ones
+        const materialList = materialsByCourse[courseId]
+            ? [...materialsByCourse[courseId].list, ...list]
+            : [...list];
+
         // Map handle removing duplicate values based on the  id
         const uniqueMaterials = [
-            ...new Map(list.map((a) => [a.material_id, a])).values(),
+            ...new Map(materialList.map((a) => [a.material_id, a])).values(),
         ];
 
         set(() => ({

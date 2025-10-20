@@ -4,6 +4,7 @@ import axios from "axios";
 import { displayToast } from "../../../../../../../Utils/displayToast";
 import DefaultCustomToast from "../../../../../../../Components/CustomToast/DefaultCustomToast";
 import useModulesStore from "../Stores/modulesStore";
+import { router } from "@inertiajs/react";
 
 export default function useMaterial({ programId, courseId }) {
     // Module store
@@ -153,7 +154,6 @@ export default function useMaterial({ programId, courseId }) {
                 );
 
                 pageNum = 2;
-                materialList = response.data.data;
             } else {
                 response = await axios.get(
                     route("materials.get", {
@@ -166,11 +166,9 @@ export default function useMaterial({ programId, courseId }) {
                 );
 
                 pageNum = materialsByCourse[courseId].page + 1;
-                materialList = [
-                    ...materialsByCourse[courseId].list,
-                    ...response.data.data,
-                ];
             }
+
+            materialList = response.data.data;
 
             const hasMoreAssessment =
                 response.data.current_page < response.data.last_page;
@@ -189,11 +187,79 @@ export default function useMaterial({ programId, courseId }) {
         }
     };
 
+    const handleArchiveMaterial = async (materialId) => {
+        try {
+            const response = await axios.delete(
+                route("material.archive", {
+                    program: programId,
+                    course: courseId,
+                    material: materialId,
+                })
+            );
+
+            updateMaterialList(response.data.data, courseId);
+            displayToast(
+                <DefaultCustomToast message={response.data.success} />,
+                "success"
+            );
+        } catch (error) {
+            console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please try again."}
+                />,
+                "error"
+            );
+        }
+    };
+
+    const handleRestoreMaterial = async (materialId) => {
+        try {
+            const response = await axios.put(
+                route("material.restore", {
+                    program: programId,
+                    course: courseId,
+                    material: materialId,
+                })
+            );
+
+            updateMaterialList(response.data.data, courseId);
+            displayToast(
+                <DefaultCustomToast message={response.data.success} />,
+                "success"
+            );
+        } catch (error) {
+            console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please try again."}
+                />,
+                "error"
+            );
+        }
+    };
+
+    const handleViewMaterial = (materialId) => {
+        router.visit(
+            route("material.view", {
+                program: programId,
+                course: courseId,
+                material: materialId,
+            }),
+            {
+                preserveScroll: true,
+            }
+        );
+    };
+
     return {
         errors,
         isLoading,
         handleAddUpdateMaterial,
         handleFetchMaterials,
         handleUnpublishMaterial,
+        handleArchiveMaterial,
+        handleRestoreMaterial,
+        handleViewMaterial,
     };
 }

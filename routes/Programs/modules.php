@@ -18,4 +18,19 @@ Route::prefix('programs/{program}/courses/{course}')
 
         // Unpublish material
         Route::put('/materials/{material}/unpublish', [MaterialController::class, 'unpublishMaterial'])->name('material.unpublish');
+
+        // Archive material
+        Route::delete('/materials/{material}/archive', [MaterialController::class, 'archiveMaterial'])->name('material.archive');
+
+        // Restore material
+        Route::put('/material/{material}/restore', [MaterialController::class, 'restoreMaterial'])->name('material.restore');
+
+        // View material
+        Route::get('/material/{material}', [MaterialController::class, 'viewMaterial'])->name('material.view');
+
+        // Stream material file
+        Route::get('/material/{material}/material-files/{file}/stream', [MaterialController::class, 'streamMaterialFile'])->name('material.file.stream');
+
+        // Download material file
+        Route::get('/material/{material}/material-files/{file}/download', [MaterialController::class, 'downloadMaterialFile'])->name('material.file.download');
     });
