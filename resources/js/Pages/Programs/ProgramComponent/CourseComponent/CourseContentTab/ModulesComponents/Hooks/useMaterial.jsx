@@ -17,6 +17,9 @@ export default function useMaterial({ programId, courseId }) {
     const updateMaterialList = useModulesStore(
         (state) => state.updateMaterialList
     );
+    const clearMaterialDetails = useModulesStore(
+        (state) => state.clearMaterialDetails
+    );
 
     const [errors, setErrors] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -85,6 +88,7 @@ export default function useMaterial({ programId, courseId }) {
                 updateMaterialList(response.data.data, courseId);
             }
             setIsMaterialFormOpen(false);
+            clearMaterialDetails();
             displayToast(
                 <DefaultCustomToast message={response.data.success} />,
                 "success"

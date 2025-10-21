@@ -26,7 +26,7 @@ export default function Section({ sectionDetails }) {
         (state) => state.updateSectionStatus
     );
 
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(true);
     const [isMaterialFormOpen, setIsMaterialFormOpen] = useState(false);
     const [isAssessmentFormOpen, setIsAssessmentFormOpen] = useState(false);
     const [isButtonDisplayed, setIsButtonDisyplayed] = useState(false);
@@ -222,8 +222,8 @@ export default function Section({ sectionDetails }) {
             </div>
 
             <div
-                className={`border-r bg-ascend-lightblue border-l border-b border-ascend-gray1  ${
-                    isExpanded ? "h-full" : "h-0 px-5 py-0"
+                className={`border-r bg-ascend-lightblue border-l border-b border-ascend-gray1 overflow-hidden transition-all duration-500 ease-in-out ${
+                    isExpanded ? "max-h-200 opacity-100" : "max-h-0 opacity-0"
                 }`}
             >
                 <div
@@ -234,7 +234,7 @@ export default function Section({ sectionDetails }) {
                     {isMaterialFormOpen && (
                         <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
                             <MaterialForm
-                                toggleOpenMaterialForm={toggleOpenMaterialForm}
+                                setIsMaterialFormOpen={setIsMaterialFormOpen}
                                 formTitle={"Add Section Material"}
                                 formWidth={"w-200"}
                                 sectionId={sectionDetails.id}
@@ -246,7 +246,7 @@ export default function Section({ sectionDetails }) {
                             <AssessmentForm
                                 toggleForm={toggleOpenAssessmentForm}
                                 formTitle={"Add Section Assessment"}
-                                formWidth={"w-200"}
+                                formWidth={"max-w-200"}
                                 sectionId={sectionDetails.id}
                             />
                         </div>

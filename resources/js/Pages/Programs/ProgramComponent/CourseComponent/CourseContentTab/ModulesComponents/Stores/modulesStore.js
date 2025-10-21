@@ -150,113 +150,295 @@ const useModulesStore = create((set) => ({
         });
     },
 
+    clearMaterialDetails: () => {
+        set({
+            materialDetails: {
+                material_title: "",
+                material_description: null,
+                status: "published",
+                material_files: [],
+                removed_files: [],
+            },
+        });
+    },
+
     // To be delete:
 
-    // materialList: [
-    //     {
-    //         id: 1,
-    //         sectionId: 1,
-    //         sortOrder: 1,
-    //         contentType: "material",
-    //         materialTitle: "Chapter 1: Introduction to Physics",
-    //         materialDescription:
-    //             "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-    //         materialFiles: [],
-    //     },
-    //     {
-    //         id: 2,
-    //         sectionId: 2,
-    //         sortOrder: 2,
-    //         contentType: "material",
-    //         materialTitle: "Lesson: Newton's Laws of Motion",
-    //         materialDescription:
-    //             "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-    //         materialFiles: [],
-    //     },
-    // ],
+    materialList: [
+        {
+            id: 1,
+            sectionId: 1,
+            sortOrder: 1,
+            contentType: "material",
+            materialTitle: "Chapter 1: Introduction to Physics",
+            materialDescription:
+                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+            materialFiles: [],
+        },
+        {
+            id: 2,
+            sectionId: 2,
+            sortOrder: 2,
+            contentType: "material",
+            materialTitle: "Lesson: Newton's Laws of Motion",
+            materialDescription:
+                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+            materialFiles: [],
+        },
+        {
+            id: 3,
+            sectionId: 2,
+            sortOrder: 2,
+            contentType: "material",
+            materialTitle: "Lesson: Newton's Laws of Motion",
+            materialDescription:
+                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+            materialFiles: [],
+        },
+        {
+            id: 2,
+            sectionId: 2,
+            sortOrder: 2,
+            contentType: "material",
+            materialTitle: "Lesson: Newton's Laws of Motion",
+            materialDescription:
+                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+            materialFiles: [],
+        },
+        {
+            id: 2,
+            sectionId: 2,
+            sortOrder: 2,
+            contentType: "material",
+            materialTitle: "Lesson: Newton's Laws of Motion",
+            materialDescription:
+                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+            materialFiles: [],
+        },
+        {
+            id: 2,
+            sectionId: 2,
+            sortOrder: 2,
+            contentType: "material",
+            materialTitle: "Lesson: Newton's Laws of Motion",
+            materialDescription:
+                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+            materialFiles: [],
+        },
+        {
+            id: 2,
+            sectionId: 2,
+            sortOrder: 2,
+            contentType: "material",
+            materialTitle: "Lesson: Newton's Laws of Motion",
+            materialDescription:
+                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+            materialFiles: [],
+        },
+        {
+            id: 2,
+            sectionId: 2,
+            sortOrder: 2,
+            contentType: "material",
+            materialTitle: "Lesson: Newton's Laws of Motion",
+            materialDescription:
+                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+            materialFiles: [],
+        },
+        {
+            id: 2,
+            sectionId: 2,
+            sortOrder: 2,
+            contentType: "material",
+            materialTitle: "Lesson: Newton's Laws of Motion",
+            materialDescription:
+                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+            materialFiles: [],
+        },
+        {
+            id: 2,
+            sectionId: 2,
+            sortOrder: 2,
+            contentType: "material",
+            materialTitle: "Lesson: Newton's Laws of Motion",
+            materialDescription:
+                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+            materialFiles: [],
+        },
+        {
+            id: 2,
+            sectionId: 2,
+            sortOrder: 2,
+            contentType: "material",
+            materialTitle: "Lesson: Newton's Laws of Motion",
+            materialDescription:
+                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+            materialFiles: [],
+        },
+        {
+            id: 2,
+            sectionId: 2,
+            sortOrder: 2,
+            contentType: "material",
+            materialTitle: "Lesson: Newton's Laws of Motion",
+            materialDescription:
+                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+            materialFiles: [],
+        },
+    ],
 
-    // sectionList: [
-    //     {
-    //         id: 1,
-    //         sectionTitle: "1st Week",
-    //         sectionStatus: "published",
-    //         sectionContentList: [
-    //             {
-    //                 id: 1,
-    //                 sectionId: 1,
-    //                 sortOrder: 1,
-    //                 contentType: "material",
-    //                 materialTitle: "Chapter 1: Introduction to Physics",
-    //                 materialDescription:
-    //                     "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-    //                 materialFiles: [],
-    //             },
-    //             {
-    //                 id: 1,
-    //                 sectionId: 1,
-    //                 sortOrder: 2,
-    //                 contentType: "assessment",
-    //                 assessmentType: "quiz",
-    //                 assessmentDueDateTime: "2025-07-15T23:59",
-    //                 assessmentPoints: 100,
-    //                 assessmentTitle: "Chapter 3 Quiz: Photosynthesis",
-    //                 assessmentDescription:
-    //                     "<h2>This quiz will cover all topics in Chapter 3, including light-dependent and light-independent reactions. Please review all diagrams and key concepts.</h2>",
-    //                 assessmentFiles: [],
-    //                 assessmentQuiz: {
-    //                     id: 1,
-    //                     quizTitle: "First quiz",
-    //                     quizDescription: "",
-    //                 },
-    //                 assessmentPostDate: "2025-07-07",
-    //                 userPosted: "John Doe",
-    //                 responseReceived: 3,
-    //             },
-    //         ],
-    //     },
-    //     {
-    //         id: 2,
-    //         sectionTitle: "Week 2",
-    //         sectionStatus: "unpublish",
-    //         sectionContentList: [
-    //             {
-    //                 id: 2,
-    //                 sectionId: 2,
-    //                 sortOrder: 1,
-    //                 contentType: "assessment",
-    //                 assessmentType: "activity",
-    //                 assessmentDueDateTime: "2025-07-20T23:59",
-    //                 assessmentPoints: 50,
-    //                 assessmentTitle: "Lab Activity: Plant Cell Observation",
-    //                 assessmentDescription: `
-    //                                     <h2>Instructions:</h2>
-    //                                     <ol>
-    //                                         <li>Obtain the prepared slides of plant cells from your instructor.</li>
-    //                                         <li>Set up the microscope and carefully observe the slides.</li>
-    //                                         <li>Draw and label the visible parts of the plant cells.</li>
-    //                                         <li>Complete the observation sheet provided.</li>
-    //                                         <li>Submit both the labeled diagram and the observation sheet before the deadline.</li>
-    //                                     </ol>
-    //                                 `,
-    //                 assessmentFiles: [],
-    //                 assessmentQuiz: null,
-    //                 assessmentPostDate: "2025-07-08",
-    //                 userPosted: "Jane Smith",
-    //                 responseReceived: 5,
-    //             },
-    //             {
-    //                 id: 2,
-    //                 sectionId: 2,
-    //                 sortOrder: 2,
-    //                 contentType: "material",
-    //                 materialTitle: "Lesson: Newton's Laws of Motion",
-    //                 materialDescription:
-    //                     "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-    //                 materialFiles: [],
-    //             },
-    //         ],
-    //     },
-    // ],
+    sectionList: [
+        {
+            id: 1,
+            sectionTitle: "1st Week",
+            sectionStatus: "published",
+            sectionContentList: [
+                {
+                    id: 1,
+                    sectionId: 1,
+                    sortOrder: 1,
+                    contentType: "material",
+                    materialTitle: "Chapter 1: Introduction to Physics",
+                    materialDescription:
+                        "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+                    materialFiles: [],
+                },
+                {
+                    id: 1,
+                    sectionId: 1,
+                    sortOrder: 1,
+                    contentType: "material",
+                    materialTitle: "Chapter 1: Introduction to Physics",
+                    materialDescription:
+                        "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+                    materialFiles: [],
+                },
+                {
+                    id: 1,
+                    sectionId: 1,
+                    sortOrder: 1,
+                    contentType: "material",
+                    materialTitle: "Chapter 1: Introduction to Physics",
+                    materialDescription:
+                        "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+                    materialFiles: [],
+                },
+                {
+                    id: 1,
+                    sectionId: 1,
+                    sortOrder: 1,
+                    contentType: "material",
+                    materialTitle: "Chapter 1: Introduction to Physics",
+                    materialDescription:
+                        "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+                    materialFiles: [],
+                },
+                {
+                    id: 1,
+                    sectionId: 1,
+                    sortOrder: 1,
+                    contentType: "material",
+                    materialTitle: "Chapter 1: Introduction to Physics",
+                    materialDescription:
+                        "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+                    materialFiles: [],
+                },
+                {
+                    id: 1,
+                    sectionId: 1,
+                    sortOrder: 1,
+                    contentType: "material",
+                    materialTitle: "Chapter 1: Introduction to Physics",
+                    materialDescription:
+                        "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+                    materialFiles: [],
+                },
+                {
+                    id: 1,
+                    sectionId: 1,
+                    sortOrder: 1,
+                    contentType: "material",
+                    materialTitle: "Chapter 1: Introduction to Physics",
+                    materialDescription:
+                        "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+                    materialFiles: [],
+                },
+                {
+                    id: 1,
+                    sectionId: 1,
+                    sortOrder: 1,
+                    contentType: "material",
+                    materialTitle: "Chapter 1: Introduction to Physics",
+                    materialDescription:
+                        "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+                    materialFiles: [],
+                },
+                {
+                    id: 1,
+                    sectionId: 1,
+                    sortOrder: 2,
+                    contentType: "assessment",
+                    assessmentType: "quiz",
+                    assessmentDueDateTime: "2025-07-15T23:59",
+                    assessmentPoints: 100,
+                    assessmentTitle: "Chapter 3 Quiz: Photosynthesis",
+                    assessmentDescription:
+                        "<h2>This quiz will cover all topics in Chapter 3, including light-dependent and light-independent reactions. Please review all diagrams and key concepts.</h2>",
+                    assessmentFiles: [],
+                    assessmentQuiz: {
+                        id: 1,
+                        quizTitle: "First quiz",
+                        quizDescription: "",
+                    },
+                    assessmentPostDate: "2025-07-07",
+                    userPosted: "John Doe",
+                    responseReceived: 3,
+                },
+            ],
+        },
+        {
+            id: 2,
+            sectionTitle: "Week 2",
+            sectionStatus: "unpublish",
+            sectionContentList: [
+                {
+                    id: 2,
+                    sectionId: 2,
+                    sortOrder: 1,
+                    contentType: "assessment",
+                    assessmentType: "activity",
+                    assessmentDueDateTime: "2025-07-20T23:59",
+                    assessmentPoints: 50,
+                    assessmentTitle: "Lab Activity: Plant Cell Observation",
+                    assessmentDescription: `
+                                        <h2>Instructions:</h2>
+                                        <ol>
+                                            <li>Obtain the prepared slides of plant cells from your instructor.</li>
+                                            <li>Set up the microscope and carefully observe the slides.</li>
+                                            <li>Draw and label the visible parts of the plant cells.</li>
+                                            <li>Complete the observation sheet provided.</li>
+                                            <li>Submit both the labeled diagram and the observation sheet before the deadline.</li>
+                                        </ol>
+                                    `,
+                    assessmentFiles: [],
+                    assessmentQuiz: null,
+                    assessmentPostDate: "2025-07-08",
+                    userPosted: "Jane Smith",
+                    responseReceived: 5,
+                },
+                {
+                    id: 2,
+                    sectionId: 2,
+                    sortOrder: 2,
+                    contentType: "material",
+                    materialTitle: "Lesson: Newton's Laws of Motion",
+                    materialDescription:
+                        "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
+                    materialFiles: [],
+                },
+            ],
+        },
+    ],
 
     // materialDetails: {
     //     id: null,

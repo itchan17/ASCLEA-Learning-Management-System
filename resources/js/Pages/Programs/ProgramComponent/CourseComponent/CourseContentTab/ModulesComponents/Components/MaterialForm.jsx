@@ -31,6 +31,9 @@ export default function MaterialForm({
     const handlelRemoveUploadedFile = useModulesStore(
         (state) => state.handlelRemoveUploadedFile
     );
+    const clearMaterialDetails = useModulesStore(
+        (state) => state.clearMaterialDetails
+    );
 
     // Custom hooks
     const { handleAddUpdateMaterial, errors, isLoading } = useMaterial({
@@ -43,7 +46,11 @@ export default function MaterialForm({
         closeDropDown();
     };
 
-    useEffect(() => console.log(materialDetails), [materialDetails]);
+    useEffect(() => {
+        return () => {
+            clearMaterialDetails();
+        };
+    }, []);
 
     return (
         <form
