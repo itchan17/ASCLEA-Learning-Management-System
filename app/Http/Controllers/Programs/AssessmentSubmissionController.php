@@ -58,6 +58,7 @@ class AssessmentSubmissionController extends Controller
                 'assessmentId' => $assessment->assessment_id,
                 'quiz' => $quiz,
                 'quizOptions' => $quiz->options,
+                'assessmentSubmissionId' => $assessmentSubmission->assessment_submission_id,
                 'questions' => fn() => $this->questionService->getQuestions($quiz, $assessmentSubmission->assessment_submission_id, $optionSlectedFields, $studentAnswerSelectedFields, true)
             ]);
         }

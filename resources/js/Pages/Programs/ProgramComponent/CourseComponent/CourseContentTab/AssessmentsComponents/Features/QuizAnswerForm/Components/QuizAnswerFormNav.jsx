@@ -20,7 +20,7 @@ export default function QuizAnswerFormNav() {
     const { submitQuiz } = useQuizAnswerForm();
 
     // Timer to start quiz with cv
-    const [startTimer, setStartTimer] = useState(false);
+    const [faceDetected, setFaceDetected] = useState(false);
     const cvOptions = quizOptions?.map(o => o.options) || [];
     
 
@@ -76,7 +76,7 @@ export default function QuizAnswerFormNav() {
             return () => clearInterval(interval);
         }
 
-        if (quiz.cheating_mitigation == 1 && startTimer && quiz.duration > 0 && !assessmentSubmission.submitted_at) {
+        if (quiz.cheating_mitigation == 1 && faceDetected && quiz.duration > 0 && !assessmentSubmission.submitted_at) {
             const end = new Date(assessmentSubmission.end_at).getTime() / 1000;
 
             const interval = timer(end);
@@ -84,7 +84,8 @@ export default function QuizAnswerFormNav() {
             return () => clearInterval(interval);
         } 
 
-    }, [startTimer]);
+    }, [faceDetected]);
+    
 
     useEffect(() => {
         const handleScroll = () => {
@@ -127,9 +128,10 @@ export default function QuizAnswerFormNav() {
                             {quiz.cheating_mitigation == 1 && ( // Only show CV indicator if cheating mitigation is enabled
                                 <div className="flex items-center">
                                     <CvMonitor 
-                                        onFaceDetected={() => setStartTimer(true)}
+                                        onFaceDetected={() => setFaceDetected(true)}
                                         options={cvOptions}
                                         assessmentSubmissionId={assessmentSubmission.assessment_submission_id}
+                                        faceDetected={faceDetected}
                                     />
                                 </div>
                             )}
