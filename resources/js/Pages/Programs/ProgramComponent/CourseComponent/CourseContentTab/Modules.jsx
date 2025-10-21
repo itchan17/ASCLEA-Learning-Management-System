@@ -16,19 +16,6 @@ export default function Modules() {
     const [isSectionFormOpen, setIsSectionFormOpen] = useState(false);
     const targetForm = useRef(null);
 
-    // Toggle Material form through button
-    const toggleOpenMaterialForm = () => {
-        if (isSectionFormOpen && !isMaterialFormOpen) {
-            setIsSectionFormOpen(!isSectionFormOpen);
-        }
-        setIsMaterialFormOpen(!isMaterialFormOpen);
-    };
-
-    // Toggle Section form
-    const toggleOpenSectionForm = () => {
-        setIsSectionFormOpen(!isSectionFormOpen);
-    };
-
     const handleClickTab = (tab) => {
         console.log(activeTab);
         setActiveTab(tab);
@@ -103,9 +90,7 @@ export default function Modules() {
                 </div>
             ) : isSectionFormOpen ? (
                 <div ref={targetForm}>
-                    <SectionForm
-                        toggleOpenSectionForm={toggleOpenSectionForm}
-                    />
+                    <SectionForm setIsSectionFormOpen={setIsSectionFormOpen} />
                 </div>
             ) : null}
 

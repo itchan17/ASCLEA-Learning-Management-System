@@ -6,6 +6,7 @@ use App\Models\PaymentHistory\Payment;
 use App\Models\PaymentHistory\PaymentFile;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\Material;
+use App\Models\Programs\Section;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -133,5 +134,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function materials(): HasMany
     {
         return $this->hasMany(Material::class, 'created_by', 'user_id');
+    }
+
+    public function sections(): HasMany
+    {
+        return $this->hasMany(Section::class, 'created_by', 'user_id');
     }
 }

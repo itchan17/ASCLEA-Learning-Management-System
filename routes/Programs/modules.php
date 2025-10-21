@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Programs\MaterialController;
+use App\Http\Controllers\Programs\SectionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('programs/{program}/courses/{course}')
@@ -33,4 +34,7 @@ Route::prefix('programs/{program}/courses/{course}')
 
         // Download material file
         Route::get('/material/{material}/material-files/{file}/download', [MaterialController::class, 'downloadMaterialFile'])->name('material.file.download');
+
+        // Create section
+        Route::post('/sections', [SectionController::class, 'addSection'])->name('section.add');
     });

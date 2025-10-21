@@ -236,7 +236,7 @@ export default function Section({ sectionDetails }) {
                             <MaterialForm
                                 setIsMaterialFormOpen={setIsMaterialFormOpen}
                                 formTitle={"Add Section Material"}
-                                formWidth={"w-200"}
+                                formWidth={"max-w-200"}
                                 sectionId={sectionDetails.id}
                             />
                         </div>

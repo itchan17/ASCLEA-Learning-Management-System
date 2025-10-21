@@ -3,6 +3,15 @@ import useAssessmentsStore from "../../../../../../../Stores/Programs/CourseCont
 
 const useModulesStore = create((set) => ({
     activeTab: "materials",
+
+    setActiveTab: (tab) => {
+        set({
+            activeTab: tab,
+        });
+    },
+
+    // Material
+
     materialDetails: {
         material_title: "",
         material_description: null,
@@ -11,12 +20,6 @@ const useModulesStore = create((set) => ({
         removed_files: [],
     },
     materialsByCourse: [],
-
-    setActiveTab: (tab) => {
-        set({
-            activeTab: tab,
-        });
-    },
 
     handleMaterialDetailsChange: (field, value) => {
         const { materialDetails } = useModulesStore.getState();
@@ -162,130 +165,32 @@ const useModulesStore = create((set) => ({
         });
     },
 
-    // To be delete:
+    // Section
+    sectionDetails: {
+        section_title: "",
+        status: "draft",
+    },
 
-    materialList: [
-        {
-            id: 1,
-            sectionId: 1,
-            sortOrder: 1,
-            contentType: "material",
-            materialTitle: "Chapter 1: Introduction to Physics",
-            materialDescription:
-                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-            materialFiles: [],
-        },
-        {
-            id: 2,
-            sectionId: 2,
-            sortOrder: 2,
-            contentType: "material",
-            materialTitle: "Lesson: Newton's Laws of Motion",
-            materialDescription:
-                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-            materialFiles: [],
-        },
-        {
-            id: 3,
-            sectionId: 2,
-            sortOrder: 2,
-            contentType: "material",
-            materialTitle: "Lesson: Newton's Laws of Motion",
-            materialDescription:
-                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-            materialFiles: [],
-        },
-        {
-            id: 2,
-            sectionId: 2,
-            sortOrder: 2,
-            contentType: "material",
-            materialTitle: "Lesson: Newton's Laws of Motion",
-            materialDescription:
-                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-            materialFiles: [],
-        },
-        {
-            id: 2,
-            sectionId: 2,
-            sortOrder: 2,
-            contentType: "material",
-            materialTitle: "Lesson: Newton's Laws of Motion",
-            materialDescription:
-                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-            materialFiles: [],
-        },
-        {
-            id: 2,
-            sectionId: 2,
-            sortOrder: 2,
-            contentType: "material",
-            materialTitle: "Lesson: Newton's Laws of Motion",
-            materialDescription:
-                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-            materialFiles: [],
-        },
-        {
-            id: 2,
-            sectionId: 2,
-            sortOrder: 2,
-            contentType: "material",
-            materialTitle: "Lesson: Newton's Laws of Motion",
-            materialDescription:
-                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-            materialFiles: [],
-        },
-        {
-            id: 2,
-            sectionId: 2,
-            sortOrder: 2,
-            contentType: "material",
-            materialTitle: "Lesson: Newton's Laws of Motion",
-            materialDescription:
-                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-            materialFiles: [],
-        },
-        {
-            id: 2,
-            sectionId: 2,
-            sortOrder: 2,
-            contentType: "material",
-            materialTitle: "Lesson: Newton's Laws of Motion",
-            materialDescription:
-                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-            materialFiles: [],
-        },
-        {
-            id: 2,
-            sectionId: 2,
-            sortOrder: 2,
-            contentType: "material",
-            materialTitle: "Lesson: Newton's Laws of Motion",
-            materialDescription:
-                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-            materialFiles: [],
-        },
-        {
-            id: 2,
-            sectionId: 2,
-            sortOrder: 2,
-            contentType: "material",
-            materialTitle: "Lesson: Newton's Laws of Motion",
-            materialDescription:
-                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-            materialFiles: [],
-        },
-        {
-            id: 2,
-            sectionId: 2,
-            sortOrder: 2,
-            contentType: "material",
-            materialTitle: "Lesson: Newton's Laws of Motion",
-            materialDescription:
-                "<h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</h2>",
-            materialFiles: [],
-        },
-    ],
+    handleSectionDetailsChange: (field, value) => {
+        const { sectionDetails } = useModulesStore.getState();
+        set({
+            sectionDetails: {
+                ...sectionDetails,
+                [field]: value,
+            },
+        });
+    },
+
+    clearSectionDetails: () => {
+        set({
+            sectionDetails: {
+                section_title: "",
+                status: "draft",
+            },
+        });
+    },
+
+    // To be delete:
 
     sectionList: [
         {
