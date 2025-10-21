@@ -33,7 +33,7 @@ export default function Dashboard() {
             ) : role === "admin" ? (
                 <AdminDashboard stats={stats} studentsPerProgram={studentsPerProgram} dailyLogins={dailyLogins} avgTimePerDay={avgTimePerDay} />
             ) : (
-                <FacultyDashboard stats={stats}/>
+                <FacultyDashboard stats={stats} dailyLogins={dailyLogins} avgTimePerDay={avgTimePerDay}/>
             )}
         </div>
     );
