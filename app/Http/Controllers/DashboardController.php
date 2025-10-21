@@ -124,6 +124,7 @@ class DashboardController extends Controller
         //==========================================================================================
         $totalLearningHours = 0;
         $totalAssignedCourses = 0;
+        $dailyTimeSpent = [];
         if ($roleName === 'student') {
             //============================================================
             //Fetch all login sessions for this student
@@ -131,25 +132,51 @@ class DashboardController extends Controller
             $studentLogins = UserLogin::where('user_id', $authUser->user_id)
                 ->whereNotNull('logout_at')
                 ->get();
+
             //============================================================
-            // Sum all session durations in hours
+            // Prepare array for daily time spent
+            //============================================================
+            for ($i = 6; $i >= 0; $i--) {
+                $date = Carbon::now()->subDays($i)->format('Y-m-d');
+
+                // Filter logins for this date
+                $loginsForDate = $studentLogins->filter(function ($login) use ($date) {
+                    return Carbon::parse($login->login_at)->isSameDay($date);
+                });
+
+                // Sum total hours for this date
+                $totalHours = $loginsForDate->sum(function ($login) {
+                    return Carbon::parse($login->login_at)
+                        ->diffInMinutes(Carbon::parse($login->logout_at)) / 60;
+                });
+
+                $dailyTimeSpent[] = [
+                    'date' => $date,
+                    'hours' => round($totalHours, 2),
+                ];
+            }
+
+            //============================================================
+            // Total Learning Hours
             //============================================================
             $totalLearningHours = $studentLogins->sum(function ($login) {
                 return Carbon::parse($login->login_at)
                             ->diffInMinutes(Carbon::parse($login->logout_at)) / 60;
             });
-            //==============================
             // Round to 2 decimal places
-            //==============================
             $totalLearningHours = round($totalLearningHours, 2);
+
             //============================================================
-            // Get total assigned courses for this student
+            // Total Assigned Courses
             //============================================================
             $totalAssignedCourses = \App\Models\LearningMember::where('user_id', $authUser->user_id)
                 ->withCount('courses') // count assigned courses relation
                 ->first()?->courses_count ?? 0;
         }
 
+        //============================================================
+        // Render Dashboard with Inertia
+        //============================================================
         return Inertia::render('Dashboard/Dashboard', [
             'authUser' => [
                 'user_id'    => $authUser->id,
@@ -157,8 +184,9 @@ class DashboardController extends Controller
                 'first_name' => $authUser->first_name,
             ],
             'stats' => $stats,
-            'total_learning_hours' => $totalLearningHours,
-            'total_assigned_courses' => $totalAssignedCourses,
+            'dailyTimeSpent' => $dailyTimeSpent,                  
+            'total_learning_hours' => $totalLearningHours,        
+            'total_assigned_courses' => $totalAssignedCourses,    
             'studentsPerProgram' => $studentsPerProgram,
             'dailyLogins' => [
                 'dates' => $dates,

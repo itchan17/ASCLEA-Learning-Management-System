@@ -5,7 +5,12 @@ import { Line, Bar } from "react-chartjs-2";
 import { MdArrowUpward } from "react-icons/md";
 import CustomSelect from "../../../Components/CustomInputField/CustomSelect";
 
-export default function StudentCharts() {
+export default function StudentCharts({ dailyTimeSpent = [] }) {
+    const labels = dailyTimeSpent.map((d) =>
+        new Date(d.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+    );
+    const hours = dailyTimeSpent.map((d) => d.hours);
+    
     return (
         <div className="flex flex-col md:flex-row justify-between">
             <div className="w-full md:w-[60%]">
@@ -17,41 +22,27 @@ export default function StudentCharts() {
                     </div>
                     <Line
                         data={{
-                            labels: [
-                                "May 5",
-                                "May 6",
-                                "May 7",
-                                "May 8",
-                                "May 9",
-                                "May 10",
-                                "May 11",
-                            ],
+                            labels: labels,
                             datasets: [
                                 {
-                                    label: "",
-                                    data: [5, 6, 1, 3, 5, 8, 3],
+                                    label: "Hours Spent",
+                                    data: hours,
                                     borderColor: "#01007d",
                                     backgroundColor: "#e4e4ff",
                                 },
                             ],
                         }}
                         options={{
-                            plugins: {
-                                legend: {
-                                    display: false,
-                                },
-                            },
+                            plugins: { legend: { display: false } },
                             scales: {
                                 y: {
                                     beginAtZero: true,
-                                    ticks: {
-                                        callback: (value) => value + "hrs",
-                                    },
+                                    ticks: { callback: (v) => v + " hrs" },
                                 },
                             },
                         }}
                         plugins={[ChartDataLabels]}
-                    ></Line>
+                    />
                 </div>
             </div>
             <div className="w-full md:w-[40%] pt-5 md:pt-0 md:pl-5 ">
