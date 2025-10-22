@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('status', ['published', 'draft']);
             $table->uuid('created_by');
             $table->foreign('created_by')->references('user_id')->on('users');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

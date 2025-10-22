@@ -46,7 +46,7 @@ export default function MaterialItem({ materialDetails }) {
     return (
         <>
             <div
-                onClick={() => handleViewMaterial(materialDetails.material_id)}
+                onClick={() => handleViewMaterial(materialDetails)}
                 className="flex flex-col justify-between border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 cursor-pointer card-hover"
             >
                 <div className="flex items-center gap-2 md:gap-20">

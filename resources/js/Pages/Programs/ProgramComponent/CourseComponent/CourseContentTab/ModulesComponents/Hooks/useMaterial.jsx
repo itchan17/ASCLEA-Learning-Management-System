@@ -243,17 +243,19 @@ export default function useMaterial({ programId, courseId }) {
         }
     };
 
-    const handleViewMaterial = (materialId) => {
-        router.visit(
-            route("material.view", {
-                program: programId,
-                course: courseId,
-                material: materialId,
-            }),
-            {
-                preserveScroll: true,
-            }
-        );
+    const handleViewMaterial = (materialDetails) => {
+        if (!materialDetails.deleted_at) {
+            router.visit(
+                route("material.view", {
+                    program: programId,
+                    course: courseId,
+                    material: materialDetails.material_id,
+                }),
+                {
+                    preserveScroll: true,
+                }
+            );
+        }
     };
 
     return {

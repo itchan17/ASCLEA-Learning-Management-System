@@ -168,7 +168,14 @@ const useModulesStore = create((set) => ({
     // Section
     sectionDetails: {
         section_title: "",
-        status: "draft",
+    },
+
+    sectionsByCourse: [],
+
+    setSectionDetails: (sectionDetails) => {
+        set({
+            sectionDetails: { section_title: sectionDetails.section_title },
+        });
     },
 
     handleSectionDetailsChange: (field, value) => {
@@ -186,6 +193,74 @@ const useModulesStore = create((set) => ({
             sectionDetails: {
                 section_title: "",
                 status: "draft",
+            },
+        });
+    },
+
+    setSections: (courseId, list, page, hasMore) => {
+        const { sectionsByCourse } = useModulesStore.getState();
+
+        // Check if the list for the course exist, if it does mix the previous list to new ones
+        const sectionList = sectionsByCourse[courseId]
+            ? [...sectionsByCourse[courseId].list, ...list]
+            : [...list];
+
+        // Map handle removing duplicate values based on the  id
+        const uniqueMaterials = [
+            ...new Map(sectionList.map((a) => [a.section_id, a])).values(),
+        ];
+
+        set(() => ({
+            sectionsByCourse: {
+                ...sectionsByCourse,
+                [courseId]: {
+                    list: uniqueMaterials,
+                    page,
+                    hasMore,
+                },
+            },
+        }));
+    },
+
+    addNewSection: (newSection, courseId) => {
+        const { sectionsByCourse } = useModulesStore.getState();
+
+        // Check if  a list already exist
+        const courseState = sectionsByCourse[courseId] || {
+            list: [],
+            page: 1,
+            hasMore: true,
+        };
+
+        set({
+            sectionsByCourse: {
+                ...sectionsByCourse,
+                [courseId]: {
+                    ...courseState,
+                    list: [...courseState.list, newSection],
+                },
+            },
+        });
+    },
+
+    updateSectionList: (updatedSection, courseId) => {
+        const { sectionsByCourse } = useModulesStore.getState();
+
+        const courseState = sectionsByCourse[courseId];
+
+        const updatedCourseSectionList = courseState.list.map((section) =>
+            section.section_id === updatedSection.section_id
+                ? updatedSection
+                : section
+        );
+
+        set({
+            sectionsByCourse: {
+                ...sectionsByCourse,
+                [courseId]: {
+                    ...courseState,
+                    list: updatedCourseSectionList,
+                },
             },
         });
     },

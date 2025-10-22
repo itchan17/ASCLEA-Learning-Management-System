@@ -23,7 +23,6 @@ class SectionController extends Controller
     {
         $validatedSectionDetails = $request->validate([
             'section_title' => 'required|string|max:255',
-            'status' => 'required|in:published,draft',
         ]);
 
         $validatedSectionDetails['course_id'] = $course->course_id;
@@ -32,5 +31,34 @@ class SectionController extends Controller
         $section = Section::create($validatedSectionDetails);
 
         return response()->json(['success' => "Section added successfully.", 'data' => $this->sectionService->getSectionCompleteDetails($section)]);
+    }
+
+    public function getSections(Request $request, Program $program, Course $course)
+    {
+        $sectionList = $this->sectionService->getSectionList($request->user()->user_id,  $course->course_id);
+
+        return response()->json($sectionList);
+    }
+
+    public function updateSection(Request $request, Program $program, Course $course, Section $section)
+    {
+        $validatedSectionDetails = $request->validate([
+            'section_title' => 'required|string|max:255',
+        ]);
+
+        $section->update($validatedSectionDetails);
+
+        return response()->json(['success' => "Section updated successfully.", 'data' => $section->refresh()]);
+    }
+
+    public function publishUnpublishSection(Program $program, Course $course, Section $section)
+    {
+        if ($section->status ===  "published") {
+            $section->update(['status' => 'draft']);
+        } else {
+            $section->update(['status' => 'published']);
+        }
+
+        return response()->json(['success' => "Section updated successfully.", 'data' => $section->refresh()]);
     }
 }

@@ -5,7 +5,13 @@ import useModulesStore from "../Stores/modulesStore";
 import useSection from "../Hooks/useSection";
 import { usePage } from "@inertiajs/react";
 
-export default function SectionForm({ setIsSectionFormOpen }) {
+export default function SectionForm({
+    setIsSectionFormOpen,
+    isEdit = false,
+    sectionId = null,
+    formTitle,
+    formWIdth,
+}) {
     const { program, course } = usePage().props;
 
     // Module Store
@@ -18,7 +24,7 @@ export default function SectionForm({ setIsSectionFormOpen }) {
     );
 
     // Custom hook
-    const { isLoading, errors, handleAddSection } = useSection({
+    const { isLoading, errors, handleAddUpdateSection } = useSection({
         programId: program.program_id,
         courseId: course.course_id,
     });
@@ -31,8 +37,14 @@ export default function SectionForm({ setIsSectionFormOpen }) {
     }, []);
 
     return (
-        <div className="border border-ascend-gray1 shadow-shadow1 p-5 space-y-5">
-            <h1 className="text-size4 font-bold">Add Section</h1>
+        <div
+            className={`w-full ${formWIdth} border border-ascend-gray1 p-5 space-y-5 bg-ascend-white ${
+                isEdit ? "" : "shadow-shadow1"
+            }`}
+        >
+            <h1 className="text-size4 font-bold">
+                {formTitle || "Add Section"}
+            </h1>
             <div>
                 <label>
                     Section Title<span className="text-ascend-red">*</span>
@@ -69,9 +81,13 @@ export default function SectionForm({ setIsSectionFormOpen }) {
                     isDisabled={isLoading}
                     isLoading={isLoading}
                     doSomething={() => {
-                        handleAddSection(setIsSectionFormOpen);
+                        handleAddUpdateSection(
+                            setIsSectionFormOpen,
+                            isEdit,
+                            sectionId
+                        );
                     }}
-                    text={"Add"}
+                    text={isEdit ? "Save" : "Add"}
                 />
             </div>
         </div>

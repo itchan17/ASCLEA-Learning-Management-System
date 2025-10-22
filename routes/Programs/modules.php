@@ -37,4 +37,13 @@ Route::prefix('programs/{program}/courses/{course}')
 
         // Create section
         Route::post('/sections', [SectionController::class, 'addSection'])->name('section.add');
+
+        // Get sections
+        Route::get('/sections', [SectionController::class, 'getSections'])->name('sections.get');
+
+        // Update section
+        Route::put('/sections/{section}', [SectionController::class, 'updateSection'])->name('section.update');
+
+        // Update section status
+        Route::put('/sections/{section}/status/update', [SectionController::class, 'publishUnpublishSection'])->name('section.status.update');
     });
