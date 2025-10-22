@@ -3,7 +3,7 @@ import DashboardCard from "../Component/DashboardCard";
 import { MdTask, MdQuiz, MdAccessTimeFilled } from "react-icons/md";
 import { RiFileList2Fill } from "react-icons/ri";
 
-export default function StudentDashboardCard() {
+export default function StudentDashboardCard({total_learning_hours, total_assigned_courses}) {
     return (
         <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             <DashboardCard
@@ -17,12 +17,12 @@ export default function StudentDashboardCard() {
                 label="Average Quiz Score"
             />
             <DashboardCard
-                value="5/10"
+                value={total_assigned_courses}
                 icon={<RiFileList2Fill className="text-ascend-black" />}
-                label="Total Finished Courses"
+                label="Total Assigned Courses"
             />
             <DashboardCard
-                value="60"
+                value={total_learning_hours}
                 icon={<MdAccessTimeFilled className="text-[#FF663C]" />}
                 label="Total Learning Hours"
             />

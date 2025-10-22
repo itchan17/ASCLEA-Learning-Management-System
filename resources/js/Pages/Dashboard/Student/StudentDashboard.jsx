@@ -4,11 +4,11 @@ import UpcomingAssessments from "./UpcomingAssessments";
 import StudentCharts from "./StudentCharts";
 import StudentDashboardCard from "./StudentDashboardCard";
 
-export default function StudentDashboard() {
+export default function StudentDashboard({total_learning_hours, total_assigned_courses, dailyTimeSpent}) {
     return (
         <>
-            <StudentDashboardCard />
-            <StudentCharts />
+            <StudentDashboardCard total_learning_hours={total_learning_hours} total_assigned_courses={total_assigned_courses}/>
+            <StudentCharts dailyTimeSpent={dailyTimeSpent}/>
             <UpcomingAssessments />
             <PastAssessments />
         </>

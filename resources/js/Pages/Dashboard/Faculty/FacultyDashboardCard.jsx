@@ -4,16 +4,16 @@ import { BsFillPeopleFill } from "react-icons/bs";
 import { MdRateReview } from "react-icons/md";
 import DashboardCard from "../Component/DashboardCard";
 
-export default function StaffDashboardCard() {
+export default function StaffDashboardCard({ stats }) {
     return (
         <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             <DashboardCard
-                value="60"
+                value={stats?.total_students || 0}
                 icon={<PiStudentFill className="text-ascend-blue" />}
                 label="Total Students"
             />
             <DashboardCard
-                value="21"
+                value="0"
                 icon={
                     <span className="text-size5 relative">
                         <BsFillPeopleFill />
@@ -23,7 +23,7 @@ export default function StaffDashboardCard() {
                 label="Online Students"
             />
             <DashboardCard
-                value="6"
+                value={stats?.assigned_courses || 0}
                 icon={<PiNotebookFill className="text-ascend-yellow" />}
                 label="Courses Assigned"
             />
