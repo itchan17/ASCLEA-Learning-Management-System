@@ -21,6 +21,7 @@ import { usePage } from "@inertiajs/react";
 import { closeDropDown } from "../../../../../../../Utils/closeDropdown";
 import SectionForm from "./SectionForm";
 import ModalContainer from "../../../../../../../Components/ModalContainer";
+import { getRemainingDays } from "../../../../../../../Utils/getRemainingDays";
 
 export default function Section({ sectionDetails }) {
     console.log(sectionDetails);
@@ -32,7 +33,12 @@ export default function Section({ sectionDetails }) {
     );
 
     // Custom hook
-    const { isLoading, handleUpdateSectionStatus } = useSection({
+    const {
+        isLoading,
+        handleUpdateSectionStatus,
+        handleArchiveSection,
+        handleRestoreSection,
+    } = useSection({
         programId: program.program_id,
         courseId: course.course_id,
     });
@@ -163,16 +169,34 @@ export default function Section({ sectionDetails }) {
                         </h1>
 
                         {/* Set the status label */}
-                        {sectionDetails.status === "published" ? (
-                            <div className="px-2 bg-ascend-green ">
-                                <span className="text-size1 font-bold text-ascend-white">
-                                    Published
+                        {sectionDetails.deleted_at ? (
+                            <div className="flex flex-wrap gap-2">
+                                <div className={`px-2 bg-ascend-red h-fit`}>
+                                    <span className="text-size1 font-bold text-ascend-white">
+                                        {"Archived"}
+                                    </span>
+                                </div>
+                                <span className="font-bold">
+                                    {`Permanently deleted in
+                                                           ${getRemainingDays(
+                                                               sectionDetails.deleted_at,
+                                                               30
+                                                           )}
+                                                            days`}
                                 </span>
                             </div>
                         ) : (
-                            <div className="px-2 bg-ascend-yellow ">
+                            <div
+                                className={`px-2 ${
+                                    sectionDetails.status === "published"
+                                        ? "px-2 bg-ascend-green"
+                                        : "px-2 bg-ascend-yellow"
+                                }`}
+                            >
                                 <span className="text-size1 font-bold text-ascend-white">
-                                    Draft
+                                    {sectionDetails.status === "published"
+                                        ? "Publshed"
+                                        : "Draft"}
                                 </span>
                             </div>
                         )}
@@ -191,50 +215,75 @@ export default function Section({ sectionDetails }) {
                                 tabIndex={0}
                                 className="dropdown-content menu font-bold space-y-2 bg-ascend-white min-w-36 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                             >
-                                <li
-                                    onClick={() => {
-                                        handleUpdateSectionStatus(
-                                            sectionDetails.section_id
-                                        );
-                                        closeDropDown();
-                                    }}
-                                >
-                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                        {sectionDetails.status === "published"
-                                            ? "Unpublish section"
-                                            : "Publish section"}
-                                    </a>
-                                </li>
-                                {sectionDetails.status === "draft" && (
+                                {!sectionDetails.deleted_at ? (
                                     <>
                                         <li
-                                            name="add-material"
-                                            onClick={openForm}
+                                            onClick={() => {
+                                                handleUpdateSectionStatus(
+                                                    sectionDetails.section_id
+                                                );
+                                                closeDropDown();
+                                            }}
                                         >
                                             <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                Add material
+                                                {sectionDetails.status ===
+                                                "published"
+                                                    ? "Unpublish section"
+                                                    : "Publish section"}
                                             </a>
                                         </li>
+                                        {sectionDetails.status === "draft" && (
+                                            <>
+                                                <li
+                                                    name="add-material"
+                                                    onClick={openForm}
+                                                >
+                                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                        Add material
+                                                    </a>
+                                                </li>
+                                                <li
+                                                    name="add-assessment"
+                                                    onClick={openForm}
+                                                >
+                                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                        Add assessment
+                                                    </a>
+                                                </li>
+                                                <li onClick={handleClickEdit}>
+                                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                        Edit section title
+                                                    </a>
+                                                </li>
+                                            </>
+                                        )}
                                         <li
-                                            name="add-assessment"
-                                            onClick={openForm}
+                                            onClick={() => {
+                                                handleArchiveSection(
+                                                    sectionDetails.section_id
+                                                );
+                                                closeDropDown();
+                                            }}
                                         >
                                             <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                Add assessment
-                                            </a>
-                                        </li>
-                                        <li onClick={handleClickEdit}>
-                                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                Edit section title
+                                                Archive section
                                             </a>
                                         </li>
                                     </>
+                                ) : (
+                                    <li
+                                        onClick={() => {
+                                            handleRestoreSection(
+                                                sectionDetails.section_id
+                                            );
+                                            closeDropDown();
+                                        }}
+                                    >
+                                        <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                            Restore section
+                                        </a>
+                                    </li>
                                 )}
-                                <li>
-                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                        Archive section
-                                    </a>
-                                </li>
                             </ul>
                         </div>
                     </RoleGuard>

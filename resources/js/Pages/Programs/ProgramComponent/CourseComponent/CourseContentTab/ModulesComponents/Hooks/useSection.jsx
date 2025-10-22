@@ -186,6 +186,60 @@ export default function useSection({ programId, courseId }) {
         }
     };
 
+    const handleArchiveSection = async (sectionId) => {
+        try {
+            const response = await axios.delete(
+                route("section.archive", {
+                    program: programId,
+                    course: courseId,
+                    section: sectionId,
+                })
+            );
+
+            console.log(response);
+            updateSectionList(response.data.data, courseId);
+            displayToast(
+                <DefaultCustomToast message={response.data.success} />,
+                "success"
+            );
+        } catch (error) {
+            console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please try again."}
+                />,
+                "error"
+            );
+        }
+    };
+
+    const handleRestoreSection = async (sectionId) => {
+        try {
+            const response = await axios.put(
+                route("section.restore", {
+                    program: programId,
+                    course: courseId,
+                    section: sectionId,
+                })
+            );
+
+            console.log(response);
+            updateSectionList(response.data.data, courseId);
+            displayToast(
+                <DefaultCustomToast message={response.data.success} />,
+                "success"
+            );
+        } catch (error) {
+            console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please try again."}
+                />,
+                "error"
+            );
+        }
+    };
+
     return {
         isLoading,
         errors,
@@ -193,5 +247,7 @@ export default function useSection({ programId, courseId }) {
         handleFetchSections,
         handleUpdateSection,
         handleUpdateSectionStatus,
+        handleArchiveSection,
+        handleRestoreSection,
     };
 }

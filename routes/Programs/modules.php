@@ -46,4 +46,10 @@ Route::prefix('programs/{program}/courses/{course}')
 
         // Update section status
         Route::put('/sections/{section}/status/update', [SectionController::class, 'publishUnpublishSection'])->name('section.status.update');
+
+        // Archive section
+        Route::delete('/sections/{section}', [SectionController::class, 'archiveSection'])->name('section.archive');
+
+        // Restore section
+        Route::put('/sections/{section}/restore', [SectionController::class, 'restoreSection'])->name('section.restore');
     });

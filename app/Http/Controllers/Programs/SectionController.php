@@ -48,7 +48,7 @@ class SectionController extends Controller
 
         $section->update($validatedSectionDetails);
 
-        return response()->json(['success' => "Section updated successfully.", 'data' => $section->refresh()]);
+        return response()->json(['success' => "Section updated successfully.", 'data' => $this->sectionService->getSectionCompleteDetails($section->refresh())]);
     }
 
     public function publishUnpublishSection(Program $program, Course $course, Section $section)
@@ -59,6 +59,20 @@ class SectionController extends Controller
             $section->update(['status' => 'published']);
         }
 
-        return response()->json(['success' => "Section updated successfully.", 'data' => $section->refresh()]);
+        return response()->json(['success' => "Section updated successfully.", 'data' => $this->sectionService->getSectionCompleteDetails($section->refresh())]);
+    }
+
+    public function archiveSection(Program $program, Course $course, Section $section)
+    {
+        $section = $this->sectionService->archiveSection($section);
+
+        return response()->json(['success' => "Section archived successfully.", 'data' => $section]);
+    }
+
+    public function restoreSection(Program $program, Course $course, $section)
+    {
+        $section = $this->sectionService->restoreSection($section);
+
+        return response()->json(['success' => "Section restored successfully.", 'data' => $section]);
     }
 }

@@ -36,4 +36,22 @@ class SectionService
 
         return $sectionList;
     }
+
+    public function archiveSection(Section $section)
+    {
+        $section->delete(); // Soft delete the section
+
+        return  $this->getSectionCompleteDetails($section);
+    }
+
+    public function restoreSection(string $sectionId)
+    {
+        // Get the instace of model since model binding
+        // is not working for soft deleted data
+        $section = Section::withTrashed()->findOrFail($sectionId);
+
+        $section->restore();
+
+        return  $this->getSectionCompleteDetails($section);
+    }
 }

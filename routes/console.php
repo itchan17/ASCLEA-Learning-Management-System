@@ -6,6 +6,7 @@ Schedule::daily()
     ->group(function () {
         Schedule::command('app:permanently-delete-assessments');
         Schedule::command('app:permanently-delete-materials');
+        Schedule::command('app:permanently-delete-sections');
     });
 
 Schedule::everyMinute()

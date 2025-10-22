@@ -60,6 +60,6 @@ class PermanentlyDeleteMaterials extends Command
             }
         }
 
-        $this->info("Deleted {$archivedMaterials->count()} assessments permanently.");
+        $this->info("Deleted {$archivedMaterials->count()} materials permanently.");
     }
 }
