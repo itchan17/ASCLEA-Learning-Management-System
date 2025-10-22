@@ -9,6 +9,7 @@ use App\Models\Role;
 use App\Models\Student;
 use App\Models\Program;
 use App\Models\LearningMember;
+use App\Models\Programs\AssessmentSubmission;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\Administration\Staff;
@@ -125,6 +126,8 @@ class DashboardController extends Controller
         $totalLearningHours = 0;
         $totalAssignedCourses = 0;
         $dailyTimeSpent = [];
+        $totalSubmitted = 0;
+        $averageQuizScore = 0;
         if ($roleName === 'student') {
             //============================================================
             //Fetch all login sessions for this student
@@ -172,6 +175,54 @@ class DashboardController extends Controller
             $totalAssignedCourses = \App\Models\LearningMember::where('user_id', $authUser->user_id)
                 ->withCount('courses') // count assigned courses relation
                 ->first()?->courses_count ?? 0;
+
+                //======================================================================
+                // Total the Assigned Courses of Student through Learning Member
+                //======================================================================
+                $assignedCourseIds = LearningMember::where('user_id', $authUser->user_id)
+                    ->with('courses') // eager load AssignedCourse
+                    ->get()
+                    ->pluck('courses') // collection of AssignedCourse collections
+                    ->flatten()        // flatten to single collection
+                    ->pluck('assigned_course_id') // now pluck the actual IDs used in submissions
+                    ->toArray();
+
+                //======================================================================
+                // Total Assessment Submitted by a student
+                //======================================================================
+                $totalSubmitted = \App\Models\Programs\AssessmentSubmission::whereIn('submitted_by', $assignedCourseIds)
+                    ->whereIn('submission_status', ['submitted', 'returned'])
+                    ->count();
+
+                //======================================================================
+                // Average Score of Students Across Quizzes
+                //======================================================================
+                $quizSubmissions = AssessmentSubmission::whereIn('submitted_by', $assignedCourseIds)
+                    ->whereHas('assessment', function ($query) {
+                        $query->whereHas('assessmentType', function ($q) {
+                            $q->where('assessment_type', 'quiz');
+                        });
+                    })
+                    ->whereNotNull('score')
+                    ->with(['assessment.quiz:quiz_id,assessment_id,quiz_total_points'])
+                    ->get();
+
+                $totalPercentages = 0;
+                $count = 0;
+
+                foreach ($quizSubmissions as $submission) {
+                    $totalPoints = $submission->assessment->quiz->quiz_total_points ?? 0;
+
+                    if ($totalPoints > 0) {
+                        // Compute individual quiz average
+                        $quizAverage = ($submission->score / $totalPoints) * 100;
+                        $totalPercentages += $quizAverage;
+                        $count++;
+                    }
+                }
+
+                $averageQuizScore = $count > 0 ? round($totalPercentages / $count) : 0;
+
         }
 
         //============================================================
@@ -184,7 +235,9 @@ class DashboardController extends Controller
                 'first_name' => $authUser->first_name,
             ],
             'stats' => $stats,
-            'dailyTimeSpent' => $dailyTimeSpent,                  
+            'dailyTimeSpent' => $dailyTimeSpent,
+            'total_submitted_assessments' => $totalSubmitted,
+            'average_quiz_score' => $averageQuizScore,                  
             'total_learning_hours' => $totalLearningHours,        
             'total_assigned_courses' => $totalAssignedCourses,    
             'studentsPerProgram' => $studentsPerProgram,

@@ -8,7 +8,16 @@ import useUserStore from "../../Stores/User/userStore";
 export default function Dashboard() {
     const [isStudent, setIsStudent] = useState(false);
     const user = useUserStore((state) => state.user);
-    const { authUser, stats, studentsPerProgram, dailyLogins, avgTimePerDay, total_learning_hours, total_assigned_courses, dailyTimeSpent } = usePage().props;
+    const { 
+        authUser, 
+        stats, 
+        studentsPerProgram, 
+        dailyLogins, avgTimePerDay, 
+        total_learning_hours, 
+        total_assigned_courses, 
+        dailyTimeSpent, 
+        total_submitted_assessments, 
+        average_quiz_score } = usePage().props;
     const role = authUser?.role;
 
     console.log("Render Dashboard");
@@ -29,11 +38,23 @@ export default function Dashboard() {
             </div>
 
             {role === "student" ? (
-                <StudentDashboard total_learning_hours={total_learning_hours} total_assigned_courses={total_assigned_courses} dailyTimeSpent={dailyTimeSpent}/>
+                <StudentDashboard 
+                    total_learning_hours={total_learning_hours} 
+                    total_assigned_courses={total_assigned_courses} 
+                    dailyTimeSpent={dailyTimeSpent} 
+                    total_submitted_assessments={total_submitted_assessments} 
+                    average_quiz_score={average_quiz_score}/>
             ) : role === "admin" ? (
-                <AdminDashboard stats={stats} studentsPerProgram={studentsPerProgram} dailyLogins={dailyLogins} avgTimePerDay={avgTimePerDay} />
+                <AdminDashboard 
+                    stats={stats} 
+                    studentsPerProgram={studentsPerProgram} 
+                    dailyLogins={dailyLogins} 
+                    avgTimePerDay={avgTimePerDay} />
             ) : (
-                <FacultyDashboard stats={stats} dailyLogins={dailyLogins} avgTimePerDay={avgTimePerDay}/>
+                <FacultyDashboard 
+                    stats={stats} 
+                    dailyLogins={dailyLogins} 
+                    avgTimePerDay={avgTimePerDay}/>
             )}
         </div>
     );
