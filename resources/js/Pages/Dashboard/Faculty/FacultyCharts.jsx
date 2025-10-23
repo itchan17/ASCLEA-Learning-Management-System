@@ -1,39 +1,54 @@
-import React from "react";
+import React, { useState } from "react";
 import { Chart as ChartJS } from "chart.js/auto";
 import { Line, Bar, Pie } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import CustomSelect from "../../../Components/CustomInputField/CustomSelect";
 
-export default function StaffCharts({ dailyLogins, avgTimePerDay}) {
+export default function StaffCharts({ dailyLogins, avgTimePerDay, assessments }) {
+    const [selectedAssessment, setSelectedAssessment] = useState("");
+
+    // Find selected assessment data
+    const currentAssessment = assessments.find(
+        (a) => a.assessment_id === selectedAssessment
+    );
+
+    // Default to 0 if not selected
+    const submitted = currentAssessment?.submitted_count || 0;
+    const returned = currentAssessment?.returned_count || 0;
+    const notSubmitted = currentAssessment?.not_submitted_count || 0;
+
+    console.log(assessments);
+console.log(currentAssessment);
+
+
     return (
         <div className="flex flex-col md:flex-row justify-between">
+            {/* Left side charts */}
             <div className="space-y-5 w-full md:w-2/3">
+                {/* Avg Time Spent Chart */}
                 <div className="sm:border border-ascend-gray1 sm:shadow-shadow1 sm:p-4 space-y-5">
-                    <div>
-                        <h1 className="text-size4 font-bold">
-                            Avg Time Spent (Hours)
-                        </h1>
-                    </div>
+                    <h1 className="text-size4 font-bold">Avg Time Spent (Hours)</h1>
                     <Line
                         data={{
-                            labels: Object.keys(avgTimePerDay).map(d =>
-                            new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                            labels: Object.keys(avgTimePerDay).map((d) =>
+                                new Date(d).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                })
                             ),
-                            datasets: [{
-                            label: "Avg Time Spent",
-                            data: Object.values(avgTimePerDay),
-                            borderColor: "#01007d",
-                            backgroundColor: "#e4e4ff",
-                            }],
+                            datasets: [
+                                {
+                                    label: "Avg Time Spent",
+                                    data: Object.values(avgTimePerDay),
+                                    borderColor: "#01007d",
+                                    backgroundColor: "#e4e4ff",
+                                },
+                            ],
                         }}
                         options={{
                             plugins: {
-                                legend: {
-                                    display: false,
-                                },
-                                datalabels: {
-                                    color: "#01007d",
-                                },
+                                legend: { display: false },
+                                datalabels: { color: "#01007d" },
                             },
                             scales: {
                                 y: {
@@ -45,16 +60,19 @@ export default function StaffCharts({ dailyLogins, avgTimePerDay}) {
                             },
                         }}
                         plugins={[ChartDataLabels]}
-                    ></Line>
+                    />
                 </div>
+
+                {/* Daily Logins */}
                 <div className="sm:border border-ascend-gray1 sm:shadow-shadow1 sm:p-4 space-y-5">
-                    <div>
-                        <h1 className="text-size4 font-bold">Daily Logins</h1>
-                    </div>
+                    <h1 className="text-size4 font-bold">Daily Logins</h1>
                     <Bar
                         data={{
-                            labels: dailyLogins.dates.map(d =>
-                                new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                            labels: dailyLogins.dates.map((d) =>
+                                new Date(d).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                })
                             ),
                             datasets: [
                                 {
@@ -67,48 +85,49 @@ export default function StaffCharts({ dailyLogins, avgTimePerDay}) {
                         options={{
                             plugins: { legend: { display: false } },
                             scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: { precision: 0 },
-                                },
+                                y: { beginAtZero: true, ticks: { precision: 0 } },
                             },
                         }}
                     />
                 </div>
             </div>
+
+            {/* Right side chart */}
             <div className="w-full md:w-1/3 md:pl-5 pt-5 md:pt-0">
                 <div className="h-full sm:border border-ascend-gray1 sm:shadow-shadow1 sm:p-4 space-y-5">
-                    <div>
-                        <h1 className="text-size4 font-bold">
-                            Assessment Submission Status
-                        </h1>
-                    </div>
+                    <h1 className="text-size4 font-bold">Assessment Submission Status</h1>
+
                     <CustomSelect
                         selectField={
                             <select
-                                className="w-full rounded-none appearance-none border px-2 s text-size1 py-2 focus:outline-ascend-blue"
-                                name="Select Course"
-                                id=""
+                                className="w-full rounded-none appearance-none border px-2 py-2 focus:outline-ascend-blue"
+                                onChange={(e) => setSelectedAssessment(e.target.value)}
+                                value={selectedAssessment}
                             >
-                                <option className="" value="">
-                                    Select assessment
-                                </option>
-                                <option value="let">Quiz 1</option>
-                                <option value="ctp">Mock exam</option>
+                                <option value="">Select assessment</option>
+                                {assessments.map((a) => (
+                                    <option
+                                        key={a.assessment_id}
+                                        value={a.assessment_id}
+                                    >
+                                        {a.assessment_title}
+                                    </option>
+                                ))}
                             </select>
                         }
                     />
+
                     <Pie
                         data={{
                             labels: [
-                                "Submitted on time",
-                                "Late submission",
+                                "Submitted",
+                                "Returned",
                                 "Not submitted",
                             ],
                             datasets: [
                                 {
                                     label: "",
-                                    data: [72, 41, 15],
+                                    data: [submitted, returned, notSubmitted],
                                     backgroundColor: [
                                         "#f9a502",
                                         "#01007d",
@@ -118,49 +137,40 @@ export default function StaffCharts({ dailyLogins, avgTimePerDay}) {
                             ],
                         }}
                         options={{
-                            plugins: {
-                                legend: {
-                                    display: false,
-                                },
-                            },
+                            plugins: { legend: { display: false } },
                         }}
-                    ></Pie>
+                    />
+
+                    {/* Manual Legend */}
                     <div className="space-y-2">
-                        <div className="">
-                            <div className="flex items-center space-x-2">
-                                <div
-                                    className={`h-4 w-4 ${"bg-ascend-blue"}`}
-                                ></div>
-                                <span className="text-size1 text-ascend-gray3">
-                                    Submitted on time
-                                </span>
-                            </div>
-
-                            <span className="font-bold ml-6">72</span>
-                        </div>
                         <div>
                             <div className="flex items-center space-x-2">
-                                <div
-                                    className={`h-4 w-4 ${"bg-ascend-yellow"}`}
-                                ></div>
+                                <div className="h-4 w-4 bg-ascend-yellow"></div>
                                 <span className="text-size1 text-ascend-gray3">
-                                    Late submission
+                                    Submitted
                                 </span>
                             </div>
-
-                            <span className="font-bold ml-6">41</span>
+                            <span className="font-bold ml-6">{submitted}</span>
                         </div>
+
                         <div>
                             <div className="flex items-center space-x-2">
-                                <div
-                                    className={`h-4 w-4 ${"bg-ascend-red"}`}
-                                ></div>
+                                <div className="h-4 w-4 bg-ascend-blue"></div>
+                                <span className="text-size1 text-ascend-gray3">
+                                    Returned
+                                </span>
+                            </div>
+                            <span className="font-bold ml-6">{returned}</span>
+                        </div>
+
+                        <div>
+                            <div className="flex items-center space-x-2">
+                                <div className="h-4 w-4 bg-ascend-red"></div>
                                 <span className="text-size1 text-ascend-gray3">
                                     Not submitted
                                 </span>
                             </div>
-
-                            <span className="font-bold ml-6">15</span>
+                            <span className="font-bold ml-6">{notSubmitted}</span>
                         </div>
                     </div>
                 </div>

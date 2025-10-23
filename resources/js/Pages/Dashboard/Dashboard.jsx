@@ -12,12 +12,14 @@ export default function Dashboard() {
         authUser, 
         stats, 
         studentsPerProgram, 
-        dailyLogins, avgTimePerDay, 
+        dailyLogins, 
+        avgTimePerDay, 
         total_learning_hours, 
         total_assigned_courses, 
         dailyTimeSpent, 
         total_submitted_assessments, 
-        average_quiz_score } = usePage().props;
+        average_quiz_score, 
+        assessments } = usePage().props;
     const role = authUser?.role;
 
     console.log("Render Dashboard");
@@ -54,7 +56,8 @@ export default function Dashboard() {
                 <FacultyDashboard 
                     stats={stats} 
                     dailyLogins={dailyLogins} 
-                    avgTimePerDay={avgTimePerDay}/>
+                    avgTimePerDay={avgTimePerDay}
+                    assessments={assessments}/>
             )}
         </div>
     );

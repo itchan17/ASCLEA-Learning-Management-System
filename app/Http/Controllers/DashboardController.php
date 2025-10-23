@@ -9,6 +9,7 @@ use App\Models\Role;
 use App\Models\Student;
 use App\Models\Program;
 use App\Models\LearningMember;
+use App\Models\Programs\Assessment;
 use App\Models\Programs\AssessmentSubmission;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -112,6 +113,7 @@ class DashboardController extends Controller
             $avgTimePerDay[$date] = $times->count() ? round($times->avg(), 2) : 0;
         }
 
+
         //============================================================
         // Fetch the total number of assigned courses to Faculty
         //============================================================
@@ -119,7 +121,29 @@ class DashboardController extends Controller
             $staff = Staff::where('user_id', $authUser->user_id)
                 ->withCount('assignedCourses')->first();
             $stats['assigned_courses'] = $staff?->assigned_courses_count ?? 0;
+
+            //============================================================
+            // Fetch the course IDs assigned to Faculty
+            //============================================================
+            $assignedCourseIds = $staff?->assignedCourses->pluck('course_id');
+
+            $assessments = Assessment::select('assessment_id', 'assessment_title')
+                ->whereIn('course_id', $assignedCourseIds ?? [])
+                ->withCount([
+                    'assessmentSubmissions as submitted_count' => function ($q) {
+                        $q->where('submission_status', 'submitted');
+                    },
+                    'assessmentSubmissions as returned_count' => function ($q) {
+                        $q->where('submission_status', 'returned');
+                    },
+                    'assessmentSubmissions as not_submitted_count' => function ($q) {
+                        $q->where('submission_status', 'not_submitted');
+                    },
+                ])
+                ->get();
         }
+
+
         //==========================================================================================
         // Fetch the Total Learning Hours and Assigned Courses of Student
         //==========================================================================================
@@ -236,10 +260,11 @@ class DashboardController extends Controller
             ],
             'stats' => $stats,
             'dailyTimeSpent' => $dailyTimeSpent,
+            'total_assigned_courses' => $totalAssignedCourses, 
+            'assessments' => $assessments ?? [],
             'total_submitted_assessments' => $totalSubmitted,
             'average_quiz_score' => $averageQuizScore,                  
-            'total_learning_hours' => $totalLearningHours,        
-            'total_assigned_courses' => $totalAssignedCourses,    
+            'total_learning_hours' => $totalLearningHours,           
             'studentsPerProgram' => $studentsPerProgram,
             'dailyLogins' => [
                 'dates' => $dates,
