@@ -35,7 +35,7 @@ class DashboardController extends Controller
         //Dashboard stats
         //==============================
         $stats = [
-            'total_students'    => User::join('roles', 'users.role_id', '=', 'roles.role_id')->where('roles.role_name', 'student')->count(),
+            'total_students'    => Student::where('enrollment_status', 'enrolled')->count(),
             'total_educators'   => User::join('roles', 'users.role_id', '=', 'roles.role_id')->where('roles.role_name', 'faculty')->count(),
             'pending_enrollees' => Student::where('enrollment_status', 'pending')->count(),
             'online_students'   => 0, // optional
@@ -219,6 +219,56 @@ class DashboardController extends Controller
                     ->count();
 
                 //======================================================================
+                // Fetch Details of Accomplished Assessments (Submitted or Returned)
+                //======================================================================
+                $accomplishedAssessments = AssessmentSubmission::whereIn('submitted_by', $assignedCourseIds)
+                    ->whereIn('submission_status', ['submitted', 'returned'])
+                    ->with([
+                        'assessment' => function ($query) {
+                            $query->select('assessment_id', 'assessment_title', 'due_datetime', 'course_id')
+                                ->with(['course:course_id,course_name,course_code']);
+                        }
+                    ])
+                    ->select('assessment_submission_id', 'assessment_id', 'score', 'submitted_at', 'submission_status')
+                    ->latest('submitted_at')
+                    ->paginate(5)
+                    ->through(function ($submission) {
+                        return [
+                            'assessment_title' => $submission->assessment?->assessment_title ?? 'Untitled',
+                            'course_name'      => $submission->assessment?->course?->course_name ?? 'Unknown Course',
+                            'course_code'      => $submission->assessment?->course?->course_code ?? '-',
+                            'due_date'         => \Carbon\Carbon::parse($submission->assessment?->due_datetime)->format('F d, Y'),
+                            'score'            => $submission->score ?? 0,
+                            'status'           => ucfirst($submission->submission_status),
+                        ];
+                    });
+
+                //======================================================================
+                // Fetch Pending Assessments (Not Submitted)
+                //======================================================================
+                $pendingAssessments = AssessmentSubmission::whereIn('submitted_by', $assignedCourseIds)
+                    ->where('submission_status', 'not_submitted')
+                    ->with([
+                        'assessment' => function ($query) {
+                            $query->select('assessment_id', 'assessment_title', 'due_datetime', 'total_points', 'course_id')
+                                ->with(['course:course_id,course_name,course_code']);
+                        }
+                    ])
+                    ->select('assessment_submission_id', 'assessment_id', 'submitted_by', 'submission_status')
+                    ->latest('assessment_submission_id')
+                    ->paginate(5)
+                    ->through(function ($submission) {
+                        return [
+                            'assessment_title' => $submission->assessment?->assessment_title ?? 'Untitled',
+                            'course_name'      => $submission->assessment?->course?->course_name ?? 'Unknown Course',
+                            'course_code'      => $submission->assessment?->course?->course_code ?? '-',
+                            'due_date'         => \Carbon\Carbon::parse($submission->assessment?->due_datetime)->format('F d, Y'),
+                            'possible_score'   => $submission->assessment?->total_points ?? 0,
+                            'status'           => ucfirst($submission->submission_status),
+                        ];
+                    });
+
+                //======================================================================
                 // Average Score of Students Across Quizzes
                 //======================================================================
                 $quizSubmissions = AssessmentSubmission::whereIn('submitted_by', $assignedCourseIds)
@@ -246,7 +296,7 @@ class DashboardController extends Controller
                 }
 
                 $averageQuizScore = $count > 0 ? round($totalPercentages / $count) : 0;
-
+                
         }
 
         //============================================================
@@ -262,6 +312,8 @@ class DashboardController extends Controller
             'dailyTimeSpent' => $dailyTimeSpent,
             'total_assigned_courses' => $totalAssignedCourses, 
             'assessments' => $assessments ?? [],
+            'accomplished_assessments' => $accomplishedAssessments ?? [],
+            'pending_assessments' => $pendingAssessments ?? [],
             'total_submitted_assessments' => $totalSubmitted,
             'average_quiz_score' => $averageQuizScore,                  
             'total_learning_hours' => $totalLearningHours,           
