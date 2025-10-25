@@ -6,6 +6,8 @@ import QuizResponsesSummary from "./QuizResponsesSummary";
 import QuizResponsesFMQ from "./QuizResponsesFMQ";
 import QuizResponsesTable from "./QuizResponsesTable";
 import QuizReponsesFeedback from "./QuizReponsesFeedback";
+import BackButton from "../../../../../../../../../Components/Button/BackButton";
+import { handleClickBackBtn } from "../../../../../../../../../Utils/handleClickBackBtn";
 
 export default function QuizReponses() {
     const {
@@ -17,8 +19,6 @@ export default function QuizReponses() {
         responses,
     } = usePage().props;
 
-    const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-    const [isEvidenceOpen, setIsEvidenceOpen] = useState(false);
     const [
         frequentlyMissedQuestionsWithColors,
         setFrequentlyMissedQuestionsWithColors,
@@ -40,6 +40,9 @@ export default function QuizReponses() {
 
     return (
         <div className="space-y-5 font-nunito-sans">
+            <div className="flex">
+                <BackButton doSomething={handleClickBackBtn} />
+            </div>
             <div className="w-full min-w-0">
                 <h1 className="text-size6 break-words font-semibold">
                     {assessment.assessment_title}
@@ -78,14 +81,6 @@ export default function QuizReponses() {
                 assessment={assessment}
                 responses={responses}
             />
-
-            {isDetailsOpen && (
-                <StudentQuizDetails setIsDetailsOpen={setIsDetailsOpen} />
-            )}
-
-            {isEvidenceOpen && (
-                <ViewEvidence setIsEvidenceOpen={setIsEvidenceOpen} />
-            )}
         </div>
     );
 }

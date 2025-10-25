@@ -11,6 +11,8 @@ use App\Models\Programs\AssessmentFile;
 use App\Services\HandlingPrivateFileService;
 use App\Services\Programs\AssessmentResponseService;
 use App\Services\Programs\AssessmentService;
+use App\Services\Programs\AssessmentSubmissionService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -19,11 +21,13 @@ class AssessmentController extends Controller
 {
     protected AssessmentService $assessmentService;
     protected AssessmentResponseService $assessmentResponseService;
+    protected AssessmentSubmissionService $assessmentSubmissionService;
 
-    public function __construct(AssessmentService $assessmentService, AssessmentResponseService $assessmentResponseService)
+    public function __construct(AssessmentService $assessmentService, AssessmentResponseService $assessmentResponseService, AssessmentSubmissionService $assessmentSubmissionService)
     {
         $this->assessmentService = $assessmentService;
         $this->assessmentResponseService = $assessmentResponseService;
+        $this->assessmentSubmissionService = $assessmentSubmissionService;
     }
 
     public function createAssessment(SaveAssessmentRequest $req, $program, $course)
@@ -103,12 +107,21 @@ class AssessmentController extends Controller
         return response()->json(["success" => "Assessment restored successfully.", "restoredAssessment" => $restoredAssessment]);
     }
 
-    public function showAssessment($program, $course, Assessment $assessment)
+    public function showAssessment(Request $request, $program, $course, Assessment $assessment)
     {
+        $assessmentType = $assessment->assessmentType->assessment_type;
+        // Finds the assessmentSubmission
+        if ($assessmentType === "activity" && $request->user()->role->role_name === "student") {
+            $assignedCourseId =  $this->assessmentSubmissionService->getAssignedCourseId($request->user(), $course);
+            $assessmentSubmission = $this->assessmentSubmissionService->getAssessmentSubmission($assignedCourseId, $assessment->assessment_id);
+        }
+
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/ViewAssessment', [
             "programId" => $program,
             "courseId" => $course,
-            "assessment" => fn() => $this->assessmentService->getAssessmentCompleteDetails($assessment)
+            "assessment" => fn() => $this->assessmentService->getAssessmentCompleteDetails($assessment),
+            // Return the uploaded file for the student null if assessmentSubmission dont exist
+            "assessmentSubmission" => fn() => $assessmentType === "activity" && $request->user()->role->role_name === "student" ? $assessmentSubmission?->load('activityFiles') : null
         ]);
     }
 
@@ -137,6 +150,7 @@ class AssessmentController extends Controller
 
     public function showAssessmentResponse(Request $request, Program $program, Course $course, Assessment $assessment)
     {
+        $assessmentType = $assessment->assessmentType->assessment_type;
 
         return Inertia::render(
             'Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/Response/ViewResponses',
@@ -146,10 +160,12 @@ class AssessmentController extends Controller
                 'assessment' => fn() => $assessment->load('assessmentType')->load('quiz')->loadCount(['assessmentSubmissions' => function ($query) {
                     $query->whereNotNull('submitted_at');
                 }]),
-                'summary' => fn() => $this->assessmentResponseService->getAssessmentResponsesSummary($assessment),
-                'frequentlyMissedQuestions' => fn() =>  $this->assessmentResponseService->getFrequentlyMissedQuestion($assessment),
                 'responses' => fn() =>  $this->assessmentResponseService->getAssessmentResponses($request, $assessment),
-                'responsesCount' => fn() => $assessment->assessmentSubmissions()->count()
+                'summary' => fn() => $assessmentType === "quiz" ? $this->assessmentResponseService->getAssessmentResponsesSummary($assessment) : null,
+                'frequentlyMissedQuestions' => fn() =>  $assessmentType === "quiz" ? $this->assessmentResponseService->getFrequentlyMissedQuestion($assessment) : null,
+                'responsesCount' => fn() => $assessment->assessmentSubmissions()->count(),
+                'gradedResponsesCount' => fn() => $assessmentType === "activity" ? $assessment->assessmentSubmissions()->where('submission_status', 'graded')->count() : null,
+                'returnedResponsesCount' => fn() => $assessmentType === "activity" ? $assessment->assessmentSubmissions()->where('submission_status', 'returned')->count() : null
             ]
         );
     }
@@ -164,5 +180,65 @@ class AssessmentController extends Controller
         $feedback = $this->assessmentResponseService->generateAndSaveFeedback($inputData, $assessment);
 
         return response()->json($feedback);
+    }
+
+    public function exportActivityResponsesToPdf(Request $request, Program $program, Course $course, Assessment $assessment)
+    {
+        $responses = $this->assessmentResponseService->getAssessmentResponses($request, $assessment, false);
+        $pdf = Pdf::loadView('programs.activityResponsesPdf', compact('responses', 'assessment'));
+        return $pdf->download($assessment->assessment_title . ' responses.pdf');
+    }
+
+    public function exportActivityResponsesToCsv(Request $request, Program $program, Course $course, Assessment $assessment)
+    {
+        $responses = $this->assessmentResponseService->getAssessmentResponses($request, $assessment, false);
+
+        $fileName = $assessment->assessment_title . ' responses.csv';
+
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+
+        $callback = $this->assessmentResponseService->handleExportActivityResponsesToCsv($responses, $assessment);
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function exportQuizResponsesToPdf(Request $request, Program $program, Course $course, Assessment $assessment)
+    {
+        $summary =  $this->assessmentResponseService->getAssessmentResponsesSummary($assessment);
+        $frequentlyMissedQuestions = $this->assessmentResponseService->getFrequentlyMissedQuestion($assessment, null);
+        $feedback = json_decode($assessment->feedback);
+        $responses = $this->assessmentResponseService->getAssessmentResponses($request, $assessment, false);
+
+        $pdf = Pdf::loadView('programs.quizResponsesPdf', compact('assessment', 'summary', 'frequentlyMissedQuestions', 'feedback', 'responses'));
+        return $pdf->download($assessment->assessment_title . ' responses.pdf');
+    }
+
+    public function exportQuizResponsesToCsv(Request $request, Program $program, Course $course, Assessment $assessment)
+    {
+        $summary = $this->assessmentResponseService->getAssessmentResponsesSummary($assessment);
+        $frequentlyMissedQuestions = $this->assessmentResponseService->getFrequentlyMissedQuestion($assessment, null);
+        $feedback = json_decode($assessment->feedback);
+        $responses = $this->assessmentResponseService->getAssessmentResponses($request, $assessment, false);
+
+        $fileName = $assessment->assessment_title . ' responses.csv';
+
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+        $callback = $this->assessmentResponseService->handleExportQuizResponsesToCsv($responses, $assessment, $summary, $frequentlyMissedQuestions, $feedback);
+
+        return response()->stream($callback, 200, $headers);
     }
 }

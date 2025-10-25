@@ -31,7 +31,11 @@ export default function QuizSubmitted({
             <div className="flex flex-col justify-center space-y-5">
                 <EmptyState
                     imgSrc={"/images/illustrations/completed.svg"}
-                    text={`“You've already completed this quiz. You can go ahead and review your responses”`}
+                    text={
+                        quiz && quiz.show_answers_after
+                            ? `“You've already completed this quiz. You can go ahead and review your responses”`
+                            : `“You've already completed this quiz.”`
+                    }
                 />
 
                 {quiz && quiz.show_answers_after && (

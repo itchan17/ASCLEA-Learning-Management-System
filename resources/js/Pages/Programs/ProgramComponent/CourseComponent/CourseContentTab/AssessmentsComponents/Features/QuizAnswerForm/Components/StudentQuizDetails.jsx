@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { MdOutlineClose } from "react-icons/md";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Bar } from "react-chartjs-2";
 import { MdArrowUpward } from "react-icons/md";
 import ViewEvidence from "./ViewEvidence";
 import { calcPercentage } from "../../../../../../../../../Utils/calcPercentage";
 import { convertDurationMinutes } from "../../../../../../../../../Utils/convertDurationMinutes";
+import { cleanDecimal } from "../../../../../../../../../Utils/cleanDecimal";
 
 export default function StudentQuizDetails({
     assessmentSubmission,
@@ -81,7 +81,9 @@ export default function StudentQuizDetails({
                             </h1>
                             <div className="flex flex-wrap items-center gap-1">
                                 <span className="text-size7 font-semibold">
-                                    {`${assessmentSubmission.score}/${quiz.quiz_total_points}`}
+                                    {`${cleanDecimal(
+                                        assessmentSubmission.score
+                                    )}/${quiz.quiz_total_points}`}
                                 </span>
                                 <span className="text-size4 font-bold text-ascend-gray3">
                                     {`${calcPercentage(

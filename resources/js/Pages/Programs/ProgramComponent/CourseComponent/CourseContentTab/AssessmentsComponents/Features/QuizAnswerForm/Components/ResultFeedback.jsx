@@ -5,6 +5,7 @@ import { Doughnut } from "react-chartjs-2";
 import { MdOutlineAccessTimeFilled } from "react-icons/md";
 import Loader from "../../../../../../../../../Components/Loader";
 import useGetQUizResultFeedback from "../Hooks/useGetQUizResultFeedback";
+import { cleanDecimal } from "../../../../../../../../../Utils/cleanDecimal";
 
 export default function ResultFeedback({
     courseId,
@@ -68,8 +69,8 @@ export default function ResultFeedback({
                                     {percentage}%
                                 </h1>
                                 <p className="text-size1 text-ascend-black text-center">
-                                    {assessmentSubmission.score} out of{" "}
-                                    {quiz.quiz_total_points}
+                                    {cleanDecimal(assessmentSubmission.score)}{" "}
+                                    out of {quiz.quiz_total_points}
                                 </p>
                             </div>
                         </div>

@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Programs;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Programs\RequiredQuestionRequest;
 use App\Models\Course;
+use App\Models\Programs\ActivityFile;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\AssessmentSubmission;
 use App\Models\Programs\Quiz;
+use App\Services\HandlingPrivateFileService;
 use App\Services\Programs\AssessmentSubmissionService;
 use App\Services\Programs\QuestionService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -27,10 +30,13 @@ class AssessmentSubmissionController extends Controller
 
     public function showQuizInstruction(Request $request, Course $course, Assessment $assessment, Quiz $quiz)
     {
+        $assignedCourseId =  $this->assessmentSubmissionService->getAssignedCourseId($request->user(), $course->course_id);
+
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/QuizInstruction', [
             'courseId' => $course->course_id,
-            'assessmentId' => $assessment->assessment_id,
-            'quiz' => $quiz
+            'assessment' => $assessment,
+            'quiz' => $quiz,
+            'assessmentSubmission' => $this->assessmentSubmissionService->getAssessmentSubmission($assignedCourseId, $assessment->assessment_id) // For checking the due date
         ]);
     }
 
@@ -174,5 +180,69 @@ class AssessmentSubmissionController extends Controller
         $feedback = json_decode($assessmentSubmission->feedback, true);
 
         return response()->json($feedback);
+    }
+
+    public function uploadActivityFiles(Request $request, Course $course, Assessment $assessment)
+    {
+        $validatedFiles = $request->validate([
+            'activity_files' => 'nullable|array|max:10',
+            'activity_files.*' => 'file|mimes:pdf,docx,pptx,png,jpg,jpeg|max:204800'
+        ]);
+
+        if (!empty($validatedFiles['activity_files'])) {
+            $assignedCourseId =  $this->assessmentSubmissionService->getAssignedCourseId($request->user(), $course->course_id);
+
+            // Find or Create assessment submission when the user upload a file
+            $assessmentSubmission = AssessmentSubmission::firstOrCreate([
+                'assessment_id' => $assessment->assessment_id,
+                'submitted_by' => $assignedCourseId
+            ]);
+
+            $this->assessmentSubmissionService->saveActivityFiles($validatedFiles['activity_files'], $assessmentSubmission);
+        }
+    }
+
+    public function streamAcitvityFiles(Course $course, Assessment $assessment, AssessmentSubmission $assessmentSubmission, ActivityFile $file)
+    {
+        return HandlingPrivateFileService::retrieveFile($file->file_path);
+    }
+
+    public function removeUploadedFile(Request $request, Course $course, Assessment $assessment, AssessmentSubmission $assessmentSubmission,  ActivityFile $file)
+    {
+        $this->assessmentSubmissionService->removeActivityFile($file);
+
+        $this->assessmentSubmissionService->removeAssessmentSubmission($assessmentSubmission);
+    }
+
+    public function submitActivity(Request $request, Course $course, Assessment $assessment)
+    {
+        $assignedCourseId =  $this->assessmentSubmissionService->getAssignedCourseId($request->user(), $course->course_id);
+
+        $this->assessmentSubmissionService->submitActivity($assignedCourseId, $assessment->assessment_id);
+    }
+
+    public function gradeActivity(Request $request, Course $course, Assessment $assessment, AssessmentSubmission $assessmentSubmission)
+    {
+        $validated = $request->validate([
+            'grade' => 'required|numeric',
+        ]);
+
+        $assessmentSubmission->update(['score' => $validated['grade'], 'submission_status' => 'graded']);
+    }
+
+    public function returnActivity(Request $request, Course $course, Assessment $assessment)
+    {
+        $validated = $request->validate([
+            'selectAll' => 'required|boolean',
+            'selectedSubmittedActivities' => 'array',
+            'unselectedSubmittedActivities' => 'array',
+        ]);
+
+        $this->assessmentSubmissionService->returnSubmittedActivities(
+            $validated['selectAll'],
+            $validated['selectedSubmittedActivities'] ?? [],
+            $validated['unselectedSubmittedActivities'] ?? [],
+            $assessment->assessment_id
+        );
     }
 }

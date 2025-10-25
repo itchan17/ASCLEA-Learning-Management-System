@@ -21,6 +21,7 @@ class AssessmentSubmission extends Model
     protected $fillable = [
         'assessment_id',
         'submitted_by',
+        'submission_status',
         'submitted_at',
         'end_at',
         'score',
@@ -40,5 +41,10 @@ class AssessmentSubmission extends Model
     public function submittedBy(): BelongsTo
     {
         return $this->belongsTo(AssignedCourse::class, 'submitted_by', 'assigned_course_id');
+    }
+
+    public function activityFiles(): HasMany
+    {
+        return $this->hasMany(ActivityFile::class, 'assessment_submission_id');
     }
 }

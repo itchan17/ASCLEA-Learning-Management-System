@@ -31,7 +31,7 @@ class EnsureValidChildParentModel
         if ($quiz && $quiz->assessment_id !== $assessment->assessment_id) {
             abort(404);
         }
-        if ($assessmentSubmission && $assessmentSubmission->assessment->quiz->quiz_id !== $quiz->quiz_id) {
+        if ($assessmentSubmission && $assessmentSubmission->assessment->quiz && $assessmentSubmission->assessment->quiz->quiz_id !== $quiz->quiz_id) {
             abort(404);
         }
 

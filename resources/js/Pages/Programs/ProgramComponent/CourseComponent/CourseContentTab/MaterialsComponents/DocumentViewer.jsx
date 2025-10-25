@@ -8,28 +8,26 @@ export default function DocumentViewer({ fileUrl }) {
     const docs = [{ uri: fileUrl }];
 
     return (
-        <div className="flex flex-col justify-center items-center -mx-6 sm:mx-0 border-ascend-gray1">
-            <DocViewer
-                config={{
-                    header: {
-                        disableHeader: true,
-                        disableFileName: false,
-                        retainURLParams: false,
-                    },
-                    csvDelimiter: ",",
-                    pdfZoom: {
-                        defaultZoom: 1,
-                        zoomJump: 0.2,
-                    },
-                    pdfVerticalScrollByDefault: true,
-                }}
-                theme={{
-                    textPrimary: "#313131",
-                    disableThemeScrollbar: false,
-                }}
-                documents={docs}
-                pluginRenderers={DocViewerRenderers}
-            />
-        </div>
+        <DocViewer
+            config={{
+                header: {
+                    disableHeader: true,
+                    disableFileName: false,
+                    retainURLParams: false,
+                },
+                csvDelimiter: ",",
+                pdfZoom: {
+                    defaultZoom: 0.5,
+                    zoomJump: 0.2,
+                },
+                pdfVerticalScrollByDefault: true,
+            }}
+            theme={{
+                textPrimary: "#313131",
+                disableThemeScrollbar: false,
+            }}
+            documents={docs}
+            pluginRenderers={DocViewerRenderers}
+        />
     );
 }

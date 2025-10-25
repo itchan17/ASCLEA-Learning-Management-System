@@ -13,6 +13,8 @@ export default function DropFiles({
         "application/pdf": [".pdf"],
         "application/vnd.openxmlformats-officedocument.presentationml.presentation":
             [".pptx"],
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            [".docx"],
     },
 }) {
     // callback function for handling drop files

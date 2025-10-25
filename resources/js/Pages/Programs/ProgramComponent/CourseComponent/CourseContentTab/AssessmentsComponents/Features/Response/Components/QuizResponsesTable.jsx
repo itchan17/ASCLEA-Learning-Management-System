@@ -1,5 +1,5 @@
 import React from "react";
-import useSearchSortQuizResponses from "../Hooks/useSearchSortQuizResponses";
+import useSearchSortResponses from "../Hooks/useSearchSortResponses";
 import { IoSearch } from "react-icons/io5";
 import { BiSortUp } from "react-icons/bi";
 import { FaSort } from "react-icons/fa";
@@ -7,6 +7,11 @@ import { convertDurationMinutes } from "../../../../../../../../../Utils/convert
 import Pagination from "../../../../../../../../../Components/Pagination";
 import { router } from "@inertiajs/react";
 import { route } from "ziggy-js";
+import { cleanDecimal } from "../../../../../../../../../Utils/cleanDecimal";
+import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
+import { IoCaretDownOutline } from "react-icons/io5";
+import { closeDropDown } from "../../../../../../../../../Utils/closeDropdown";
+import EmptyState from "../../../../../../../../../Components/EmptyState/EmptyState";
 
 export default function QuizResponsesTable({
     programId,
@@ -20,7 +25,9 @@ export default function QuizResponsesTable({
         sortScore,
         handleSortTime,
         sortTime,
-    } = useSearchSortQuizResponses({
+        search,
+        isSearchSortLoading,
+    } = useSearchSortResponses({
         programId,
         courseId,
         assessmentId: assessment.assessment_id,
@@ -129,7 +136,15 @@ export default function QuizResponsesTable({
                                 >
                                     <td>
                                         <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl shrink-0"></div>
+                                            <img
+                                                src={
+                                                    response.submitted_by
+                                                        .profile_image &&
+                                                    `/storage/${response.submitted_by.profile_image}`
+                                                }
+                                                alt="Profile image"
+                                                className="w-12 h-12 bg-ascend-gray1/20 rounded-4xl shrink-0"
+                                            ></img>
 
                                             <div className="font-bold">
                                                 {`${response.submitted_by.first_name} ${response.submitted_by.last_name}`}
@@ -144,35 +159,100 @@ export default function QuizResponsesTable({
                                         }
                                     </td>
                                     <td>
-                                        {response.score}/
+                                        {cleanDecimal(response.score)}/
                                         {assessment.quiz.quiz_total_points}
                                     </td>
                                     <td className="text-ascend-red">6</td>
-                                    {/* <td>
-                                        <span
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setIsEvidenceOpen(true);
-                                            }}
-                                            className="hover:text-ascend-blue underline"
-                                        >
-                                            View detection results
-                                        </span>
-                                    </td> */}
                                 </tr>
                             ))}
                         </tbody>
                     )}
                 </table>
+
+                {/* For displaying no data in the table*/}
+                {!isSearchSortLoading &&
+                    (responses.data.length === 0 && !search ? (
+                        <EmptyState
+                            imgSrc={"/images/illustrations/empty.svg"}
+                            text={`“No responses have been submitted for this quiz yet.”`}
+                        />
+                    ) : responses.data.length === 0 && search ? (
+                        <div className="flex justify-center py-5">
+                            <p className="text-ascend-black">No data found</p>
+                        </div>
+                    ) : (
+                        ""
+                    ))}
             </div>
 
-            {responses.data.length > 0 && responses.total > 10 && (
-                <Pagination
-                    links={responses.links}
-                    currentPage={responses.current_page}
-                    lastPage={responses.last_page}
-                    only={["responses"]}
-                />
+            {responses.data.length > 0 && (
+                <div className="flex flex-wrap-reverse items-center justify-between gap-5">
+                    <div className="flex space-x-[0.5px]">
+                        <PrimaryButton text={"Download"} />
+
+                        {/* Dropdown button */}
+                        <div className="dropdown dropdown-end cursor-pointer ">
+                            <button
+                                tabIndex={0}
+                                role="button"
+                                className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
+                            >
+                                <div className="text-size1 ">
+                                    {<IoCaretDownOutline />}
+                                </div>
+                            </button>
+
+                            <ul
+                                tabIndex={0}
+                                className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                            >
+                                <li onClick={closeDropDown}>
+                                    <a
+                                        href={route(
+                                            "quiz.responses.export.pdf",
+                                            {
+                                                program: programId,
+                                                course: courseId,
+                                                assessment:
+                                                    assessment.assessment_id,
+                                            }
+                                        )}
+                                        className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
+                                    >
+                                        Download as PDF
+                                    </a>
+                                </li>
+                                <li onClick={closeDropDown}>
+                                    <a
+                                        href={route(
+                                            "quiz.responses.export.csv",
+                                            {
+                                                program: programId,
+                                                course: courseId,
+                                                assessment:
+                                                    assessment.assessment_id,
+                                            }
+                                        )}
+                                        className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
+                                    >
+                                        Download as CSV
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    {responses.total > 10 && (
+                        <div className="w-full sm:w-fit">
+                            <Pagination
+                                links={responses.links}
+                                currentPage={responses.current_page}
+                                lastPage={responses.last_page}
+                                only={["responses"]}
+                            />
+                        </div>
+                    )}
+                </div>
             )}
         </>
     );

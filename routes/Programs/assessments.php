@@ -33,14 +33,26 @@ Route::prefix('programs/{program}/courses/{course}')
         Route::get('/assessments/{assessment}/files/{file}', [AssessmentController::class, "viewFile"])->can('viewAssessmentFile', ['assessment', 'course'])->name('program.course.file.view');
 
         // Route for displaying the file
-        Route::get('/assessments/{assessment}/files/{file}/stream', [AssessmentController::class, "streamAssessmentFile"])->can('viewAssessmentFile', ['assessment', 'course'])->name('program.course.file.stream');
+        Route::get('/assessments/{assessment}/assessment-files/{file}/stream', [AssessmentController::class, "streamAssessmentFile"])->can('viewAssessmentFile', ['assessment', 'course'])->name('program.course.file.stream');
 
         // ROute for downloading the file
-        Route::get('/assessments/{assessment}/files/{file}/download', [AssessmentController::class, "downloadAssessmentFile"])->can('downloadAssessmentFile', ['assessment', 'course'])->name('program.course.file.download');
+        Route::get('/assessments/{assessment}/assessment-files/{file}/download', [AssessmentController::class, "downloadAssessmentFile"])->can('downloadAssessmentFile', ['assessment', 'course'])->name('program.course.file.download');
 
         // Route for viewing assessment responses
         Route::get('/assessments/{assessment}/responses', [AssessmentController::class, 'showAssessmentResponse'])->can('viewAssessmentResponses', 'assessment')->name('assessment.responses.view');
 
         // Route for geferating student analytics feedback
         Route::post('/assessments/{assessment}/responses/ai/feedback', [AssessmentController::class, 'quizResponsesFeedback'])->can('generateQuizResponsesFeedback', 'assessment')->name('generate.quiz.responses.feedback');
+
+        // Route for exporting activity reponses to pdf
+        Route::get('/assessments/{assessment}/activity/export/pdf', [AssessmentController::class, 'exportActivityResponsesToPdf'])->can('downloadAssessmentResponsesData', 'assessment')->name('activity.responses.export.pdf');
+
+        // Route for exporting activity reponses to csv
+        Route::get('/assessments/{assessment}/activity/export/csv', [AssessmentController::class, 'exportActivityResponsesToCsv'])->can('downloadAssessmentResponsesData', 'assessment')->name('activity.responses.export.csv');
+
+        // Route for exporting quiz reponses to pdf
+        Route::get('/assessments/{assessment}/quiz/export/pdf', [AssessmentController::class, 'exportQuizResponsesToPdf'])->can('downloadAssessmentResponsesData', 'assessment')->name('quiz.responses.export.pdf');
+
+        // Route for exporting quiz reponses to csv
+        Route::get('/assessments/{assessment}/quiz/export/csv', [AssessmentController::class, 'exportQuizResponsesToCsv'])->can('downloadAssessmentResponsesData', 'assessment')->name('quiz.responses.export.csv');
     });
