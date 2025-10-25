@@ -99,7 +99,7 @@ export default function LandingPage({ text }) {
                         doSomething={() => router.visit('/register')}
                         className="w-60 py-3 space-x-1 bg-ascend-blue
                         hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
-                        text="Enroll Now"
+                        text="Register now"
                         textStyle="font-semibold text-2xl"
                     />
                 </div>
