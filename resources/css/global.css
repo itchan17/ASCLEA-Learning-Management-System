@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+/* Move the card to top when hover */
+.card-hover {
+    @apply hover:-translate-y-2 transition-all duration-300;
+}
+
+/* Change the bg color to lightbluewhen hover */
+.hover-change-bg-color {
+    @apply hover:bg-[#e4e4ff] transition-all duration-300;
+}

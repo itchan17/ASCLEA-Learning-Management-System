@@ -1,0 +1,22 @@
+.typing-header {
+    overflow: hidden;
+    width: fit-content;
+    animation: typing 3s;
+}
+
+.typing-subheading {
+    overflow: hidden;
+    width: fit-content;
+    animation: typing 3s;
+    animation-delay: 2s;
+    animation-fill-mode: both;
+}
+
+@keyframes typing {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
