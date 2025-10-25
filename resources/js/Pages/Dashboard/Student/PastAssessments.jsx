@@ -1,42 +1,70 @@
 import React from "react";
+import { usePage, router } from "@inertiajs/react";
+import Pagination from "@/Components/Pagination";
 
 export default function PastAssessments() {
+    const { accomplished_assessments } = usePage().props;
+
+    const handlePageChange = (url) => {
+        if (url) {
+            router.get(url, {}, { preserveState: true, replace: true });
+        }
+    };
+
     return (
-        <div className="pt-5 space-y-5">
-            <h1 className="text-size4 font-bold">Past Assessments</h1>
+        <div className="pt-5 space-y-5 font-nunito-sans">
+            <h1 className="text-size4 font-bold">Accomplished Assessments</h1>
+
             <div className="overflow-x-auto">
                 <table className="table">
-                    {/* head */}
-                    <thead className="">
+                    <thead>
                         <tr className="border-b-2 border-ascend-gray3">
                             <th>Course</th>
                             <th>Title</th>
                             <th>Due Date</th>
-                            <th>Possible Score</th>
+                            <th>Score</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="hover:bg-ascend-lightblue cursor-pointer">
-                            <td>Educ 101</td>
-                            <td>Drill title</td>
-                            <td>April 14, 2025</td>
-                            <td>150</td>
-                        </tr>
-                        <tr className="hover:bg-ascend-lightblue cursor-pointer">
-                            <td>Educ 102</td>
-                            <td>Drill title</td>
-                            <td>April 14, 2025</td>
-                            <td>150</td>
-                        </tr>
-                        <tr className="hover:bg-ascend-lightblue cursor-pointer">
-                            <td>Educ 103</td>
-                            <td>Drill title</td>
-                            <td>April 14, 2025</td>
-                            <td>150</td>
-                        </tr>
+                        {accomplished_assessments.data && accomplished_assessments.data.length > 0 ? (
+                            accomplished_assessments.data.map((assessment, index) => (
+                                <tr
+                                    key={index}
+                                    className="hover:bg-ascend-lightblue cursor-pointer transition-all duration-300"
+                                >
+                                    <td>{assessment.course_code} - {assessment.course_name}</td>
+                                    <td>{assessment.assessment_title}</td>
+                                    <td>{assessment.due_date?? "No Due Date"}</td>
+                                    <td>{assessment.score}</td>
+                                    <td>{assessment.status}</td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="5" className="text-center text-ascend-gray4 py-4">
+                                    No accomplished assessments yet.
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
             </div>
+
+            {/*================= Pagination (if data exists) =================*/}
+            {accomplished_assessments.data && accomplished_assessments.data.length > 0 && (
+                <div className="flex justify-end mt-5">
+                    {accomplished_assessments?.links && (
+                        <Pagination
+                            links={accomplished_assessments.links}
+                            currentPage={accomplished_assessments.current_page}
+                            lastPage={accomplished_assessments.last_page}
+                            only={["accomplished_assessments"]}
+                            onPageChange={handlePageChange}
+                        />
+                    )}
+                </div>
+            )}
         </div>
     );
 }
