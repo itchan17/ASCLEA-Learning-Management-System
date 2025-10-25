@@ -35,7 +35,7 @@ export default function PastAssessments() {
                                 >
                                     <td>{assessment.course_code} - {assessment.course_name}</td>
                                     <td>{assessment.assessment_title}</td>
-                                    <td>{assessment.due_date}</td>
+                                    <td>{assessment.due_date?? "No Due Date"}</td>
                                     <td>{assessment.score}</td>
                                     <td>{assessment.status}</td>
                                 </tr>

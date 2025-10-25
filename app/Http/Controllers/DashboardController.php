@@ -237,11 +237,14 @@ class DashboardController extends Controller
                             'assessment_title' => $submission->assessment?->assessment_title ?? 'Untitled',
                             'course_name'      => $submission->assessment?->course?->course_name ?? 'Unknown Course',
                             'course_code'      => $submission->assessment?->course?->course_code ?? '-',
-                            'due_date'         => \Carbon\Carbon::parse($submission->assessment?->due_datetime)->format('F d, Y'),
+                            'due_date'         => $submission->assessment?->due_datetime
+                                    ? \Carbon\Carbon::parse($submission->assessment->due_datetime)->format('F d, Y')
+                                    : null,
                             'score'            => $submission->score ?? 0,
                             'status'           => ucfirst($submission->submission_status),
                         ];
                     });
+                    
 
                 //======================================================================
                 // Fetch Pending Assessments (Not Submitted)
@@ -262,7 +265,9 @@ class DashboardController extends Controller
                             'assessment_title' => $submission->assessment?->assessment_title ?? 'Untitled',
                             'course_name'      => $submission->assessment?->course?->course_name ?? 'Unknown Course',
                             'course_code'      => $submission->assessment?->course?->course_code ?? '-',
-                            'due_date'         => \Carbon\Carbon::parse($submission->assessment?->due_datetime)->format('F d, Y'),
+                            'due_date'         => $submission->assessment?->due_datetime
+                                    ? \Carbon\Carbon::parse($submission->assessment->due_datetime)->format('F d, Y')
+                                    : null,
                             'possible_score'   => $submission->assessment?->total_points ?? 0,
                             'status'           => ucfirst($submission->submission_status),
                         ];
