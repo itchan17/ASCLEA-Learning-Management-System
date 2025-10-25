@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Section extends Model
@@ -34,5 +35,10 @@ class Section extends Model
     public function author(): BelongsTo
     {
         return  $this->belongsTo(User::class, 'created_by', 'user_id');
+    }
+
+    public function sectionItem(): HasMany
+    {
+        return  $this->hasMany(SectionItem::class, 'section_id');
     }
 }
