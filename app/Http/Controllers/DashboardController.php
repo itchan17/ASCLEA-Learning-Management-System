@@ -196,9 +196,10 @@ class DashboardController extends Controller
             //============================================================
             // Total Assigned Courses
             //============================================================
-            $totalAssignedCourses = \App\Models\LearningMember::where('user_id', $authUser->user_id)
-                ->withCount('courses') // count assigned courses relation
-                ->first()?->courses_count ?? 0;
+            $totalAssignedCourses = LearningMember::where('user_id', $authUser->user_id)
+                ->withCount('courses')
+                ->get()
+                ->sum('courses_count');
 
                 //======================================================================
                 // Total the Assigned Courses of Student through Learning Member
