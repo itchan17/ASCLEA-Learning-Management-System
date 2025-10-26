@@ -42,7 +42,7 @@ export default function UpcomingAssessments() {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="4" className="text-center text-ascend-gray4 py-4">
+                                <td colSpan="4" className="text-center text-ascend-gray4 py-4 italic">
                                     No pending assessments.
                                 </td>
                             </tr>

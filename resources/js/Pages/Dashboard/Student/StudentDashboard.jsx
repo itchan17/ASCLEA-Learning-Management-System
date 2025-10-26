@@ -9,7 +9,8 @@ export default function StudentDashboard({
     total_assigned_courses, 
     dailyTimeSpent, 
     total_submitted_assessments, 
-    average_quiz_score
+    average_quiz_score,
+    courseImprovementRates
     }) {
     return (
         <>
@@ -19,7 +20,8 @@ export default function StudentDashboard({
                 total_submitted_assessments={total_submitted_assessments} 
                 average_quiz_score={average_quiz_score}/>
             <StudentCharts 
-                dailyTimeSpent={dailyTimeSpent}/>
+                dailyTimeSpent={dailyTimeSpent}
+                courseImprovementRates={courseImprovementRates}/>
             <UpcomingAssessments />
             <PastAssessments />
         </>

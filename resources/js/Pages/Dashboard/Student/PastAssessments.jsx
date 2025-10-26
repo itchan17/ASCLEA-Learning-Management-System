@@ -42,7 +42,7 @@ export default function PastAssessments() {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5" className="text-center text-ascend-gray4 py-4">
+                                <td colSpan="5" className="text-center text-ascend-gray4 py-4 italic">
                                     No accomplished assessments yet.
                                 </td>
                             </tr>

@@ -19,7 +19,8 @@ export default function Dashboard() {
         dailyTimeSpent, 
         total_submitted_assessments, 
         average_quiz_score, 
-        assessments } = usePage().props;
+        assessments,
+        courseImprovementRates } = usePage().props;
     const role = authUser?.role;
 
     console.log("Render Dashboard");
@@ -45,7 +46,8 @@ export default function Dashboard() {
                     total_assigned_courses={total_assigned_courses} 
                     dailyTimeSpent={dailyTimeSpent} 
                     total_submitted_assessments={total_submitted_assessments} 
-                    average_quiz_score={average_quiz_score}/>
+                    average_quiz_score={average_quiz_score}
+                    courseImprovementRates={courseImprovementRates}/>
             ) : role === "admin" ? (
                 <AdminDashboard 
                     stats={stats} 

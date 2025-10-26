@@ -11,88 +11,101 @@ use App\Models\Program;
 use App\Models\LearningMember;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\AssessmentSubmission;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 use App\Models\Administration\Staff;
 use App\Models\UserLogin;
-
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    /**
-     * Display the dashboard based on user role
-     */
     public function index()
     {
         $authUser = auth()->user();
-        //==============================
-        //Get role name of the user
-        //==============================
-        $roleName = Role::where('role_id', $authUser->role_id)
-                        ->value('role_name');
-        
-        //==============================
-        //Dashboard stats
-        //==============================
-        $stats = [
+        $roleName = Role::where('role_id', $authUser->role_id)->value('role_name');
+
+        $stats = $this->getDashboardStats();
+
+        $studentsPerProgram = $this->getStudentsPerProgram();
+
+        [$dailyLoginDates, $dailyLoginCounts, $avgTimePerDay] = $this->getDailyLoginsAndAverageTime();
+
+        $assessments = $accomplishedAssessments = $pendingAssessments = [];
+        $totalLearningHours = $totalAssignedCourses = $totalSubmitted = $averageQuizScore = 0;
+        $courseImprovementRates = [];
+        $dailyTimeSpent = [];
+
+        if ($roleName === 'faculty') {
+            [$stats, $assessments] = $this->getFacultyData($authUser, $stats);
+        } elseif ($roleName === 'student') {
+            [
+                $dailyTimeSpent,
+                $totalLearningHours,
+                $totalAssignedCourses,
+                $accomplishedAssessments,
+                $pendingAssessments,
+                $totalSubmitted,
+                $averageQuizScore,
+                $courseImprovementRates
+            ] = $this->getStudentData($authUser);
+        }
+
+        return Inertia::render('Dashboard/Dashboard', [
+            'authUser' => [
+                'user_id'    => $authUser->id,
+                'role'       => $roleName,
+                'first_name' => $authUser->first_name,
+            ],
+            'stats' => $stats,
+            'studentsPerProgram' => $studentsPerProgram,
+            'dailyLogins' => [
+                'dates' => $dailyLoginDates,
+                'counts' => $dailyLoginCounts,
+            ],
+            'avgTimePerDay' => $avgTimePerDay,
+            'dailyTimeSpent' => $dailyTimeSpent,
+            'total_assigned_courses' => $totalAssignedCourses,
+            'assessments' => $assessments,
+            'accomplished_assessments' => $accomplishedAssessments,
+            'pending_assessments' => $pendingAssessments,
+            'total_submitted_assessments' => $totalSubmitted,
+            'average_quiz_score' => $averageQuizScore,
+            'courseImprovementRates' => $courseImprovementRates,
+            'total_learning_hours' => $totalLearningHours,
+        ]);
+    }
+
+    private function getDashboardStats()
+    {
+        return [
             'total_students'    => Student::where('enrollment_status', 'enrolled')->count(),
-            'total_educators'   => User::join('roles', 'users.role_id', '=', 'roles.role_id')->where('roles.role_name', 'faculty')->count(),
+            'total_educators'   => User::join('roles', 'users.role_id', '=', 'roles.role_id')
+                                       ->where('roles.role_name', 'faculty')->count(),
             'pending_enrollees' => Student::where('enrollment_status', 'pending')->count(),
             'online_students'   => 0, // optional
         ];
+    }
 
-        //============================================================
-        //Number of Students per Program
-        //============================================================
-        $studentsPerProgram = Program::select('program_id', 'program_name')
+    private function getStudentsPerProgram()
+    {
+        return Program::select('program_id', 'program_name')
             ->withCount(['learningMembers as total_students' => function ($query) {
                 $query->join('users', 'learning_members.user_id', '=', 'users.user_id')
                     ->join('roles', 'users.role_id', '=', 'roles.role_id')
                     ->where('roles.role_name', 'student');
             }])
             ->get();
-        //==========================================================================================
-        //Number Unique student user that logins daily for the last 7 days
-        //==========================================================================================
-        $dailyLogins = DB::table('user_logins')
-            ->join('users', 'user_logins.user_id', '=', 'users.user_id')
-            ->join('roles', 'users.role_id', '=', 'roles.role_id')
-            ->where('roles.role_name', 'student')
-            ->where('login_at', '>=', Carbon::now()->subDays(6)->startOfDay())
-            ->select(DB::raw('DATE(login_at) as login_date'), DB::raw('COUNT(DISTINCT user_logins.user_id) as total'))
-            ->groupBy('login_date')
-            ->orderBy('login_date')
-            ->get();
-        
-        //============================================================
-        //Fetch the Average Time Spent and Daily Logins
-        //Fill missing dates with 0
-        //============================================================
-        
-        $dates = [];
-        $counts = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i)->format('Y-m-d');
-            $dates[] = $date;
-            $counts[] = $dailyLogins->firstWhere('login_date', $date)?->total ?? 0;
-        }
+    }
 
-        //============================================================
-        //Fetch last 7 days of logins for students
-        //============================================================
-        $startDate = Carbon::now()->subDays(6)->startOfDay();
-        $endDate   = Carbon::now()->endOfDay();
-
+    private function getDailyLoginsAndAverageTime()
+    {
         $logins = DB::table('user_logins')
             ->join('users', 'user_logins.user_id', '=', 'users.user_id')
             ->join('roles', 'users.role_id', '=', 'roles.role_id')
             ->where('roles.role_name', 'student')
-            ->where('login_at', '>=', $startDate)
+            ->where('login_at', '>=', Carbon::now()->subDays(6)->startOfDay())
             ->select('user_logins.user_id', 'login_at', 'logout_at')
             ->get();
-        //==========================================================================================
-        //Prepare dates and counts for the Daily Login Counts and Average Time Per Day
-        //==========================================================================================
+
         $dates = [];
         $dailyCounts = [];
         $avgTimePerDay = [];
@@ -102,233 +115,188 @@ class DashboardController extends Controller
             $dates[] = $date;
 
             $dailyLogins = $logins->filter(fn($l) => Carbon::parse($l->login_at)->format('Y-m-d') === $date);
-            //============================================================
-            //Daily login count (unique users)
-            //============================================================
             $dailyCounts[] = $dailyLogins->unique('user_id')->count();
-            //==============================
-            // Average session time
-            //==============================
-            $times = $dailyLogins->filter(fn($l) => $l->logout_at)->map(fn($l) => Carbon::parse($l->login_at)->diffInMinutes(Carbon::parse($l->logout_at)) / 60);
+
+            $times = $dailyLogins->filter(fn($l) => $l->logout_at)
+                                 ->map(fn($l) => Carbon::parse($l->login_at)
+                                 ->diffInMinutes(Carbon::parse($l->logout_at)) / 60);
             $avgTimePerDay[$date] = $times->count() ? round($times->avg(), 2) : 0;
         }
 
+        return [$dates, $dailyCounts, $avgTimePerDay];
+    }
 
-        //============================================================
-        // Fetch the total number of assigned courses to Faculty
-        //============================================================
-        if ($roleName === 'faculty') {
-            $staff = Staff::where('user_id', $authUser->user_id)
-                ->withCount('assignedCourses')->first();
-            $stats['assigned_courses'] = $staff?->assigned_courses_count ?? 0;
+    private function getFacultyData($authUser, $stats)
+    {
+        $staff = Staff::where('user_id', $authUser->user_id)
+            ->withCount('assignedCourses')->with('assignedCourses')->first();
 
-            //============================================================
-            // Fetch the course IDs assigned to Faculty
-            //============================================================
-            $assignedCourseIds = $staff?->assignedCourses->pluck('course_id');
+        $stats['assigned_courses'] = $staff?->assigned_courses_count ?? 0;
 
-            $assessments = Assessment::select('assessment_id', 'assessment_title')
-                ->whereIn('course_id', $assignedCourseIds ?? [])
-                ->withCount([
-                    'assessmentSubmissions as submitted_count' => function ($q) {
-                        $q->where('submission_status', 'submitted');
-                    },
-                    'assessmentSubmissions as returned_count' => function ($q) {
-                        $q->where('submission_status', 'returned');
-                    },
-                    'assessmentSubmissions as not_submitted_count' => function ($q) {
-                        $q->where('submission_status', 'not_submitted');
-                    },
-                ])
-                ->get();
-        }
+        $assignedCourseIds = $staff?->assignedCourses->pluck('course_id') ?? [];
 
+        $assessments = Assessment::select('assessment_id', 'assessment_title')
+            ->whereIn('course_id', $assignedCourseIds)
+            ->withCount([
+                'assessmentSubmissions as submitted_count' => fn($q) => $q->where('submission_status', 'submitted'),
+                'assessmentSubmissions as returned_count'  => fn($q) => $q->where('submission_status', 'returned'),
+                'assessmentSubmissions as not_submitted_count' => fn($q) => $q->where('submission_status', 'not_submitted'),
+            ])
+            ->get();
 
-        //==========================================================================================
-        // Fetch the Total Learning Hours and Assigned Courses of Student
-        //==========================================================================================
-        $totalLearningHours = 0;
-        $totalAssignedCourses = 0;
+        return [$stats, $assessments];
+    }
+
+    private function getStudentData($authUser)
+    {
+        $studentLogins = UserLogin::where('user_id', $authUser->user_id)
+                                  ->whereNotNull('logout_at')
+                                  ->get();
+
+        $dailyTimeSpent = $this->computeDailyTimeSpent($studentLogins);
+
+        $totalLearningHours = round($studentLogins->sum(fn($login) =>
+            Carbon::parse($login->login_at)->diffInMinutes(Carbon::parse($login->logout_at)) / 60, 2), 2);
+
+        $totalAssignedCourses = LearningMember::where('user_id', $authUser->user_id)
+            ->withCount('courses')->get()->sum('courses_count');
+
+        $assignedCourseIds = LearningMember::where('user_id', $authUser->user_id)
+            ->with('courses')->get()->pluck('courses')->flatten()->pluck('assigned_course_id')->toArray();
+
+        $totalSubmitted = AssessmentSubmission::whereIn('submitted_by', $assignedCourseIds)
+            ->whereIn('submission_status', ['submitted', 'returned'])->count();
+
+        [$accomplishedAssessments, $pendingAssessments] = $this->getStudentAssessments($assignedCourseIds);
+
+        $averageQuizScore = $this->computeAverageQuizScore($assignedCourseIds);
+
+        $courseImprovementRates = $this->computeCourseImprovementRates($assignedCourseIds);
+
+        return [
+            $dailyTimeSpent,
+            $totalLearningHours,
+            $totalAssignedCourses,
+            $accomplishedAssessments,
+            $pendingAssessments,
+            $totalSubmitted,
+            $averageQuizScore,
+            $courseImprovementRates
+        ];
+    }
+
+    private function computeDailyTimeSpent($studentLogins)
+    {
         $dailyTimeSpent = [];
-        $totalSubmitted = 0;
-        $averageQuizScore = 0;
-        if ($roleName === 'student') {
-            //============================================================
-            //Fetch all login sessions for this student
-            //============================================================
-            $studentLogins = UserLogin::where('user_id', $authUser->user_id)
-                ->whereNotNull('logout_at')
-                ->get();
 
-            //============================================================
-            // Prepare array for daily time spent
-            //============================================================
-            for ($i = 6; $i >= 0; $i--) {
-                $date = Carbon::now()->subDays($i)->format('Y-m-d');
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i)->format('Y-m-d');
 
-                // Filter logins for this date
-                $loginsForDate = $studentLogins->filter(function ($login) use ($date) {
-                    return Carbon::parse($login->login_at)->isSameDay($date);
-                });
+            $loginsForDate = $studentLogins->filter(fn($login) =>
+                Carbon::parse($login->login_at)->isSameDay($date));
 
-                // Sum total hours for this date
-                $totalHours = $loginsForDate->sum(function ($login) {
-                    return Carbon::parse($login->login_at)
-                        ->diffInMinutes(Carbon::parse($login->logout_at)) / 60;
-                });
+            $totalHours = $loginsForDate->sum(fn($login) =>
+                Carbon::parse($login->login_at)->diffInMinutes(Carbon::parse($login->logout_at)) / 60);
 
-                $dailyTimeSpent[] = [
-                    'date' => $date,
-                    'hours' => round($totalHours, 2),
-                ];
-            }
-
-            //============================================================
-            // Total Learning Hours
-            //============================================================
-            $totalLearningHours = $studentLogins->sum(function ($login) {
-                return Carbon::parse($login->login_at)
-                            ->diffInMinutes(Carbon::parse($login->logout_at)) / 60;
-            });
-            // Round to 2 decimal places
-            $totalLearningHours = round($totalLearningHours, 2);
-
-            //============================================================
-            // Total Assigned Courses
-            //============================================================
-            $totalAssignedCourses = LearningMember::where('user_id', $authUser->user_id)
-                ->withCount('courses')
-                ->get()
-                ->sum('courses_count');
-
-                //======================================================================
-                // Total the Assigned Courses of Student through Learning Member
-                //======================================================================
-                $assignedCourseIds = LearningMember::where('user_id', $authUser->user_id)
-                    ->with('courses') // eager load AssignedCourse
-                    ->get()
-                    ->pluck('courses') // collection of AssignedCourse collections
-                    ->flatten()        // flatten to single collection
-                    ->pluck('assigned_course_id') // now pluck the actual IDs used in submissions
-                    ->toArray();
-
-                //======================================================================
-                // Total Assessment Submitted by a student
-                //======================================================================
-                $totalSubmitted = \App\Models\Programs\AssessmentSubmission::whereIn('submitted_by', $assignedCourseIds)
-                    ->whereIn('submission_status', ['submitted', 'returned'])
-                    ->count();
-
-                //======================================================================
-                // Fetch Details of Accomplished Assessments (Submitted or Returned)
-                //======================================================================
-                $accomplishedAssessments = AssessmentSubmission::whereIn('submitted_by', $assignedCourseIds)
-                    ->whereIn('submission_status', ['submitted', 'returned'])
-                    ->with([
-                        'assessment' => function ($query) {
-                            $query->select('assessment_id', 'assessment_title', 'due_datetime', 'course_id')
-                                ->with(['course:course_id,course_name,course_code']);
-                        }
-                    ])
-                    ->select('assessment_submission_id', 'assessment_id', 'score', 'submitted_at', 'submission_status')
-                    ->latest('submitted_at')
-                    ->paginate(5)
-                    ->through(function ($submission) {
-                        return [
-                            'assessment_title' => $submission->assessment?->assessment_title ?? 'Untitled',
-                            'course_name'      => $submission->assessment?->course?->course_name ?? 'Unknown Course',
-                            'course_code'      => $submission->assessment?->course?->course_code ?? '-',
-                            'due_date'         => $submission->assessment?->due_datetime
-                                    ? \Carbon\Carbon::parse($submission->assessment->due_datetime)->format('F d, Y')
-                                    : null,
-                            'score'            => $submission->score ?? 0,
-                            'status'           => ucfirst($submission->submission_status),
-                        ];
-                    });
-                    
-
-                //======================================================================
-                // Fetch Pending Assessments (Not Submitted)
-                //======================================================================
-                $pendingAssessments = AssessmentSubmission::whereIn('submitted_by', $assignedCourseIds)
-                    ->where('submission_status', 'not_submitted')
-                    ->with([
-                        'assessment' => function ($query) {
-                            $query->select('assessment_id', 'assessment_title', 'due_datetime', 'total_points', 'course_id')
-                                ->with(['course:course_id,course_name,course_code']);
-                        }
-                    ])
-                    ->select('assessment_submission_id', 'assessment_id', 'submitted_by', 'submission_status')
-                    ->latest('assessment_submission_id')
-                    ->paginate(5)
-                    ->through(function ($submission) {
-                        return [
-                            'assessment_title' => $submission->assessment?->assessment_title ?? 'Untitled',
-                            'course_name'      => $submission->assessment?->course?->course_name ?? 'Unknown Course',
-                            'course_code'      => $submission->assessment?->course?->course_code ?? '-',
-                            'due_date'         => $submission->assessment?->due_datetime
-                                    ? \Carbon\Carbon::parse($submission->assessment->due_datetime)->format('F d, Y')
-                                    : null,
-                            'possible_score'   => $submission->assessment?->total_points ?? 0,
-                            'status'           => ucfirst($submission->submission_status),
-                        ];
-                    });
-
-                //======================================================================
-                // Average Score of Students Across Quizzes
-                //======================================================================
-                $quizSubmissions = AssessmentSubmission::whereIn('submitted_by', $assignedCourseIds)
-                    ->whereHas('assessment', function ($query) {
-                        $query->whereHas('assessmentType', function ($q) {
-                            $q->where('assessment_type', 'quiz');
-                        });
-                    })
-                    ->whereNotNull('score')
-                    ->with(['assessment.quiz:quiz_id,assessment_id,quiz_total_points'])
-                    ->get();
-
-                $totalPercentages = 0;
-                $count = 0;
-
-                foreach ($quizSubmissions as $submission) {
-                    $totalPoints = $submission->assessment->quiz->quiz_total_points ?? 0;
-
-                    if ($totalPoints > 0) {
-                        // Compute individual quiz average
-                        $quizAverage = ($submission->score / $totalPoints) * 100;
-                        $totalPercentages += $quizAverage;
-                        $count++;
-                    }
-                }
-
-                $averageQuizScore = $count > 0 ? round($totalPercentages / $count) : 0;
-                
+            $dailyTimeSpent[] = ['date' => $date, 'hours' => round($totalHours, 2)];
         }
 
-        //============================================================
-        // Render Dashboard with Inertia
-        //============================================================
-        return Inertia::render('Dashboard/Dashboard', [
-            'authUser' => [
-                'user_id'    => $authUser->id,
-                'role'       => $roleName,
-                'first_name' => $authUser->first_name,
-            ],
-            'stats' => $stats,
-            'dailyTimeSpent' => $dailyTimeSpent,
-            'total_assigned_courses' => $totalAssignedCourses, 
-            'assessments' => $assessments ?? [],
-            'accomplished_assessments' => $accomplishedAssessments ?? [],
-            'pending_assessments' => $pendingAssessments ?? [],
-            'total_submitted_assessments' => $totalSubmitted,
-            'average_quiz_score' => $averageQuizScore,                  
-            'total_learning_hours' => $totalLearningHours,           
-            'studentsPerProgram' => $studentsPerProgram,
-            'dailyLogins' => [
-                'dates' => $dates,
-                'counts' => $counts,
-            ],
-            'avgTimePerDay' => $avgTimePerDay,
-        ]);
+        return $dailyTimeSpent;
+    }
+
+    private function getStudentAssessments($assignedCourseIds)
+    {
+        $accomplished = AssessmentSubmission::whereIn('submitted_by', $assignedCourseIds)
+            ->whereIn('submission_status', ['submitted', 'returned'])
+            ->with(['assessment' => fn($q) =>
+                $q->select('assessment_id', 'assessment_title', 'due_datetime', 'course_id')
+                  ->with(['course:course_id,course_name,course_code'])])
+            ->select('assessment_submission_id', 'assessment_id', 'score', 'submitted_at', 'submission_status')
+            ->latest('submitted_at')->paginate(5)
+            ->through(fn($submission) => [
+                'assessment_title' => $submission->assessment?->assessment_title ?? 'Untitled',
+                'course_name' => $submission->assessment?->course?->course_name ?? 'Unknown Course',
+                'course_code' => $submission->assessment?->course?->course_code ?? '-',
+                'due_date' => $submission->assessment?->due_datetime ? Carbon::parse($submission->assessment->due_datetime)->format('F d, Y') : null,
+                'score' => $submission->score ?? 0,
+                'status' => ucfirst($submission->submission_status),
+            ]);
+
+        $pending = AssessmentSubmission::whereIn('submitted_by', $assignedCourseIds)
+            ->where('submission_status', 'not_submitted')
+            ->with(['assessment' => fn($q) =>
+                $q->select('assessment_id', 'assessment_title', 'due_datetime', 'total_points', 'course_id')
+                  ->with(['course:course_id,course_name,course_code'])])
+            ->select('assessment_submission_id', 'assessment_id', 'submitted_by', 'submission_status')
+            ->latest('assessment_submission_id')->paginate(5)
+            ->through(fn($submission) => [
+                'assessment_title' => $submission->assessment?->assessment_title ?? 'Untitled',
+                'course_name' => $submission->assessment?->course?->course_name ?? 'Unknown Course',
+                'course_code' => $submission->assessment?->course?->course_code ?? '-',
+                'due_date' => $submission->assessment?->due_datetime ? Carbon::parse($submission->assessment->due_datetime)->format('F d, Y') : null,
+                'possible_score' => $submission->assessment?->total_points ?? 0,
+                'status' => ucfirst($submission->submission_status),
+            ]);
+
+        return [$accomplished, $pending];
+    }
+
+    private function computeAverageQuizScore($assignedCourseIds)
+    {
+        $submissions = AssessmentSubmission::whereIn('submitted_by', $assignedCourseIds)
+            ->whereHas('assessment.assessmentType', fn($q) => $q->where('assessment_type', 'quiz'))
+            ->whereNotNull('score')->with('assessment.quiz:quiz_id,assessment_id,quiz_total_points')
+            ->get();
+
+        $totalPercent = 0;
+        $count = 0;
+
+        foreach ($submissions as $submission) {
+            $totalPoints = $submission->assessment->quiz->quiz_total_points ?? 0;
+            if ($totalPoints > 0) {
+                $totalPercent += ($submission->score / $totalPoints) * 100;
+                $count++;
+            }
+        }
+
+        return $count ? round($totalPercent / $count) : 0;
+    }
+
+    private function computeCourseImprovementRates($assignedCourseIds)
+    {
+        $submissions = AssessmentSubmission::whereIn('submitted_by', $assignedCourseIds)
+            ->whereHas('assessment.assessmentType', fn($q) => $q->where('assessment_type', 'quiz'))
+            ->whereNotNull('score')
+            ->with(['assessment.quiz:quiz_id,assessment_id,quiz_total_points', 'assessment.course:course_id,course_name'])
+            ->get()
+            ->groupBy('assessment.course.course_name');
+
+        $rates = [];
+
+        foreach ($submissions as $courseName => $courseSubmissions) {
+            $sorted = $courseSubmissions->sortBy('submitted_at');
+            $half = ceil($sorted->count() / 2);
+            $previous = $sorted->take($half);
+            $current = $sorted->slice($half);
+
+            $computeAvg = fn($set) => $set->reduce(function ($carry, $s) {
+                $points = $s->assessment->quiz->quiz_total_points ?? 0;
+                return $points > 0 ? $carry + ($s->score / $points) * 100 : $carry;
+            }, 0) / max($set->count(), 1);
+
+            $prevAvg = round($computeAvg($previous), 2);
+            $currAvg = round($computeAvg($current), 2);
+
+            $improvement = $prevAvg > 0 ? round((($currAvg - $prevAvg) / $prevAvg) * 100, 2) : 0;
+
+            $rates[] = [
+                'course_name' => $courseName,
+                'previous_avg' => $prevAvg,
+                'current_avg' => $currAvg,
+                'improvement_rate' => $improvement,
+            ];
+        }
+
+        return $rates;
     }
 }

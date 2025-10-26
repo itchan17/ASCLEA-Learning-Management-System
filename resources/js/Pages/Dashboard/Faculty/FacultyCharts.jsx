@@ -17,10 +17,6 @@ export default function StaffCharts({ dailyLogins, avgTimePerDay, assessments })
     const returned = currentAssessment?.returned_count || 0;
     const notSubmitted = currentAssessment?.not_submitted_count || 0;
 
-    console.log(assessments);
-console.log(currentAssessment);
-
-
     return (
         <div className="flex flex-col md:flex-row justify-between">
             {/* Left side charts */}
@@ -97,6 +93,7 @@ console.log(currentAssessment);
                 <div className="h-full sm:border border-ascend-gray1 sm:shadow-shadow1 sm:p-4 space-y-5">
                     <h1 className="text-size4 font-bold">Assessment Submission Status</h1>
 
+                    {/* Dropdown */}
                     <CustomSelect
                         selectField={
                             <select
@@ -117,62 +114,63 @@ console.log(currentAssessment);
                         }
                     />
 
-                    <Pie
-                        data={{
-                            labels: [
-                                "Submitted",
-                                "Returned",
-                                "Not submitted",
-                            ],
-                            datasets: [
-                                {
-                                    label: "",
-                                    data: [submitted, returned, notSubmitted],
-                                    backgroundColor: [
-                                        "#f9a502",
-                                        "#01007d",
-                                        "#c51919",
+                    {/* Conditional rendering */}
+                    {selectedAssessment ? (
+                        <>
+                            <Pie
+                                data={{
+                                    labels: ["Submitted", "Returned", "Not submitted"],
+                                    datasets: [
+                                        {
+                                            label: "",
+                                            data: [submitted, returned, notSubmitted],
+                                            backgroundColor: [
+                                                "#f9a502",
+                                                "#01007d",
+                                                "#c51919",
+                                            ],
+                                        },
                                     ],
-                                },
-                            ],
-                        }}
-                        options={{
-                            plugins: { legend: { display: false } },
-                        }}
-                    />
+                                }}
+                                options={{
+                                    plugins: { legend: { display: false } },
+                                }}
+                            />
 
-                    {/* Manual Legend */}
-                    <div className="space-y-2">
-                        <div>
-                            <div className="flex items-center space-x-2">
-                                <div className="h-4 w-4 bg-ascend-yellow"></div>
-                                <span className="text-size1 text-ascend-gray3">
-                                    Submitted
-                                </span>
-                            </div>
-                            <span className="font-bold ml-6">{submitted}</span>
-                        </div>
+                            {/* Manual Legend */}
+                            <div className="space-y-2">
+                                <div>
+                                    <div className="flex items-center space-x-2">
+                                        <div className="h-4 w-4 bg-ascend-yellow"></div>
+                                        <span className="text-size1 text-ascend-gray3">Submitted</span>
+                                    </div>
+                                    <span className="font-bold ml-6">{submitted}</span>
+                                </div>
 
-                        <div>
-                            <div className="flex items-center space-x-2">
-                                <div className="h-4 w-4 bg-ascend-blue"></div>
-                                <span className="text-size1 text-ascend-gray3">
-                                    Returned
-                                </span>
-                            </div>
-                            <span className="font-bold ml-6">{returned}</span>
-                        </div>
+                                <div>
+                                    <div className="flex items-center space-x-2">
+                                        <div className="h-4 w-4 bg-ascend-blue"></div>
+                                        <span className="text-size1 text-ascend-gray3">Returned</span>
+                                    </div>
+                                    <span className="font-bold ml-6">{returned}</span>
+                                </div>
 
-                        <div>
-                            <div className="flex items-center space-x-2">
-                                <div className="h-4 w-4 bg-ascend-red"></div>
-                                <span className="text-size1 text-ascend-gray3">
-                                    Not submitted
-                                </span>
+                                <div>
+                                    <div className="flex items-center space-x-2">
+                                        <div className="h-4 w-4 bg-ascend-red"></div>
+                                        <span className="text-size1 text-ascend-gray3">Not submitted</span>
+                                    </div>
+                                    <span className="font-bold ml-6">{notSubmitted}</span>
+                                </div>
                             </div>
-                            <span className="font-bold ml-6">{notSubmitted}</span>
+                        </>
+                    ) : (
+                        <div className="flex items-center justify-center h-48 text-ascend-gray3 text-center">
+                            <p className="h-48 text-ascend-gray4 italic">
+                                Please select a course to check the Assessment Submission Status.
+                            </p>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>
