@@ -55,7 +55,8 @@ class AssessmentSubmissionPolicy
             $query->where('course_id', $course->course_id);
         })->exists();
         $isNotSubmitted = $assessmentSubmission->submitted_at === null;
-        $isNotPastDueDate = $assessment->due_datetime > Carbon::now();
+        // If assessment is not has no due date return true, if not check if i ts past due data
+        $isNotPastDueDate = !is_null($assessment->due_datetime) ? $assessment->due_datetime > Carbon::now() : true;
         $isPublished = $assessment->status === "published";
         $isAssessmentSubmissionAuthor = $assessmentSubmission->submittedBy->member->user->user_id === $user->user_id;
 
@@ -117,5 +118,61 @@ class AssessmentSubmissionPolicy
         $isAssessmentSubmissionAuthor = $assessmentSubmission->submittedBy->member->user->user_id === $user->user_id;
 
         return $isAssessmentSubmissionAuthor;
+    }
+
+    public function uploadActivityFile(User $user, Course $course)
+    {
+        $isStudent = $user->role->role_name === "student";
+        $isCourseAssigned = $user->programs()->whereHas('courses', function ($query) use ($course) {
+            $query->where('course_id', $course->course_id);
+        })->exists();
+
+        $isAuthorized = $isStudent && $isCourseAssigned;
+
+        return $isAuthorized;
+    }
+
+    public function viewActivityFile(User $user, AssessmentSubmission $assessmentSubmission, Assessment $assessment)
+    {
+        $isAdmin = $user->role->role_name === "admin";
+        $isAssessmentSubmissionAuthor = $assessmentSubmission->submittedBy->member->user->user_id === $user->user_id;
+        $isAssessmentAuthor = $assessment->author->user_id === $user->user_id;
+
+        $isAuthorized = $isAdmin || $isAssessmentSubmissionAuthor || $isAssessmentAuthor;
+
+        return $isAuthorized;
+    }
+
+    public function removeActivityFile(User $user, AssessmentSubmission $assessmentSubmission)
+    {
+        $isAssessmentSubmissionAuthor = $assessmentSubmission->submittedBy->member->user->user_id === $user->user_id;
+
+        return $isAssessmentSubmissionAuthor;
+    }
+
+    public function submitActivity(User $user, Course $course)
+    {
+        $isStudent = $user->role->role_name === "student";
+        $isCourseAssigned = $user->programs()->whereHas('courses', function ($query) use ($course) {
+            $query->where('course_id', $course->course_id);
+        })->exists();
+
+        $isAuthorized = $isStudent && $isCourseAssigned;
+
+        return $isAuthorized;
+    }
+
+    public function gradeActivity(User $user, Assessment $assessment)
+    {
+        $isAssessmentAuthor = $assessment->author->user_id === $user->user_id;
+
+        return $isAssessmentAuthor;
+    }
+
+    public function returnGradedActivity(User $user, Assessment $assessment)
+    {
+        $isAssessmentAuthor = $assessment->author->user_id === $user->user_id;
+
+        return $isAssessmentAuthor;
     }
 }

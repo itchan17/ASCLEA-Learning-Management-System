@@ -13,7 +13,7 @@ class CalculationService
     public function calculateHoursAndMins(int $mins)
     {
         if ($mins === 0) {
-            return null;
+            return 0;
         }
 
         $hours = intdiv($mins, 60);

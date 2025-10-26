@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import BackButton from "../../../../../../Components/Button/BackButton";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import ReactQuill from "react-quill-new";
@@ -10,49 +10,26 @@ import File from "../File";
 import Quiz from "./Quiz";
 import { handleClickBackBtn } from "../../../../../../Utils/handleClickBackBtn";
 import { router, usePage } from "@inertiajs/react";
-import { useRoute } from "ziggy-js";
-import useAssessmentsStore from "../../../../../../Stores/Programs/CourseContent/assessmentsStore";
+import { route } from "ziggy-js";
 import { formatFullDate } from "../../../../../../Utils/formatFullDate";
 import { formatDueDateTime } from "../../../../../../Utils/formatDueDateTime";
 import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
 import { hasText } from "../../../../../../Utils/hasText";
 import { closeDropDown } from "../../../../../../Utils/closeDropdown";
+import AcitivityMyWork from "./Features/Response/Components/AcitivityMyWork";
+import ModalDocViewer from "../../../../../../Components/ModalDocViewer";
+import { cleanDecimal } from "../../../../../../Utils/cleanDecimal";
 
 export default function ViewAssessment({
     programId,
     courseId,
     assessment,
+    assessmentSubmission,
     auth,
 }) {
-    const route = useRoute();
-
-    // Assessment store
-    const assessmentList = useAssessmentsStore((state) => state.assessmentList);
-
-    const [assessmentDetails, setAssessmentDetails] = useState(null);
-
-    // temporarily get the data of slected assessment
-    // useEffect(() => {
-    //     // check if id is true
-    //     if (assessmentId) {
-    //         // find the assessment details in asssessment list based on the id in url
-    //         // this in temporary only as there's currently data passed from backend
-    //         // the data will come from the backend and here's we're it will be set
-    //         const details = assessmentList.find(
-    //             (detail) => detail.id === Number(assessmentId)
-    //         );
-
-    //         // set the data
-    //         setAssessmentDetails(details);
-    //     }
-    // }, [assessmentId]);
-
-    //     // Close the dropdown after clicked
-    //     const elem = document.activeElement;
-    //     if (elem) {
-    //         elem?.blur();
-    //     }
-    // };
+    const [fileUrl, setFileUrl] = useState(null);
+    const [fileDownload, setFileDownload] = useState(null);
+    const [fileName, setFileName] = useState(null);
 
     const handleClickViewResponses = () => {
         router.visit(
@@ -65,15 +42,30 @@ export default function ViewAssessment({
         closeDropDown();
     };
 
-    const handleFileClick = (fileId) => {
-        router.get(
-            route("program.course.file.view", {
-                program: programId,
-                course: courseId,
-                assessment: assessment.assessment_id,
-                file: fileId,
-            })
-        );
+    const handleFileClick = (fileId, fileName) => {
+        const url = route("program.course.file.stream", {
+            program: programId,
+            course: courseId,
+            assessment: assessment.assessment_id,
+            file: fileId,
+        });
+
+        const fileDownload = route("program.course.file.download", {
+            program: programId,
+            course: courseId,
+            assessment: assessment.assessment_id,
+            file: fileId,
+        });
+
+        setFileUrl(url);
+        setFileDownload(fileDownload);
+        setFileName(fileName);
+    };
+
+    const handleViewFileClose = () => {
+        setFileUrl(null);
+        setFileName(null);
+        setFileDownload(null);
     };
 
     return (
@@ -140,9 +132,18 @@ export default function ViewAssessment({
                 )}
             </div>
             <div className="flex flex-wrap justify-between">
-                <h1 className="font-bold">
-                    Possible Points: {assessment.total_points}
-                </h1>
+                {assessmentSubmission &&
+                assessmentSubmission.submission_status === "returned" ? (
+                    <h1 className="font-bold">
+                        Graded: {cleanDecimal(assessmentSubmission.score)} /{" "}
+                        {assessment.total_points}
+                    </h1>
+                ) : (
+                    <h1 className="font-bold">
+                        Possible Points: {assessment.total_points}
+                    </h1>
+                )}
+
                 <h1 className="font-bold">
                     {assessment.due_datetime
                         ? `Due on
@@ -158,11 +159,27 @@ export default function ViewAssessment({
                             key={file.assessment_file_id}
                             fileName={file.file_name}
                             onClick={() =>
-                                handleFileClick(file.assessment_file_id)
+                                handleFileClick(
+                                    file.assessment_file_id,
+                                    file.file_name
+                                )
                             }
                         />
                     ))}
             </div>
+
+            {fileUrl && (
+                <ModalDocViewer
+                    fileName={fileName}
+                    fileUrl={fileUrl}
+                    onClose={handleViewFileClose}
+                    fileDownload={fileDownload}
+                />
+            )}
+
+            {/* The section for student to upload their works for the activity */}
+            {assessment.assessment_type.assessment_type === "activity" &&
+                auth.user.role_name === "student" && <AcitivityMyWork />}
         </div>
     );
 }

@@ -16,7 +16,7 @@ export default function Pagination({ links, currentPage, lastPage, only }) {
     });
 
     return (
-        <div className="flex justify-center sm:justify-end w-full mt-5">
+        <div className="flex justify-center sm:justify-end w-full">
             <div className="join font-nunito-sans">
                 {filteredLinks.map((link, index) => (
                     <Link

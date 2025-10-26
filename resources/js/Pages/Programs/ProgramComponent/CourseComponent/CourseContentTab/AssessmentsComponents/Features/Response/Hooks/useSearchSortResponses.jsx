@@ -3,7 +3,7 @@ import { debounce, identity } from "lodash";
 import { router } from "@inertiajs/react";
 import { route } from "ziggy-js";
 
-export default function useSearchSortQuizResponses({
+export default function useSearchSortResponses({
     programId,
     courseId,
     assessmentId,
@@ -11,7 +11,10 @@ export default function useSearchSortQuizResponses({
     const [search, setSearch] = useState("");
     const [sortScore, setSortScore] = useState(null);
     const [sortTime, setSortTime] = useState(null);
+    const [sortSubmittedDate, setSortSubmittedDate] = useState(null);
     const [initalRender, setInitialRender] = useState(true);
+    const [submissionStatus, setSubmissionStatus] = useState(null);
+    const [isSearchSortLoading, setIsSearchSortLoading] = useState(false);
 
     const debouncedSearch = useMemo(() => {
         return debounce((e) => {
@@ -24,6 +27,10 @@ export default function useSearchSortQuizResponses({
         if (sortScore) {
             console.log("RESET SORT SCORE");
             setSortScore(null);
+        }
+        if (sortSubmittedDate) {
+            console.log("RESET SORT SCORE");
+            setSortSubmittedDate(null);
         }
 
         if (!sortTime || sortTime === "desc") {
@@ -38,6 +45,10 @@ export default function useSearchSortQuizResponses({
         if (sortTime) {
             setSortTime(null);
         }
+        if (sortSubmittedDate) {
+            console.log("RESET SORT SCORE");
+            setSortSubmittedDate(null);
+        }
 
         if (!sortScore || sortScore === "desc") {
             setSortScore("asc");
@@ -46,7 +57,25 @@ export default function useSearchSortQuizResponses({
         }
     };
 
+    const handleSortSubmittedDate = () => {
+        // Remove sorting of other column
+        if (sortScore) {
+            console.log("RESET SORT SCORE");
+            setSortScore(null);
+        }
+        if (sortTime) {
+            setSortTime(null);
+        }
+
+        if (!sortSubmittedDate || sortSubmittedDate === "desc") {
+            setSortSubmittedDate("asc");
+        } else if (sortSubmittedDate === "asc") {
+            setSortSubmittedDate("desc");
+        }
+    };
+
     const handleGetResponses = (query) => {
+        setIsSearchSortLoading(true);
         router.get(
             route("assessment.responses.view", {
                 program: programId,
@@ -60,8 +89,15 @@ export default function useSearchSortQuizResponses({
                 preserveScroll: true,
                 preserveState: true,
                 only: ["responses"],
+                onFinish: () => {
+                    setIsSearchSortLoading(false);
+                },
             }
         );
+    };
+
+    const handleFilterSubmissionStatus = (e) => {
+        setSubmissionStatus(e.target.value);
     };
 
     useEffect(() => {
@@ -71,12 +107,21 @@ export default function useSearchSortQuizResponses({
             if (search.trim()) query.search = search.trim();
             if (sortScore) query.sortScore = sortScore;
             if (sortTime) query.sortTime = sortTime;
+            if (sortSubmittedDate) query.sortSubmittedDate = sortSubmittedDate;
+            if (submissionStatus) query.submissionStatus = submissionStatus;
 
             handleGetResponses(query);
         } else {
             setInitialRender(false);
         }
-    }, [search, sortScore, sortTime]);
+    }, [search, sortScore, sortTime, sortSubmittedDate, submissionStatus]);
+
+    useEffect(() => {
+        // Cleanup when component unmounts
+        return () => {
+            debouncedSearch.cancel();
+        };
+    }, [debouncedSearch]);
 
     return {
         debouncedSearch,
@@ -84,5 +129,11 @@ export default function useSearchSortQuizResponses({
         sortScore,
         handleSortTime,
         sortTime,
+        handleSortSubmittedDate,
+        sortSubmittedDate,
+        handleFilterSubmissionStatus,
+        search,
+        submissionStatus,
+        isSearchSortLoading,
     };
 }

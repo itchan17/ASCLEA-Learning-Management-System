@@ -70,17 +70,25 @@ export default function QuestionForm() {
                             min="0"
                             max="999"
                             onKeyDown={(e) => {
-                                if (e.key === "-") {
-                                    e.preventDefault();
+                                console.log(e.length);
+                                if (
+                                    e.key === "-" ||
+                                    e.key === "e" ||
+                                    e.key === "+"
+                                ) {
+                                    e.preventDefault(); // prevent invalid characters
                                 }
                             }}
                             value={questionDetails.question_points}
-                            onChange={(e) =>
-                                handleQuestionDetailsChange(
-                                    "question_points",
-                                    e.target.value
-                                )
-                            }
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                if (value.length <= 3) {
+                                    handleQuestionDetailsChange(
+                                        "question_points",
+                                        value
+                                    );
+                                }
+                            }}
                         />
                         <label className="font-bold">Points</label>
                     </div>

@@ -16,6 +16,7 @@ import axios from "axios";
 import ModalContainer from "../../../../../../Components/ModalContainer";
 import File from "../File";
 import { getRemainingDays } from "../../../../../../Utils/getRemainingDays";
+import ModalDocViewer from "../../../../../../Components/ModalDocViewer";
 
 export default function AssessmentItem({
     assessmentDetails,
@@ -33,6 +34,9 @@ export default function AssessmentItem({
     const { course, program, auth } = usePage().props;
 
     const [isEdit, setIsEdit] = useState(false);
+    const [fileUrl, setFileUrl] = useState(null);
+    const [fileDownload, setFileDownload] = useState(null);
+    const [fileName, setFileName] = useState(null);
 
     const stopPropagation = (e) => {
         e.stopPropagation();
@@ -181,15 +185,30 @@ export default function AssessmentItem({
         }
     };
 
-    const handleFileClick = (fileId) => {
-        router.get(
-            route("program.course.file.view", {
-                program: program.program_id,
-                course: course.course_id,
-                assessment: assessmentDetails.assessment_id,
-                file: fileId,
-            })
-        );
+    const handleFileClick = (fileId, fileName) => {
+        const url = route("program.course.file.stream", {
+            program: program.program_id,
+            course: course.course_id,
+            assessment: assessmentDetails.assessment_id,
+            file: fileId,
+        });
+
+        const fileDownload = route("program.course.file.download", {
+            program: program.program_id,
+            course: course.course_id,
+            assessment: assessmentDetails.assessment_id,
+            file: fileId,
+        });
+
+        setFileUrl(url);
+        setFileDownload(fileDownload);
+        setFileName(fileName);
+    };
+
+    const handleViewFileClose = () => {
+        setFileUrl(null);
+        setFileName(null);
+        setFileDownload(null);
     };
 
     return (
@@ -343,7 +362,10 @@ export default function AssessmentItem({
                                 key={file.assessment_file_id}
                                 fileName={file.file_name}
                                 onClick={() =>
-                                    handleFileClick(file.assessment_file_id)
+                                    handleFileClick(
+                                        file.assessment_file_id,
+                                        file.file_name
+                                    )
                                 }
                             ></File>
                         ))}
@@ -368,6 +390,15 @@ export default function AssessmentItem({
                     </span>
                 </div>
             </div>
+
+            {fileUrl && (
+                <ModalDocViewer
+                    fileName={fileName}
+                    fileUrl={fileUrl}
+                    onClose={handleViewFileClose}
+                    fileDownload={fileDownload}
+                />
+            )}
 
             {isEdit && (
                 <ModalContainer>

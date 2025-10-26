@@ -3,12 +3,13 @@
 namespace Database\Seeders;
 
 use App\Models\AssignedCourse;
+use App\Models\Programs\ActivityFile;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\AssessmentSubmission;
 use App\Services\Programs\AssessmentSubmissionService;
 use App\Services\Programs\StudentQuizAnswerService;
 use Carbon\Carbon;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 
 class AssessmentSubmissionSeeder extends Seeder
@@ -27,24 +28,25 @@ class AssessmentSubmissionSeeder extends Seeder
     public function run(): void
     {
         // Must be a valid course and assessment
-        $courseId = '01990ee0-96b6-70cd-b4e7-622d64d9acfd';
-        $assessmentId = '01995b9c-a26e-71b9-8684-c661b0ec38c1';
+        $courseId = '0199e04f-aa4c-7263-86cb-2872a2cd767b';
+        $quizAssessmentId = '0199e050-7c3e-708e-8f50-b4a86db42971'; // Replace with a valid quiz assessment id
+        $activityAssessmentId = "0199e067-32dc-730b-ac35-6da759c16daa"; // Replace with a valid activity assessment id
 
         $studentsAssignedToCourse = AssignedCourse::where('course_id', $courseId)->whereHas('member.user.role', function ($q) {
             $q->where('role_name', 'student');
         })->get();
-        $assessment = Assessment::where('assessment_id', $assessmentId)->first();
+        $assessment = Assessment::where('assessment_id', $quizAssessmentId)->first();
         $quiz = $assessment->quiz;
         $questions = $quiz->questions()
             ->with('options')
             ->get();
 
-
+        // Loop for submitting quiz assessment
         // Loop through each student and answer the quiz
         foreach ($studentsAssignedToCourse as $student) {
 
             // Create first the submission
-            $assessmentSubmission = $this->assessmentSubmissionService->createQuizAssessmentSubmission($student->assigned_course_id, $assessment->assessment_id, $quiz);
+            $assessmentSubmission = $this->assessmentSubmissionService->createQuizAssessmentSubmission($student->assigned_course_id, $quizAssessmentId, $quiz);
 
             // Loop through questions and answer each
             foreach ($questions as $question) {
@@ -91,6 +93,46 @@ class AssessmentSubmissionSeeder extends Seeder
 
             // This will update the assessment submission data with the latest records
             $this->assessmentSubmissionService->updateQuizAssessmentSubmission($assessmentSubmission, $totalScore, $submittedAt);
+        }
+
+        // Loop for submitting activity assessment
+        foreach ($studentsAssignedToCourse as $student) {
+
+            // Create first assessment submission data
+            $assessmentSubmission = AssessmentSubmission::firstOrCreate([
+                'assessment_id' => $activityAssessmentId,
+                'submitted_by' => $student->assigned_course_id
+            ]);
+
+            // Replace fields with valid file data already uploaded in the file storage
+            $activityFiles = [
+                [
+                    'activity_file_id' => (string) Str::uuid(),
+                    'assessment_submission_id' => $assessmentSubmission->assessment_submission_id,
+                    'file_path' => "activityFiles/HVvvg7850MlposmL4bSOxQ4E3xDRy7q0BcyXgRS0.jpg",
+                    'original_file_path' => "activityFiles/HVvvg7850MlposmL4bSOxQ4E3xDRy7q0BcyXgRS0.jpg",
+                    'file_name' => "Anoyo_Christian_Activity3_Page3.jpg",
+                    'file_type' => "image/jpeg",
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ],
+                [
+                    'activity_file_id' => (string) Str::uuid(),
+                    'assessment_submission_id' => $assessmentSubmission->assessment_submission_id,
+                    'file_path' => "activityFiles/HlgnAEqwUwuFVdFkcUazL6OujKWIsBI974qv4O7t.pdf",
+                    'original_file_path' => "activityFiles/HlgnAEqwUwuFVdFkcUazL6OujKWIsBI974qv4O7t.pdf",
+                    'file_name' => "ELEC IT E-3 - Week 2 - Introduction to Microsoft Power BI (3).pdf",
+                    'file_type' => "application/pdf",
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]
+            ];
+
+            // Add a file for submission
+            ActivityFile::insert($activityFiles);
+
+            // Submit the activity
+            $this->assessmentSubmissionService->submitActivity($student->assigned_course_id, $activityAssessmentId);
         }
     }
 }

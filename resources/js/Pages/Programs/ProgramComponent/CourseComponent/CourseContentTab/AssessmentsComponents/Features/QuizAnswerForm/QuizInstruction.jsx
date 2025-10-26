@@ -10,9 +10,21 @@ import AlertModal from "../../../../../../../../Components/AlertModal";
 import useQuizAnswerForm from "./Hooks/useQuizAnswerForm";
 import { convertDurationMinutes } from "../../../../../../../../Utils/convertDurationMinutes";
 
-export default function QuizInstruction({ courseId, quiz, assessmentId }) {
+export default function QuizInstruction({
+    courseId,
+    quiz,
+    assessment,
+    assessmentSubmission,
+}) {
     const [openAlertModal, setOpenAlertModal] = useState(false);
     const [duration, setDuration] = useState("");
+
+    // Set the over duedate when the user has not starter the quiz and due dat isover
+    const [isOverDueDate, setIsOverDueDate] = useState(
+        !assessmentSubmission && assessment.due_datetime
+            ? new Date() > new Date(assessment.due_datetime)
+            : null
+    );
 
     // Custom hook
     const { navigateQuizAnswerForm, isLoading } = useQuizAnswerForm();
@@ -23,7 +35,7 @@ export default function QuizInstruction({ courseId, quiz, assessmentId }) {
         } else {
             navigateQuizAnswerForm({
                 courseId: courseId,
-                assessmentId: assessmentId,
+                assessmentId: assessment.assessment_id,
                 quizId: quiz.quiz_id,
             });
         }
@@ -91,7 +103,7 @@ export default function QuizInstruction({ courseId, quiz, assessmentId }) {
                     onConfirm={() => {
                         navigateQuizAnswerForm({
                             courseId: courseId,
-                            assessmentId: assessmentId,
+                            assessmentId: assessment.assessment_id,
                             quizId: quiz.quiz_id,
                         });
                         setOpenAlertModal(false);
@@ -140,6 +152,7 @@ export default function QuizInstruction({ courseId, quiz, assessmentId }) {
 
                 <div className="flex w-full justify-end">
                     <PrimaryButton
+                        isDisabled={isOverDueDate}
                         text={"Start"}
                         doSomething={handleStartCLick}
                     />

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\CV\DetectedCheatings; 
+use App\Models\CV\DetectedCheating; 
 
 
 class AssessmentSubmission extends Model
@@ -23,6 +23,7 @@ class AssessmentSubmission extends Model
     protected $fillable = [
         'assessment_id',
         'submitted_by',
+        'submission_status',
         'submitted_at',
         'end_at',
         'score',
@@ -47,5 +48,10 @@ class AssessmentSubmission extends Model
     public function submittedBy(): BelongsTo
     {
         return $this->belongsTo(AssignedCourse::class, 'submitted_by', 'assigned_course_id');
+    }
+
+    public function activityFiles(): HasMany
+    {
+        return $this->hasMany(ActivityFile::class, 'assessment_submission_id');
     }
 }

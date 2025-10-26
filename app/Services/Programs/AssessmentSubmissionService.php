@@ -2,15 +2,17 @@
 
 namespace App\Services\Programs;
 
+use App\Models\Programs\ActivityFile;
 use App\Models\Programs\AssessmentSubmission;
 use App\Models\Programs\Quiz;
 use App\Models\User;
+use App\Services\PdfConverter;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class AssessmentSubmissionService
 {
@@ -164,5 +166,116 @@ class AssessmentSubmissionService
         $assessmentSubmission->update(['feedback' => $data]);
     }
 
-    public function saveQuizResultFeedback($data, AssessmentSubmission $assessmentSubmission) {}
+    public function saveActivityFiles(array $activityFiles, AssessmentSubmission $assessmentSubmission)
+    {
+        $uploadedFiles = [];
+        $now = Carbon::now(); // Get current to use for timesptamps
+
+        foreach ($activityFiles as $index => $file) {
+
+            // Store the files in private storage
+            $originalFilePath = $file->store('activityFiles');
+
+            $mimeType = $file->getMimeType();
+            $newFilePath = null;
+
+            // Check if the file is pptx or docx type
+            if (in_array($mimeType, [
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+            ])) {
+
+                $inputFile = storage_path('app/private/' . $originalFilePath); // Get the complete file path
+                $fileName = pathinfo($originalFilePath, PATHINFO_FILENAME); // Get the file name
+                $outputFile = storage_path('app/private/activityFiles/' . $fileName); // Set the file path and file name of the converted file
+
+                // Custom fucntion that handle pdf conversion
+                PdfConverter::convertToPdf($inputFile, $outputFile);
+
+                // Set the new file path for the converted file
+                $newFilePath = "activityFiles/" . $fileName . ".pdf";
+            }
+
+            $data = [
+                'activity_file_id' => (string) Str::uuid(),
+                'assessment_submission_id' => $assessmentSubmission->assessment_submission_id,
+                'file_path' => $newFilePath ?? $originalFilePath, // Check for new file path, indicates the files was converted to pdf
+                'original_file_path' => $originalFilePath, // Always save the original file path
+                'file_name' => $file->getClientOriginalName(),
+                'file_type' => $file->getClientMimeType(),
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+
+            // Add the file data inside this array
+            $uploadedFiles[$index] = $data;
+        }
+
+        // Save the files data in the table
+        ActivityFile::insert($uploadedFiles);
+    }
+
+    public function removeActivityFile(ActivityFile $file)
+    {
+        // If file_path is not equal to original_file_path, it means it was converted to pdf
+        // And we have to delete the original file
+        if ($file->file_path !== $file->original_file_path) {
+            // Remove the two files
+            Storage::delete($file->original_file_path);
+        }
+
+        Storage::delete($file->file_path);
+
+        $file->delete();
+    }
+
+    // Delete the assesmsent submission when the user remove all the uploaded activity files
+    public function removeAssessmentSubmission(AssessmentSubmission $assessmentSubmission)
+    {
+        if ($assessmentSubmission->activityFiles->count() === 0) {
+            $assessmentSubmission->delete();
+        }
+    }
+
+    public function submitActivity(string $assignedCourseId, string $assessmentId)
+    {
+        // Find or Create assessment submission when thse user submit the activity
+        // In this way we can allow activity submission even the student has no uploaded file
+        $assessmentSubmission = AssessmentSubmission::firstOrCreate([
+            'assessment_id' => $assessmentId,
+            'submitted_by' => $assignedCourseId
+        ]);
+
+        if ($assessmentSubmission->submission_status === "not_submitted") {
+            // Then we updated the submisison status and set the submitted time
+            $assessmentSubmission->update(['submission_status' => 'submitted', 'submitted_at' => Carbon::now()]);
+        } else {
+            // For unsubmititng
+            $assessmentSubmission->update(['submission_status' => 'not_submitted', 'submitted_at' => null]);
+        }
+    }
+
+    public function returnSubmittedActivities(
+        bool $selectAll,
+        array $selectedSubmittedActivities,
+        array $unselectedSubmittedActivities,
+        string $assessmentId
+    ) {
+        $assessmentSubmissions = AssessmentSubmission::where('assessment_id', $assessmentId)
+            ->where('submission_status', '!=', 'not_submitted');
+
+        if ($selectAll) {
+            if (!empty($unselectedSubmittedActivities)) {
+                $assessmentSubmissions->whereNotIn('assessment_submission_id', $unselectedSubmittedActivities);
+            }
+        } else {
+            if (!empty($selectedSubmittedActivities)) {
+                $assessmentSubmissions->whereIn('assessment_submission_id', $selectedSubmittedActivities);
+            }
+        }
+
+        $assessmentSubmissions->update([
+            'submission_status' => 'returned',
+        ]);
+    }
 }
