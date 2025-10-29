@@ -6,6 +6,7 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 function StaffCharts({ studentsPerProgram, dailyLogins, avgTimePerDay }) {
     const programLabels = studentsPerProgram.map(p => p.program_name);
     const programData = studentsPerProgram.map(p => p.total_students);
+    const hasProgramData = studentsPerProgram.length > 0 && programData.some(n => n > 0);
 
     const backgroundColors = ["#f9a502","#01007d","#ff6384","#36a2eb","#4caf50","#ff9800",];
     
@@ -80,45 +81,65 @@ function StaffCharts({ studentsPerProgram, dailyLogins, avgTimePerDay }) {
                     />
                 </div>
             </div>
+            
+            {/* Students per Program */}
             <div className="w-full md:w-1/3 md:pl-5 pt-5 md:pt-0">
                 <div className="h-full sm:border border-ascend-gray1 sm:shadow-shadow1 sm:p-4 space-y-5">
-                    <div>
-                        <h1 className="text-size4 font-bold">
-                            Students per Program
-                        </h1>
-                    </div>
-                    <Pie
-                        data={{
-                            labels: programLabels,
-                            datasets: [{
-                                label: "Students per Program",
-                                data: programData,
-                                backgroundColor: backgroundColors.slice(0, programLabels.length),
-                            }],
-                        }}
-                        options={{ plugins: { legend: { display: false } } }}
-                    />
+                    <h1 className="text-size4 font-bold">Students per Program</h1>
 
-                    {/* Legend below Pie chart */}
-                    <div className="space-y-2">
-                        {studentsPerProgram.map((program, index) => (
-                            <div key={program.program_id}>
-                                <div className="flex items-center space-x-2">
-                                    <div
-                                        className={`h-4 w-4`}
-                                        style={{ backgroundColor: backgroundColors[index] }}
-                                    ></div>
-                                    <span className="text-size1 text-ascend-gray3">
-                                        {program.program_name}
-                                    </span>
-                                </div>
-                                <span className="font-bold ml-6">{program.total_students}</span>
+                    {hasProgramData ? (
+                        <>
+                            <Pie
+                                data={{
+                                    labels: programLabels,
+                                    datasets: [
+                                        {
+                                            label: "Students per Program",
+                                            data: programData,
+                                            backgroundColor: backgroundColors.slice(
+                                                0,
+                                                programLabels.length
+                                            ),
+                                        },
+                                    ],
+                                }}
+                                options={{ plugins: { legend: { display: false } } }}
+                            />
+
+                            {/* Legend below Pie chart */}
+                            <div className="space-y-2">
+                                {studentsPerProgram.map((program, index) => (
+                                    <div key={program.program_id}>
+                                        <div className="flex items-center space-x-2">
+                                            <div
+                                                className="h-4 w-4"
+                                                style={{
+                                                    backgroundColor: backgroundColors[index],
+                                                }}
+                                            ></div>
+                                            <span className="text-size1 text-ascend-gray3">
+                                                {program.program_name}
+                                            </span>
+                                        </div>
+                                        <span className="font-bold ml-6">
+                                            {program.total_students}
+                                        </span>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
+                        </>
+                    ) : (
+                        <div className="flex items-center justify-center h-48 text-ascend-gray3 text-center">
+                            <p className="h-48 text-ascend-gray4 italic">
+                                No Programs yet — create a program to see the total number of
+                                students per program.
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
     );
 }
+
 export default React.memo(StaffCharts);

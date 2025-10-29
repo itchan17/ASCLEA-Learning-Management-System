@@ -35,7 +35,8 @@ class DashboardController extends Controller
         $dailyTimeSpent = [];
 
         if ($roleName === 'faculty') {
-            [$stats, $assessments] = $this->getFacultyData($authUser, $stats);
+            [$stats, $assessments, $dailyLoginDates, $dailyLoginCounts, $avgTimePerDay] =
+            $this->getFacultyData($authUser, $stats);
         } elseif ($roleName === 'student') {
             [
                 $dailyTimeSpent,
@@ -96,12 +97,19 @@ class DashboardController extends Controller
             ->get();
     }
 
-    private function getDailyLoginsAndAverageTime()
+    private function getDailyLoginsAndAverageTime($studentIds = null)
     {
-        $logins = DB::table('user_logins')
+        $query = DB::table('user_logins')
             ->join('users', 'user_logins.user_id', '=', 'users.user_id')
             ->join('roles', 'users.role_id', '=', 'roles.role_id')
-            ->where('roles.role_name', 'student')
+            ->where('roles.role_name', 'student');
+
+        // Filter only those students that belong to the faculty (if provided)
+        if ($studentIds) {
+            $query->whereIn('user_logins.user_id', $studentIds);
+        }
+
+        $logins = $query
             ->where('login_at', '>=', Carbon::now()->subDays(6)->startOfDay())
             ->select('user_logins.user_id', 'login_at', 'logout_at')
             ->get();
@@ -118,8 +126,8 @@ class DashboardController extends Controller
             $dailyCounts[] = $dailyLogins->unique('user_id')->count();
 
             $times = $dailyLogins->filter(fn($l) => $l->logout_at)
-                                 ->map(fn($l) => Carbon::parse($l->login_at)
-                                 ->diffInMinutes(Carbon::parse($l->logout_at)) / 60);
+                                ->map(fn($l) => Carbon::parse($l->login_at)
+                                ->diffInMinutes(Carbon::parse($l->logout_at)) / 60);
             $avgTimePerDay[$date] = $times->count() ? round($times->avg(), 2) : 0;
         }
 
@@ -129,13 +137,31 @@ class DashboardController extends Controller
     private function getFacultyData($authUser, $stats)
     {
         $staff = Staff::where('user_id', $authUser->user_id)
-            ->withCount('assignedCourses')->with('assignedCourses')->first();
+            ->withCount('assignedCourses')
+            ->with('assignedCourses')
+            ->first();
 
         $stats['assigned_courses'] = $staff?->assigned_courses_count ?? 0;
 
         $assignedCourseIds = $staff?->assignedCourses->pluck('course_id') ?? [];
 
-        $assessments = Assessment::select('assessment_id', 'assessment_title')
+        // Get the user IDs of students under this faculty’s courses
+        $studentIds = \App\Models\AssignedCourse::whereIn('course_id', $assignedCourseIds)
+            ->join('learning_members', 'assigned_courses.learning_member_id', '=', 'learning_members.learning_member_id')
+            ->join('users', 'learning_members.user_id', '=', 'users.user_id')
+            ->join('roles', 'users.role_id', '=', 'roles.role_id')
+            ->where('roles.role_name', 'student')
+            ->distinct()
+            ->pluck('learning_members.user_id')
+            ->toArray();
+
+        $stats['total_students'] = count($studentIds);
+
+        // Fetch logins/time only for this faculty’s students
+        [$dailyLoginDates, $dailyLoginCounts, $avgTimePerDay] = $this->getDailyLoginsAndAverageTime($studentIds);
+
+        // Assessments data for faculty dashboard
+        $assessments = \App\Models\Programs\Assessment::select('assessment_id', 'assessment_title')
             ->whereIn('course_id', $assignedCourseIds)
             ->withCount([
                 'assessmentSubmissions as submitted_count' => fn($q) => $q->where('submission_status', 'submitted'),
@@ -144,7 +170,8 @@ class DashboardController extends Controller
             ])
             ->get();
 
-        return [$stats, $assessments];
+        // Return also the login/time data
+        return [$stats, $assessments, $dailyLoginDates, $dailyLoginCounts, $avgTimePerDay];
     }
 
     private function getStudentData($authUser)
