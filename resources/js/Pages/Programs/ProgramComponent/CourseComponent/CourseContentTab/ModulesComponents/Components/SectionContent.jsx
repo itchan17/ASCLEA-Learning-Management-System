@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -6,11 +6,34 @@ import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import { MdOutlineDragIndicator } from "react-icons/md";
 import RoleGuard from "../../../../../../../Components/Auth/RoleGuard";
+import { closeDropDown } from "../../../../../../../Utils/closeDropdown";
+import ModalContainer from "../../../../../../../Components/ModalContainer";
+import MaterialForm from "./MaterialForm";
+import AssessmentForm from "../../AssessmentsComponents/AssessmentForm";
+import useAssessmentsStore from "../../../../../../../Stores/Programs/CourseContent/assessmentsStore";
+import useModulesStore from "../Stores/modulesStore";
+import { RiCreativeCommonsZeroLine } from "react-icons/ri";
 
-export default function SectionContent({ disabled, contentDetails }) {
+export default function SectionContent({
+    disabled,
+    contentDetails,
+    sectionId = null,
+}) {
     const route = useRoute();
 
     const { program, course } = usePage().props;
+
+    // Module store
+    const setMaterialDetails = useModulesStore(
+        (state) => state.setMaterialDetails
+    );
+    // Assessment store
+    const setAssessmentDetails = useAssessmentsStore(
+        (state) => state.setAssessmentDetails
+    );
+
+    const [openEditForm, setOpenEditForm] = useState(false);
+
     const {
         attributes,
         listeners,
@@ -71,68 +94,108 @@ export default function SectionContent({ disabled, contentDetails }) {
     const stopPropagation = (e) => {
         e.stopPropagation();
     };
+
+    const handleClickEdit = () => {
+        setOpenEditForm(true);
+
+        if (contentDetails.item_type === "App\\Models\\Programs\\Material") {
+            setMaterialDetails(contentDetails.item);
+        } else {
+            console.log(contentDetails.item);
+            setAssessmentDetails(contentDetails.item);
+        }
+
+        closeDropDown();
+    };
+
     return (
-        <div
-            onClick={handleSectionContentClick}
-            ref={setNodeRef}
-            {...attributes}
-            style={style}
-            className="bg-ascend-white border border-ascend-gray1"
-        >
-            {!disabled && (
-                <div
-                    style={{ touchAction: "none" }}
-                    ref={setActivatorNodeRef}
-                    {...(!disabled && listeners)}
-                    className="flex justify-center cursor-grab py-1"
-                >
-                    <MdOutlineDragIndicator className="rotate-90" />
-                </div>
-            )}
+        <>
             <div
-                className={`flex items-center gap-2 md:gap-20 justify-between pr-5 pl-5 pb-5 cursor-pointer ${
-                    disabled ? "pt-5" : null
-                } text-ascend-black`}
+                onClick={handleSectionContentClick}
+                ref={setNodeRef}
+                {...attributes}
+                style={style}
+                className="bg-ascend-white border border-ascend-gray1"
             >
-                <h1 className="text-size2 font-bold break-words flex-1 min-w-0">
-                    {`${contentDetails.order}. `}
-                    {contentDetails.item_type ===
-                    "App\\Models\\Programs\\Material"
-                        ? contentDetails.item.material_title
-                        : contentDetails.item.assessment_title}
-                </h1>
-
-                <RoleGuard allowedRoles={["admin", "faculty"]}>
+                {!disabled && (
                     <div
-                        onClick={stopPropagation}
-                        className="dropdown dropdown-end cursor-pointer"
+                        style={{ touchAction: "none" }}
+                        ref={setActivatorNodeRef}
+                        {...(!disabled && listeners)}
+                        className="flex justify-center cursor-grab py-1"
                     >
-                        <div
-                            tabIndex={0}
-                            role="button"
-                            className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue transition-all duration-300"
-                        >
-                            <BsThreeDotsVertical className="text-size3" />
-                        </div>
-
-                        <ul
-                            tabIndex={0}
-                            className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-                        >
-                            <li>
-                                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Edit
-                                </a>
-                            </li>
-                            <li>
-                                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Delete
-                                </a>
-                            </li>
-                        </ul>
+                        <MdOutlineDragIndicator className="rotate-90" />
                     </div>
-                </RoleGuard>
+                )}
+                <div
+                    className={`flex items-center gap-2 md:gap-20 justify-between pr-5 pl-5 pb-5 cursor-pointer ${
+                        disabled ? "pt-5" : null
+                    } text-ascend-black`}
+                >
+                    <h1 className="text-size2 font-bold break-words flex-1 min-w-0">
+                        {`${contentDetails.order}. `}
+                        {contentDetails.item_type ===
+                        "App\\Models\\Programs\\Material"
+                            ? contentDetails.item.material_title
+                            : contentDetails.item.assessment_title}
+                    </h1>
+
+                    <RoleGuard allowedRoles={["admin", "faculty"]}>
+                        <div
+                            onClick={stopPropagation}
+                            className="dropdown dropdown-end cursor-pointer relative"
+                        >
+                            <div
+                                tabIndex={0}
+                                role="button"
+                                className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue transition-all duration-300"
+                            >
+                                <BsThreeDotsVertical className="text-size3" />
+                            </div>
+
+                            <ul
+                                tabIndex={0}
+                                className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black absolute z-999"
+                            >
+                                <li onClick={handleClickEdit}>
+                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        Edit
+                                    </a>
+                                </li>
+                                <li>
+                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                        Delete
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </RoleGuard>
+                </div>
             </div>
-        </div>
+            {openEditForm && (
+                <ModalContainer>
+                    {contentDetails.item_type ===
+                    "App\\Models\\Programs\\Material" ? (
+                        <MaterialForm
+                            formTitle={"Edit Material"}
+                            isEdit={true}
+                            setIsMaterialFormOpen={setOpenEditForm}
+                            materialId={contentDetails.item.material_id}
+                            formWidth="max-w-200"
+                            sectionId={sectionId}
+                        />
+                    ) : (
+                        <AssessmentForm
+                            formTitle={"Edit Assessment"}
+                            isEdit={true}
+                            setIsAssessmentFormOpen={setOpenEditForm}
+                            assessmentId={contentDetails.item.assessment_id}
+                            formWidth="max-w-200"
+                            sectionId={sectionId}
+                        />
+                    )}
+                </ModalContainer>
+            )}
+        </>
     );
 }

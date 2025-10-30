@@ -6,7 +6,7 @@ import EmptyState from "../../../../../../../Components/EmptyState/EmptyState";
 import Loader from "../../../../../../../Components/Loader";
 import useMaterial from "../Hooks/useMaterial";
 
-export default function MaterialList() {
+export default function MaterialList({ setIsMaterialFormOpen }) {
     const { program, course } = usePage().props;
 
     // Module store
@@ -60,6 +60,9 @@ export default function MaterialList() {
                                 <MaterialItem
                                     key={material.material_id}
                                     materialDetails={material}
+                                    setIsMaterialFormOpen={
+                                        setIsMaterialFormOpen
+                                    }
                                 />
                             )
                         )}

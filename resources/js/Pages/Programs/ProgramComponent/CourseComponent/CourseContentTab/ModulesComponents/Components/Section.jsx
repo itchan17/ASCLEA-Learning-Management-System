@@ -52,16 +52,6 @@ export default function Section({ sectionDetails }) {
         sectionDetails.sectionContentList
     );
 
-    // Pass to the material form component for cancelling the form
-    const toggleOpenMaterialForm = () => {
-        setIsMaterialFormOpen(!isMaterialFormOpen);
-    };
-
-    // Pass to the asessment form component for cancelling the form
-    const toggleOpenAssessmentForm = () => {
-        setIsAssessmentFormOpen(!isAssessmentFormOpen);
-    };
-
     // Open material or assessment form
     const openForm = (e) => {
         // Open form if close
@@ -297,35 +287,12 @@ export default function Section({ sectionDetails }) {
                     }`}
                 >
                     <div
-                        className={`max-h-[500px] overflow-y-auto ${
+                        className={`max-h-[500px] space-y-3 overflow-y-auto ${
                             isExpanded ? "p-5" : "px-5 py-0"
                         }`}
                     >
-                        {isMaterialFormOpen && (
-                            <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
-                                <MaterialForm
-                                    setIsMaterialFormOpen={
-                                        setIsMaterialFormOpen
-                                    }
-                                    formTitle={"Add Section Material"}
-                                    formWidth={"max-w-200"}
-                                    sectionId={sectionDetails.section_id}
-                                />
-                            </div>
-                        )}
-                        {isAssessmentFormOpen && (
-                            <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
-                                <AssessmentForm
-                                    toggleForm={toggleOpenAssessmentForm}
-                                    formTitle={"Add Section Assessment"}
-                                    formWidth={"max-w-200"}
-                                    sectionId={sectionDetails.section_id}
-                                />
-                            </div>
-                        )}
-
                         {isExpanded && (
-                            <div className="space-y-3">
+                            <>
                                 {sectionDetails.items.length > 0 ? (
                                     <DndContext
                                         sensors={sensors}
@@ -333,12 +300,7 @@ export default function Section({ sectionDetails }) {
                                         collisionDetection={closestCorners}
                                     >
                                         <SectionContentList
-                                            sectionContent={
-                                                sectionDetails.items
-                                            }
-                                            sectionStatus={
-                                                sectionDetails.status
-                                            }
+                                            sectionDetails={sectionDetails}
                                         />
                                     </DndContext>
                                 ) : (
@@ -346,11 +308,32 @@ export default function Section({ sectionDetails }) {
                                         No content found.
                                     </h1>
                                 )}
-                            </div>
+                            </>
                         )}
                     </div>
                 </div>
             </div>
+
+            {isMaterialFormOpen && (
+                <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
+                    <MaterialForm
+                        setIsMaterialFormOpen={setIsMaterialFormOpen}
+                        formTitle={"Add Section Material"}
+                        formWidth={"max-w-200"}
+                        sectionId={sectionDetails.section_id}
+                    />
+                </div>
+            )}
+            {isAssessmentFormOpen && (
+                <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
+                    <AssessmentForm
+                        setIsAssessmentFormOpen={setIsAssessmentFormOpen}
+                        formTitle={"Add Section Assessment"}
+                        formWidth={"max-w-200"}
+                        sectionId={sectionDetails.section_id}
+                    />
+                </div>
+            )}
 
             {isEditSectionFormOpen && (
                 <ModalContainer>

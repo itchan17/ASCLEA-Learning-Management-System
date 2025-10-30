@@ -88,9 +88,16 @@ class AssessmentController extends Controller
             $this->assessmentService->createInitialQuizForm($updatedAssessment);
         }
 
-        $updatedAssessmentData = $this->assessmentService->getAssessmentCompleteDetails($updatedAssessment);
+        if (array_key_exists('section_id', $validatedUpdatedAssessment) && !is_null($validatedUpdatedAssessment['section_id'])) {
+            $sectionItem = $this->sectionItemService->updateSectionItem($updatedAssessment->sectionItem);
 
-        return response()->json(['success' => "Assessment updated sucessfully.", 'data' => $updatedAssessmentData]);
+            // Return the section item with material details
+            return response()->json(['success' => "Material added in section successfully.", 'data' => $sectionItem]);
+        } else {
+            $updatedAssessmentData = $this->assessmentService->getAssessmentCompleteDetails($updatedAssessment);
+
+            return response()->json(['success' => "Assessment updated sucessfully.", 'data' => $updatedAssessmentData]);
+        }
     }
 
     // Independent controller that handle unpublishing of assessment

@@ -11,7 +11,10 @@ import useModulesStore from "../Stores/modulesStore";
 import useMaterial from "../Hooks/useMaterial";
 import { getRemainingDays } from "../../../../../../../Utils/getRemainingDays";
 
-export default function MaterialItem({ materialDetails }) {
+export default function MaterialItem({
+    materialDetails,
+    setIsMaterialFormOpen,
+}) {
     const { program, course, auth } = usePage().props;
     // Module store
     const setMaterialDetails = useModulesStore(
@@ -41,6 +44,7 @@ export default function MaterialItem({ materialDetails }) {
         setIsEditMaterialFormOpen(true);
         setMaterialDetails(materialDetails);
         closeDropDown();
+        setIsMaterialFormOpen(false);
     };
 
     return (

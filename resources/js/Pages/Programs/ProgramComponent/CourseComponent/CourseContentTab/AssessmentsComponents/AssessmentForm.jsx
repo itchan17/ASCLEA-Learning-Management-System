@@ -25,6 +25,7 @@ export default function AssessmentForm({
     sectionId = null,
     isEdit = false,
     assessmentId,
+    setIsAssessmentFormOpen,
 }) {
     const { program, course } = usePage().props;
 
@@ -54,6 +55,9 @@ export default function AssessmentForm({
     // Modules store
     const addNewSectionItem = useModulesStore(
         (state) => state.addNewSectionItem
+    );
+    const updateSectionItems = useModulesStore(
+        (state) => state.updateSectionItems
     );
 
     const [errors, setErrors] = useState(null);
@@ -147,8 +151,12 @@ export default function AssessmentForm({
             }
         );
 
-        // Change the updated assessment data in the list
-        updateAssessmentInList(response.data.data, course.course_id);
+        if (sectionId) {
+            updateSectionItems(response.data.data, course.course_id, sectionId);
+        } else {
+            // Change the updated assessment data in the list
+            updateAssessmentInList(response.data.data, course.course_id);
+        }
 
         displayToast(
             <DefaultCustomToast message={response.data.success} />,
@@ -167,7 +175,7 @@ export default function AssessmentForm({
                 await addAssessment();
             }
 
-            toggleForm();
+            setIsAssessmentFormOpen(false);
             clearAssessmentDetails();
         } catch (error) {
             console.error(error);
@@ -190,7 +198,7 @@ export default function AssessmentForm({
     };
 
     const cancelAssessmentForm = () => {
-        toggleForm();
+        setIsAssessmentFormOpen(false);
         clearAssessmentDetails();
     };
 
@@ -484,7 +492,10 @@ export default function AssessmentForm({
                                 isLoading={isLoading}
                                 doSomething={handeSubmit}
                                 text={
-                                    assessmentDetails.status === "published"
+                                    sectionId && isEdit
+                                        ? "Save"
+                                        : assessmentDetails.status ===
+                                          "published"
                                         ? "Publish"
                                         : "Save as draft"
                                 }
@@ -494,44 +505,47 @@ export default function AssessmentForm({
                         {/* Dropdown button */}
                         {/* Always publish if material is for aa section */}
                         {(isEdit ||
-                            (assessmentDetails.assessment_type === "activity" &&
-                                !sectionId)) && (
-                            <div className="dropdown dropdown-end cursor-pointer ">
-                                <button
-                                    tabIndex={0}
-                                    role="button"
-                                    className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
-                                >
-                                    <div className="text-size1 ">
-                                        {<IoCaretDownOutline />}
-                                    </div>
-                                </button>
+                            assessmentDetails.assessment_type === "activity") &&
+                            !sectionId && (
+                                <div className="dropdown dropdown-end cursor-pointer ">
+                                    <button
+                                        tabIndex={0}
+                                        role="button"
+                                        className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
+                                    >
+                                        <div className="text-size1 ">
+                                            {<IoCaretDownOutline />}
+                                        </div>
+                                    </button>
 
-                                <ul
-                                    tabIndex={0}
-                                    className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-                                >
-                                    <li
-                                        onClick={() =>
-                                            statusChange("status", "published")
-                                        }
+                                    <ul
+                                        tabIndex={0}
+                                        className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                                     >
-                                        <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                            Publish
-                                        </a>
-                                    </li>
-                                    <li
-                                        onClick={() =>
-                                            statusChange("status", "draft")
-                                        }
-                                    >
-                                        <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                            Save as draft
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        )}
+                                        <li
+                                            onClick={() =>
+                                                statusChange(
+                                                    "status",
+                                                    "published"
+                                                )
+                                            }
+                                        >
+                                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                Publish
+                                            </a>
+                                        </li>
+                                        <li
+                                            onClick={() =>
+                                                statusChange("status", "draft")
+                                            }
+                                        >
+                                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                Save as draft
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            )}
                     </div>
                 </div>
             </div>

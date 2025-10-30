@@ -143,7 +143,10 @@ export default function Assessments() {
 
             {isAssessmentFormOpen && (
                 <div ref={targetForm}>
-                    <AssessmentForm toggleForm={toggleAssessmentForm} />
+                    <AssessmentForm
+                        setIsAssessmentFormOpen={setIsAssessmentFormOpen}
+                        toggleForm={toggleAssessmentForm}
+                    />
                 </div>
             )}
 

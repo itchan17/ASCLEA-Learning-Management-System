@@ -211,7 +211,9 @@ export default function MaterialForm({
                             isDisabled={isLoading}
                             isLoading={isLoading}
                             text={
-                                materialDetails.status === "published"
+                                sectionId && isEdit
+                                    ? "Save"
+                                    : materialDetails.status === "published"
                                     ? "Publish"
                                     : "Save as draft"
                             }

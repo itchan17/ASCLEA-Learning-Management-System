@@ -73,9 +73,16 @@ class MaterialController extends Controller
             $this->materialService->saveMaterialFiles($validatedMaterialData['material_files'], $upatedMaterial);
         }
 
-        $materialCompleteDetails = $this->materialService->getmaterialCompleteDetails($upatedMaterial);
+        if (array_key_exists('section_id', $validatedMaterialData) && !is_null($validatedMaterialData['section_id'])) {
+            $sectionItem = $this->sectionItemService->updateSectionItem($upatedMaterial->sectionItem);
 
-        return response()->json(['success' => "Material updated sucessfully.", 'data' => $materialCompleteDetails]);
+            // Return the section item with material details
+            return response()->json(['success' => "Material added in section successfully.", 'data' => $sectionItem]);
+        } else {
+            $materialCompleteDetails = $this->materialService->getmaterialCompleteDetails($upatedMaterial);
+
+            return response()->json(['success' => "Material updated sucessfully.", 'data' => $materialCompleteDetails]);
+        }
     }
 
     public function unpublishMaterial(Program $program, Course $course, Material $material)

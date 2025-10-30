@@ -23,7 +23,9 @@ export default function useMaterial({ programId, courseId }) {
     const addNewSectionItem = useModulesStore(
         (state) => state.addNewSectionItem
     );
-    const setSectionItems = useModulesStore((state) => state.setSectionItems);
+    const updateSectionItems = useModulesStore(
+        (state) => state.updateSectionItems
+    );
 
     const [errors, setErrors] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -94,7 +96,12 @@ export default function useMaterial({ programId, courseId }) {
                     }
                 );
 
-                updateMaterialList(response.data.data, courseId);
+                if (sectionId) {
+                    console.log(response);
+                    updateSectionItems(response.data.data, courseId, sectionId);
+                } else {
+                    updateMaterialList(response.data.data, courseId);
+                }
             }
             setIsMaterialFormOpen(false);
             clearMaterialDetails();

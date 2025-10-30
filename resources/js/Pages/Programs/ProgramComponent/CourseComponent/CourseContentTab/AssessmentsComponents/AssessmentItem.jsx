@@ -42,10 +42,6 @@ export default function AssessmentItem({
         e.stopPropagation();
     };
 
-    const toggleForm = () => {
-        setIsEdit(!isEdit);
-    };
-
     const handleCardClick = () => {
         if (!assessmentDetails.deleted_at) {
             router.visit(
@@ -88,6 +84,7 @@ export default function AssessmentItem({
     const handleEditClick = () => {
         closeDropDown();
         setIsEdit(true);
+        console.log(assessmentDetails);
         setAssessmentDetails(assessmentDetails);
         setIsAssessmentFormOpen(false); // Close the add assessment form if open
     };
@@ -408,8 +405,7 @@ export default function AssessmentItem({
                             assessmentDetails.assessment_type.assessment_type
                         )}`}
                         isEdit={isEdit}
-                        setIsEdit={setIsEdit}
-                        toggleForm={toggleForm}
+                        setIsAssessmentFormOpen={setIsEdit}
                         formWidth="max-w-200"
                     />
                 </ModalContainer>

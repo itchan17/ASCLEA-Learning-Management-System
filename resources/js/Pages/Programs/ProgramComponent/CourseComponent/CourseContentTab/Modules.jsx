@@ -95,7 +95,11 @@ export default function Modules() {
             ) : null}
 
             {/* For displaying the tab content */}
-            {activeTab === "materials" ? <MaterialList /> : <SectionList />}
+            {activeTab === "materials" ? (
+                <MaterialList setIsMaterialFormOpen={setIsMaterialFormOpen} />
+            ) : (
+                <SectionList />
+            )}
         </div>
     );
 }
