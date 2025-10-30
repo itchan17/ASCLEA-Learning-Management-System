@@ -25,6 +25,7 @@ class AddMaterialRequest extends FormRequest
             'material_title' => 'required|string|max:255',
             'material_description' => 'nullable|string',
             'status' => 'required|in:published,draft',
+            'section_id' => 'nullable|string',
 
             // Files
             'material_files' => 'nullable|array|max:10',

@@ -47,6 +47,10 @@ export default function SectionList() {
         };
     }, [handleObserver]);
 
+    useEffect(() => {
+        console.log(sectionsByCourse[course.course_id]);
+    }, [sectionsByCourse]);
+
     return (
         <div className="space-y-5">
             {sectionsByCourse[course.course_id] &&

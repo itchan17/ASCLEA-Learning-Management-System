@@ -20,6 +20,10 @@ export default function useMaterial({ programId, courseId }) {
     const clearMaterialDetails = useModulesStore(
         (state) => state.clearMaterialDetails
     );
+    const addNewSectionItem = useModulesStore(
+        (state) => state.addNewSectionItem
+    );
+    const setSectionItems = useModulesStore((state) => state.setSectionItems);
 
     const [errors, setErrors] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -49,7 +53,8 @@ export default function useMaterial({ programId, courseId }) {
     const handleAddUpdateMaterial = async (
         setIsMaterialFormOpen,
         isEdit = false,
-        materialId = null
+        materialId = null,
+        sectionId = null
     ) => {
         setIsLoading(true);
         setErrors(null);
@@ -70,7 +75,12 @@ export default function useMaterial({ programId, courseId }) {
                     }
                 );
 
-                addNewMaterial(response.data.data, courseId);
+                if (sectionId) {
+                    console.log(sectionId);
+                    addNewSectionItem(response.data.data, courseId, sectionId);
+                } else {
+                    addNewMaterial(response.data.data, courseId);
+                }
             } else {
                 materialFormData.append("_method", "PUT");
                 response = await axios.post(

@@ -37,7 +37,7 @@ class Section extends Model
         return  $this->belongsTo(User::class, 'created_by', 'user_id');
     }
 
-    public function sectionItem(): HasMany
+    public function items(): HasMany
     {
         return  $this->hasMany(SectionItem::class, 'section_id');
     }

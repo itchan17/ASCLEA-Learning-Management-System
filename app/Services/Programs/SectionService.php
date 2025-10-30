@@ -10,6 +10,7 @@ class SectionService
     {
         return $section->load([
             'author:user_id,first_name,last_name',
+            'items.item'
         ]);
     }
 
@@ -19,6 +20,7 @@ class SectionService
             ->with(['author' => function ($query) {
                 $query->select('user_id', 'first_name', 'last_name');
             }])
+            ->with('items.item')
             ->where(function ($query) use ($userId) {
                 // Display section added by the user or section that was publsiehd
                 $query->where('created_by', $userId)

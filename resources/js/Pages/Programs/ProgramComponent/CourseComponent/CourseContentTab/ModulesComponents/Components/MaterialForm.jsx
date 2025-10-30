@@ -12,7 +12,7 @@ import useModulesStore from "../Stores/modulesStore";
 
 export default function MaterialForm({
     formTitle,
-    sectionId,
+    sectionId = null,
     setIsMaterialFormOpen,
     isEdit = false,
     formWidth,
@@ -51,6 +51,16 @@ export default function MaterialForm({
             clearMaterialDetails();
         };
     }, []);
+
+    useEffect(() => {
+        if (sectionId) {
+            handleMaterialDetailsChange("section_id", sectionId);
+        }
+    }, []);
+
+    // useEffect(() => {
+    //     console.log(materialDetails);
+    // }, [materialDetails]);
 
     return (
         <form
@@ -194,7 +204,8 @@ export default function MaterialForm({
                                 handleAddUpdateMaterial(
                                     setIsMaterialFormOpen,
                                     isEdit,
-                                    materialId
+                                    materialId,
+                                    sectionId
                                 )
                             }
                             isDisabled={isLoading}

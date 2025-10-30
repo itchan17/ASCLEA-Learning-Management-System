@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Program;
 use App\Models\Programs\Section;
+use App\Services\Programs\SectionItemService;
 use App\Services\Programs\SectionService;
 use Illuminate\Http\Request;
 
@@ -13,10 +14,12 @@ class SectionController extends Controller
 {
 
     protected SectionService $sectionService;
+    protected SectionItemService $sectionItemService;
 
-    public function __construct(SectionService $sectionService)
+    public function __construct(SectionService $sectionService, SectionItemService $sectionItemService)
     {
         $this->sectionService = $sectionService;
+        $this->sectionItemService = $sectionItemService;
     }
 
     public function addSection(Request $request, Program $program, Course $course)

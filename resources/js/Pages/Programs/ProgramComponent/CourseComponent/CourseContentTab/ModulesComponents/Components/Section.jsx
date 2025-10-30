@@ -22,15 +22,16 @@ import { closeDropDown } from "../../../../../../../Utils/closeDropdown";
 import SectionForm from "./SectionForm";
 import ModalContainer from "../../../../../../../Components/ModalContainer";
 import { getRemainingDays } from "../../../../../../../Utils/getRemainingDays";
+import Loader from "../../../../../../../Components/Loader";
 
 export default function Section({ sectionDetails }) {
-    console.log(sectionDetails);
     const { program, course } = usePage().props;
-
+    console.log(sectionDetails);
     // Modules store
     const setSectionDetails = useModulesStore(
         (state) => state.setSectionDetails
     );
+    const sectionsByCourse = useModulesStore((state) => state.sectionsByCourse);
 
     // Custom hook
     const {
@@ -98,7 +99,6 @@ export default function Section({ sectionDetails }) {
         setIsExpanded(!isExpanded);
         setIsButtonDisyplayed(false);
     };
-    console.log(sectionContent);
 
     // Helper function for getting the index
     const getSectionContentPos = (id) =>
@@ -309,7 +309,7 @@ export default function Section({ sectionDetails }) {
                                     }
                                     formTitle={"Add Section Material"}
                                     formWidth={"max-w-200"}
-                                    sectionId={sectionDetails.id}
+                                    sectionId={sectionDetails.section_id}
                                 />
                             </div>
                         )}
@@ -323,21 +323,29 @@ export default function Section({ sectionDetails }) {
                                 />
                             </div>
                         )}
+
                         {isExpanded && (
                             <div className="space-y-3">
-                                <DndContext
-                                    sensors={sensors}
-                                    onDragEnd={handleDragEnd}
-                                    collisionDetection={closestCorners}
-                                >
-                                    {/* <SectionContentList
-                                sectionContent={sectionContent}
-                                sectionStatus={sectionDetails.sectionStatus}
-                            /> */}
-                                </DndContext>
-                                <h1 className="text-center">
-                                    No content found.
-                                </h1>
+                                {sectionDetails.items.length > 0 ? (
+                                    <DndContext
+                                        sensors={sensors}
+                                        onDragEnd={handleDragEnd}
+                                        collisionDetection={closestCorners}
+                                    >
+                                        <SectionContentList
+                                            sectionContent={
+                                                sectionDetails.items
+                                            }
+                                            sectionStatus={
+                                                sectionDetails.status
+                                            }
+                                        />
+                                    </DndContext>
+                                ) : (
+                                    <h1 className="text-center">
+                                        No content found.
+                                    </h1>
+                                )}
                             </div>
                         )}
                     </div>

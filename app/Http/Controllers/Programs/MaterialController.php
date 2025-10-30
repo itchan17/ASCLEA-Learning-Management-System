@@ -10,16 +10,19 @@ use App\Models\Programs\Material;
 use App\Models\Programs\MaterialFile;
 use App\Services\HandlingPrivateFileService;
 use App\Services\Programs\MaterialService;
+use App\Services\Programs\SectionItemService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class MaterialController extends Controller
 {
     protected MaterialService $materialService;
+    protected SectionItemService $sectionItemService;
 
-    public function __construct(MaterialService $materialService)
+    public function __construct(MaterialService $materialService, SectionItemService $sectionItemService)
     {
         $this->materialService = $materialService;
+        $this->sectionItemService = $sectionItemService;
     }
 
     public function addMaterial(AddMaterialRequest $request, Program $program, Course $course)
@@ -36,9 +39,17 @@ class MaterialController extends Controller
             $this->materialService->saveMaterialFiles($request->material_files, $material);
         }
 
-        $materialCompleteDetails = $this->materialService->getmaterialCompleteDetails($material);
+        if (array_key_exists('section_id', $validatedData) && !is_null($validatedData['section_id'])) {
+            $sectionItem = $this->sectionItemService->createSectionItem($validatedData['section_id'], $material->material_id, Material::class);
 
-        return response()->json(['success' => "Material added successfully.", 'data' => $materialCompleteDetails]);
+            // Return the section item with material details
+            return response()->json(['success' => "Material added in section successfully.", 'data' => $sectionItem]);
+        } else {
+            // Return here the material details
+            $materialCompleteDetails = $this->materialService->getmaterialCompleteDetails($material);
+
+            return response()->json(['success' => "Material added successfully.", 'data' => $materialCompleteDetails]);
+        }
     }
 
     public function getMaterials(Request $request, Program $program, Course $course)

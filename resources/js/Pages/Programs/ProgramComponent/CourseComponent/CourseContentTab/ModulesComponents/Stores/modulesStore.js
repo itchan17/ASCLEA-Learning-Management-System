@@ -265,6 +265,38 @@ const useModulesStore = create((set) => ({
         });
     },
 
+    // Section items
+    addNewSectionItem: (newSectionItem, courseId, sectionId) => {
+        const { sectionsByCourse } = useModulesStore.getState();
+
+        const courseState = sectionsByCourse[courseId] || {
+            list: [],
+            page: 1,
+            hasMore: true,
+        };
+
+        // Update the item list of the section
+        const updatedList = courseState.list.map((section) => {
+            if (section.section_id === sectionId) {
+                return {
+                    ...section,
+                    items: [...(section.items || []), newSectionItem],
+                };
+            }
+            return section;
+        });
+        console.log(updatedList);
+        set({
+            sectionsByCourse: {
+                ...sectionsByCourse,
+                [courseId]: {
+                    ...courseState,
+                    list: updatedList,
+                },
+            },
+        });
+    },
+
     // To be delete:
 
     sectionList: [
