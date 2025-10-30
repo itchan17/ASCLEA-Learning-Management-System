@@ -12,6 +12,7 @@ use App\Services\HandlingPrivateFileService;
 use App\Services\Programs\AssessmentResponseService;
 use App\Services\Programs\AssessmentService;
 use App\Services\Programs\AssessmentSubmissionService;
+use App\Services\Programs\SectionItemService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -22,12 +23,14 @@ class AssessmentController extends Controller
     protected AssessmentService $assessmentService;
     protected AssessmentResponseService $assessmentResponseService;
     protected AssessmentSubmissionService $assessmentSubmissionService;
+    protected SectionItemService $sectionItemService;
 
-    public function __construct(AssessmentService $assessmentService, AssessmentResponseService $assessmentResponseService, AssessmentSubmissionService $assessmentSubmissionService)
+    public function __construct(AssessmentService $assessmentService, AssessmentResponseService $assessmentResponseService, AssessmentSubmissionService $assessmentSubmissionService, SectionItemService $sectionItemService)
     {
         $this->assessmentService = $assessmentService;
         $this->assessmentResponseService = $assessmentResponseService;
         $this->assessmentSubmissionService = $assessmentSubmissionService;
+        $this->sectionItemService = $sectionItemService;
     }
 
     public function createAssessment(SaveAssessmentRequest $req, $program, $course)
@@ -45,9 +48,19 @@ class AssessmentController extends Controller
             $this->assessmentService->createInitialQuizForm($assessment);
         }
 
-        $assessmentCompleteDetails = $this->assessmentService->getAssessmentCompleteDetails($assessment);
+        // If assesssment was created through section, crerate a data for section item tables
+        if (array_key_exists('section_id', $validatedAssessment) && !is_null($validatedAssessment['section_id'])) {
 
-        return response()->json(['success' => "Assessment created successfully.", 'data' => $assessmentCompleteDetails]);
+            $sectionItem = $this->sectionItemService->createSectionItem($validatedAssessment['section_id'], $assessment->assessment_id, Assessment::class);
+
+            // Return the section item with material details
+            return response()->json(['success' => "Material added in section successfully.", 'data' => $sectionItem]);
+        } else {
+
+            $assessmentCompleteDetails = $this->assessmentService->getAssessmentCompleteDetails($assessment);
+
+            return response()->json(['success' => "Assessment created successfully.", 'data' => $assessmentCompleteDetails]);
+        }
     }
 
     public function listAssessments($program, $course)

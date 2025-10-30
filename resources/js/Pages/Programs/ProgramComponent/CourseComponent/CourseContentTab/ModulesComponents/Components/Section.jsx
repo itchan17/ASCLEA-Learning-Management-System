@@ -319,7 +319,7 @@ export default function Section({ sectionDetails }) {
                                     toggleForm={toggleOpenAssessmentForm}
                                     formTitle={"Add Section Assessment"}
                                     formWidth={"max-w-200"}
-                                    sectionId={sectionDetails.id}
+                                    sectionId={sectionDetails.section_id}
                                 />
                             </div>
                         )}

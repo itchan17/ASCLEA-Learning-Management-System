@@ -76,7 +76,6 @@ export default function useMaterial({ programId, courseId }) {
                 );
 
                 if (sectionId) {
-                    console.log(sectionId);
                     addNewSectionItem(response.data.data, courseId, sectionId);
                 } else {
                     addNewMaterial(response.data.data, courseId);

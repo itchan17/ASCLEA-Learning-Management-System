@@ -28,6 +28,7 @@ class SaveAssessmentRequest extends FormRequest
             'due_datetime' => 'nullable|date_format:Y-m-d\TH:i|after:now',
             'total_points' => 'nullable|numeric|min:0',
             'status' => 'required|in:published,draft',
+            'section_id' => 'nullable|string',
 
             // Files
             'assessment_files' => 'nullable|array|max:10',

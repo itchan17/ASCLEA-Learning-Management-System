@@ -16,12 +16,13 @@ import { displayToast } from "../../../../../../Utils/displayToast";
 import DefaultCustomToast from "../../../../../../Components/CustomToast/DefaultCustomToast";
 import { capitalize } from "lodash";
 import axios from "axios";
+import useModulesStore from "../ModulesComponents/Stores/modulesStore";
 
 export default function AssessmentForm({
     toggleForm,
     formTitle,
     formWidth,
-    sectionId,
+    sectionId = null,
     isEdit = false,
     assessmentId,
 }) {
@@ -50,6 +51,11 @@ export default function AssessmentForm({
         (state) => state.updateAssessmentInList
     );
 
+    // Modules store
+    const addNewSectionItem = useModulesStore(
+        (state) => state.addNewSectionItem
+    );
+
     const [errors, setErrors] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -60,6 +66,13 @@ export default function AssessmentForm({
             // If note edit this means user will create a new assessment
             // WE have to reset the value first
             clearAssessmentDetails();
+        }
+    }, []);
+
+    useEffect(() => {
+        if (sectionId) {
+            // Add the  sectionId to the assessment details
+            handleAssessmentChange("section_id", sectionId);
         }
     }, []);
 
@@ -102,8 +115,12 @@ export default function AssessmentForm({
                 headers: { "Content-Type": "multipart/form-data" },
             }
         );
-
-        addNewAssessment(response.data.data, course.course_id);
+        if (sectionId) {
+            // Add the asssessment in the section
+            addNewSectionItem(response.data.data, course.course_id, sectionId);
+        } else {
+            addNewAssessment(response.data.data, course.course_id);
+        }
 
         displayToast(
             <DefaultCustomToast message={response.data.success} />,
@@ -188,7 +205,7 @@ export default function AssessmentForm({
         // Check if type is quiz
         // Set the button to save as draft and status to draft
         // since user can only save quiz as draft to allow them to edit quiz form before publish
-        if (assessmentType === "quiz") {
+        if (assessmentType === "quiz" && !sectionId) {
             handleAssessmentChange("status", "draft");
         }
 
@@ -475,9 +492,10 @@ export default function AssessmentForm({
                         )}
 
                         {/* Dropdown button */}
+                        {/* Always publish if material is for aa section */}
                         {(isEdit ||
-                            assessmentDetails.assessment_type ===
-                                "activity") && (
+                            (assessmentDetails.assessment_type === "activity" &&
+                                !sectionId)) && (
                             <div className="dropdown dropdown-end cursor-pointer ">
                                 <button
                                     tabIndex={0}
