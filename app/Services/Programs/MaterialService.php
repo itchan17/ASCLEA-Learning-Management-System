@@ -82,6 +82,7 @@ class MaterialService
                 $query->whereNull('deleted_at')
                     ->orWhere('created_by', $userId);
             })
+            ->whereDoesntHave('sectionItem') // Only gets materials not created in section
             ->orderBy('created_at', 'desc')
             ->orderBy('material_id', 'desc')
             ->paginate(5);

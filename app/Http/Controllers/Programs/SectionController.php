@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Program;
 use App\Models\Programs\Section;
+use App\Models\Programs\SectionItem;
 use App\Services\Programs\SectionItemService;
 use App\Services\Programs\SectionService;
 use Illuminate\Http\Request;
@@ -77,5 +78,12 @@ class SectionController extends Controller
         $section = $this->sectionService->restoreSection($section);
 
         return response()->json(['success' => "Section restored successfully.", 'data' => $section]);
+    }
+
+    public function sortSectionItem(Request $request, Program $program, Course $course, Section $section, SectionItem $sectionItem)
+    {
+        $this->sectionItemService->sortSectionItem($section, $sectionItem, $request->all());
+
+        return response()->json("Section items sorted successfully.");
     }
 }

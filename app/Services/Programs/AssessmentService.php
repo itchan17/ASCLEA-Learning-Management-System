@@ -123,6 +123,7 @@ class AssessmentService
                 $query->whereNull('deleted_at')
                     ->orWhere('created_by', $user->user_id);
             })
+            ->whereDoesntHave('sectionItem') // Only gets assessments not created in section
             ->select(
                 'assessment_id',
                 'assessment_type_id',

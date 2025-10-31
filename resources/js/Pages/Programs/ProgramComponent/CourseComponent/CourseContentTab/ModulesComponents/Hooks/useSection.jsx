@@ -223,14 +223,41 @@ export default function useSection({ programId, courseId }) {
                 })
             );
 
-            console.log(response);
             updateSectionList(response.data.data, courseId);
             displayToast(
                 <DefaultCustomToast message={response.data.success} />,
                 "success"
             );
         } catch (error) {
-            console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please try again."}
+                />,
+                "error"
+            );
+        }
+    };
+
+    const handleSectionItemSorting = async (
+        sectionId,
+        sectionItemId,
+        newSortOrder,
+        origSortOrder
+    ) => {
+        try {
+            const response = await axios.put(
+                route("section.item.sort", {
+                    program: programId,
+                    course: courseId,
+                    section: sectionId,
+                    sectionItem: sectionItemId,
+                }),
+                {
+                    newSortOrder: newSortOrder + 1,
+                    origSortOrder: origSortOrder + 1,
+                }
+            );
+        } catch (error) {
             displayToast(
                 <DefaultCustomToast
                     message={"Something went wrong. Please try again."}
@@ -249,5 +276,6 @@ export default function useSection({ programId, courseId }) {
         handleUpdateSectionStatus,
         handleArchiveSection,
         handleRestoreSection,
+        handleSectionItemSorting,
     };
 }

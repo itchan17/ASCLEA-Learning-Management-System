@@ -4,6 +4,7 @@ namespace App\Services\Programs;
 
 use App\Models\Programs\Assessment;
 use App\Models\Programs\Material;
+use App\Models\Programs\Section;
 use App\Models\Programs\SectionItem;
 use Carbon\Carbon;
 
@@ -54,5 +55,31 @@ class SectionItemService
         $sectionItem->refresh();
 
         return $this->getSectionItemCompleteDetails($sectionItem);
+    }
+
+    public function sortSectionItem(Section $section, SectionItem $sectionItem, array $data)
+    {
+        // Updates the sort order of the dragged section item
+        $sectionItem->update(['order' => $data['newSortOrder']]);
+
+        // Reorder logic:
+        // - If the section item is moved DOWN (newSortOrder > origSortOrder):
+        //   We have to decrement all the section items between the original pos and new pos of the section item
+        // - If the section item is moved UP (newSortOrder < origSortOrder):
+        //   We have to increment all the section items between the original pos and new pos of the section item
+
+        if ($data['newSortOrder'] > $data['origSortOrder']) {
+            SectionItem::where('section_item_id', "!=", $sectionItem->section_item_id)
+                ->where('section_id', $section->section_id)
+                ->where('order', "<=", $data['newSortOrder'])
+                ->where('order', '>', $data['origSortOrder'])
+                ->decrement('order');
+        } else {
+            SectionItem::where('section_item_id', "!=", $sectionItem->section_item_id)
+                ->where('section_id', $section->section_id)
+                ->where('order', ">=", $data['newSortOrder'])
+                ->where('order', '<', $data['origSortOrder'])
+                ->increment('order');
+        }
     }
 }

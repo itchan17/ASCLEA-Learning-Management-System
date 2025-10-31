@@ -22,16 +22,15 @@ import { closeDropDown } from "../../../../../../../Utils/closeDropdown";
 import SectionForm from "./SectionForm";
 import ModalContainer from "../../../../../../../Components/ModalContainer";
 import { getRemainingDays } from "../../../../../../../Utils/getRemainingDays";
-import Loader from "../../../../../../../Components/Loader";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 
 export default function Section({ sectionDetails }) {
-    const { program, course } = usePage().props;
-    console.log(sectionDetails);
+    const { program, course, auth } = usePage().props;
     // Modules store
     const setSectionDetails = useModulesStore(
         (state) => state.setSectionDetails
     );
-    const sectionsByCourse = useModulesStore((state) => state.sectionsByCourse);
+    const setSectionItems = useModulesStore((state) => state.setSectionItems);
 
     // Custom hook
     const {
@@ -39,6 +38,7 @@ export default function Section({ sectionDetails }) {
         handleUpdateSectionStatus,
         handleArchiveSection,
         handleRestoreSection,
+        handleSectionItemSorting,
     } = useSection({
         programId: program.program_id,
         courseId: course.course_id,
@@ -48,9 +48,6 @@ export default function Section({ sectionDetails }) {
     const [isExpanded, setIsExpanded] = useState(true);
     const [isMaterialFormOpen, setIsMaterialFormOpen] = useState(false);
     const [isAssessmentFormOpen, setIsAssessmentFormOpen] = useState(false);
-    const [sectionContent, setSectionContent] = useState(
-        sectionDetails.sectionContentList
-    );
 
     // Open material or assessment form
     const openForm = (e) => {
@@ -92,7 +89,9 @@ export default function Section({ sectionDetails }) {
 
     // Helper function for getting the index
     const getSectionContentPos = (id) =>
-        sectionContent.findIndex((content) => content.sortOrder === id);
+        sectionDetails.items.findIndex(
+            (content) => content.section_item_id === id
+        );
 
     // Function for sorting the array
     const handleDragEnd = (event) => {
@@ -102,18 +101,28 @@ export default function Section({ sectionDetails }) {
         const originalPos = getSectionContentPos(active.id);
         const newPos = getSectionContentPos(over.id);
 
-        setSectionContent((sectionContent) => {
-            const updatedOrder = arrayMove(
-                sectionContent,
-                originalPos,
-                newPos
-            ).map((item, index) => ({
-                ...item,
-                sortOrder: index + 1,
-            }));
+        const updatedOrder = arrayMove(
+            sectionDetails.items,
+            originalPos,
+            newPos
+        ).map((item, index) => ({
+            ...item,
+            order: index + 1,
+        }));
 
-            return updatedOrder;
-        });
+        // Set the new order od section items
+        setSectionItems(
+            course.course_id,
+            sectionDetails.section_id,
+            updatedOrder
+        );
+
+        handleSectionItemSorting(
+            sectionDetails.section_id,
+            active.id,
+            newPos,
+            originalPos
+        );
     };
 
     // This allows drag and drop in mobile device
@@ -176,21 +185,25 @@ export default function Section({ sectionDetails }) {
                                 </span>
                             </div>
                         ) : (
-                            <div
-                                className={`px-2 ${
-                                    sectionDetails.status === "published"
-                                        ? "px-2 bg-ascend-green"
-                                        : "px-2 bg-ascend-yellow"
-                                }`}
-                            >
-                                <span className="text-size1 font-bold text-ascend-white">
-                                    {sectionDetails.status === "published"
-                                        ? "Publshed"
-                                        : "Draft"}
-                                </span>
-                            </div>
+                            sectionDetails.author.user_id ===
+                                auth.user.user_id && (
+                                <div
+                                    className={`px-2 ${
+                                        sectionDetails.status === "published"
+                                            ? "px-2 bg-ascend-green"
+                                            : "px-2 bg-ascend-yellow"
+                                    }`}
+                                >
+                                    <span className="text-size1 font-bold text-ascend-white">
+                                        {sectionDetails.status === "published"
+                                            ? "Published"
+                                            : "Draft"}
+                                    </span>
+                                </div>
+                            )
                         )}
                     </div>
+
                     <RoleGuard allowedRoles={["admin", "faculty"]}>
                         <div className="dropdown dropdown-end cursor-pointer">
                             <div
@@ -298,6 +311,7 @@ export default function Section({ sectionDetails }) {
                                         sensors={sensors}
                                         onDragEnd={handleDragEnd}
                                         collisionDetection={closestCorners}
+                                        modifiers={[restrictToVerticalAxis]}
                                     >
                                         <SectionContentList
                                             sectionDetails={sectionDetails}

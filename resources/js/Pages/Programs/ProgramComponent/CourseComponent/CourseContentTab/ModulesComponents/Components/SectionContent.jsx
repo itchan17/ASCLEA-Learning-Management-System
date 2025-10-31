@@ -16,7 +16,7 @@ import { RiCreativeCommonsZeroLine } from "react-icons/ri";
 
 export default function SectionContent({
     disabled,
-    contentDetails,
+    itemDetails,
     sectionId = null,
 }) {
     const route = useRoute();
@@ -42,7 +42,7 @@ export default function SectionContent({
         transition,
         setActivatorNodeRef,
     } = useSortable({
-        id: contentDetails.order,
+        id: itemDetails.section_item_id,
         transition: {
             duration: 300, // milliseconds
             easing: "cubic-bezier(0.25, 1, 0.5, 1)",
@@ -66,12 +66,12 @@ export default function SectionContent({
         // While data here is coming from sectionContentList inside sectionDetails
         // If coding backend started the data on view assessment or view materials should be directly coming from backend not on lists in the stores
 
-        if (contentDetails.item_type === "App\\Models\\Programs\\Material") {
+        if (itemDetails.item_type === "App\\Models\\Programs\\Material") {
             router.visit(
                 route("material.view", {
                     program: program.program_id,
                     course: course.course_id,
-                    material: contentDetails.item.material_id,
+                    material: itemDetails.item.material_id,
                 }),
                 {
                     preserveScroll: false,
@@ -82,7 +82,7 @@ export default function SectionContent({
                 route("program.course.assessment.view", {
                     program: program.program_id,
                     course: course.course_id,
-                    assessment: contentDetails.item.assessment_id,
+                    assessment: itemDetails.item.assessment_id,
                 }),
                 {
                     preserveScroll: false,
@@ -98,11 +98,11 @@ export default function SectionContent({
     const handleClickEdit = () => {
         setOpenEditForm(true);
 
-        if (contentDetails.item_type === "App\\Models\\Programs\\Material") {
-            setMaterialDetails(contentDetails.item);
+        if (itemDetails.item_type === "App\\Models\\Programs\\Material") {
+            setMaterialDetails(itemDetails.item);
         } else {
-            console.log(contentDetails.item);
-            setAssessmentDetails(contentDetails.item);
+            console.log(itemDetails.item);
+            setAssessmentDetails(itemDetails.item);
         }
 
         closeDropDown();
@@ -133,54 +133,56 @@ export default function SectionContent({
                     } text-ascend-black`}
                 >
                     <h1 className="text-size2 font-bold break-words flex-1 min-w-0">
-                        {`${contentDetails.order}. `}
-                        {contentDetails.item_type ===
+                        {`${itemDetails.order}. `}
+                        {itemDetails.item_type ===
                         "App\\Models\\Programs\\Material"
-                            ? contentDetails.item.material_title
-                            : contentDetails.item.assessment_title}
+                            ? itemDetails.item.material_title
+                            : itemDetails.item.assessment_title}
                     </h1>
 
-                    <RoleGuard allowedRoles={["admin", "faculty"]}>
-                        <div
-                            onClick={stopPropagation}
-                            className="dropdown dropdown-end cursor-pointer relative"
-                        >
+                    {!disabled && (
+                        <RoleGuard allowedRoles={["admin", "faculty"]}>
                             <div
-                                tabIndex={0}
-                                role="button"
-                                className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue transition-all duration-300"
+                                onClick={stopPropagation}
+                                className="dropdown dropdown-end cursor-pointer relative"
                             >
-                                <BsThreeDotsVertical className="text-size3" />
-                            </div>
+                                <div
+                                    tabIndex={0}
+                                    role="button"
+                                    className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue transition-all duration-300"
+                                >
+                                    <BsThreeDotsVertical className="text-size3" />
+                                </div>
 
-                            <ul
-                                tabIndex={0}
-                                className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black absolute z-999"
-                            >
-                                <li onClick={handleClickEdit}>
-                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                        Edit
-                                    </a>
-                                </li>
-                                <li>
-                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                        Delete
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </RoleGuard>
+                                <ul
+                                    tabIndex={0}
+                                    className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black absolute z-999"
+                                >
+                                    <li onClick={handleClickEdit}>
+                                        <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                            Edit
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                            Delete
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </RoleGuard>
+                    )}
                 </div>
             </div>
             {openEditForm && (
                 <ModalContainer>
-                    {contentDetails.item_type ===
+                    {itemDetails.item_type ===
                     "App\\Models\\Programs\\Material" ? (
                         <MaterialForm
                             formTitle={"Edit Material"}
                             isEdit={true}
                             setIsMaterialFormOpen={setOpenEditForm}
-                            materialId={contentDetails.item.material_id}
+                            materialId={itemDetails.item.material_id}
                             formWidth="max-w-200"
                             sectionId={sectionId}
                         />
@@ -189,7 +191,7 @@ export default function SectionContent({
                             formTitle={"Edit Assessment"}
                             isEdit={true}
                             setIsAssessmentFormOpen={setOpenEditForm}
-                            assessmentId={contentDetails.item.assessment_id}
+                            assessmentId={itemDetails.item.assessment_id}
                             formWidth="max-w-200"
                             sectionId={sectionId}
                         />

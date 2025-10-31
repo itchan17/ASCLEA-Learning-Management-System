@@ -52,4 +52,7 @@ Route::prefix('programs/{program}/courses/{course}')
 
         // Restore section
         Route::put('/sections/{section}/restore', [SectionController::class, 'restoreSection'])->name('section.restore');
+
+        // Restore section
+        Route::put('/sections/{section}/section-items/{sectionItem}', [SectionController::class, 'sortSectionItem'])->name('section.item.sort');
     });
