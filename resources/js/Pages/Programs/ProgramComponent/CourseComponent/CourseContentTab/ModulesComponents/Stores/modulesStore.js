@@ -168,6 +168,7 @@ const useModulesStore = create((set) => ({
     // Section
     sectionDetails: {
         section_title: "",
+        status: "draft",
     },
 
     sectionsByCourse: [],
@@ -237,7 +238,7 @@ const useModulesStore = create((set) => ({
                 ...sectionsByCourse,
                 [courseId]: {
                     ...courseState,
-                    list: [...courseState.list, newSection],
+                    list: [newSection, ...courseState.list],
                 },
             },
         });

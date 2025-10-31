@@ -10,6 +10,8 @@ class StudentProgress extends Model
 {
     use HasUuids;
 
+    protected $table = 'student_progresses';
+
     public $incrementing = false;
 
     protected $keyType = 'string';

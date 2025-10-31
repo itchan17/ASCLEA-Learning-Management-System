@@ -27,6 +27,7 @@ class SectionController extends Controller
     {
         $validatedSectionDetails = $request->validate([
             'section_title' => 'required|string|max:255',
+            'status' => 'required|in:published,draft',
         ]);
 
         $validatedSectionDetails['course_id'] = $course->course_id;
@@ -39,7 +40,7 @@ class SectionController extends Controller
 
     public function getSections(Request $request, Program $program, Course $course)
     {
-        $sectionList = $this->sectionService->getSectionList($request->user()->user_id,  $course->course_id);
+        $sectionList = $this->sectionService->getSectionList($request->user(),  $course->course_id, $request->user()->role->role_name);
 
         return response()->json($sectionList);
     }

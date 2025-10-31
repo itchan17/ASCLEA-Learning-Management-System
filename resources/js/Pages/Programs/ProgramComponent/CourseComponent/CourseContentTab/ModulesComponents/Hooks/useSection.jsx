@@ -27,6 +27,7 @@ export default function useSection({ programId, courseId }) {
         sectionId = null
     ) => {
         setIsLoading(true);
+        console.log(sectionDetails);
         try {
             let response;
             if (!isEdit && !sectionId) {

@@ -12,7 +12,7 @@ import MaterialForm from "./MaterialForm";
 import AssessmentForm from "../../AssessmentsComponents/AssessmentForm";
 import useAssessmentsStore from "../../../../../../../Stores/Programs/CourseContent/assessmentsStore";
 import useModulesStore from "../Stores/modulesStore";
-import { RiCreativeCommonsZeroLine } from "react-icons/ri";
+import { AiFillLock } from "react-icons/ai";
 
 export default function SectionContent({
     disabled,
@@ -109,7 +109,18 @@ export default function SectionContent({
     };
 
     return (
-        <>
+        <div className="relative">
+            {itemDetails.is_item_locked && (
+                <div className="absolute inset-0 bg-black/15 z-100 flex justify-center items-center overflow-y-auto h-full">
+                    <div className="flex flex-col items-center">
+                        <AiFillLock className="text-size5    text-ascend-blue" />
+                        {/* <h1 className="text-size2 font-medium text-ascend-black italic">
+                            This section is locked. Please complete the previous
+                            section to unlock it.
+                        </h1> */}
+                    </div>
+                </div>
+            )}
             <div
                 onClick={handleSectionContentClick}
                 ref={setNodeRef}
@@ -198,6 +209,6 @@ export default function SectionContent({
                     )}
                 </ModalContainer>
             )}
-        </>
+        </div>
     );
 }

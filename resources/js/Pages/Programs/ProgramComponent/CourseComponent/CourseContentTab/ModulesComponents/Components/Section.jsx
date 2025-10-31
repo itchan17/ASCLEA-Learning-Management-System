@@ -23,6 +23,7 @@ import SectionForm from "./SectionForm";
 import ModalContainer from "../../../../../../../Components/ModalContainer";
 import { getRemainingDays } from "../../../../../../../Utils/getRemainingDays";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import { AiFillLock } from "react-icons/ai";
 
 export default function Section({ sectionDetails }) {
     const { program, course, auth } = usePage().props;
@@ -293,12 +294,23 @@ export default function Section({ sectionDetails }) {
                 </div>
 
                 <div
-                    className={`border-r bg-ascend-lightblue border-l border-b border-ascend-gray1 overflow-hidden transition-all duration-500 ease-in-out ${
+                    className={`relative border-r bg-ascend-lightblue border-l border-b border-ascend-gray1 overflow-hidden transition-all duration-500 ease-in-out ${
                         isExpanded
                             ? "max-h-200 opacity-100"
                             : "max-h-0 opacity-0"
                     }`}
                 >
+                    {sectionDetails.is_locked && (
+                        <div className="absolute backdrop-blur-[3px] inset-0 bg-black/15 z-100 flex justify-center items-center overflow-y-auto h-full">
+                            <div className="flex flex-col items-center">
+                                <AiFillLock className="text-7xl text-ascend-blue" />
+                                <h1 className="text-size4 font-medium text-ascend-black italic">
+                                    This section is locked. Please complete the
+                                    previous section to unlock it.
+                                </h1>
+                            </div>
+                        </div>
+                    )}
                     <div
                         className={`max-h-[500px] space-y-3 overflow-y-auto ${
                             isExpanded ? "p-5" : "px-5 py-0"
