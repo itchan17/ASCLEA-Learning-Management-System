@@ -62,6 +62,9 @@ class SectionService
                 'items' => function ($query) {
                     $query->orderBy('order', 'asc');
                 },
+                'items.studentProgress' => function ($query) use ($assignedCourseId) {
+                    $query->where('assigned_course_id', $assignedCourseId);
+                },
             ])
             ->where(function ($query) use ($user) {
                 // Display section added by the user or section that was publsiehd
@@ -119,7 +122,7 @@ class SectionService
 
             $isLocked = $itemsCount > 0 ? $previousSection->items()
                 ->whereHas('studentProgress', function ($query) use ($assignedCourseId) {
-                    $query->where('assigned_course_id', $assignedCourseId);
+                    $query->where('assigned_course_id', $assignedCourseId)->where('is_done', true);
                 })
                 ->count() !== $itemsCount : true;
 
@@ -146,6 +149,7 @@ class SectionService
                 // Lock this item if the previous one has not been completed
                 $sectionItem->is_item_locked = !$prevSectionItem->studentProgress()
                     ->where('assigned_course_id', $assignedCourseId)
+                    ->where('is_done', true)
                     ->exists();
             }
         }

@@ -11,12 +11,27 @@ import { handleClickBackBtn } from "../../../../../../../Utils/handleClickBackBt
 import { formatFullDate } from "../../../../../../../Utils/formatFullDate";
 import { route } from "ziggy-js";
 import ModalDocViewer from "../../../../../../../Components/ModalDocViewer";
+import PrimaryButton from "../../../../../../../Components/Button/PrimaryButton";
+import RoleGuard from "../../../../../../../Components/Auth/RoleGuard";
+import useSection from "../Hooks/useSection";
 
-export default function ViewMaterial({ programId, courseId, material }) {
+export default function ViewMaterial({
+    programId,
+    courseId,
+    material,
+    studentProgress,
+}) {
     const [fileUrl, setFileUrl] = useState(null);
     const [fileDownload, setFileDownload] = useState(null);
     const [fileName, setFileName] = useState(null);
     console.log(material);
+    console.log(studentProgress);
+
+    // Custom hook
+    const { isLoading, handleDoneUndoneSectionItem } = useSection({
+        programId,
+        courseId,
+    });
 
     const handleFileClick = (fileId, fileName) => {
         const url = route("material.file.stream", {
@@ -45,8 +60,28 @@ export default function ViewMaterial({ programId, courseId, material }) {
     };
     return (
         <div className="text-ascend-black space-y-5 font-nunito-sans">
-            <div className="flex">
+            <div className="flex flex-wrap items-center justify-between">
                 <BackButton doSomething={handleClickBackBtn} />
+                {material.section_item && (
+                    <RoleGuard allowedRoles={["student"]}>
+                        <PrimaryButton
+                            isDisabled={isLoading}
+                            isLoading={isLoading}
+                            doSomething={() =>
+                                handleDoneUndoneSectionItem(
+                                    material.section_item.section_id,
+                                    material.section_item.section_item_id
+                                )
+                            }
+                            text={
+                                !material.section_item.student_progress ||
+                                !material.section_item.student_progress.is_done
+                                    ? "Mark as Done"
+                                    : "Undone"
+                            }
+                        />
+                    </RoleGuard>
+                )}
             </div>
             <div className="space-y-5 pb-5 border-b border-ascend-gray1">
                 <div className="flex items-start gap-2 md:gap-20">

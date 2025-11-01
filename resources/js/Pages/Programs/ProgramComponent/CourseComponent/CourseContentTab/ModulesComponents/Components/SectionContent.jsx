@@ -18,6 +18,7 @@ export default function SectionContent({
     disabled,
     itemDetails,
     sectionId = null,
+    sectionDetails,
 }) {
     const route = useRoute();
 
@@ -110,14 +111,10 @@ export default function SectionContent({
 
     return (
         <div className="relative">
-            {itemDetails.is_item_locked && (
+            {!sectionDetails.is_locked && itemDetails.is_item_locked && (
                 <div className="absolute inset-0 bg-black/15 z-100 flex justify-center items-center overflow-y-auto h-full">
                     <div className="flex flex-col items-center">
                         <AiFillLock className="text-size5    text-ascend-blue" />
-                        {/* <h1 className="text-size2 font-medium text-ascend-black italic">
-                            This section is locked. Please complete the previous
-                            section to unlock it.
-                        </h1> */}
                     </div>
                 </div>
             )}

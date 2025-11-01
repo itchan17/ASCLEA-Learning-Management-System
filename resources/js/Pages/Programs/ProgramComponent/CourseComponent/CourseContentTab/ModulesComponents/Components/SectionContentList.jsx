@@ -21,6 +21,7 @@ export default function SectionContentList({ sectionDetails }) {
                         key={item.section_item_id}
                         itemDetails={item}
                         sectionId={sectionDetails.section_id}
+                        sectionDetails={sectionDetails}
                     />
                 );
             })}

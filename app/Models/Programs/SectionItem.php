@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class SectionItem extends Model
@@ -35,8 +36,8 @@ class SectionItem extends Model
         return $this->belongsTo(Section::class, 'secction_id');
     }
 
-    public function studentProgress(): HasMany
+    public function studentProgress(): HasOne
     {
-        return $this->hasMany(StudentProgress::class, 'student_progress_id');
+        return $this->hasOne(StudentProgress::class, 'section_item_id');
     }
 }

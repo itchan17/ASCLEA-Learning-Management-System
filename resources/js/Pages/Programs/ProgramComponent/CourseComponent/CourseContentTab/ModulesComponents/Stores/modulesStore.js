@@ -368,6 +368,109 @@ const useModulesStore = create((set) => ({
             },
         });
     },
+
+    lockUnlockSectionorSectionItems: (
+        courseId,
+        sectionId,
+        sectionItemId,
+        studentProgress
+    ) => {
+        const { sectionsByCourse, setSectionItems, updateSectionList } =
+            useModulesStore.getState();
+
+        const courseState = sectionsByCourse[courseId] || {
+            list: [],
+            page: 1,
+            hasMore: true,
+        };
+
+        if (courseState.list.length > 0) {
+            const sectionIndex = courseState.list.findIndex(
+                (section) => section.section_id === sectionId
+            );
+
+            const section = courseState.list[sectionIndex];
+            const nextSection = courseState.list[sectionIndex + 1];
+
+            let sectionitemIndex = null;
+            let sectionItemsCount = section.items.length;
+
+            const updatedSectionItems = section.items.map((item, index) => {
+                // Update the student progress of the currentt item
+                if (item.section_item_id === sectionItemId) {
+                    sectionitemIndex = index;
+
+                    // Checks if the section item is the last item
+                    // Or if the student undone a section item which is not laast
+                    // This will llock or unlocck  next section
+                    if (
+                        (sectionItemsCount === index + 1 && nextSection) ||
+                        (!studentProgress.is_done && !nextSection.is_locked)
+                    ) {
+                        let updatedNextSectionItems = [];
+
+                        if (nextSection.items.length > 0) {
+                            updatedNextSectionItems = nextSection.items.map(
+                                (item, index) => {
+                                    /// Always unlock tthe first section item
+                                    if (index === 0) {
+                                        return {
+                                            ...item,
+                                            is_item_locked: false,
+                                        };
+                                    }
+                                    return {
+                                        ...item,
+                                        is_item_locked: true,
+                                    };
+                                }
+                            );
+                        }
+
+                        const updatedNextSection = {
+                            ...nextSection,
+                            is_locked: !nextSection.is_locked, // lock / unlock the section
+                            items: updatedNextSectionItems,
+                        };
+
+                        updateSectionList(updatedNextSection, courseId);
+                    }
+
+                    return { ...item, student_progress: studentProgress };
+                }
+
+                // Unlocks the next item
+                if (studentProgress.is_done) {
+                    // Check if the item is the next item
+                    if (
+                        Number.isInteger(sectionitemIndex) &&
+                        sectionitemIndex + 1 === index
+                    ) {
+                        return {
+                            ...item,
+                            is_item_locked: false,
+                        };
+                    }
+                } else {
+                    // If the student undone a section item with 1  or more unlock section ittem before lock section item
+                    // We  will lock all those unlock item
+                    if (
+                        Number.isInteger(sectionitemIndex) &&
+                        index > sectionitemIndex
+                    ) {
+                        return {
+                            ...item,
+                            is_item_locked: true,
+                        };
+                    }
+                }
+
+                return item;
+            });
+
+            setSectionItems(courseId, sectionId, updatedSectionItems);
+        }
+    },
 }));
 
 export default useModulesStore;

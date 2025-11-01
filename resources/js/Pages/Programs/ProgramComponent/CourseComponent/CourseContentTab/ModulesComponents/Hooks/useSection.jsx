@@ -4,6 +4,7 @@ import { route } from "ziggy-js";
 import useModulesStore from "../Stores/modulesStore";
 import { displayToast } from "../../../../../../../Utils/displayToast";
 import DefaultCustomToast from "../../../../../../../Components/CustomToast/DefaultCustomToast";
+import { router } from "@inertiajs/react";
 
 export default function useSection({ programId, courseId }) {
     // Module store
@@ -16,6 +17,9 @@ export default function useSection({ programId, courseId }) {
     const sectionsByCourse = useModulesStore((state) => state.sectionsByCourse);
     const updateSectionList = useModulesStore(
         (state) => state.updateSectionList
+    );
+    const lockUnlockSectionorSectionItems = useModulesStore(
+        (state) => state.lockUnlockSectionorSectionItems
     );
 
     const [isLoading, setIsLoading] = useState(false);
@@ -268,6 +272,42 @@ export default function useSection({ programId, courseId }) {
         }
     };
 
+    const handleDoneUndoneSectionItem = (sectionId, sectionItemId) => {
+        setIsLoading(true);
+
+        router.put(
+            route("section.item.useer.progress", {
+                program: programId,
+                course: courseId,
+                section: sectionId,
+                sectionItem: sectionItemId,
+            }),
+            {},
+            {
+                showProgress: false,
+                onSuccess: (page) => {
+                    const studentProgress =
+                        page.props.material.section_item.student_progress;
+
+                    lockUnlockSectionorSectionItems(
+                        courseId,
+                        sectionId,
+                        sectionItemId,
+                        studentProgress
+                    );
+                },
+                onFinish: () => setIsLoading(false),
+            }
+        );
+        // try {
+
+        // } catch (error) {
+        //     console.error(error);
+        // } finally {
+        //     setIsLoading(false);
+        // }
+    };
+
     return {
         isLoading,
         errors,
@@ -278,5 +318,6 @@ export default function useSection({ programId, courseId }) {
         handleArchiveSection,
         handleRestoreSection,
         handleSectionItemSorting,
+        handleDoneUndoneSectionItem,
     };
 }

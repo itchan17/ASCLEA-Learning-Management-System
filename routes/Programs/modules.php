@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Programs\MaterialController;
 use App\Http\Controllers\Programs\SectionController;
+use App\Http\Controllers\Programs\StudentProgressController;
+use App\Http\Controllers\Programs\UserProgressController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('programs/{program}/courses/{course}')
@@ -55,4 +57,7 @@ Route::prefix('programs/{program}/courses/{course}')
 
         // Restore section
         Route::put('/sections/{section}/section-items/{sectionItem}', [SectionController::class, 'sortSectionItem'])->name('section.item.sort');
+
+        // Restore section
+        Route::put('/sections/{section}/section-items/{sectionItem}/student-progress', [StudentProgressController::class, 'handleStudentProgress'])->name('section.item.useer.progress');
     });

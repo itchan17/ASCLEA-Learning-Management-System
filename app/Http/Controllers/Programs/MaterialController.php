@@ -11,6 +11,7 @@ use App\Models\Programs\MaterialFile;
 use App\Services\HandlingPrivateFileService;
 use App\Services\Programs\MaterialService;
 use App\Services\Programs\SectionItemService;
+use App\Services\Programs\SectionService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -18,11 +19,13 @@ class MaterialController extends Controller
 {
     protected MaterialService $materialService;
     protected SectionItemService $sectionItemService;
+    protected SectionService $sectionService;
 
-    public function __construct(MaterialService $materialService, SectionItemService $sectionItemService)
+    public function __construct(MaterialService $materialService, SectionItemService $sectionItemService, SectionService $sectionService)
     {
         $this->materialService = $materialService;
         $this->sectionItemService = $sectionItemService;
+        $this->sectionService = $sectionService;
     }
 
     public function addMaterial(AddMaterialRequest $request, Program $program, Course $course)
@@ -109,9 +112,18 @@ class MaterialController extends Controller
         return response()->json(["success" => "Material restored successfully.", "data" => $restoredMaterial]);
     }
 
-    public function viewMaterial(Program $program, Course $course, Material $material)
+    public function viewMaterial(Request $request, Program $program, Course $course, Material $material)
     {
         $materialCompleteDetails = $this->materialService->getmaterialCompleteDetails($material);
+        $assignedCourseId = $this->sectionService->getAssignedCourseId($request->user(), $course->course_id);
+
+        // Check if the material iss part of section
+        // This will be use to add a Done button in the client
+        $materialCompleteDetails->load([
+            'sectionItem.studentProgress' => function ($q) use ($assignedCourseId) {
+                $q->where('assigned_course_id', $assignedCourseId);
+            },
+        ]);
 
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/ModulesComponents/Components/ViewMaterial', [
             'programId' => $program->program_id,
