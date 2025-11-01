@@ -31,6 +31,9 @@ class SectionService
                         ],
                     ]);
                 },
+                'items' => function ($query) {
+                    $query->orderBy('order', 'asc');
+                },
             ]
         );
     }
@@ -122,7 +125,7 @@ class SectionService
 
             $isLocked = $itemsCount > 0 ? $previousSection->items()
                 ->whereHas('studentProgress', function ($query) use ($assignedCourseId) {
-                    $query->where('assigned_course_id', $assignedCourseId)->where('is_done', true);
+                    $query->where('assigned_course_id', $assignedCourseId);
                 })
                 ->count() !== $itemsCount : true;
 
@@ -149,7 +152,6 @@ class SectionService
                 // Lock this item if the previous one has not been completed
                 $sectionItem->is_item_locked = !$prevSectionItem->studentProgress()
                     ->where('assigned_course_id', $assignedCourseId)
-                    ->where('is_done', true)
                     ->exists();
             }
         }

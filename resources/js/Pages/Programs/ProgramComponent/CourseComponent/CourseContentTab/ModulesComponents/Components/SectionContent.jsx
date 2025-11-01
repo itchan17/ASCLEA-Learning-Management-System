@@ -13,6 +13,7 @@ import AssessmentForm from "../../AssessmentsComponents/AssessmentForm";
 import useAssessmentsStore from "../../../../../../../Stores/Programs/CourseContent/assessmentsStore";
 import useModulesStore from "../Stores/modulesStore";
 import { AiFillLock } from "react-icons/ai";
+import { AiFillCheckCircle } from "react-icons/ai";
 
 export default function SectionContent({
     disabled,
@@ -140,13 +141,23 @@ export default function SectionContent({
                         disabled ? "pt-5" : null
                     } text-ascend-black`}
                 >
-                    <h1 className="text-size2 font-bold break-words flex-1 min-w-0">
-                        {`${itemDetails.order}. `}
-                        {itemDetails.item_type ===
-                        "App\\Models\\Programs\\Material"
-                            ? itemDetails.item.material_title
-                            : itemDetails.item.assessment_title}
-                    </h1>
+                    <div className="flex items-center space-x-5">
+                        <RoleGuard allowedRoles={["student"]}>
+                            {itemDetails.student_progress &&
+                            itemDetails.student_progress.is_done ? (
+                                <AiFillCheckCircle className="text-size6 text-ascend-green border border-ascend-gray3 rounded-full" />
+                            ) : (
+                                <div className="w-7 h-7 border border-ascend-gray3 rounded-full"></div>
+                            )}
+                        </RoleGuard>
+                        <h1 className="text-size2 font-bold break-words flex-1 min-w-0">
+                            {`${itemDetails.order}. `}
+                            {itemDetails.item_type ===
+                            "App\\Models\\Programs\\Material"
+                                ? itemDetails.item.material_title
+                                : itemDetails.item.assessment_title}
+                        </h1>
+                    </div>
 
                     {!disabled && (
                         <RoleGuard allowedRoles={["admin", "faculty"]}>

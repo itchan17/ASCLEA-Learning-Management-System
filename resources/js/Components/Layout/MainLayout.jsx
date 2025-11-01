@@ -3,6 +3,7 @@ import Navbar from "./Navbar/Navbar";
 import Sidebar from "./Sidebar/Sidebar";
 import { usePage } from "@inertiajs/react";
 import useUserStore from "../../Stores/User/userStore";
+import useModulesStore from "../../Pages/Programs/ProgramComponent/CourseComponent/CourseContentTab/ModulesComponents/Stores/modulesStore";
 
 export default function MainLayout({ children }) {
     const setAuthUser = useUserStore((state) => state.setAuthUser);
@@ -11,6 +12,17 @@ export default function MainLayout({ children }) {
 
     // Get the autheticated user data
     const { user } = usePage().props.auth;
+
+    const rehydrateModuleStore = useModulesStore.persist.rehydrate;
+
+    useEffect(() => {
+        const handleFocus = () => {
+            rehydrateModuleStore();
+        };
+
+        window.addEventListener("focus", handleFocus);
+        return () => window.removeEventListener("focus", handleFocus);
+    }, []);
 
     // Initialize the data uf auth user
     useEffect(() => {

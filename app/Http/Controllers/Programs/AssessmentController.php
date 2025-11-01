@@ -130,16 +130,21 @@ class AssessmentController extends Controller
     public function showAssessment(Request $request, $program, $course, Assessment $assessment)
     {
         $assessmentType = $assessment->assessmentType->assessment_type;
+        $assignedCourseId =  $this->assessmentSubmissionService->getAssignedCourseId($request->user(), $course);
+
         // Finds the assessmentSubmission
         if ($assessmentType === "activity" && $request->user()->role->role_name === "student") {
-            $assignedCourseId =  $this->assessmentSubmissionService->getAssignedCourseId($request->user(), $course);
             $assessmentSubmission = $this->assessmentSubmissionService->getAssessmentSubmission($assignedCourseId, $assessment->assessment_id);
         }
 
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/ViewAssessment', [
             "programId" => $program,
             "courseId" => $course,
-            "assessment" => fn() => $this->assessmentService->getAssessmentCompleteDetails($assessment),
+            "assessment" => fn() => $this->assessmentService->getAssessmentCompleteDetails($assessment)->load([
+                'sectionItem.studentProgress' => function ($q) use ($assignedCourseId) {
+                    $q->where('assigned_course_id', $assignedCourseId);
+                },
+            ]),
             // Return the uploaded file for the student null if assessmentSubmission dont exist
             "assessmentSubmission" => fn() => $assessmentType === "activity" && $request->user()->role->role_name === "student" ? $assessmentSubmission?->load('activityFiles') : null
         ]);

@@ -18,8 +18,8 @@ export default function useSection({ programId, courseId }) {
     const updateSectionList = useModulesStore(
         (state) => state.updateSectionList
     );
-    const lockUnlockSectionorSectionItems = useModulesStore(
-        (state) => state.lockUnlockSectionorSectionItems
+    const unlockSectionAndSectionItems = useModulesStore(
+        (state) => state.unlockSectionAndSectionItems
     );
 
     const [isLoading, setIsLoading] = useState(false);
@@ -286,26 +286,21 @@ export default function useSection({ programId, courseId }) {
             {
                 showProgress: false,
                 onSuccess: (page) => {
-                    const studentProgress =
-                        page.props.material.section_item.student_progress;
+                    if (page.props.material.section_item) {
+                        const studentProgress =
+                            page.props.material.section_item.student_progress;
 
-                    lockUnlockSectionorSectionItems(
-                        courseId,
-                        sectionId,
-                        sectionItemId,
-                        studentProgress
-                    );
+                        unlockSectionAndSectionItems(
+                            courseId,
+                            sectionId,
+                            sectionItemId,
+                            studentProgress
+                        );
+                    }
                 },
                 onFinish: () => setIsLoading(false),
             }
         );
-        // try {
-
-        // } catch (error) {
-        //     console.error(error);
-        // } finally {
-        //     setIsLoading(false);
-        // }
     };
 
     return {

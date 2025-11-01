@@ -12,6 +12,7 @@ use App\Models\Programs\Quiz;
 use App\Services\HandlingPrivateFileService;
 use App\Services\Programs\AssessmentSubmissionService;
 use App\Services\Programs\QuestionService;
+use App\Services\Programs\StudentProgressService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -21,11 +22,13 @@ class AssessmentSubmissionController extends Controller
 
     protected QuestionService $questionService;
     protected AssessmentSubmissionService $assessmentSubmissionService;
+    protected StudentProgressService $studentProgressService;
 
-    public function __construct(QuestionService $questionService, AssessmentSubmissionService $assessmentSubmissionService)
+    public function __construct(QuestionService $questionService, AssessmentSubmissionService $assessmentSubmissionService, StudentProgressService $studentProgressService)
     {
         $this->questionService = $questionService;
         $this->assessmentSubmissionService = $assessmentSubmissionService;
+        $this->studentProgressService = $studentProgressService;
     }
 
     public function showQuizInstruction(Request $request, Course $course, Assessment $assessment, Quiz $quiz)
@@ -105,7 +108,11 @@ class AssessmentSubmissionController extends Controller
 
         return Inertia::render('Programs/ProgramComponent/CourseComponent/CourseContentTab/AssessmentsComponents/Features/QuizAnswerForm/Components/QuizSubmitted', [
             'courseId' => $course->course_id,
-            'assessmentId' => $assessment->assessment_id,
+            'assessment' => $assessment->load([
+                'sectionItem.studentProgress' => function ($q) use ($assignedCourseId) {
+                    $q->where('assigned_course_id', $assignedCourseId);
+                },
+            ]),
             'quiz' => $quiz,
             'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'submitted_at'])
         ]);
@@ -113,9 +120,16 @@ class AssessmentSubmissionController extends Controller
 
     public function submitQuiz(RequiredQuestionRequest $request, Course $course, Assessment $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
     {
+        $assignedCourseId =  $this->assessmentSubmissionService->getAssignedCourseId($request->user(), $course->course_id);
+
         $totalScore = $this->assessmentSubmissionService->getTotalScore($assessmentSubmission);
 
         $this->assessmentSubmissionService->updateQuizAssessmentSubmission($assessmentSubmission, $totalScore);
+
+        // Check if assessmennt has sectionItem, it means this is a section assessment
+        if ($assessment->sectionItem) {
+            $this->studentProgressService->doneUndoneStudentProgress($assignedCourseId, $assessment->sectionItem);
+        }
 
         inertia()->clearHistory();
 
@@ -219,6 +233,11 @@ class AssessmentSubmissionController extends Controller
         $assignedCourseId =  $this->assessmentSubmissionService->getAssignedCourseId($request->user(), $course->course_id);
 
         $this->assessmentSubmissionService->submitActivity($assignedCourseId, $assessment->assessment_id);
+
+        // Check if assessmennt has sectionItem, it means this is a section assessment
+        if ($assessment->sectionItem) {
+            $this->studentProgressService->doneUndoneStudentProgress($assignedCourseId, $assessment->sectionItem);
+        }
     }
 
     public function gradeActivity(Request $request, Course $course, Assessment $assessment, AssessmentSubmission $assessmentSubmission)
