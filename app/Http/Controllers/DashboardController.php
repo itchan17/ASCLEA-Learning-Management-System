@@ -136,16 +136,22 @@ class DashboardController extends Controller
 
     private function getFacultyData($authUser, $stats)
     {
-        $staff = Staff::where('user_id', $authUser->user_id)
-            ->withCount('assignedCourses')
-            ->with('assignedCourses')
-            ->first();
+        
+    $staff = Staff::where('user_id', $authUser->user_id)
+        ->withCount('assignedCourses')
+        ->with('assignedCourses')
+        ->first();
 
+        $programCount = LearningMember::where('user_id', $authUser->user_id)
+            ->distinct('program_id')
+            ->count('program_id');
+
+        $stats['assigned_programs'] = $programCount;
         $stats['assigned_courses'] = $staff?->assigned_courses_count ?? 0;
 
         $assignedCourseIds = $staff?->assignedCourses->pluck('course_id') ?? [];
 
-        // Get the user IDs of students under this faculty’s courses
+        // Get the user IDs of students under this faculty’s courses to count the total students
         $studentIds = \App\Models\AssignedCourse::whereIn('course_id', $assignedCourseIds)
             ->join('learning_members', 'assigned_courses.learning_member_id', '=', 'learning_members.learning_member_id')
             ->join('users', 'learning_members.user_id', '=', 'users.user_id')
@@ -154,7 +160,7 @@ class DashboardController extends Controller
             ->distinct()
             ->pluck('learning_members.user_id')
             ->toArray();
-
+        
         $stats['total_students'] = count($studentIds);
 
         // Fetch logins/time only for this faculty’s students

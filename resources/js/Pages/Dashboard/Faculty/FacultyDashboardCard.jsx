@@ -23,14 +23,14 @@ export default function StaffDashboardCard({ stats }) {
                 label="Online Students"
             />
             <DashboardCard
+                value={stats.assigned_programs || 0}
+                icon={<MdRateReview className="text-[#FF663C]" />}
+                label="Programs Assigned"
+            />
+            <DashboardCard
                 value={stats?.assigned_courses || 0}
                 icon={<PiNotebookFill className="text-ascend-yellow" />}
                 label="Courses Assigned"
-            />
-            <DashboardCard
-                value="21"
-                icon={<MdRateReview className="text-[#FF663C]" />}
-                label="Pending Grading"
             />
         </div>
     );
