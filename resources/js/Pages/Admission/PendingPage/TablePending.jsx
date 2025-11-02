@@ -18,8 +18,6 @@ const TablePending = () => {
     return (
         <>
             <div className="flex justify-end items-center">
-                <BiFilter className="text-size5" />
-                <div className="font-bold text-size2 pr-10">Filter</div>
                 <div className="relative">
                     <input
                         className="w-full sm:w-50 border h-9 pl-10 p-2 border-ascend-black focus:outline-ascend-blue just"
@@ -35,7 +33,6 @@ const TablePending = () => {
                     <thead>
                         <tr className="border-b-2 border-ascend-gray3">
                             <th>Name</th>
-                            <th>Program</th>
                             <th>Email</th>
                             <th>Date Applied</th>
                         </tr>
@@ -49,7 +46,6 @@ const TablePending = () => {
                                     className="hover:bg-ascend-lightblue cursor-pointer border-b border-ascend-gray1"
                                 >
                                     <td className="py-5">{p.name}</td>
-                                    <td className="py-5">{p.program}</td>
                                     <td className="py-5">{p.email}</td>
                                     <td className="py-5">{p.date_applied}</td>
                                     <td className="py-5">

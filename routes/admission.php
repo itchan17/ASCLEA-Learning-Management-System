@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\Admission\AdmissionFileController;
 
 Route::get('/admission', function () {
             return Inertia::render('Admission/AdmissionPage');
@@ -23,6 +24,19 @@ Route::prefix('admission')
                 'studentid' => $studentid,
             ]);
         })->name('enrolled.student.view');
+
+});
+
+
+//student view
+Route::prefix('admission')
+    ->middleware(['auth', 'verified', 'preventBack', 'checkRole:student'])
+    ->group(function () {
+
+        // Route to upload admission files
+        Route::post('/upload-admission-files', [AdmissionFileController::class, 'store'])
+            ->middleware(['auth', 'verified', 'preventBack'])
+            ->name('admissionfiles.upload');
 });
         
 

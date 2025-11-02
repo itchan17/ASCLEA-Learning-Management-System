@@ -58,16 +58,12 @@ const EnrollmentRequest = () => {
                     <div className="font-nunito-sans text-size3 mt-3">{applicant.name}</div>
                 </div>
                 <div>
-                    <div className="font-nunito-sans text-size3 font-bold">Program Applied For</div>
-                    <div className="font-nunito-sans text-size3 mt-3">{applicant.program}</div>
+                    <div className="font-nunito-sans text-size3 font-bold">Date of Application</div>
+                    <div className="font-nunito-sans text-size3 mt-3">{applicant.date_applied}</div>
                 </div>
                 <div>
                     <div className="font-nunito-sans text-size3 font-bold mt-5">Address</div>
                     <div className="font-nunito-sans text-size3 mt-3">{applicant.address}</div>
-                </div>
-                <div>
-                    <div className="font-nunito-sans text-size3 font-bold mt-5">Date of Application</div>
-                    <div className="font-nunito-sans text-size3 mt-3">{applicant.date_applied}</div>
                 </div>
         </div>
     <div className='mt-6'>

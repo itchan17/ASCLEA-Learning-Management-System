@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Models\Admission\AdmissionFiles;
+
 class Student extends Model
 {
     use HasFactory, HasUuids;
@@ -56,6 +58,11 @@ class Student extends Model
     public function learningMember()
     {
         return $this->hasOne(LearningMember::class, 'user_id', 'user_id');
+    }
+
+    public function admissionFiles(): HasMany
+    {
+        return $this->hasMany(AdmissionFile::class, 'student_id', 'student_id');
     }
 
 
