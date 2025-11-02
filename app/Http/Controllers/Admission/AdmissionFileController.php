@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admission;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Admission\AdmissionFile;
 use App\Models\Student;
-use Illuminate\Support\Facades\Storage;
 
 class AdmissionFileController extends Controller
 {
@@ -39,4 +39,17 @@ class AdmissionFileController extends Controller
 
         return back()->with('error', 'No files were uploaded.');
     }
+
+    public function getPendingStudents()
+    {
+        // Fetch all students whose enrollment_status is 'pending'
+        // and eager load their related user details
+        $pendingStudents = \App\Models\Student::with('user')
+            ->where('enrollment_status', 'pending')
+            ->get(['student_id', 'user_id', 'enrollment_status', 'created_at']);
+
+        // Return as JSON (for API) or Inertia page props if you're using Inertia
+        return response()->json($pendingStudents);
+    }
+
 }

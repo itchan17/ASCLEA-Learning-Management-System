@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-use App\Models\Admission\AdmissionFiles;
+use App\Models\Admission\AdmissionFile;
 
 class Student extends Model
 {

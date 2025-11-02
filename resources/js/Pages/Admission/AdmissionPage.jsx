@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { usePage } from "@inertiajs/react";
 import Tabs from "../../Components/Tabs/Tabs";
 import PendingPage from "./PendingPage/PendingPage";
 import EnrolledPage from "./EnrolledPage/EnrolledPage";
@@ -7,10 +7,12 @@ import useUserStore from "../../Stores/User/userStore";
 import UnapprovedStudentAdmission from "./UnapprovedStudent/UnapprovedStudentAdmission";
 
 const AdmissionPage = () => {
-    // User store
     const user = useUserStore((state) => state.user);
-
     const { activeTab, setActiveTab } = useActiveTabStore();
+
+    // Inertia-provided props
+    const { pendingStudents, enrolledStudents } = usePage().props;
+
     const tabs = ["Pending", "Enrolled Students"];
 
     return (
@@ -23,8 +25,8 @@ const AdmissionPage = () => {
                         tabList={tabs}
                     />
 
-                    {activeTab === 0 && <PendingPage />}
-                    {activeTab === 1 && <EnrolledPage />}
+                    {activeTab === 0 && <PendingPage pendingStudents={pendingStudents} />}
+                    {activeTab === 1 && <EnrolledPage enrolledStudents={enrolledStudents} />}
                 </div>
             ) : (
                 <UnapprovedStudentAdmission />
