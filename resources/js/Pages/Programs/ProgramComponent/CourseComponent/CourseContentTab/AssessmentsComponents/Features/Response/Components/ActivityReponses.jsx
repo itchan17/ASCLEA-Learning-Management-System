@@ -225,7 +225,7 @@ export default function ActivityReponses() {
                         </tbody>
                     )}
                 </table>
-
+                {console.log(submissionStatus)}
                 {/* For displaying no data in the table*/}
                 {!isSearchSortLoading &&
                     (responses.data.length === 0 &&
@@ -235,8 +235,8 @@ export default function ActivityReponses() {
                             imgSrc={"/images/illustrations/empty.svg"}
                             text={`“No responses have been submitted for this activity yet.”`}
                         />
-                    ) : (responses.data.length === 0 && search) ||
-                      submissionStatus ? (
+                    ) : responses.data.length === 0 &&
+                      (search || submissionStatus) ? (
                         <div className="flex justify-center py-5">
                             <p className="text-ascend-black">No data found</p>
                         </div>
