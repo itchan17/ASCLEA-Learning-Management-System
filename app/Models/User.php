@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\PaymentHistory\Payment;
 use App\Models\PaymentHistory\PaymentFile;
 use App\Models\Programs\Assessment;
+use App\Models\Programs\Grade;
 use App\Models\Programs\Material;
 use App\Models\Programs\Section;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -139,5 +140,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sections(): HasMany
     {
         return $this->hasMany(Section::class, 'created_by', 'user_id');
+    }
+
+    public function gradedStudents(): HasMany
+    {
+        return $this->hasMany(Grade::class, 'graded_by', 'user_id');
     }
 }
