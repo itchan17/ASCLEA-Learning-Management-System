@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Programs\AssessmentSubmission;
+use App\Models\Programs\Grade;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -51,5 +52,10 @@ class AssignedCourse extends Model
     public function assessmentSubmissions(): HasMany
     {
         return $this->hasMany(AssessmentSubmission::class, 'submitted_by', 'assigned_course_id');
+    }
+
+    public function grades(): HasMany
+    {
+        return $this->hasMany(Grade::class, 'assigned_course_id');
     }
 }
