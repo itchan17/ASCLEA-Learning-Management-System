@@ -18,7 +18,7 @@ return new class extends Migration
             $table->uuid('assigned_course_id');
             $table->foreign('assigned_course_id')->references('assigned_course_id')->on('assigned_courses')->onDelete('cascade');
             $table->enum('status', ['graded', 'returned']);
-            $table->integer('grade');
+            $table->decimal('grade', 4, 2)->nullable();
             $table->uuid('graded_by');
             $table->foreign('graded_by')->references('user_id')->on('users')->onDelete('cascade');
             $table->timestamps();
