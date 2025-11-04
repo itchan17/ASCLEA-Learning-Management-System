@@ -7,14 +7,17 @@ use App\Models\Admission\AdmissionFile;
 use App\Http\Controllers\Admission\AdmissionFileController;
 
 Route::get('/admission', function () {
+    //Route for fetching Pending Students
     $pendingStudents = Student::with('user')
         ->where('enrollment_status', 'pending')
         ->get(['student_id', 'user_id', 'enrollment_status', 'created_at']);
 
+    //Route for fetching Enrolled, Dropout, and Withdrawn Students
     $enrolledStudents = Student::with('user')
-        ->where('enrollment_status', 'enrolled')
+        ->whereIn('enrollment_status', ['enrolled', 'dropout', 'withdrawn'])
         ->get(['student_id', 'user_id', 'enrollment_status', 'created_at']);
 
+    //Route for Render the Pending and Enrolled Students
     return Inertia::render('Admission/AdmissionPage', [
         'pendingStudents' => $pendingStudents,
         'enrolledStudents' => $enrolledStudents,
@@ -26,7 +29,7 @@ Route::prefix('admission')
     ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin'])
     ->group(function () {
 
-        // Route for selected applicant (pending student) to view their details
+        // Route for selected applicant (pending student) for admin to view their details
         Route::get('/pending/{student}', function (\App\Models\Student $student) {
             // Eager load user relationship and admission files
             $student->load(['user', 'admissionFiles']);
@@ -36,13 +39,19 @@ Route::prefix('admission')
             ]);
         })->name('pending.student.view');
 
-        // Route for selected enrolled student to view their information
-        Route::get('/enrolled/{studentid}', function ($studentid) {
+
+        // Route for selected enrolled student for admin view to their details
+        Route::get('/enrolled/{student}', function (Student $student) {
+            $student->load(['user', 'admissionFiles']);
+
             return Inertia::render('Admission/EnrolledPage/StudentInfo', [
-                'studentid' => $studentid,
+                'student' => $student,
             ]);
         })->name('enrolled.student.view');
 
+        // Route for Updating Student Information
+        Route::put('/enrolled/{student}', [AdmissionFileController::class, 'updateStudent'])
+            ->name('admission.updateStudent');
     });
 
 //student Routes
