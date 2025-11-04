@@ -2,14 +2,33 @@ import React from "react";
 import { IoSearch } from "react-icons/io5";
 import usePeopleStore from "../../../../../../Stores/Programs/peopleStore";
 import EmptyState from "../../../../../../Components/EmptyState/EmptyState";
+import Pagination from "../../../../../../Components/Pagination";
 import { FaSort } from "react-icons/fa";
 import { BiSortUp } from "react-icons/bi";
+import { usePage } from "@inertiajs/react";
+import { IoCaretDownOutline } from "react-icons/io5";
+import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
+import { closeDropDown } from "../../../../../../Utils/closeDropdown";
+import useSearchSortGrades from "./Hooks/useSearchSortGrades";
 
 export default function GradesTable() {
-    // People Store
-    const peopleList = usePeopleStore((state) => state.peopleList);
+    const { students, program, course } = usePage().props;
+    console.log(students);
+
+    // Custom hook
+    const {
+        debouncedSearch,
+        isSearchSortLoading,
+        sortLastName,
+        handleSortLastName,
+        sortFirstName,
+        handleSortFirstName,
+    } = useSearchSortGrades({
+        programId: program.program_id,
+        courseId: course.course_id,
+    });
     return (
-        <div className="space-y-5">
+        <div className="space-y-5  overflow-hidden">
             <div className="w-full flex justify-end">
                 <div className="flex flex-wrap w-full sm:w-fit gap-2">
                     <select
@@ -24,6 +43,7 @@ export default function GradesTable() {
                             className="border w-full pl-10 pr-3 py-2 border-ascend-black focus:outline-ascend-blue"
                             type="text"
                             placeholder="Search name"
+                            onChange={debouncedSearch}
                         />
                         <IoSearch className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1" />
                     </div>
@@ -43,19 +63,51 @@ export default function GradesTable() {
                                 </div>
                             </th>
                             <th className="text-ascend-black font-black">
-                                <div className="flex space-x-1 items-center hover:bg-ascend-lightblue transition-all duration-300 w-fit p-2 cursor-pointer">
+                                <div
+                                    onClick={handleSortLastName}
+                                    className="flex space-x-1 items-center hover:bg-ascend-lightblue transition-all duration-300 w-fit p-2 cursor-pointer"
+                                >
                                     <p>Last Name</p>
-                                    <span className="text-size4 ">
-                                        <FaSort />
-                                    </span>
+                                    {!sortLastName ? (
+                                        <span className="text-size4 ">
+                                            <FaSort />
+                                        </span>
+                                    ) : (
+                                        <span
+                                            className={`text-size4 ${
+                                                sortLastName &&
+                                                sortLastName === "desc"
+                                                    ? "transform scale-y-[-1]"
+                                                    : ""
+                                            } transition-all duration-300`}
+                                        >
+                                            <BiSortUp />
+                                        </span>
+                                    )}
                                 </div>
                             </th>
                             <th className="text-ascend-black font-black">
-                                <div className="flex space-x-1 items-center hover:bg-ascend-lightblue transition-all duration-300 w-fit p-2 cursor-pointer">
+                                <div
+                                    onClick={handleSortFirstName}
+                                    className="flex space-x-1 items-center hover:bg-ascend-lightblue transition-all duration-300 w-fit p-2 cursor-pointer"
+                                >
                                     <p>First Name</p>
-                                    <span className="text-size4 ">
-                                        <FaSort />
-                                    </span>
+                                    {!sortFirstName ? (
+                                        <span className="text-size4 ">
+                                            <FaSort />
+                                        </span>
+                                    ) : (
+                                        <span
+                                            className={`text-size4 ${
+                                                sortFirstName &&
+                                                sortFirstName === "desc"
+                                                    ? "transform scale-y-[-1]"
+                                                    : ""
+                                            } transition-all duration-300`}
+                                        >
+                                            <BiSortUp />
+                                        </span>
+                                    )}
                                 </div>
                             </th>
                             <th className="text-ascend-black font-black">
@@ -69,12 +121,12 @@ export default function GradesTable() {
                             </th>
                         </tr>
                     </thead>
-                    {peopleList?.length > 0 && (
+                    {students.data.length > 0 && (
                         <tbody>
-                            {peopleList.map((p, index) => (
+                            {students.data.map((student, index) => (
                                 <tr
                                     key={index}
-                                    className="hover:bg-ascend-lightblue cursor-pointer"
+                                    className="hover:bg-ascend-lightblue"
                                 >
                                     <td>
                                         <input
@@ -83,17 +135,21 @@ export default function GradesTable() {
                                         />
                                     </td>
                                     <td>
-                                        <p className="font-bold">Doe</p>
+                                        <p className="font-bold">
+                                            {student.last_name}
+                                        </p>
                                     </td>
                                     <td>
-                                        <p className="font-bold">John</p>
+                                        <p className="font-bold">
+                                            {student.first_name}
+                                        </p>
                                     </td>
                                     <td>
                                         <p className="text-ascend-blue">
                                             Graded
                                         </p>
                                     </td>
-                                    <td>{p.email}</td>
+                                    <td>{student.email}</td>
                                     <td>
                                         <div className="space-x-2 flex flex-nowrap items-center">
                                             <input
@@ -123,14 +179,84 @@ export default function GradesTable() {
                         </tbody>
                     )}
                 </table>
-                {peopleList?.length === 0 && (
+                {/* {peopleList?.length === 0 && (
                     <EmptyState
                         paddingY="py-0"
                         imgSrc={"/images/illustrations/grades.svg"}
                         text={`“Oops! No one to hand an A+ to. Add your first student to get started.”`}
                     />
-                )}
+                )} */}
             </div>
+
+            {students.data.length > 0 && (
+                <div className="flex flex-wrap-reverse items-center justify-between gap-5">
+                    <div className="flex space-x-[0.5px]">
+                        <PrimaryButton text={"Download"} />
+
+                        {/* Dropdown button */}
+                        <div className="dropdown dropdown-end cursor-pointer ">
+                            <button
+                                tabIndex={0}
+                                role="button"
+                                className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
+                            >
+                                <div className="text-size1 ">
+                                    {<IoCaretDownOutline />}
+                                </div>
+                            </button>
+
+                            <ul
+                                tabIndex={0}
+                                className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                            >
+                                <li onClick={closeDropDown}>
+                                    <a
+                                        // href={route(
+                                        //     "activity.responses.export.pdf",
+                                        //     {
+                                        //         program: programId,
+                                        //         course: courseId,
+                                        //         assessment:
+                                        //             assessment.assessment_id,
+                                        //     }
+                                        // )}
+                                        className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
+                                    >
+                                        Download as PDF
+                                    </a>
+                                </li>
+                                <li onClick={closeDropDown}>
+                                    <a
+                                        // href={route(
+                                        //     "activity.responses.export.csv",
+                                        //     {
+                                        //         program: programId,
+                                        //         course: courseId,
+                                        //         assessment:
+                                        //             assessment.assessment_id,
+                                        //     }
+                                        // )}
+                                        className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
+                                    >
+                                        Download as CSV
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    {students.total > 10 && (
+                        <div className="w-full sm:w-fit">
+                            <Pagination
+                                links={students.links}
+                                currentPage={students.current_page}
+                                lastPage={students.last_page}
+                                only={["students"]}
+                            />
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

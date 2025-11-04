@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class AssignedCourse extends Model
 {
@@ -57,5 +58,10 @@ class AssignedCourse extends Model
     public function grades(): HasMany
     {
         return $this->hasMany(Grade::class, 'assigned_course_id');
+    }
+
+    public function grade(): HasOne
+    {
+        return $this->hasOne(Grade::class, 'assigned_course_id');
     }
 }
