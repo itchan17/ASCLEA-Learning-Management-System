@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Programs;
 
 use App\Http\Controllers\Controller;
+use App\Models\AssignedCourse;
 use App\Models\Course;
 use App\Models\Program;
 use App\Services\Programs\GradeService;
@@ -17,5 +18,15 @@ class GradeController extends Controller
         $this->gradeService = $gradeService;
     }
 
-    public function getStudents(Program $program, Course $course) {}
+    public function gradeStudent(Request $request, Program $program, Course $course, AssignedCourse $assignedCourse)
+    {
+
+        $validatedData = $request->validate([
+            'grade' => 'required|numeric|min:0|max:999.99',
+        ]);
+
+        $this->gradeService->createUpdateStudentGrade($validatedData['grade'], $course, $assignedCourse, $request->user()->user_id);
+    }
+
+    public function returnStudentGrade(Request $request, Program $program, Course $course, AssignedCourse $assignedCourse) {}
 }

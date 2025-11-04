@@ -10,6 +10,7 @@ import { IoCaretDownOutline } from "react-icons/io5";
 import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
 import { closeDropDown } from "../../../../../../Utils/closeDropdown";
 import useSearchSortGrades from "./Hooks/useSearchSortGrades";
+import StudentGradeRow from "./Components/StudentGradeRow";
 
 export default function GradesTable() {
     const { students, program, course } = usePage().props;
@@ -35,6 +36,7 @@ export default function GradesTable() {
                         className={`textField border w-full sm:w-40 px-3 py-2  focus:outline-ascend-blue`}
                     >
                         <option value="">All</option>
+                        <option value="no_grade">No grade</option>
                         <option value="graded">Graded</option>
                         <option value="returned">Returned</option>
                     </select>
@@ -124,57 +126,10 @@ export default function GradesTable() {
                     {students.data.length > 0 && (
                         <tbody>
                             {students.data.map((student, index) => (
-                                <tr
-                                    key={index}
-                                    className="hover:bg-ascend-lightblue"
-                                >
-                                    <td>
-                                        <input
-                                            type="checkbox"
-                                            className="accent-ascend-blue w-4 h-4 cursor-pointer"
-                                        />
-                                    </td>
-                                    <td>
-                                        <p className="font-bold">
-                                            {student.last_name}
-                                        </p>
-                                    </td>
-                                    <td>
-                                        <p className="font-bold">
-                                            {student.first_name}
-                                        </p>
-                                    </td>
-                                    <td>
-                                        <p className="text-ascend-blue">
-                                            Graded
-                                        </p>
-                                    </td>
-                                    <td>{student.email}</td>
-                                    <td>
-                                        <div className="space-x-2 flex flex-nowrap items-center">
-                                            <input
-                                                className="w-16 border h-9 p-2 border-ascend-black focus:outline-ascend-blue"
-                                                type="number"
-                                                min={0}
-                                                max={999}
-                                                onKeyDown={(e) => {
-                                                    if (
-                                                        e.key === "-" ||
-                                                        e.key === "e" ||
-                                                        e.key === "+"
-                                                    ) {
-                                                        e.preventDefault(); // prevent invalid characters
-                                                    }
-                                                }}
-                                                // onChange={(e) => {if(e.value.length)}}
-                                            />
-
-                                            <span className="text-nowrap ml-3">
-                                                Saving
-                                            </span>
-                                        </div>
-                                    </td>
-                                </tr>
+                                <StudentGradeRow
+                                    key={student.assigned_course_id}
+                                    student={student}
+                                />
                             ))}
                         </tbody>
                     )}

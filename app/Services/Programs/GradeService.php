@@ -2,7 +2,9 @@
 
 namespace App\Services\Programs;
 
+use App\Models\AssignedCourse;
 use App\Models\Course;
+use App\Models\Programs\Grade;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -47,4 +49,33 @@ class GradeService
 
         return $students->paginate(10, ['*'], 'page')->withQueryString();
     }
+
+    public function createUpdateStudentGrade($grade, Course $course, AssignedCourse $assignedCourse, string $userId)
+    {
+        $grade = Grade::updateOrCreate(
+            ['course_id' => $course->course_id, 'assigned_course_id' => $assignedCourse->assigned_course_id],
+            ['course_id' => $course->course_id, 'assigned_course_id' => $assignedCourse->assigned_course_id, 'grade' => $grade, 'graded_by' => $userId]
+        );
+
+        return $grade;
+    }
+
+    // public function returnGrades(array $validatedData, string $coursesId)
+    // {
+    //     $grades = Grade::where('course_idd', $coursesId);
+
+    //     if ($validatedData['selectAll']) {
+    //         if (!empty($unselectedSubmittedActivities)) {
+    //             $assessmentSubmissions->whereNotIn('assessment_submission_id', $unselectedSubmittedActivities);
+    //         }
+    //     } else {
+    //         if (!empty($selectedSubmittedActivities)) {
+    //             $assessmentSubmissions->whereIn('assessment_submission_id', $selectedSubmittedActivities);
+    //         }
+    //     }
+
+    //     $assessmentSubmissions->update([
+    //         'submission_status' => 'returned',
+    //     ]);
+    // }
 }
