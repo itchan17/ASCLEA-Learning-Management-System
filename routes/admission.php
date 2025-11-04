@@ -8,6 +8,8 @@ use App\Http\Controllers\Admission\AdmissionFileController;
 
 Route::get('/admission', function () {
     //Route for fetching Pending Students
+    $user = auth()->user();
+    $student = Student::where('user_id', $user->user_id)->first();
     $pendingStudents = Student::with('user')
         ->where('enrollment_status', 'pending')
         ->get(['student_id', 'user_id', 'enrollment_status', 'created_at']);
@@ -21,6 +23,7 @@ Route::get('/admission', function () {
     return Inertia::render('Admission/AdmissionPage', [
         'pendingStudents' => $pendingStudents,
         'enrolledStudents' => $enrolledStudents,
+        'student' => $student,
     ]);
 })->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin,student']);
 

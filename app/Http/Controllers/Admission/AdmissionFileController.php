@@ -17,11 +17,18 @@ class AdmissionFileController extends Controller
         $student = Student::where('user_id', $user->user_id)->firstOrFail();
 
         $request->validate([
-            'files.*' => 'required|file|mimes:jpg,jpeg,png,pdf,docx,doc|max:5120', // 5MB max each
+            'files.*' => 'required|file|max:5120', // 5MB max each
         ]);
 
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
+                $extension = strtolower($file->getClientOriginalExtension());
+
+                $allowedExtensions = ['jpg', 'jpeg', 'png', 'pdf'];
+                if (!in_array($extension, $allowedExtensions)) {
+                    return back()->with('error', 'Only JPG, JPEG, PNG, or PDF files are allowed.');
+                }
+
                 $path = $file->store('admission', 'public');
 
                 AdmissionFile::create([
@@ -33,6 +40,8 @@ class AdmissionFileController extends Controller
                     'uploaded_at' => now(),
                 ]);
             }
+
+            $student->update(['admission_status' => 'Pending']);
 
             return back()->with('success', 'Files uploaded successfully!');
         }

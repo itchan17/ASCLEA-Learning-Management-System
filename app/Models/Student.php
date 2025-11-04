@@ -42,7 +42,8 @@ class Student extends Model
      */
     protected $fillable = [
         'user_id',
-        'enrollment_status'
+        'enrollment_status',
+        'admission_status'
     ];
 
     public function user(): BelongsTo
@@ -64,6 +65,5 @@ class Student extends Model
     {
         return $this->hasMany(AdmissionFile::class, 'student_id', 'student_id');
     }
-
 
 }

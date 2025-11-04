@@ -8,14 +8,13 @@ import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToa
 import { FaFileImage, FaFilePdf } from "react-icons/fa";
 import { ImCancelCircle } from "react-icons/im";
 import { router } from "@inertiajs/react";
+
     
-
-export default function UnapprovedStudentAdmission() {
+export default function UnapprovedStudentAdmission({student}) {
     const [openForm, setOpenForm] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
+    const [submitted, setSubmitted] = useState();
     const [uploadedFiles, setUploadedFiles] = useState([]);
-
-
+  
     const handleFileChange = (fieldName, files) => {
         setUploadedFiles((prev) => [...prev, ...files]);
     };
@@ -28,10 +27,33 @@ export default function UnapprovedStudentAdmission() {
         setOpenForm(!openForm);
     };
 
+    console.log("Student Admission Status:", student?.admission_status);
+
     const handleSubmit = () => {
         if (uploadedFiles.length === 0) {
             displayToast(
                 <DefaultCustomToast message="Please upload at least one file." />,
+                "error"
+            );
+            return;
+        }
+
+        if (uploadedFiles.length > 5) {
+            displayToast(
+                <DefaultCustomToast message="You can upload a maximum of 5 files." />,
+                "error"
+            );
+            return;
+        }
+
+        const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "application/pdf"];
+        const invalidFiles = uploadedFiles.filter(
+            (file) => !allowedTypes.includes(file.type)
+        );
+
+        if (invalidFiles.length > 0) {
+            displayToast(
+                <DefaultCustomToast message="Only JPG, JPEG, PNG, or PDF files are allowed." />,
                 "error"
             );
             return;
@@ -65,7 +87,7 @@ export default function UnapprovedStudentAdmission() {
 
     return (
         <div className="flex justify-center font-nunito-sans">
-            {submitted ? (
+            {submitted || student?.admission_status === "Pending" ? (
                 <div className="flex flex-col justify-center">
                     <div className="flex justify-center items-center font-bold">
                         <h1 className="pr-3">Status:</h1>

@@ -6,7 +6,7 @@ import useActiveTabStore from "../../Stores/Admission/ActiveTabStore";
 import useUserStore from "../../Stores/User/userStore";
 import UnapprovedStudentAdmission from "./UnapprovedStudent/UnapprovedStudentAdmission";
 
-const AdmissionPage = () => {
+const AdmissionPage = ({student}) => {
     const user = useUserStore((state) => state.user);
     const { activeTab, setActiveTab } = useActiveTabStore();
 
@@ -29,7 +29,7 @@ const AdmissionPage = () => {
                     {activeTab === 1 && <EnrolledPage enrolledStudents={enrolledStudents} />}
                 </div>
             ) : (
-                <UnapprovedStudentAdmission />
+                <UnapprovedStudentAdmission student={student} />
             )}
         </>
     );
