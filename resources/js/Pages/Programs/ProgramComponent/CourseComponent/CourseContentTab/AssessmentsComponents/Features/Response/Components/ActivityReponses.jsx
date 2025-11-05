@@ -225,7 +225,7 @@ export default function ActivityReponses() {
                         </tbody>
                     )}
                 </table>
-                {console.log(submissionStatus)}
+
                 {/* For displaying no data in the table*/}
                 {!isSearchSortLoading &&
                     (responses.data.length === 0 &&

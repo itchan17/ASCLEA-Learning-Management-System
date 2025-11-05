@@ -3,7 +3,6 @@
 use App\Http\Controllers\Programs\MaterialController;
 use App\Http\Controllers\Programs\SectionController;
 use App\Http\Controllers\Programs\StudentProgressController;
-use App\Http\Controllers\Programs\UserProgressController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('programs/{program}/courses/{course}')

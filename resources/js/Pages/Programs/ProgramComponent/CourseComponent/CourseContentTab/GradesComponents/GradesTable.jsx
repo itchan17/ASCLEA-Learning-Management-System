@@ -11,6 +11,7 @@ import useSearchSortGrades from "./Hooks/useSearchSortGrades";
 import StudentGradeRow from "./Components/StudentGradeRow";
 import useReturnGrades from "./Hooks/useReturnGrades";
 import AlertModal from "../../../../../../Components/AlertModal";
+import EmptyState from "../../../../../../Components/EmptyState/EmptyState";
 
 export default function GradesTable() {
     const { students, program, course } = usePage().props;
@@ -27,6 +28,8 @@ export default function GradesTable() {
         sortFirstName,
         handleSortFirstName,
         filterStatus,
+        search,
+        status,
     } = useSearchSortGrades({
         programId: program.program_id,
         courseId: course.course_id,
@@ -191,13 +194,18 @@ export default function GradesTable() {
                         </tbody>
                     )}
                 </table>
-                {/* {peopleList?.length === 0 && (
-                    <EmptyState
-                        paddingY="py-0"
-                        imgSrc={"/images/illustrations/grades.svg"}
-                        text={`“Oops! No one to hand an A+ to. Add your first student to get started.”`}
-                    />
-                )} */}
+                {/* For displaying no data in the table*/}
+                {!isSearchSortLoading &&
+                    (students.data.length === 0 && !search && !status ? (
+                        <EmptyState
+                            imgSrc={"/images/illustrations/empty.svg"}
+                            text={`“There are no students to be graded.”`}
+                        />
+                    ) : students.data.length === 0 && (search || students) ? (
+                        <div className="flex justify-center py-5">
+                            <p className="text-ascend-black">No data found</p>
+                        </div>
+                    ) : null)}
             </div>
 
             {students.data.length > 0 && (

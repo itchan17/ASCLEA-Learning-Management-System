@@ -5,7 +5,6 @@ namespace App\Services\Programs;
 use App\Models\AssignedCourse;
 use App\Models\Course;
 use App\Models\Programs\Grade;
-use App\Models\User;
 use Illuminate\Http\Request;
 
 class GradeService
@@ -40,7 +39,7 @@ class GradeService
         if ($status = $request->input('status')) {
             if ($status === 'no_grade') {
                 $students->whereNull('grades.status');
-            } else {
+            } elseif ($status === 'graded' || $status === 'returned') {
                 $students->where('grades.status', $status);
             }
         }
