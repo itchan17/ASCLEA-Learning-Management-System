@@ -9,7 +9,7 @@ export default function useSearchSortGrades({ programId, courseId }) {
     const [search, setSearch] = useState("");
     const [sortLastName, setSortLastName] = useState(null);
     const [sortFirstName, setSortFirstName] = useState(null);
-    const [status, setStatus] = useState("null");
+    const [status, setStatus] = useState(null);
 
     const debouncedSearch = useMemo(() => {
         return debounce((e) => {
@@ -96,5 +96,7 @@ export default function useSearchSortGrades({ programId, courseId }) {
         sortFirstName,
         handleSortFirstName,
         filterStatus,
+        search,
+        status,
     };
 }
