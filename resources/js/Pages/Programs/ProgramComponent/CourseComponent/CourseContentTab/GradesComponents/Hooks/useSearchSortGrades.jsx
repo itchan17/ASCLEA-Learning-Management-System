@@ -9,6 +9,7 @@ export default function useSearchSortGrades({ programId, courseId }) {
     const [search, setSearch] = useState("");
     const [sortLastName, setSortLastName] = useState(null);
     const [sortFirstName, setSortFirstName] = useState(null);
+    const [status, setStatus] = useState("null");
 
     const debouncedSearch = useMemo(() => {
         return debounce((e) => {
@@ -61,6 +62,10 @@ export default function useSearchSortGrades({ programId, courseId }) {
         }
     };
 
+    const filterStatus = (e) => {
+        setStatus(e.target.value);
+    };
+
     useEffect(() => {
         if (!initalRender) {
             const query = {};
@@ -68,12 +73,13 @@ export default function useSearchSortGrades({ programId, courseId }) {
             if (search.trim()) query.search = search.trim();
             if (sortLastName) query.lastName = sortLastName;
             if (sortFirstName) query.firstName = sortFirstName;
+            if (status) query.status = status;
 
             handleGetStudents(query);
         } else {
             setInitialRender(false);
         }
-    }, [search, sortLastName, sortFirstName]);
+    }, [search, sortLastName, sortFirstName, status]);
 
     useEffect(() => {
         // Cleanup when component unmounts
@@ -89,5 +95,6 @@ export default function useSearchSortGrades({ programId, courseId }) {
         handleSortLastName,
         sortFirstName,
         handleSortFirstName,
+        filterStatus,
     };
 }

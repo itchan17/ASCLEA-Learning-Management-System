@@ -17,11 +17,13 @@ class GradeService
                 'assigned_courses.*',
                 'users.first_name',
                 'users.last_name',
-                'users.email'
+                'users.email',
+                'grades.status as grade_status'
             )
             ->join('learning_members', 'assigned_courses.learning_member_id', '=', 'learning_members.learning_member_id')
             ->join('users', 'learning_members.user_id', '=', 'users.user_id')
             ->join('roles', 'users.role_id', '=', 'roles.role_id')
+            ->leftJoin('grades', 'assigned_courses.assigned_course_id', '=', 'grades.assigned_course_id')
             ->where('roles.role_name', 'student')
             ->with('grade');
 
@@ -34,48 +36,55 @@ class GradeService
             });
         }
 
-        // Sort by last name
-        if ($sortLastName = $request->input('lastName')) {
-            $students->orderBy('users.last_name', $sortLastName);
+        // Filter by grade status
+        if ($status = $request->input('status')) {
+            if ($status === 'no_grade') {
+                $students->whereNull('grades.status');
+            } else {
+                $students->where('grades.status', $status);
+            }
         }
 
-        // Sort by first name
-        elseif ($sortFirstName = $request->input('firstName')) {
+        // Sort by last name, first name, or fallback
+        if ($sortLastName = $request->input('lastName')) {
+            $students->orderBy('users.last_name', $sortLastName);
+        } elseif ($sortFirstName = $request->input('firstName')) {
             $students->orderBy('users.first_name', $sortFirstName);
         } else {
             $students->orderBy('assigned_courses.created_at', 'asc')
                 ->orderBy('assigned_courses.assigned_course_id', 'asc');
         }
 
-        return $students->paginate(10, ['*'], 'page')->withQueryString();
+        return $students->paginate(10)->withQueryString();
     }
+
 
     public function createUpdateStudentGrade($grade, Course $course, AssignedCourse $assignedCourse, string $userId)
     {
         $grade = Grade::updateOrCreate(
             ['course_id' => $course->course_id, 'assigned_course_id' => $assignedCourse->assigned_course_id],
-            ['course_id' => $course->course_id, 'assigned_course_id' => $assignedCourse->assigned_course_id, 'grade' => $grade, 'graded_by' => $userId]
+            ['course_id' => $course->course_id, 'assigned_course_id' => $assignedCourse->assigned_course_id, 'grade' => $grade, 'status' => 'graded', 'graded_by' => $userId]
         );
 
         return $grade;
     }
 
-    // public function returnGrades(array $validatedData, string $coursesId)
-    // {
-    //     $grades = Grade::where('course_idd', $coursesId);
+    public function returnGrades(array $validatedData, string $coursesId)
+    {
+        $grades = Grade::where('course_id', $coursesId);
 
-    //     if ($validatedData['selectAll']) {
-    //         if (!empty($unselectedSubmittedActivities)) {
-    //             $assessmentSubmissions->whereNotIn('assessment_submission_id', $unselectedSubmittedActivities);
-    //         }
-    //     } else {
-    //         if (!empty($selectedSubmittedActivities)) {
-    //             $assessmentSubmissions->whereIn('assessment_submission_id', $selectedSubmittedActivities);
-    //         }
-    //     }
+        if ($validatedData['selectAll']) {
+            if (!empty($validatedData['unselectedStudentGrades'])) {
+                $grades->whereNotIn('grade_id', $validatedData['unselectedStudentGrades']);
+            }
+        } else {
+            if (!empty($validatedData['selectedStudentGrades'])) {
+                $grades->whereIn('grade_id', $validatedData['selectedStudentGrades']);
+            }
+        }
 
-    //     $assessmentSubmissions->update([
-    //         'submission_status' => 'returned',
-    //     ]);
-    // }
+        $grades->update([
+            'status' => 'returned',
+        ]);
+    }
 }

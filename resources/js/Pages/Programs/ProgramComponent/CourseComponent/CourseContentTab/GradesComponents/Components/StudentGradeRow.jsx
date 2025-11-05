@@ -3,7 +3,11 @@ import useGrades from "../Hooks/useGrades";
 import { usePage } from "@inertiajs/react";
 import { capitalize } from "lodash";
 
-export default function StudentGradeRow({ student }) {
+export default function StudentGradeRow({
+    student,
+    handleSelectStudentGrade,
+    selectedStudentGrades,
+}) {
     const { program, course } = usePage().props;
 
     const { handleGradeChange, isLoading, grade, isChanged } = useGrades({
@@ -17,8 +21,15 @@ export default function StudentGradeRow({ student }) {
         <tr className="hover:bg-ascend-lightblue">
             <td>
                 <input
+                    disabled={!student.grade} // Disable if student has no grades
                     type="checkbox"
                     className="accent-ascend-blue w-4 h-4 cursor-pointer"
+                    checked={selectedStudentGrades.some(
+                        (id) => id === student?.grade?.grade_id
+                    )}
+                    onChange={() =>
+                        handleSelectStudentGrade(student?.grade?.grade_id)
+                    }
                 />
             </td>
             <td>
