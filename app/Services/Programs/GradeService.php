@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class GradeService
 {
-    public function getStudentsToBeGraded(Request $request, Course $course)
+    public function getStudentsToBeGraded(Request $request, Course $course,  bool $isPaginated = true)
     {
         $students = $course->assignedTo()
             ->select(
@@ -54,7 +54,11 @@ class GradeService
                 ->orderBy('assigned_courses.assigned_course_id', 'asc');
         }
 
-        return $students->paginate(10)->withQueryString();
+        if ($isPaginated) {
+            return $students->paginate(10)->withQueryString();
+        }
+
+        return $students->get();
     }
 
 
@@ -85,5 +89,28 @@ class GradeService
         $grades->update([
             'status' => 'returned',
         ]);
+    }
+
+    public function handleExportStudentGradesToCsv($students)
+    {
+        $columns = ['Last Name', 'First Name', 'Status', 'Email', 'Grade'];
+
+        $callback = function () use ($students, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($students as $student) {
+                fputcsv($file, [
+                    $student->last_name ?? 'N/A',
+                    $student->first_name ?? 'N/A',
+                    $student->grade->status ?? 'no grade',
+                    $student->email ?? 'N/A',
+                    $student->grade->grade ?? '',
+                ]);
+            }
+            fclose($file);
+        };
+
+        return $callback;
     }
 }
