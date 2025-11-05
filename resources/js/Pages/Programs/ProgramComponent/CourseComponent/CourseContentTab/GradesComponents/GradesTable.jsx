@@ -57,7 +57,7 @@ export default function GradesTable() {
     }, [students]);
 
     return (
-        <div className="space-y-5  overflow-hidden">
+        <div className="space-y-5">
             {/* Display alert modal */}
             {openAlertModal && (
                 <AlertModal
@@ -231,15 +231,13 @@ export default function GradesTable() {
                             >
                                 <li onClick={closeDropDown}>
                                     <a
-                                        // href={route(
-                                        //     "activity.responses.export.pdf",
-                                        //     {
-                                        //         program: programId,
-                                        //         course: courseId,
-                                        //         assessment:
-                                        //             assessment.assessment_id,
-                                        //     }
-                                        // )}
+                                        href={route(
+                                            "export.student.grades.pdf",
+                                            {
+                                                program: program.program_id,
+                                                course: course.course_id,
+                                            }
+                                        )}
                                         className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
                                     >
                                         Download as PDF
@@ -247,15 +245,13 @@ export default function GradesTable() {
                                 </li>
                                 <li onClick={closeDropDown}>
                                     <a
-                                        // href={route(
-                                        //     "activity.responses.export.csv",
-                                        //     {
-                                        //         program: programId,
-                                        //         course: courseId,
-                                        //         assessment:
-                                        //             assessment.assessment_id,
-                                        //     }
-                                        // )}
+                                        href={route(
+                                            "export.student.grades.csv",
+                                            {
+                                                program: program.program_id,
+                                                course: course.course_id,
+                                            }
+                                        )}
                                         className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
                                     >
                                         Download as CSV
