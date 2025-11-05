@@ -1,7 +1,5 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import { IoSearch } from "react-icons/io5";
-import usePeopleStore from "../../../../../../Stores/Programs/peopleStore";
-import EmptyState from "../../../../../../Components/EmptyState/EmptyState";
 import Pagination from "../../../../../../Components/Pagination";
 import { FaSort } from "react-icons/fa";
 import { BiSortUp } from "react-icons/bi";
@@ -11,10 +9,14 @@ import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
 import { closeDropDown } from "../../../../../../Utils/closeDropdown";
 import useSearchSortGrades from "./Hooks/useSearchSortGrades";
 import StudentGradeRow from "./Components/StudentGradeRow";
+import useReturnGrades from "./Hooks/useReturnGrades";
+import AlertModal from "../../../../../../Components/AlertModal";
 
 export default function GradesTable() {
     const { students, program, course } = usePage().props;
-    console.log(students);
+
+    const [hasGradedStudent, setHasGradedStudent] = useState(false);
+    const [openAlertModal, setOpenAlertModal] = useState(false);
 
     // Custom hook
     const {
@@ -24,15 +26,61 @@ export default function GradesTable() {
         handleSortLastName,
         sortFirstName,
         handleSortFirstName,
+        filterStatus,
     } = useSearchSortGrades({
         programId: program.program_id,
         courseId: course.course_id,
     });
+
+    const {
+        handleSelectAll,
+        handlePostStudentGrades,
+        handleSelectStudentGrade,
+        isLoading,
+        selectAll,
+        selectedStudentGrades,
+    } = useReturnGrades({
+        programId: program.program_id,
+        courseId: course.course_id,
+        students: students.data,
+    });
+
+    useEffect(() => {
+        // This state is use for disabling the select all checkbox
+        setHasGradedStudent(
+            students.data.length > 0 &&
+                students.data.some((student) => student.grade) // Check if there's at;easat 1 student graded
+        );
+    }, [students]);
+
     return (
         <div className="space-y-5  overflow-hidden">
+            {/* Display alert modal */}
+            {openAlertModal && (
+                <AlertModal
+                    title={"Post Grades Confirmation"}
+                    description={
+                        "Once posted, grades will be visible to students. Are you sure you want to continue?"
+                    }
+                    closeModal={() => setOpenAlertModal(false)}
+                    onConfirm={() => {
+                        handlePostStudentGrades(setOpenAlertModal);
+                    }}
+                    isLoading={isLoading}
+                />
+            )}
+            <div className="flex flex-wrap gap-2 justify-between items-center">
+                <h1 className="text-size6 font-bold">{course.course_name}</h1>
+                <PrimaryButton
+                    isDisabled={selectedStudentGrades.length === 0 || isLoading}
+                    doSomething={() => setOpenAlertModal(true)}
+                    text="Post Grades"
+                />
+            </div>
             <div className="w-full flex justify-end">
                 <div className="flex flex-wrap w-full sm:w-fit gap-2">
                     <select
+                        onChange={filterStatus}
                         className={`textField border w-full sm:w-40 px-3 py-2  focus:outline-ascend-blue`}
                     >
                         <option value="">All</option>
@@ -58,8 +106,11 @@ export default function GradesTable() {
                             <th className="w-0">
                                 <div className="flex items-center mb-0 gap-2 text-ascend-black font-black">
                                     <input
+                                        disabled={!hasGradedStudent}
                                         type="checkbox"
+                                        checked={selectAll}
                                         className="accent-ascend-blue w-4 h-4 cursor-pointer"
+                                        onChange={handleSelectAll}
                                     />
                                     <span>Select all</span>
                                 </div>
@@ -129,6 +180,12 @@ export default function GradesTable() {
                                 <StudentGradeRow
                                     key={student.assigned_course_id}
                                     student={student}
+                                    selectedStudentGrades={
+                                        selectedStudentGrades
+                                    }
+                                    handleSelectStudentGrade={
+                                        handleSelectStudentGrade
+                                    }
                                 />
                             ))}
                         </tbody>

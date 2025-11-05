@@ -28,5 +28,14 @@ class GradeController extends Controller
         $this->gradeService->createUpdateStudentGrade($validatedData['grade'], $course, $assignedCourse, $request->user()->user_id);
     }
 
-    public function returnStudentGrade(Request $request, Program $program, Course $course, AssignedCourse $assignedCourse) {}
+    public function returnStudentGrade(Request $request, Program $program, Course $course)
+    {
+        $validated = $request->validate([
+            'selectAll' => 'required|boolean',
+            'selectedStudentGrades' => 'array',
+            'unselectedStudentGrades' => 'array',
+        ]);
+
+        $this->gradeService->returnGrades($validated, $course->course_id);
+    }
 }

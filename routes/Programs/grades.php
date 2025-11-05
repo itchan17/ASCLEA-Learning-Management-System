@@ -9,4 +9,7 @@ Route::prefix('programs/{program}/courses/{course}')
 
         // Route for grading the student
         Route::post('/students/{assignedCourse}/grades', [GradeController::class, 'gradeStudent'])->name('student.grade');
+
+        // Route for returning the student grades
+        Route::put('/students/grades', [GradeController::class, 'returnStudentGrade'])->name('return.student.grades');
     });
