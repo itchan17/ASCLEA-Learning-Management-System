@@ -19,7 +19,7 @@ const StudentInfo = () => {
         {!isEditDisabled ? (
           <PrimaryButton text="Archive" btnColor="bg-ascend-red" />
         ) : (
-          <PrimaryButton text="Delete" btnColor="bg-ascend-red" />
+          <PrimaryButton text="Archive" btnColor="bg-ascend-red" />
         )}
       </div>
 

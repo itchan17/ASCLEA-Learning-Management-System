@@ -43,7 +43,9 @@ class Student extends Model
     protected $fillable = [
         'user_id',
         'enrollment_status',
-        'admission_status'
+        'admission_status',
+        'admission_message',
+        'payment',
     ];
 
     public function user(): BelongsTo

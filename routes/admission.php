@@ -12,12 +12,12 @@ Route::get('/admission', function () {
     $student = Student::where('user_id', $user->user_id)->first();
     $pendingStudents = Student::with('user')
         ->where('enrollment_status', 'pending')
-        ->get(['student_id', 'user_id', 'enrollment_status', 'created_at']);
+        ->get(['student_id', 'user_id', 'enrollment_status','admission_status', 'created_at']);
 
     //Route for fetching Enrolled, Dropout, and Withdrawn Students
     $enrolledStudents = Student::with('user')
         ->whereIn('enrollment_status', ['enrolled', 'dropout', 'withdrawn'])
-        ->get(['student_id', 'user_id', 'enrollment_status', 'created_at']);
+        ->get(['student_id', 'user_id', 'enrollment_status', 'admission_status', 'created_at']);
 
     //Route for Render the Pending and Enrolled Students
     return Inertia::render('Admission/AdmissionPage', [
@@ -56,6 +56,11 @@ Route::prefix('admission')
         Route::put('/enrolled/{student}', [AdmissionFileController::class, 'updateStudent'])
             ->name('admission.updateStudent');
     });
+
+    // Update admission and enrollment status (Approve/Reject)
+    Route::put('/update-status/{id}', [AdmissionFileController::class, 'updateStatus'])
+        ->name('admission.updateStatus');
+
 
 //student Routes
 Route::prefix('admission')

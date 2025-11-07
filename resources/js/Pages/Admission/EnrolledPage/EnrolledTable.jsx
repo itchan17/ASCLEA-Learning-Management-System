@@ -1,6 +1,5 @@
 import React from "react";
 import EmptyState from "../../../Components/EmptyState/EmptyState";
-import { BiFilter } from "react-icons/bi";
 import { router } from "@inertiajs/react";
 import { IoSearch } from "react-icons/io5";
 import { useRoute } from "ziggy-js";
@@ -15,8 +14,6 @@ const EnrolledTable = ({ enrolledStudents }) => {
   return (
     <>
       <div className="flex justify-end items-center mb-3">
-        <BiFilter className="text-size5" />
-        <div className="font-bold text-size2 pr-10">Filter</div>
         <div className="relative">
           <input
             className="w-full sm:w-50 border h-9 pl-10 p-2 border-ascend-black focus:outline-ascend-blue"

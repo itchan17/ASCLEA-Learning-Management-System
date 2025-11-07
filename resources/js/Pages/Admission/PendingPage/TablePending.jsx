@@ -1,7 +1,6 @@
 import React from "react";
 import EmptyState from "../../../Components/EmptyState/EmptyState";
 import { IoSearch } from "react-icons/io5";
-import { BiFilter } from "react-icons/bi";
 import { router } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 
@@ -15,8 +14,6 @@ const TablePending = ({ pendingStudents }) => {
   return (
     <>
       <div className="flex justify-end items-center mb-3">
-        <BiFilter className="text-size5" />
-        <div className="font-bold text-size2 pr-10">Filter</div>
         <div className="relative">
           <input
             className="w-full sm:w-50 border h-9 pl-10 p-2 border-ascend-black focus:outline-ascend-blue"
@@ -34,6 +31,7 @@ const TablePending = ({ pendingStudents }) => {
               <th>Name</th>
               <th>Email</th>
               <th>Date Applied</th>
+              <th>Admission Status</th>
               <th></th>
             </tr>
           </thead>
@@ -52,6 +50,21 @@ const TablePending = ({ pendingStudents }) => {
                   <td className="py-5">{student.user.email}</td>
                   <td className="py-5">
                     {new Date(student.created_at).toLocaleDateString()}
+                  </td>
+                  <td
+                    className={`py-5 ${
+                      student.admission_status === "Accepted"
+                        ? "text-ascend-blue"
+                        : student.admission_status === "Not Submitted"
+                        ? "text-ascend-red"
+                        : student.admission_status === "Submitted"
+                        ? "text-ascend-yellow"
+                        : student.admission_status === "Reviewing"
+                        ? "text-ascend-green"
+                        : "text-ascend-gray2"
+                    }`}
+                  >
+                    {student.admission_status}
                   </td>
                   <td className="py-5">
                     <span className="text-ascend-blue underline">

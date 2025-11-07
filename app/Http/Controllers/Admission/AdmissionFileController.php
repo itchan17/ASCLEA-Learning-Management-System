@@ -55,7 +55,7 @@ class AdmissionFileController extends Controller
         // and eager load their related user details
         $pendingStudents = \App\Models\Student::with('user')
             ->where('enrollment_status', 'pending')
-            ->get(['student_id', 'user_id', 'enrollment_status', 'created_at']);
+            ->get(['student_id', 'user_id', 'enrollment_status', 'admission_status', 'created_at']);
 
         return response()->json($pendingStudents);
     }
@@ -65,8 +65,8 @@ class AdmissionFileController extends Controller
         // Get all students whose status is 'enrolled', 'dropout', 'withdrawn' and eager load 'user'
         // Withdrawn enrollment status is not yet available to the model
         $enrolledStudents = \App\Models\Student::with('user')
-            ->whereIn('enrollment_status', ['enrolled', 'dropout', 'withdrawn'])
-            ->get(['student_id', 'user_id', 'enrollment_status', 'created_at']);
+            ->whereIn('enrollment_status', ['enrolled', 'pending', 'dropout', 'withdrawn'])
+            ->get(['student_id', 'user_id', 'enrollment_status', 'admission_status', 'created_at']);
 
         return response()->json($enrolledStudents);
     }
@@ -83,7 +83,8 @@ class AdmissionFileController extends Controller
         'birthdate' => 'nullable|date',
         'gender' => 'nullable|in:male,female,other',
         'program' => 'nullable|string|max:255',
-        'enrollment_status' => 'nullable|in:enrolled,dropout,withdrawn', //Withdrawn enrollment status do not exist yet in the model
+        'enrollment_status' => 'nullable|in:enrolled,pending,dropout,withdrawn', //Withdrawn enrollment status do not exist yet in the model
+        'admission_status' => 'nullable|in:Not Submitted,Pending,Accepted,Rejected',
         'house_no' => 'nullable|string|max:255',
         'region' => 'nullable|string|max:255',
         'province' => 'nullable|string|max:255',
@@ -108,8 +109,54 @@ class AdmissionFileController extends Controller
 
     $student->update([
         'enrollment_status' => $request->enrollment_status,
+        'admission_status' => $request->admission_status ?? $student->admission_status,
     ]);
         return redirect()->back()->with('success', 'Student updated successfully.');
     }
 
+    //Logic for Updating the Enrollment Status based on the Student's Admission Status
+    public function EnrollmentStatus($admission_status)
+    {
+        /*if ($admission_status === 'Accepted') {
+            return 'enrolled';
+        } elseif ($admission_status === 'Not Submitted') {
+            return 'pending';
+        } elseif ($admission_status === 'Pending') {
+            return 'pending';
+        } elseif ($admission_status === 'Rejected') {
+            return 'pending';
+        } else {
+            return 'pending';
+        }*/
+        return $admission_status === 'Accepted' ? 'enrolled' : 'pending';
+    }
+
+    //Update Status Function to Update the Admission Status of Students
+    public function updateStatus(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'admission_status' => 'required|in:Not Submitted,Pending,Accepted,Rejected',
+            'admission_message' => 'nullable|string|max:500',
+        ]);
+
+        $student = Student::findOrFail($id);
+
+        // Update admission details
+        $student->admission_status = $validated['admission_status'];
+        $student->admission_message = $validated['admission_message'] ?? null;
+
+        // Automatically update enrollment_status based on admission_status
+        $student->enrollment_status = $this->EnrollmentStatus($student->admission_status);
+
+        // If the student is accepted and enrolled, update payment to "paid"
+        if ($student->admission_status === 'Accepted' && $student->enrollment_status === 'enrolled') {
+            $student->payment = 'paid';
+        } else {
+            $student->payment = 'unpaid';
+        }
+
+        $student->save();
+
+        return back()->with('success', 'Status updated successfully.');
+    }
 }
