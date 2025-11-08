@@ -277,6 +277,31 @@ class AdmissionFileController extends Controller
         return redirect()->route('admission.index')->with('success', 'Student archived successfully.');
     }
 
+    public function updateProfile(Request $request, $id)
+    {
+        $request->validate([
+            'profile_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $student = Student::findOrFail($id);
+        $user = $student->user;
+
+        if ($request->hasFile('profile_image')) {
+            $file = $request->file('profile_image');
+            $filePath = $file->store('profile_images', 'public');
+
+            // Delete old photo if exists
+            if ($user->profile_image && \Storage::disk('public')->exists($user->profile_image)) {
+                \Storage::disk('public')->delete($user->profile_image);
+            }
+
+            $user->profile_image = $filePath;
+            $user->save();
+        }
+
+        return back()->with('success', 'Profile photo updated successfully.');
+    }
+
     protected function checkAdmin()
     {
         if (!auth()->check() || auth()->user()->role->role_name !== 'admin') {

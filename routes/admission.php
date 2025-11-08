@@ -42,6 +42,10 @@ Route::prefix('admission')
         // Archive Enrolled Student
         Route::delete('/students/{student}/archive', [AdmissionFileController::class, 'archive'])
             ->name('students.archive');
+
+        // Update Student Profile Photo
+        Route::put('/students/{student}/update-profile', [AdmissionFileController::class, 'updateProfile'])
+            ->name('student.profile.update');
     });
 
 //student Routes

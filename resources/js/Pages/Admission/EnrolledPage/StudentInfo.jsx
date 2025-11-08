@@ -10,35 +10,75 @@ import AssesstmentTable from './AssesstmentTable';
 import AlertModal from '../../../Components/AlertModal';
 import { displayToast } from '../../../Utils/displayToast';
 import DefaultCustomToast from '../../../Components/CustomToast/DefaultCustomToast';
+import { BiSolidEditAlt } from "react-icons/bi";
+import Loader from "../../../Components/Loader";
 
 const StudentInfo = () => {
   const { student, learningMembers, completedAssessments } = usePage().props;
   const [isEditDisabled, setIsEditDisabled] = useState(true);
 
+  // ================== ARCHIVE STUDENT HANDLER ==================
   const [openAlertModal, setOpenAlertModal] = useState(false);
   const [isArchiveLoading, setIsArchiveLoading] = useState(false);
 
   const handleArchive = () => {
   setIsArchiveLoading(true);
 
-  router.delete(route("students.archive", student.student_id), {
-    onSuccess: (page) => {
-      setIsArchiveLoading(false);
-      setOpenAlertModal(false);
-      displayToast(
-        <DefaultCustomToast message={page.props.flash.success || "Student archived successfully!"} />,
-        "success"
-      );
-    },
-    onError: (errors) => {
-      setIsArchiveLoading(false);
-      displayToast(
-        <DefaultCustomToast message="Failed to archive student." />,
-        "error"
-      );
-    },
-  });
-};
+    router.delete(route("students.archive", student.student_id), {
+      onSuccess: (page) => {
+        setIsArchiveLoading(false);
+        setOpenAlertModal(false);
+        displayToast(
+          <DefaultCustomToast message={page.props.flash.success || "Student archived successfully!"} />,
+          "success"
+        );
+      },
+      onError: (errors) => {
+        setIsArchiveLoading(false);
+        displayToast(
+          <DefaultCustomToast message="Failed to archive student." />,
+          "error"
+        );
+      },
+    });
+  };
+
+  // ================== PROFILE IMAGE HANDLER ==================
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
+  const [updateProfileError, setUpdateProfileError] = useState(null);
+
+  const handleProfileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsProfileLoading(true);
+
+    router.post(
+      route("student.profile.update", student.student_id),
+      { _method: "put", profile_image: file },
+      {
+        showProgress: false,
+        onSuccess: (page) => {
+          displayToast(
+            <DefaultCustomToast
+              message={page.props.flash.success || "Profile photo updated successfully!"}
+            />,
+            "success"
+          );
+        },
+        onError: (error) => {
+          setUpdateProfileError(error);
+          displayToast(
+            <DefaultCustomToast message="Failed to update profile photo. Please use a smaller image." />,
+            "error"
+          );
+        },
+        onFinish: () => {
+          setIsProfileLoading(false);
+        },
+      }
+    );
+  };
 
 
   return (
@@ -63,9 +103,45 @@ const StudentInfo = () => {
         />
       </div>
 
-      {/* Student Header */}
-      <div className="flex items-center mt-5">
-        <div className="w-18 h-18 bg-ascend-gray1 rounded-full"></div>
+        <div className="flex items-center mt-5">
+        {/* Profile Image */}
+        <div className="relative w-18 h-18 bg-ascend-gray1 rounded-full shrink-0 group">
+          {isProfileLoading && (
+            <>
+              <div className="absolute inset-0 bg-ascend-lightblue opacity-40 rounded-full"></div>
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                <Loader color="bg-ascend-blue" size="sm" />
+              </div>
+            </>
+          )}
+
+          <img
+            src={
+              student?.user?.profile_image
+                ? `/storage/${student.user.profile_image}`
+                : "/images/default_profile.png"
+            }
+            alt="Profile"
+            className="w-full h-full object-cover rounded-full"
+          />
+
+          <label
+            htmlFor="inputProfile"
+            className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 text-ascend-white opacity-0 hover:opacity-50 cursor-pointer rounded-full transition-opacity duration-200"
+          >
+            <BiSolidEditAlt className="text-size4" />
+          </label>
+
+          <input
+            id="inputProfile"
+            type="file"
+            className="hidden"
+            accept="image/*"
+            onChange={handleProfileChange}
+          />
+        </div>
+        
+        {/* Student Header */}
         <div className="flex flex-col ml-2">
           <div className="flex items-center">
             <div className="font-nunito-sans text-size4 ml-5 font-bold">
