@@ -1,98 +1,133 @@
-import React from "react";
-import EmptyState from "../../../Components/EmptyState/EmptyState";
-import { IoSearch } from "react-icons/io5";
-import { router } from "@inertiajs/react";
+import { useState, useMemo, useEffect } from "react";
+import { usePage, router } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
+import EmptyState from "../../../Components/EmptyState/EmptyState";
+import Pagination from "@/Components/Pagination";
+import { IoSearch } from "react-icons/io5";
+import { debounce } from "lodash";
 
-const TablePending = ({ pendingStudents }) => {
-  const route = useRoute();
+export default function PendingStudentsTable({ active }) {
+    const route = useRoute();
+    const { pendingStudents } = usePage().props;
+    const [search, setSearch] = useState("");
 
-  const handleRowClick = (studentid) => {
-    router.visit(route("pending.student.view", { student: studentid }));
-  };
+    //=========================== Handle Row Click ===========================//
+    const handleRowClick = (studentId) => {
+        router.visit(route("pending.student.view", { student: studentId }));
+    };
 
-  return (
-    <>
-      <div className="flex justify-end items-center mb-3">
-        <div className="relative">
-          <input
-            className="w-full sm:w-50 border h-9 pl-10 p-2 border-ascend-black focus:outline-ascend-blue"
-            type="text"
-            placeholder="Search name"
-          />
-          <IoSearch className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1" />
+    //=========================== Handle Input Change ===========================//
+    const handleInputChange = (e) => {
+        setSearch(e.target.value); // update input instantly
+        debouncedSearch(e.target.value); // debounce router call
+    };
+
+    //=========================== Debounced router call ===========================//
+    const debouncedSearch = useMemo(() => debounce((value) => {
+        router.get(route("pending.students"), { search: value, page: 1 }, {
+            preserveState: true,
+            showProgress: false,
+            only: ["pendingStudents"]
+        });
+    }, 300), []);
+
+    useEffect(() => {
+        return () => debouncedSearch.cancel(); // cleanup on unmount
+    }, []);
+
+    //=========================== Reset search/page when tab becomes active ===========================//
+    useEffect(() => {
+        if (active) {
+            setSearch("");
+            router.get(route("pending.students"), { page: 1 }, {
+                preserveState: true,
+                showProgress: false,
+                only: ["pendingStudents"]
+            });
+        }
+    }, [active]);
+
+    return (
+        <div>
+            {/*=========================== Search Input ===========================*/}
+            <div className="flex justify-end mb-3">
+                <div className="relative">
+                    <input
+                        className="w-full sm:w-60 border h-10 pl-10 pr-3 border-ascend-black focus:outline-ascend-blue"
+                        type="text"
+                        placeholder="Search"
+                        value={search}
+                        onChange={handleInputChange}
+                    />
+                    <IoSearch className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1" />
+                </div>
+            </div>
+
+            {/*=========================== Table ===========================*/}
+            <div className="overflow-x-auto">
+                <table className="table w-full">
+                    <thead>
+                        <tr className="border-b-2 border-ascend-gray3">
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Date Applied</th>
+                            <th>Admission Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {pendingStudents?.data?.length > 0 ? (
+                            pendingStudents.data.map((student) => (
+                                <tr
+                                    key={student.student_id}
+                                    onClick={() => handleRowClick(student.student_id)}
+                                    className="hover:bg-ascend-lightblue cursor-pointer border-b border-ascend-gray1"
+                                >
+                                    <td className="py-5">
+                                        {student.user.first_name}{" "}
+                                        {student.user.middle_name ? student.user.middle_name + " " : ""}
+                                        {student.user.last_name}
+                                    </td>
+                                    <td className="py-5">{student.user.email}</td>
+                                    <td className="py-5">{new Date(student.created_at).toLocaleDateString()}</td>
+                                    <td className={`py-5 ${
+                                        student.admission_status === "Accepted" ? "text-ascend-blue" :
+                                        student.admission_status === "Not Submitted" ? "text-ascend-red" :
+                                        student.admission_status === "Pending" ? "text-ascend-yellow" : "text-ascend-gray2"
+                                    }`}>
+                                        {student.admission_status}
+                                    </td>
+                                    <td className="py-5">
+                                        <span className="text-ascend-blue underline">View More</span>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="5">
+                                    <EmptyState
+                                        paddingY="py-0"
+                                        imgSrc="/images/illustrations/Thinking.svg"
+                                        text={`Nothing to see here… yet!`}
+                                    />
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {/*=========================== Pagination ===========================*/}
+            {pendingStudents?.links?.length > 0 && (
+                <div className="flex justify-end p-3">
+                    <Pagination
+                        links={pendingStudents.links}
+                        currentPage={pendingStudents.current_page}
+                        lastPage={pendingStudents.last_page}
+                        only={["pendingStudents"]}
+                    />
+                </div>
+            )}
         </div>
-      </div>
-
-      <div className="overflow-x-auto">
-        <table className="table w-full">
-          <thead>
-            <tr className="border-b-2 border-ascend-gray3">
-              <th>Name</th>
-              <th>Email</th>
-              <th>Date Applied</th>
-              <th>Admission Status</th>
-              <th></th>
-            </tr>
-          </thead>
-
-          {pendingStudents?.length > 0 && (
-            <tbody>
-              {pendingStudents.map((student, index) => (
-                <tr
-                  key={index}
-                  onClick={() => handleRowClick(student.student_id)}
-                  className="hover:bg-ascend-lightblue cursor-pointer border-b border-ascend-gray1"
-                >
-                  <td className="py-5">
-                    {student.user.first_name} {student.user.last_name}
-                  </td>
-                  <td className="py-5">{student.user.email}</td>
-                  <td className="py-5">
-                    {new Date(student.created_at).toLocaleDateString()}
-                  </td>
-                  <td
-                    className={`py-5 ${
-                      student.admission_status === "Accepted"
-                        ? "text-ascend-blue"
-                        : student.admission_status === "Not Submitted"
-                        ? "text-ascend-red"
-                        : student.admission_status === "Submitted"
-                        ? "text-ascend-yellow"
-                        : student.admission_status === "Reviewing"
-                        ? "text-ascend-green"
-                        : "text-ascend-gray2"
-                    }`}
-                  >
-                    {student.admission_status}
-                  </td>
-                  <td className="py-5">
-                    <span className="text-ascend-blue underline">
-                      View More
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          )}
-
-          {pendingStudents?.length === 0 && (
-            <tbody>
-              <tr>
-                <td colSpan="4">
-                  <EmptyState
-                    paddingY="py-0"
-                    imgSrc={"/images/illustrations/Thinking.svg"}
-                    text={`“Nothing to see here… yet! Add some content to get going”`}
-                  />
-                </td>
-              </tr>
-            </tbody>
-          )}
-        </table>
-      </div>
-    </>
-  );
-};
-
-export default TablePending;
+    );
+}

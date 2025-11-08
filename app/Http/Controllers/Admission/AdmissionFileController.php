@@ -8,9 +8,37 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Admission\AdmissionFile;
 use App\Models\Student;
+use Inertia\Inertia;
 
 class AdmissionFileController extends Controller
 {
+    public function index(Request $request)
+    {
+        $user = auth()->user();
+
+        if ($user->role->role_name === 'admin') {
+            $pendingStudents = Student::with('user')
+                ->where('enrollment_status', 'pending')
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+
+            $enrolledStudents = Student::with('user')
+                ->whereIn('enrollment_status', ['enrolled','dropout','withdrawn'])
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+
+            return Inertia::render('Admission/AdmissionPage', [
+                'pendingStudents' => $pendingStudents,
+                'enrolledStudents' => $enrolledStudents, 
+            ]);
+        } else {
+            $student = Student::where('user_id', $user->user_id)->first();
+            return Inertia::render('Admission/AdmissionPage', [
+                'student' => $student,
+            ]);
+        }
+    }
+
     public function store(Request $request)
     {
         $user = auth()->user();
@@ -49,26 +77,76 @@ class AdmissionFileController extends Controller
         return back()->with('error', 'No files were uploaded.');
     }
 
-    public function getPendingStudents()
+    public function getPendingStudents(Request $request)
     {
         // Fetch all students whose enrollment_status is 'pending'
         // and eager load their related user details
-        $pendingStudents = \App\Models\Student::with('user')
-            ->where('enrollment_status', 'pending')
-            ->get(['student_id', 'user_id', 'enrollment_status', 'admission_status', 'created_at']);
+    $this->checkAdmin();
 
-        return response()->json($pendingStudents);
+    $query = Student::with(['user', 'admissionFiles'])
+        ->where('enrollment_status', 'pending');
+
+    if ($search = $request->input('search')) {
+        $query->whereHas('user', function ($q) use ($search) {
+            $q->where('first_name', 'like', "%{$search}%")
+              ->orWhere('last_name', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%");
+        });
     }
 
-    public function getEnrolledStudents()
+    $pendingStudents = $query->orderBy('created_at', 'desc')
+        ->paginate(10)
+        ->withQueryString();
+
+    return Inertia::render('Admission/AdmissionPage', [
+        'pendingStudents' => $pendingStudents,
+        ]);
+    }
+
+    public function viewPendingStudent(Student $student)
+    {
+        $this->checkAdmin();
+        $student->load(['user', 'admissionFiles']);
+
+        return Inertia::render('Admission/PendingPage/EnrollmentRequest', [
+            'student' => $student,
+        ]);
+    }
+
+    public function getEnrolledStudents(Request $request)
     {
         // Get all students whose status is 'enrolled', 'dropout', 'withdrawn' and eager load 'user'
         // Withdrawn enrollment status is not yet available to the model
-        $enrolledStudents = \App\Models\Student::with('user')
-            ->whereIn('enrollment_status', ['enrolled', 'pending', 'dropout', 'withdrawn'])
-            ->get(['student_id', 'user_id', 'enrollment_status', 'admission_status', 'created_at']);
+        $this->checkAdmin();
 
-        return response()->json($enrolledStudents);
+        $query = Student::with(['user', 'admissionFiles'])
+            ->whereIn('enrollment_status', ['enrolled', 'dropout', 'withdrawn']);
+
+        if ($search = $request->input('search')) {
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $enrolledStudents = $query->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('Admission/AdmissionPage', [
+            'enrolledStudents' => $enrolledStudents,
+        ]);
+    }
+
+    public function viewEnrolledStudent(Student $student)
+    {
+        $this->checkAdmin();
+        $student->load(['user', 'admissionFiles']);
+
+        return Inertia::render('Admission/EnrolledPage/StudentInfo', [
+            'student' => $student,
+        ]);
     }
 
     //Function of Updating the Information of Accepted Students
@@ -158,5 +236,12 @@ class AdmissionFileController extends Controller
         $student->save();
 
         return back()->with('success', 'Status updated successfully.');
+    }
+
+    protected function checkAdmin()
+    {
+        if (!auth()->check() || auth()->user()->role->role_name !== 'admin') {
+            abort(403, 'Unauthorized');
+        }
     }
 }
