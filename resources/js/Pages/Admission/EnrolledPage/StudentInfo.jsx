@@ -9,7 +9,7 @@ import AssesstmentTable from './AssesstmentTable';
 import { useState } from 'react';
 
 const StudentInfo = () => {
-  const { student } = usePage().props;
+  const { student, learningMembers, completedAssessments } = usePage().props;
   const [isEditDisabled, setIsEditDisabled] = useState(true);
 
   return (
@@ -40,7 +40,7 @@ const StudentInfo = () => {
                   : "bg-ascend-yellow"
               } px-3`}
             >
-              {student.enrollment_status}
+              {student.enrollment_status.charAt(0).toUpperCase() + student.enrollment_status.slice(1)}
             </div>
           </div>
           <div className="font-nunito-sans text-size2 ml-5">Student</div>
@@ -63,11 +63,11 @@ const StudentInfo = () => {
       </div>
       {/* Courses Table */}
       <div className="mt-10">
-        <CoursesTable student={student} />
+        <CoursesTable learningMembers={learningMembers} />
       </div>
       {/* Assessment Table */}
       <div className="mt-10">
-        <AssesstmentTable student={student} />
+        <AssesstmentTable completedAssessments={completedAssessments ?? []} />
       </div>
     </>
   );

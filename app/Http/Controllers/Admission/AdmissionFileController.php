@@ -39,6 +39,7 @@ class AdmissionFileController extends Controller
         }
     }
 
+    //==================== STORE STUDENT SUBMITTED DOCUMENTS/FILES ====================//
     public function store(Request $request)
     {
         $user = auth()->user();
@@ -77,12 +78,13 @@ class AdmissionFileController extends Controller
         return back()->with('error', 'No files were uploaded.');
     }
 
+    //==================== GET ALL PENDING STUDENTS ====================//
     public function getPendingStudents(Request $request)
     {
-        // Fetch all students whose enrollment_status is 'pending'
-        // and eager load their related user details
     $this->checkAdmin();
-
+    
+    // Fetch all students whose enrollment_status is 'pending'
+    // and eager load their related user details
     $query = Student::with(['user', 'admissionFiles'])
         ->where('enrollment_status', 'pending');
 
@@ -103,6 +105,7 @@ class AdmissionFileController extends Controller
         ]);
     }
 
+    //==================== VIEW THE CORRESPONDING INFO RELATED TO PENDING STUDENTS ====================//
     public function viewPendingStudent(Student $student)
     {
         $this->checkAdmin();
@@ -113,6 +116,7 @@ class AdmissionFileController extends Controller
         ]);
     }
 
+    //==================== GET ALL PENDING STUDENTS ====================//
     public function getEnrolledStudents(Request $request)
     {
         // Get all students whose status is 'enrolled', 'dropout', 'withdrawn' and eager load 'user'
@@ -139,17 +143,48 @@ class AdmissionFileController extends Controller
         ]);
     }
 
+    //==================== VIEW THE CORRESPONDING INFO RELATED TO ENROLLED STUDENTS ====================//
     public function viewEnrolledStudent(Student $student)
     {
         $this->checkAdmin();
+
+        // Eager Load student information and admission files (for debugging and validation)
         $student->load(['user', 'admissionFiles']);
+
+        // Get all learning members for this student via user_id
+        $learningMembers = \App\Models\LearningMember::with([
+            'program',
+            'courses.course',
+            'courses.assessmentSubmissions.assessment',
+        ])->where('user_id', $student->user_id)
+        ->get();
+
+        // Flatten completed assessments across all learning members
+        $completedAssessments = $learningMembers->flatMap(function ($lm) {
+            return $lm->courses->flatMap(function ($assignedCourse) use ($lm) {
+                return $assignedCourse->assessmentSubmissions
+                    ->whereIn('submission_status', ['submitted', 'returned'])
+                    ->map(function ($submission) use ($assignedCourse, $lm) {
+                        return [
+                            'assessment_name' => $submission->assessment->assessment_title ?? 'N/A',
+                            'course_name' => $assignedCourse->course->course_name ?? 'N/A',
+                            'program_name' => $lm->program->program_name ?? 'N/A',
+                            'score' => $submission->score,
+                            'submitted_at' => $submission->submitted_at,
+                            'status' => $submission->submission_status,
+                        ];
+                    });
+            });
+        });
 
         return Inertia::render('Admission/EnrolledPage/StudentInfo', [
             'student' => $student,
+            'learningMembers' => $learningMembers,
+            'completedAssessments' => $completedAssessments,
         ]);
     }
 
-    //Function of Updating the Information of Accepted Students
+    //==================== FUNCTION OF UPDATING THE INFORMATION OF ACCEPTED/ENROLLED STUDENTS ====================//
     public function updateStudent(Request $request, Student $student)
     {
     $validated = $request->validate([
@@ -192,24 +227,13 @@ class AdmissionFileController extends Controller
         return redirect()->back()->with('success', 'Student updated successfully.');
     }
 
-    //Logic for Updating the Enrollment Status based on the Student's Admission Status
+    //==================== LOGIC FOR UPDATING THE ENROLLMENT STATUS BASED ON THE STUDENT'S ADMISSION STATUS ====================//
     public function EnrollmentStatus($admission_status)
     {
-        /*if ($admission_status === 'Accepted') {
-            return 'enrolled';
-        } elseif ($admission_status === 'Not Submitted') {
-            return 'pending';
-        } elseif ($admission_status === 'Pending') {
-            return 'pending';
-        } elseif ($admission_status === 'Rejected') {
-            return 'pending';
-        } else {
-            return 'pending';
-        }*/
         return $admission_status === 'Accepted' ? 'enrolled' : 'pending';
     }
 
-    //Update Status Function to Update the Admission Status of Students
+    //==================== UPDATE STATUS FUNCTION TO UPDATE THE ADMISSION STATUS OF STUDENTS ====================//
     public function updateStatus(Request $request, $id)
     {
         $validated = $request->validate([
