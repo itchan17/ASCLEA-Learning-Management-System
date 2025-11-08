@@ -38,6 +38,10 @@ Route::prefix('admission')
         // Update admission/enrollment status
         Route::put('/update-status/{id}', [AdmissionFileController::class, 'updateStatus'])
             ->name('admission.updateStatus');
+
+        // Archive Enrolled Student
+        Route::delete('/students/{student}/archive', [AdmissionFileController::class, 'archive'])
+            ->name('students.archive');
     });
 
 //student Routes

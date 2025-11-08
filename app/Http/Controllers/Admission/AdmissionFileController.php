@@ -262,6 +262,21 @@ class AdmissionFileController extends Controller
         return back()->with('success', 'Status updated successfully.');
     }
 
+    //==================== ARCHIVE ENROLLED STUDENTS ====================//
+    public function archive(Student $student)
+    {
+        $this->checkAdmin();
+
+        // Soft delete the enrolled student
+        $student->delete();
+
+        // Soft delete the related user
+        if ($student->user) {
+            $student->user->delete();
+        }
+        return redirect()->route('admission.index')->with('success', 'Student archived successfully.');
+    }
+
     protected function checkAdmin()
     {
         if (!auth()->check() || auth()->user()->role->role_name !== 'admin') {

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -12,7 +13,7 @@ use App\Models\Admission\AdmissionFile;
 
 class Student extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -47,6 +48,8 @@ class Student extends Model
         'admission_message',
         'payment',
     ];
+
+    protected $dates = ['deleted_at'];
 
     public function user(): BelongsTo
     {

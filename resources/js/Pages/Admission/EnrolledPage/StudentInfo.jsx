@@ -1,26 +1,66 @@
-import React from 'react'
+import React, { useState } from 'react';
+import { usePage, useForm, router } from '@inertiajs/react';
+import { useRoute } from 'ziggy-js';
 import BackButton from '../../../Components/Button/BackButton';
 import PrimaryButton from '../../../Components/Button/PrimaryButton';
 import useEnrolledStore from "../../../Stores/Admission/EnrolledStore";
-import { usePage } from '@inertiajs/react'
 import DataFormFields from './DataFormFields';
 import CoursesTable from "./CoursesTable";
 import AssesstmentTable from './AssesstmentTable';
-import { useState } from 'react';
+import AlertModal from '../../../Components/AlertModal';
+import { displayToast } from '../../../Utils/displayToast';
+import DefaultCustomToast from '../../../Components/CustomToast/DefaultCustomToast';
 
 const StudentInfo = () => {
   const { student, learningMembers, completedAssessments } = usePage().props;
   const [isEditDisabled, setIsEditDisabled] = useState(true);
 
+  const [openAlertModal, setOpenAlertModal] = useState(false);
+  const [isArchiveLoading, setIsArchiveLoading] = useState(false);
+
+  const handleArchive = () => {
+  setIsArchiveLoading(true);
+
+  router.delete(route("students.archive", student.student_id), {
+    onSuccess: (page) => {
+      setIsArchiveLoading(false);
+      setOpenAlertModal(false);
+      displayToast(
+        <DefaultCustomToast message={page.props.flash.success || "Student archived successfully!"} />,
+        "success"
+      );
+    },
+    onError: (errors) => {
+      setIsArchiveLoading(false);
+      displayToast(
+        <DefaultCustomToast message="Failed to archive student." />,
+        "error"
+      );
+    },
+  });
+};
+
+
   return (
     <>
+      {/*===========================Alert Modal for Archiving Student===========================*/}
+      {openAlertModal && (
+        <AlertModal
+          title={"Archive Confirmation"}
+          description={"Are you sure you want to archive this student?"}
+          closeModal={() => setOpenAlertModal(false)}
+          onConfirm={handleArchive}
+          isLoading={isArchiveLoading}
+        />
+      )}
+
       <div className="flex items-center justify-between">
         <BackButton doSomething={() => window.history.back()} />
-        {!isEditDisabled ? (
-          <PrimaryButton text="Archive" btnColor="bg-ascend-red" />
-        ) : (
-          <PrimaryButton text="Archive" btnColor="bg-ascend-red" />
-        )}
+        <PrimaryButton
+          text="Archive"
+          btnColor="bg-ascend-red"
+          doSomething={() => setOpenAlertModal(true)}
+        />
       </div>
 
       {/* Student Header */}
