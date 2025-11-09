@@ -2,24 +2,39 @@ import React, { useState } from "react";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
 import SecondaryButton from "../../../Components/Button/SecondaryButton";
 import { router, usePage } from "@inertiajs/react";
+import { displayToast } from '../../../Utils/displayToast';
+import DefaultCustomToast from '../../../Components/CustomToast/DefaultCustomToast';
 
 export default function RejectionModal({ toggleModal }) {
-    console.log("Render Add Approval Form");
-    
+    console.log("Render Reject Modal Form");
+
   const { student } = usePage().props;
   const [message, setMessage] = useState("");
 
   const handleReject = (e) => {
     e.preventDefault();
+
     router.put(
       route("admission.updateStatus", student.student_id),
       {
         admission_status: "Rejected",
-        admission_message: message, 
+        admission_message: message,
       },
       {
-        onSuccess: () => {
+        onSuccess: (page) => {
           toggleModal();
+          displayToast(
+            <DefaultCustomToast
+              message={page.props.flash.success || "Student Enrollment Request has been rejected."}
+            />,
+            "error"
+          );
+        },
+        onError: () => {
+          displayToast(
+            <DefaultCustomToast message="Failed to reject student." />,
+            "error"
+          );
         },
       }
     );
@@ -43,9 +58,8 @@ export default function RejectionModal({ toggleModal }) {
             rows={5}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-          ></textarea>
+          />
         </div>
-
         <div className="flex justify-end space-x-2">
           <SecondaryButton doSomething={toggleModal} text={"Close"} />
           <PrimaryButton btnType={"submit"} btnColor={"bg-ascend-red"} text={"Reject"} />

@@ -118,15 +118,15 @@ export default function PendingStudentsTable({ active }) {
             </div>
 
             {/*=========================== Pagination ===========================*/}
-            {pendingStudents?.links?.length > 0 && (
-                <div className="flex justify-end p-3">
-                    <Pagination
-                        links={pendingStudents.links}
-                        currentPage={pendingStudents.current_page}
-                        lastPage={pendingStudents.last_page}
-                        only={["pendingStudents"]}
-                    />
-                </div>
+            {pendingStudents?.data?.length > 0 && pendingStudents?.links?.length > 0 && (
+            <div className="flex justify-end p-3">
+                <Pagination
+                    links={pendingStudents.links}
+                    currentPage={pendingStudents.current_page}
+                    lastPage={pendingStudents.last_page}
+                    only={["pendingStudents"]}
+                />
+            </div>
             )}
         </div>
     );

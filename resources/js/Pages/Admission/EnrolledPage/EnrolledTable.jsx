@@ -26,6 +26,7 @@ export default function EnrolledStudentsTable({ active }) {
     const debouncedSearch = useMemo(() => debounce((value) => {
         router.get(route("enrolled.students"), { search: value, page: 1 }, {
             preserveState: true,
+            showProgress: false,
             only: ["enrolledStudents"]
         });
     }, 300), []);
@@ -100,7 +101,7 @@ export default function EnrolledStudentsTable({ active }) {
                                         </td>
                                         <td className="py-5">{student.user.email}</td>
                                         <td className="py-5">
-                                            {new Date(student.created_at).toLocaleDateString()}
+                                            {student.approved_at ? new Date(student.approved_at).toLocaleDateString() : "-"}
                                         </td>
                                         <td className={`py-5 capitalize ${statusColor}`}>
                                             {student.enrollment_status}
@@ -129,7 +130,7 @@ export default function EnrolledStudentsTable({ active }) {
             </div>
 
             {/*=========================== Pagination ===========================*/}
-            {enrolledStudents?.links?.length > 0 && (
+            {enrolledStudents?.data?.length > 0 && enrolledStudents?.links?.length > 0 && (
                 <div className="flex justify-end p-3">
                     <Pagination
                         links={enrolledStudents.links}

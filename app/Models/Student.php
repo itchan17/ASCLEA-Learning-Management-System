@@ -71,4 +71,9 @@ class Student extends Model
         return $this->hasMany(AdmissionFile::class, 'student_id', 'student_id');
     }
 
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
 }

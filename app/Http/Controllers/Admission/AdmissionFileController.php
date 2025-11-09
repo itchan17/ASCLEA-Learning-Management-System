@@ -150,7 +150,7 @@ class AdmissionFileController extends Controller
         $this->checkAdmin();
 
         // Eager Load student information and admission files (for debugging and validation)
-        $student->load(['user', 'admissionFiles']);
+        $student->load(['user', 'admissionFiles', 'approver']);
 
         // Get all learning members for this student via user_id
         $learningMembers = \App\Models\LearningMember::with([
@@ -247,6 +247,7 @@ class AdmissionFileController extends Controller
         // Update admission details
         $student->admission_status = $validated['admission_status'];
         $student->admission_message = $validated['admission_message'] ?? null;
+        $student->approved_by = auth()->id();
 
         // Automatically update enrollment_status based on admission_status
         $student->enrollment_status = $this->EnrollmentStatus($student->admission_status);
@@ -254,13 +255,22 @@ class AdmissionFileController extends Controller
         // If the student is accepted and enrolled, update payment to "paid"
         if ($student->admission_status === 'Accepted' && $student->enrollment_status === 'enrolled') {
             $student->payment = 'paid';
+            $student->approved_at = now();
         } else {
             $student->payment = 'unpaid';
+            $student->approved_at = null;
         }
 
         $student->save();
+        
+        // If the Student has been approved, the toast status is success and will direct the admin to the admission page
+        if ($student->admission_status === 'Accepted' && $student->enrollment_status === 'enrolled') {
+            return redirect()->route('admission.index')->with('success', 'Student approved successfully!');
+        }
 
-        return back()->with('success', 'Status updated successfully.');
+        // If the Student is pending and updated as rejected, the toast status is error and will stay on the view enrollment request page
+        return redirect()->back()->with('error', 'Student Enrollment Request has been ' . strtolower($student->admission_status) . '.');
+        //return redirect()->route('admission.index')->with('success', 'Status updated successfully.');
     }
 
     //==================== ARCHIVE ENROLLED STUDENTS ====================//

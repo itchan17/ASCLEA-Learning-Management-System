@@ -166,7 +166,10 @@ const StudentInfo = () => {
       {/* Approval Info */}
       <div className="mt-5 flex items-center justify-between">
         <div className="font-nunito-sans text-size2">
-          Approved enrollment by: Name
+          Approved by:{" "}
+          {student.approver
+            ? `${student.approver.first_name} ${student.approver.last_name}`
+            : ""}
         </div>
       </div>
       {/* Data Form Fields */}
