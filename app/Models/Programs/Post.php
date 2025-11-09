@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Announcement extends Model
+class Post extends Model
 {
     use HasUuids, SoftDeletes;
 
@@ -17,12 +17,12 @@ class Announcement extends Model
 
     protected $keyType = 'string';
 
-    protected $primaryKey = 'aannouncemennt_id';
+    protected $primaryKey = 'post_id';
 
     protected $fillable = [
         'course_id',
-        'announcemennt_title',
-        'announcemennt_description',
+        'post_title',
+        'post_description',
         'created_by'
     ];
 

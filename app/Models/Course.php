@@ -2,12 +2,11 @@
 
 namespace App\Models;
 
-use App\Models\Programs\Announcement;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\Grade;
 use App\Models\Programs\Material;
+use App\Models\Programs\Post;
 use App\Models\Programs\Section;
-use App\Policies\CoursePolicy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -79,8 +78,8 @@ class Course extends Model
         return $this->hasMany(Grade::class, 'course_id');
     }
 
-    public function announcements(): HasMany
+    public function posts(): HasMany
     {
-        return $this->hasMany(Announcement::class, 'course_id');
+        return $this->hasMany(Post::class, 'course_id');
     }
 }

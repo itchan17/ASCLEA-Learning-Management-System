@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('announcements', function (Blueprint $table) {
-            $table->uuid('announcement_id')->primary();
+        Schema::create('posts', function (Blueprint $table) {
+            $table->uuid('post_id')->primary();
             $table->uuid('course_id');
             $table->foreign('course_id')->references('course_id')->on('courses')->onDelete('cascade');
-            $table->string('announcement_title');
-            $table->longText('announcement_description')->nullable();
+            $table->string('post_title');
+            $table->longText('post_description')->nullable();
             $table->enum('status', ['published', 'draft']);
             $table->uuid('created_by');
             $table->foreign('created_by')->references('user_id')->on('users');
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('announcements');
+        Schema::dropIfExists('posts');
     }
 };
