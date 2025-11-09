@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Programs\Announcement;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\Grade;
 use App\Models\Programs\Material;
 use App\Models\Programs\Section;
+use App\Policies\CoursePolicy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -59,21 +61,26 @@ class Course extends Model
 
     public function assessments(): HasMany
     {
-        return  $this->hasMany(Assessment::class, 'course_id');
+        return $this->hasMany(Assessment::class, 'course_id');
     }
 
     public function materials(): HasMany
     {
-        return  $this->hasMany(Material::class, 'course_id');
+        return $this->hasMany(Material::class, 'course_id');
     }
 
     public function sections(): HasMany
     {
-        return  $this->hasMany(Section::class, 'course_id');
+        return $this->hasMany(Section::class, 'course_id');
     }
 
     public function grades(): HasMany
     {
-        return  $this->hasMany(Grade::class, 'course_id');
+        return $this->hasMany(Grade::class, 'course_id');
+    }
+
+    public function announcements(): HasMany
+    {
+        return $this->hasMany(Announcement::class, 'course_id');
     }
 }
