@@ -23,6 +23,7 @@ class Post extends Model
         'course_id',
         'post_title',
         'post_description',
+        'status',
         'created_by'
     ];
 

@@ -1,13 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import PrimaryButton from "../../../../../Components/Button/PrimaryButton";
-import PostForm from "./HomeComponents/PostForm";
-import Post from "./HomeComponents/Post";
+import PostForm from "./HomeComponents/Components/PostForm";
+import Post from "./HomeComponents/Components/Post";
 import usePostStore from "../../../../../Stores/Programs/CourseContent/postStore";
 import EmptyState from "../../../../../Components/EmptyState/EmptyState";
 import { router, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
-import useProgramStore from "../../../../../Stores/Programs/programStore";
 import useCourseStore from "../../../../../Stores/Programs/courseStore";
 import AddCourseForm from "../AddCourseForm";
 import RoleGuard from "../../../../../Components/Auth/RoleGuard";
@@ -40,14 +39,12 @@ export default function Home({}) {
     // Scroll into the form once opened
     useEffect(() => {
         if (isFormOpen) {
-            targetForm.current?.scrollIntoView({ behavior: "smooth" });
+            targetForm.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
         }
     }, [isFormOpen]);
-
-    const toggleForm = () => {
-        setIsFormOpen(!isFormOpen);
-        clearPostDetails();
-    };
 
     const handleEditClick = () => {
         console.log(course);
@@ -159,7 +156,7 @@ export default function Home({}) {
                 <RoleGuard allowedRoles={["admin", "faculty"]}>
                     <PrimaryButton
                         isDisabled={isFormOpen}
-                        doSomething={toggleForm}
+                        doSomething={() => setIsFormOpen(true)}
                         text="Write a Post"
                     />
                 </RoleGuard>
@@ -167,7 +164,7 @@ export default function Home({}) {
 
             {isFormOpen && (
                 <div ref={targetForm}>
-                    <PostForm toggleForm={toggleForm} />
+                    <PostForm setIsPostFormOpen={setIsFormOpen} />
                 </div>
             )}
             {postList?.length > 0 ? (

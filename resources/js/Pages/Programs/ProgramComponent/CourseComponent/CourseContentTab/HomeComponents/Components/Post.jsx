@@ -2,9 +2,9 @@ import React from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.bubble.css";
-import "../../../../../../../css/quillTextEditor.css";
+import "../../../../../../../../css/quillTextEditor.css";
 import DOMPurify from "dompurify";
-import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
+import RoleGuard from "../../../../../../../Components/Auth/RoleGuard";
 
 export default function Post({ postContent }) {
     const postHtml = DOMPurify.sanitize(postContent.postDescription);

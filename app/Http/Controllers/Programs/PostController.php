@@ -23,11 +23,12 @@ class PostController extends Controller
         $validatedData = $request->validate([
             'post_title' => 'required|string|max:255',
             'post_description' => 'nullable|string',
+            'status' => 'required|in:published,draft',
         ]);
 
         $newPost = $this->postService->savePost($validatedData, $course->course_id, $request->user()->user_id);
 
-        return response()->json(['success' => "Post createdd successfully.", 'data' => $newPost]);
+        return response()->json(['success' => "Post created successfully.", 'data' => $newPost]);
     }
 
     public function getPosts(Request $request, Program $program, Course $course)
