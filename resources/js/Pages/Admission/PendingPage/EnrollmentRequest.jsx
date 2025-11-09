@@ -5,6 +5,7 @@ import PrimaryButton from "../../../Components/Button/PrimaryButton";
 import ApprovalModal from "./ApprovalModal";
 import RejectionModal from "./RejectionModal";
 import { FaFileImage, FaFilePdf } from "react-icons/fa";
+import ModalDocViewer from "../../../Components/ModalDocViewer";
 
 const EnrollmentRequest = () => {
   const { student } = usePage().props; // directly from Inertia
@@ -13,6 +14,36 @@ const EnrollmentRequest = () => {
 
   const toggleModalApprove = () => setIsModalOpenApprove(!isModalOpenApprove);
   const toggleModalReject = () => setIsModalOpenReject(!isModalOpenReject);
+
+  const [isFileViewerOpen, setIsFileViewerOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState({ url: "", name: "" });
+  const [fileUrl, setFileUrl] = useState(null);
+  const [fileDownload, setFileDownload] = useState(null);
+  const [fileName, setFileName] = useState(null);
+
+
+  const handleFileClick = (file) => {
+    const url = route("admission.file.stream", {
+        student: student.student_id,
+        file: file.admission_file_id,
+    });
+
+    const downloadUrl = route("admission.file.download", {
+        student: student.student_id,
+        file: file.admission_file_id,
+    });
+
+    setFileUrl(url);
+    setFileDownload(downloadUrl);
+    setFileName(file.file_name);
+};
+
+  const handleViewFileClose = () => { 
+    setFileUrl(null); 
+    setFileName(null); 
+    setFileDownload(null); 
+  };
+
 
   return (
     <div className="space-y-5">
@@ -66,34 +97,57 @@ const EnrollmentRequest = () => {
 
         {/* Admission Files */}
         <div className="mt-6">
-        <div className="font-nunito-sans text-size6 font-bold mt-5">Attached Files</div>
+          <div className="font-nunito-sans text-size6 font-bold mt-5">Attached Files</div>
 
-        {student.admissionFiles && student.admissionFiles.length > 0 ? (
-            <div className="mt-3 space-y-2">
-            {student.admissionFiles.map((file) => (
-                <div
-                key={file.admission_file_id}
-                className="flex items-center gap-3 border border-ascend-gray1 p-3 cursor-pointer hover:bg-ascend-lightblue"
-                onClick={() => window.open(
-                    file.file_path.startsWith("http") ? file.file_path : `/storage/${file.file_path}`,
-                    "_blank"
-                )}
-                >
-                {file.file_type.startsWith("image/") && <FaFileImage className="text-2xl text-ascend-blue" />}
-                {file.file_type === "application/pdf" && <FaFilePdf className="text-2xl text-ascend-blue" />}
-                <span className="text-ascend-gray1 text-sm">{file.file_name}</span>
-                </div>
-            ))}
+          {student.admission_files && student.admission_files.length > 0 ? (
+            <div className="mt-4">
+              {student.admission_files.map((file) => {
+                const isImage = file.file_type.startsWith("image/");
+                const isPdf = file.file_type === "application/pdf";
+
+                return (
+                  <div
+                    key={file.admission_file_id}
+                    onClick={() => handleFileClick(file)}
+                    className="flex items-center justify-between border border-ascend-gray1 p-3 mb-2 mt-2 cursor-pointer hover:bg-ascend-lightblue transition-all duration-300"
+                  >
+                    {/* File type + name */}
+                    <div className="flex items-center gap-3">
+                      {isImage && (
+                        <FaFileImage className="text-ascend-blue text-2xl flex-shrink-0" />
+                      )}
+                      {isPdf && (
+                        <FaFilePdf className="text-ascend-blue text-2xl flex-shrink-0" />
+                      )}
+                      {file.file_name}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-        ) : (
+          ) : (
             <p className="mt-3 text-ascend-gray1">No files uploaded.</p>
-        )}
+          )}
         </div>
+
       </div>
 
       {/* Modals */}
       {isModalOpenApprove && <ApprovalModal toggleModal={toggleModalApprove} />}
       {isModalOpenReject && <RejectionModal toggleModal={toggleModalReject} />}
+      {fileUrl && (
+        <ModalDocViewer
+          onClose={() => {
+            setFileUrl(null);
+            setFileDownload(null);
+            setFileName(null);
+          }}
+          fileUrl={fileUrl}
+          fileName={fileName}
+          fileDownload={fileDownload}
+        />
+      )}
+
     </div>
   );
 };

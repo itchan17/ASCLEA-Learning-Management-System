@@ -308,4 +308,28 @@ class AdmissionFileController extends Controller
             abort(403, 'Unauthorized');
         }
     }
+
+    public function streamAdmissionFile(Student $student, AdmissionFile $file)
+    {
+        $this->checkAdmin();
+
+        // Ensure the file belongs to the student
+        abort_if($file->student_id !== $student->student_id, 403, 'Unauthorized');
+
+        // Stream the file from storage
+        return response()->file(storage_path('app/public/' . $file->file_path));
+    }
+    
+    public function downloadAdmissionFile(Student $student, AdmissionFile $file)
+    {
+        $this->checkAdmin();
+
+        // Ensure the file belongs to the student
+        abort_if($file->student_id !== $student->student_id, 403, 'Unauthorized');
+
+        // Force file download
+        return response()->download(storage_path('app/public/' . $file->file_path), $file->file_name);
+    }
+
+
 }

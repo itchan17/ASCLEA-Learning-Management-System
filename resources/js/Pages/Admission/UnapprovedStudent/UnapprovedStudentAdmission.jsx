@@ -88,29 +88,67 @@ export default function UnapprovedStudentAdmission({student}) {
     return (
         <div className="flex justify-center font-nunito-sans">
             {submitted || student?.admission_status === "Pending" ? (
-                <div className="flex flex-col justify-center">
-                    <div className="flex justify-center items-center font-bold">
-                        <h1 className="pr-3">Status:</h1>
-                        <div className="w-4 h-4 bg-ascend-yellow rounded-4xl shrink-0 mr-1"></div>
-                        <span>Pending Review</span>
-                    </div>
-                    <EmptyState
-                        imgSrc={"/images/illustrations/review.svg"}
-                        text={`“Your account is currently under review. Please wait while we verify your information. You'll be notified once it's complete.”`}
-                    />
-                </div>
-            ) : (
-                <div className="flex flex-col justify-center space-y-5">
-                    <EmptyState
-                        imgSrc={"/images/illustrations/upload_document.svg"}
-                        text={`"One step away! Upload your  proof of enrollment to start exploring."`}
-                    />
-                    <PrimaryButton
-                        doSomething={toggleForm}
-                        text={"Upload File"}
-                    />
-                </div>
-            )}
+              <div className="flex flex-col justify-center">
+                  <div className="flex justify-center items-center font-bold">
+                      <h1 className="pr-3">Status:</h1>
+                      <div className="w-4 h-4 bg-ascend-yellow rounded-4xl shrink-0 mr-1"></div>
+                      <span>Pending Review</span>
+                  </div>
+                  <EmptyState
+                      imgSrc="/images/illustrations/review.svg"
+                      text="“Your account is currently under review. Please wait while we verify your information. You'll be notified once it's complete.”"
+                  />
+              </div>
+          ) : null}
+
+          {student?.admission_status === "Accepted" ? (
+              <div className="flex flex-col justify-center">
+                  <div className="flex justify-center items-center font-bold">
+                      <h1 className="pr-3">Status:</h1>
+                      <div className="w-4 h-4 bg-ascend-green rounded-4xl shrink-0 mr-1"></div>
+                      <span>Accepted</span>
+                  </div>
+                  <EmptyState
+                      imgSrc="/images/illustrations/AcceptedAdmission.svg"
+                      text="“Congratulations! Your admission has been accepted. Welcome aboard!”"
+                  />
+              </div>
+          ) : null}
+
+          {student?.admission_status === "Rejected" ? (
+              <div className="flex flex-col justify-center">
+                  <div className="flex justify-center items-center font-bold">
+                      <h1 className="pr-3">Status:</h1>
+                      <div className="w-4 h-4 bg-ascend-red rounded-4xl shrink-0 mr-1"></div>
+                      <span>Rejected</span>
+                  </div>
+                  <div className="flex flex-col justify-center space-y-5">
+                      <EmptyState
+                          imgSrc="/images/illustrations/RejectedAdmission.svg"
+                          text="“Unfortunately, your admission was not approved. You may re-upload the required documents for reconsideration.”"
+                      />
+                      <PrimaryButton
+                          doSomething={toggleForm}
+                          text="Upload File"
+                      />
+                  </div>
+              </div>
+          ) : null}
+
+          {student?.admission_status === null && (
+              <div className="flex flex-col justify-center space-y-5">
+                  <EmptyState
+                      imgSrc="/images/illustrations/upload_document.svg"
+                      text="“One step away! Upload your proof of enrollment to start exploring.”"
+                  />
+                  <PrimaryButton
+                      doSomething={toggleForm}
+                      text="Upload File"
+                  />
+              </div>
+          )}
+
+            
 
         {openForm && (
         <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">

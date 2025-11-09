@@ -46,6 +46,17 @@ Route::prefix('admission')
         // Update Student Profile Photo
         Route::put('/students/{student}/update-profile', [AdmissionFileController::class, 'updateProfile'])
             ->name('student.profile.update');
+
+        // Route to stream admission file
+        Route::get('/admission/{student}/admission-files/{file}/stream', [AdmissionFileController::class, 'streamAdmissionFile'])
+        ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin'])
+        ->name('admission.file.stream');
+
+        // Route to download admission file
+        Route::get('/admission/{student}/admission-files/{file}/download', [AdmissionFileController::class, 'downloadAdmissionFile'])
+            ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin'])
+            ->name('admission.file.download');
+
     });
 
 //student Routes
