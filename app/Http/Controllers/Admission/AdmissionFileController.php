@@ -29,7 +29,8 @@ class AdmissionFileController extends Controller
 
             return Inertia::render('Admission/AdmissionPage', [
                 'pendingStudents' => $pendingStudents,
-                'enrolledStudents' => $enrolledStudents, 
+                'enrolledStudents' => $enrolledStudents,
+                'activeTab' => 0, 
             ]);
         } else {
             $student = Student::where('user_id', $user->user_id)->first();

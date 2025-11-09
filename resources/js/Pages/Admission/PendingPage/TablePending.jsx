@@ -66,7 +66,7 @@ export default function PendingStudentsTable({ active }) {
             {/*=========================== Table ===========================*/}
             <div className="overflow-x-auto">
                 <table className="table w-full">
-                    <thead>
+                    <thead className="text-ascend-black">
                         <tr className="border-b-2 border-ascend-gray3">
                             <th>Name</th>
                             <th>Email</th>
