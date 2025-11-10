@@ -320,6 +320,7 @@ class AdmissionFileController extends Controller
         }
     }
 
+    //==================== VIEW ADMISSION FILES OF PENDING STUDENT ====================//
     public function streamAdmissionFile(Student $student, AdmissionFile $file)
     {
         $this->checkAdmin();
@@ -331,6 +332,7 @@ class AdmissionFileController extends Controller
         return response()->file(storage_path('app/public/' . $file->file_path));
     }
     
+    //==================== DOWNLOAD ADMISSION FILES OF PENDING STUDENTS ====================//
     public function downloadAdmissionFile(Student $student, AdmissionFile $file)
     {
         $this->checkAdmin();
@@ -341,6 +343,125 @@ class AdmissionFileController extends Controller
         // Force file download
         return response()->download(storage_path('app/public/' . $file->file_path), $file->file_name);
     }
+
+    //==================== EXPORT PENDING STUDENTS AS CSV ====================//
+    public function exportCsv()
+    {
+        $this->checkAdmin();
+
+        $fileName = 'pending_students.csv';
+
+        // Fetch all pending students with student enrollment status of pending
+        $students = Student::with('user')
+            ->where('enrollment_status', 'pending')
+            ->get();
+
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+        $columns = ['Name', 'Email', 'Enrollment Status', 'Admission Status', 'Date Applied'];
+
+        $callback = function () use ($students, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($students as $student) {
+                fputcsv($file, [
+                    $student->user ? $student->user->first_name . ' ' . $student->user->last_name : 'N/A',
+                    $student->user->email ?? 'N/A',
+                    $student->enrollment_status ?? 'N/A',
+                    $student->admission_status ?? 'N/A',
+                    $student->created_at ? $student->created_at->format('m/d/Y') : 'N/A',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    //==================== EXPORT PENDING STUDENTS AS PDF ====================//
+    public function exportPdf()
+    {
+        $this->checkAdmin();
+
+        // Fetch all pending students with student enrollment status of pending
+        $students = Student::with('user')
+            ->where('enrollment_status', 'pending')
+            ->get();
+
+        // Use a blade view for formatting PDF
+        $pdf = Pdf::loadView('admission.pending-students-pdf', compact('students'));
+
+        return $pdf->download('pending_students.pdf');
+    }
+
+
+    //==================== EXPORT ENROLLED STUDENTS AS CSV ====================//
+    public function exportEnrolledCsv()
+    {
+        $this->checkAdmin();
+
+        $fileName = 'enrolled_students.csv';
+
+        // Fetch all enrolled students with student enrollment status of enrolled/dropout/withdrawn
+        $students = Student::with('user')
+            ->whereIn('enrollment_status', ['enrolled', 'dropout', 'withdrawn'])
+            ->get();
+
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+        $columns = ['Name', 'Email', 'Enrollment Status', 'Admission Status', 'Date Approved'];
+
+        $callback = function () use ($students, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($students as $student) {
+                fputcsv($file, [
+                    $student->user ? $student->user->first_name . ' ' . $student->user->last_name : 'N/A',
+                    $student->user->email ?? 'N/A',
+                    $student->enrollment_status ?? 'N/A',
+                    $student->admission_status ?? 'N/A',
+                    $student->approved_at ? $student->approved_at->format('m/d/Y') : 'N/A',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    //==================== EXPORT ENROLLED STUDENTS AS PDF ====================//
+    public function exportEnrolledPdf()
+    {
+        $this->checkAdmin();
+
+        // Fetch all enrolled students with student enrollment status of enrolled/dropout/withdrawn
+        $students = Student::with('user')
+            ->whereIn('enrollment_status', ['enrolled', 'dropout', 'withdrawn'])
+            ->get();
+
+        // Use a blade view for formatting PDF
+        $pdf = Pdf::loadView('admission.enrolled-students-pdf', compact('students'));
+
+        return $pdf->download('enrolled_students.pdf');
+    }
+
+
 
 
 }

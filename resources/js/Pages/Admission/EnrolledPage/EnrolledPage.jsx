@@ -7,7 +7,7 @@ const EnrolledPage = ({ enrolledStudents }) => {
     <>
       <div className="flex items-center justify-between">
         <div className="font-nunito-sans text-size6 font-bold">Student List</div>
-        <PrimaryButton text="Download" />
+        {/*<PrimaryButton text="Download" />*/}
       </div>
 
       <EnrolledTable enrolledStudents={enrolledStudents} />

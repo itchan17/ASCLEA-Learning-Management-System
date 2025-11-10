@@ -49,7 +49,14 @@ class Student extends Model
         'payment',
     ];
 
-    protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at', 'approved_at', 'created_at', 'updated_at'];
+
+    protected $casts = [
+        'approved_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
+    ];
 
     public function user(): BelongsTo
     {

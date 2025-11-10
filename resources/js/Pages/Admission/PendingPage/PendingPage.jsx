@@ -9,7 +9,7 @@ const PendingPage = ({ pendingStudents }) => {
     <>
       <div className="flex items-center justify-between">
         <div className="font-nunito-sans text-size6 font-bold">To Be Approved</div>
-        <PrimaryButton text="Download" />
+        {/*<PrimaryButton text="Download" />*/}
       </div>
 
       <TablePending pendingStudents={pendingStudents} />

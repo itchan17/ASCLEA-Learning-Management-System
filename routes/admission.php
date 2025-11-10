@@ -57,6 +57,22 @@ Route::prefix('admission')
             ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin'])
             ->name('admission.file.download');
 
+        // Route to download/Export Pending Students through through CSV    
+        Route::get('/admissions/pending/export-csv', [AdmissionFileController::class, 'exportCsv'])
+            ->name('admissions.pending.exportCsv');
+
+        // Route to download/Export Pending Students through through PDF
+        Route::get('/admissions/pending/export-pdf', [AdmissionFileController::class, 'exportPdf'])
+            ->name('admissions.pending.exportPdf');
+
+        // Route to download/Export Enrolled Students through CSV  
+        Route::get('/admissions/enrolled/export-csv', [AdmissionFileController::class, 'exportEnrolledCsv'])
+            ->name('admissions.enrolled.exportCsv');
+
+        // Route to download/Export Enrolled Students throughPDF 
+        Route::get('/admissions/enrolled/export-pdf', [AdmissionFileController::class, 'exportEnrolledPdf'])
+            ->name('admissions.enrolled.exportPdf');
+
     });
 
 //student Routes

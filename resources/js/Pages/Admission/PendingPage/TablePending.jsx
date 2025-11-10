@@ -3,8 +3,9 @@ import { usePage, router } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import EmptyState from "../../../Components/EmptyState/EmptyState";
 import Pagination from "@/Components/Pagination";
-import { IoSearch } from "react-icons/io5";
+import { IoSearch, IoCaretDownOutline } from "react-icons/io5";
 import { debounce } from "lodash";
+import PrimaryButton from "../../../Components/Button/PrimaryButton";
 
 export default function PendingStudentsTable({ active }) {
     const route = useRoute();
@@ -117,16 +118,60 @@ export default function PendingStudentsTable({ active }) {
                 </table>
             </div>
 
-            {/*=========================== Pagination ===========================*/}
-            {pendingStudents?.data?.length > 0 && pendingStudents?.links?.length > 0 && (
-            <div className="flex justify-end p-3">
-                <Pagination
-                    links={pendingStudents.links}
-                    currentPage={pendingStudents.current_page}
-                    lastPage={pendingStudents.last_page}
-                    only={["pendingStudents"]}
-                />
-            </div>
+            {/*=========================== Download & Pagination ===========================*/}
+            {pendingStudents?.data?.length > 0 && (
+                <div className="flex flex-wrap gap-5 justify-between items-center mt-5">
+                    {/* Download Section (LEFT) */}
+                    <div className="flex items-center space-x-[0.5px] [&>*]:!mt-0">
+                        <PrimaryButton text="Download" />
+                        <div className="dropdown dropdown-end cursor-pointer">
+                            <button
+                                tabIndex={0}
+                                role="button"
+                                className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
+                            >
+                                <div className="text-size1">
+                                    <IoCaretDownOutline />
+                                </div>
+                            </button>
+
+                            <ul
+                                tabIndex={0}
+                                className="dropdown-content menu space-y-2 font-bold text-size2 text-ascend-black bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none"
+                            >
+                                <li>
+                                    {/* href={route("admissions.pending.exportPdf")} */}
+                                    <a
+                                        href="#"
+                                        className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
+                                    >
+                                        Download as pdf
+                                    </a>
+                                </li>
+                                <li>
+                                    <a
+                                        href={route("admissions.pending.exportCsv")}
+                                        className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
+                                    >
+                                        Download as csv
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    {/* Pagination (RIGHT) */}
+                    {pendingStudents?.links?.length > 0 && (
+                        <div className="flex items-center [&>*]:!mt-0">
+                            <Pagination
+                                links={pendingStudents.links}
+                                currentPage={pendingStudents.current_page}
+                                lastPage={pendingStudents.last_page}
+                                only={["pendingStudents"]}
+                            />
+                        </div>
+                    )}
+                </div>
             )}
         </div>
     );
