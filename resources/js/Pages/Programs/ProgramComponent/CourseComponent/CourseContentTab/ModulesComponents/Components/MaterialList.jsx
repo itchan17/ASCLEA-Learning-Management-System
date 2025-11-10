@@ -53,22 +53,23 @@ function MaterialList({ setIsMaterialFormOpen, programId, courseId }) {
     }, [handleObserver]);
 
     return (
-        <div className="space-y-5">
+        <div>
             {/* Dropdown for material list */}
-            {courseMaterials && courseMaterials.list.length > 0 && (
-                <div className="flex flex-col space-y-5">
-                    {courseMaterials.list.map((material) => (
-                        <MaterialItem
-                            key={material.material_id}
-                            materialDetails={material}
-                            setIsMaterialFormOpen={setIsMaterialFormOpen}
-                        />
-                    ))}
-                </div>
-            )}
+            {courseMaterials &&
+                courseMaterials.list.length > 0 &&
+                courseMaterials.list.map((material) => (
+                    <MaterialItem
+                        key={material.material_id}
+                        materialDetails={material}
+                        setIsMaterialFormOpen={setIsMaterialFormOpen}
+                    />
+                ))}
 
             {(!courseMaterials || courseMaterials.hasMore) && (
-                <div ref={loaderRef} className=" w-full flex justify-center">
+                <div
+                    ref={loaderRef}
+                    className=" w-full flex justify-center mt-5"
+                >
                     <Loader color="bg-ascend-blue" />
                 </div>
             )}

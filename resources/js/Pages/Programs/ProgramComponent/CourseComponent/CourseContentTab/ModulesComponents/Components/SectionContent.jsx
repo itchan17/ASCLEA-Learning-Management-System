@@ -10,8 +10,6 @@ import { closeDropDown } from "../../../../../../../Utils/closeDropdown";
 import ModalContainer from "../../../../../../../Components/ModalContainer";
 import MaterialForm from "./MaterialForm";
 import AssessmentForm from "../../AssessmentsComponents/AssessmentForm";
-import useAssessmentsStore from "../../../../../../../Stores/Programs/CourseContent/assessmentsStore";
-import useModulesStore from "../Stores/modulesStore";
 import { AiFillLock } from "react-icons/ai";
 import { AiFillCheckCircle } from "react-icons/ai";
 
@@ -24,15 +22,6 @@ export default function SectionContent({
     const route = useRoute();
 
     const { program, course } = usePage().props;
-
-    // Module store
-    const setMaterialDetails = useModulesStore(
-        (state) => state.setMaterialDetails
-    );
-    // Assessment store
-    const setAssessmentDetails = useAssessmentsStore(
-        (state) => state.setAssessmentDetails
-    );
 
     const [openEditForm, setOpenEditForm] = useState(false);
 
@@ -99,100 +88,95 @@ export default function SectionContent({
 
     const handleClickEdit = () => {
         setOpenEditForm(true);
-
-        if (itemDetails.item_type === "App\\Models\\Programs\\Material") {
-            setMaterialDetails(itemDetails.item);
-        } else {
-            console.log(itemDetails.item);
-            setAssessmentDetails(itemDetails.item);
-        }
-
         closeDropDown();
     };
 
     return (
-        <div className="relative">
-            {!sectionDetails.is_locked && itemDetails.is_item_locked && (
-                <div className="absolute inset-0 bg-black/15 z-100 flex justify-center items-center overflow-y-auto h-full">
-                    <div className="flex flex-col items-center">
-                        <AiFillLock className="text-size5    text-ascend-blue" />
-                    </div>
-                </div>
-            )}
-            <div
-                onClick={handleSectionContentClick}
-                ref={setNodeRef}
-                {...attributes}
-                style={style}
-                className="bg-ascend-white border border-ascend-gray1"
-            >
-                {!disabled && (
-                    <div
-                        style={{ touchAction: "none" }}
-                        ref={setActivatorNodeRef}
-                        {...(!disabled && listeners)}
-                        className="flex justify-center cursor-grab py-1"
-                    >
-                        <MdOutlineDragIndicator className="rotate-90" />
+        <>
+            <div className="relative">
+                {!sectionDetails.is_locked && itemDetails.is_item_locked && (
+                    <div className="absolute inset-0 bg-black/15 z-100 flex justify-center items-center overflow-y-auto h-full">
+                        <div className="flex flex-col items-center">
+                            <AiFillLock className="text-size5    text-ascend-blue" />
+                        </div>
                     </div>
                 )}
                 <div
-                    className={`flex items-center gap-2 md:gap-20 justify-between pr-5 pl-5 pb-5 cursor-pointer ${
-                        disabled ? "pt-5" : null
-                    } text-ascend-black`}
+                    onClick={handleSectionContentClick}
+                    ref={setNodeRef}
+                    {...attributes}
+                    style={style}
+                    className="bg-ascend-white border border-ascend-gray1"
                 >
-                    <div className="flex items-center space-x-5">
-                        <RoleGuard allowedRoles={["student"]}>
-                            {itemDetails.student_progress &&
-                            itemDetails.student_progress.is_done ? (
-                                <AiFillCheckCircle className="text-size6 text-ascend-green border border-ascend-gray3 rounded-full" />
-                            ) : (
-                                <div className="w-7 h-7 border border-ascend-gray3 rounded-full"></div>
-                            )}
-                        </RoleGuard>
-                        <h1 className="text-size2 font-bold break-words flex-1 min-w-0">
-                            {`${itemDetails.order}. `}
-                            {itemDetails.item_type ===
-                            "App\\Models\\Programs\\Material"
-                                ? itemDetails.item.material_title
-                                : itemDetails.item.assessment_title}
-                        </h1>
-                    </div>
-
                     {!disabled && (
-                        <RoleGuard allowedRoles={["admin", "faculty"]}>
-                            <div
-                                onClick={stopPropagation}
-                                className="dropdown dropdown-end cursor-pointer relative"
-                            >
-                                <div
-                                    tabIndex={0}
-                                    role="button"
-                                    className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue transition-all duration-300"
-                                >
-                                    <BsThreeDotsVertical className="text-size3" />
-                                </div>
-
-                                <ul
-                                    tabIndex={0}
-                                    className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black absolute z-999"
-                                >
-                                    <li onClick={handleClickEdit}>
-                                        <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                            Edit
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                            Delete
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </RoleGuard>
+                        <div
+                            style={{ touchAction: "none" }}
+                            ref={setActivatorNodeRef}
+                            {...(!disabled && listeners)}
+                            className="flex justify-center cursor-grab py-1"
+                        >
+                            <MdOutlineDragIndicator className="rotate-90" />
+                        </div>
                     )}
+                    <div
+                        className={`flex items-center gap-2 md:gap-20 justify-between pr-5 pl-5 pb-5 cursor-pointer ${
+                            disabled ? "pt-5" : null
+                        } text-ascend-black`}
+                    >
+                        <div className="flex items-center space-x-5">
+                            <RoleGuard allowedRoles={["student"]}>
+                                {itemDetails.student_progress &&
+                                itemDetails.student_progress.is_done ? (
+                                    <AiFillCheckCircle className="text-size6 text-ascend-green border border-ascend-gray3 rounded-full" />
+                                ) : (
+                                    <div className="w-7 h-7 border border-ascend-gray3 rounded-full"></div>
+                                )}
+                            </RoleGuard>
+                            <h1 className="text-size2 font-bold break-words flex-1 min-w-0">
+                                {`${itemDetails.order}. `}
+                                {itemDetails.item_type ===
+                                "App\\Models\\Programs\\Material"
+                                    ? itemDetails.item.material_title
+                                    : itemDetails.item.assessment_title}
+                            </h1>
+                        </div>
+
+                        {!disabled && (
+                            <RoleGuard allowedRoles={["admin", "faculty"]}>
+                                <div
+                                    onClick={stopPropagation}
+                                    className="dropdown dropdown-end cursor-pointer relative"
+                                >
+                                    <div
+                                        tabIndex={0}
+                                        role="button"
+                                        className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue transition-all duration-300"
+                                    >
+                                        <BsThreeDotsVertical className="text-size3" />
+                                    </div>
+
+                                    <ul
+                                        tabIndex={0}
+                                        className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black absolute z-999"
+                                    >
+                                        <li onClick={handleClickEdit}>
+                                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                Edit
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                Delete
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </RoleGuard>
+                        )}
+                    </div>
                 </div>
             </div>
+
             {openEditForm && (
                 <ModalContainer>
                     {itemDetails.item_type ===
@@ -204,6 +188,7 @@ export default function SectionContent({
                             materialId={itemDetails.item.material_id}
                             formWidth="max-w-200"
                             sectionId={sectionId}
+                            materialDetailsToEdit={itemDetails.item}
                         />
                     ) : (
                         <AssessmentForm
@@ -213,10 +198,11 @@ export default function SectionContent({
                             assessmentId={itemDetails.item.assessment_id}
                             formWidth="max-w-200"
                             sectionId={sectionId}
+                            assessmentDetailsToEdit={itemDetails.item}
                         />
                     )}
                 </ModalContainer>
             )}
-        </div>
+        </>
     );
 }

@@ -70,7 +70,10 @@ function PostList({ courseId, programId }) {
             )}
 
             {(!coursePosts || coursePosts.hasMore) && (
-                <div ref={loaderRef} className=" w-full flex justify-center">
+                <div
+                    ref={loaderRef}
+                    className=" w-full flex justify-center mt-5"
+                >
                     <Loader color="bg-ascend-blue" />
                 </div>
             )}

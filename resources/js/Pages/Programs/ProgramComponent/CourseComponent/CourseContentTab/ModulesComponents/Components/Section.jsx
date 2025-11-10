@@ -345,24 +345,25 @@ export default function Section({ sectionDetails }) {
             </div>
 
             {isMaterialFormOpen && (
-                <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
+                <ModalContainer>
                     <MaterialForm
                         setIsMaterialFormOpen={setIsMaterialFormOpen}
                         formTitle={"Add Section Material"}
                         formWidth={"max-w-200"}
                         sectionId={sectionDetails.section_id}
                     />
-                </div>
+                </ModalContainer>
             )}
+
             {isAssessmentFormOpen && (
-                <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
+                <ModalContainer>
                     <AssessmentForm
                         setIsAssessmentFormOpen={setIsAssessmentFormOpen}
                         formTitle={"Add Section Assessment"}
                         formWidth={"max-w-200"}
                         sectionId={sectionDetails.section_id}
                     />
-                </div>
+                </ModalContainer>
             )}
 
             {isEditSectionFormOpen && (

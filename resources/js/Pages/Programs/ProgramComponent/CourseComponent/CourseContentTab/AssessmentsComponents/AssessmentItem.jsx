@@ -9,7 +9,7 @@ import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
 import { capitalize } from "lodash";
 import AssessmentForm from "./AssessmentForm";
 import { closeDropDown } from "../../../../../../Utils/closeDropdown";
-import useAssessmentsStore from "../../../../../../Stores/Programs/CourseContent/assessmentsStore";
+import useAssessmentsStore from "./Stores/assessmentsStore";
 import { displayToast } from "../../../../../../Utils/displayToast";
 import DefaultCustomToast from "../../../../../../Components/CustomToast/DefaultCustomToast";
 import axios from "axios";
@@ -84,8 +84,6 @@ export default function AssessmentItem({
     const handleEditClick = () => {
         closeDropDown();
         setIsEdit(true);
-        console.log(assessmentDetails);
-        setAssessmentDetails(assessmentDetails);
         setIsAssessmentFormOpen(false); // Close the add assessment form if open
     };
 
@@ -212,7 +210,7 @@ export default function AssessmentItem({
         <>
             <div
                 onClick={handleCardClick}
-                className="flex flex-col justify-between border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 cursor-pointer card-hover"
+                className="flex flex-col justify-between border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 cursor-pointer card-hover mt-5"
             >
                 <div className="flex items-start sm:items-center gap-2 md:gap-2">
                     <div className="flex-1 min-w-0 flex flex-wrap gap-5">
@@ -411,6 +409,7 @@ export default function AssessmentItem({
                         isEdit={isEdit}
                         setIsAssessmentFormOpen={setIsEdit}
                         formWidth="max-w-200"
+                        assessmentDetailsToEdit={assessmentDetails}
                     />
                 </ModalContainer>
             )}

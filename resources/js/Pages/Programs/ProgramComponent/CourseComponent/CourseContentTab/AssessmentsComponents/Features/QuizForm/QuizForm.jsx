@@ -9,7 +9,7 @@ import useQuizDetails from "./Hooks/useQuizDetails";
 import useQuizStore from "./Stores/quizStore";
 import useQuestion from "./Question/Hooks/useQuestion";
 import useQuestionStore from "./Question/Stores/questionStore";
-import useAssessmentsStore from "../../../../../../../../Stores/Programs/CourseContent/assessmentsStore";
+import useAssessmentsStore from "../../Stores/assessmentsStore";
 import {
     SortableContext,
     verticalListSortingStrategy,
@@ -67,10 +67,6 @@ export default function QuizForm({ courseId, assessmentId, quiz }) {
     const onEdit = useQuestionStore((state) => state.onEdit);
 
     // Assessment store
-    const assessmentList = useAssessmentsStore((state) => state.assessmentList);
-    const setAssessmentList = useAssessmentsStore(
-        (state) => state.setAssessmentList
-    );
     const assessmentByCourse = useAssessmentsStore(
         (state) => state.assessmentByCourse
     );
