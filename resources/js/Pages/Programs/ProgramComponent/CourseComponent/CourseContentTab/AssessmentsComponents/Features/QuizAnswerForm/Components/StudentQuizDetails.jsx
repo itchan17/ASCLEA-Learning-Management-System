@@ -12,6 +12,7 @@ export default function StudentQuizDetails({
     prevQuizAssessmentSubmitted,
     studentData,
     quiz,
+    warningsCount,
 }) {
     const [isEvidenceOpen, setIsEvidenceOpen] = useState(false);
     const [improvementRateDetails, setImprovementRateDetails] = useState({
@@ -51,6 +52,24 @@ export default function StudentQuizDetails({
         setImprovementRateDetails(() => calculateImprovementRate());
     }, [assessmentSubmission]);
 
+    const [warningCount, setWarningCount] = useState(0);
+
+    useEffect(() => {
+        const fetchWarnings = async () => {
+                try {
+                    const res = await fetch(`/detected-cheatings/${assessmentSubmission.assessment_submission_id}`);
+                    if (!res.ok) throw new Error("Failed to fetch warnings");
+    
+                    const data = await res.json();
+                    setWarningCount(data.cheatings?.length || 0); 
+                } catch (error) {
+                    console.error(error);
+                }
+            };
+    
+            fetchWarnings();
+    }, [assessmentSubmission.assessment_submission_id]);
+    
     return (
         <div className="bg-ascend-white p-5 space-y-5 border border-ascend-gray1 shadow-shadow1">
             <div className="flex items-center justify-between">
@@ -116,6 +135,7 @@ export default function StudentQuizDetails({
                                 <span
                                     onClick={() =>
                                         setIsEvidenceOpen(!isEvidenceOpen)
+                                        
                                     }
                                     className="ml-2 text-ascend-black text-size1 cursor-pointer hover:text-ascend-blue transition-all duration-300 text-nowrap hover:underline"
                                 >
@@ -124,7 +144,7 @@ export default function StudentQuizDetails({
                             </h1>
                             <div className="flex items-center gap-1">
                                 <span className="text-size7 font-semibold">
-                                    6
+                                    {warningCount}
                                 </span>
                             </div>
                         </div>
@@ -192,7 +212,11 @@ export default function StudentQuizDetails({
             </div>
 
             {isEvidenceOpen && (
-                <ViewEvidence setIsEvidenceOpen={setIsEvidenceOpen} />
+                <ViewEvidence 
+                    setIsEvidenceOpen={setIsEvidenceOpen}
+                    assessmentSubmissionId={assessmentSubmission.assessment_submission_id}
+                    studentData={studentData}
+                />
             )}
         </div>
     );

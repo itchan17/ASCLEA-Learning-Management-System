@@ -47,8 +47,12 @@ class AssessmentSubmissionService
         $endAt = null;
 
         // Check if quiz has a timer then set the end time
-        if ($quiz->duration > 0) {
+        if ($quiz->duration > 0 && $quiz->cheating_mitigation == 0) {
             $endAt = Carbon::now()->addMinutes($quiz->duration);
+        }
+
+        if ($quiz->duration > 0 && $quiz->cheating_mitigation == 1) {
+            $endAt = Carbon::now()->addMinutes($quiz->duration + 1); 
         }
 
         $assessmentSubmission =  AssessmentSubmission::create(
