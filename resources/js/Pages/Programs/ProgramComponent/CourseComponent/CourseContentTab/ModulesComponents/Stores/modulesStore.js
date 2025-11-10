@@ -87,39 +87,7 @@ const useModulesStore = create(
             },
 
             // Section
-            sectionDetails: {
-                section_title: "",
-                status: "draft",
-            },
-
             sectionsByCourse: [],
-
-            setSectionDetails: (sectionDetails) => {
-                set({
-                    sectionDetails: {
-                        section_title: sectionDetails.section_title,
-                    },
-                });
-            },
-
-            handleSectionDetailsChange: (field, value) => {
-                const { sectionDetails } = useModulesStore.getState();
-                set({
-                    sectionDetails: {
-                        ...sectionDetails,
-                        [field]: value,
-                    },
-                });
-            },
-
-            clearSectionDetails: () => {
-                set({
-                    sectionDetails: {
-                        section_title: "",
-                        status: "draft",
-                    },
-                });
-            },
 
             setSections: (courseId, list, page, hasMore) => {
                 const { sectionsByCourse } = useModulesStore.getState();
