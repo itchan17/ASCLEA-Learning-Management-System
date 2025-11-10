@@ -5,15 +5,17 @@ import "react-quill-new/dist/quill.bubble.css";
 import "../../../../../../../../css/quillTextEditor.css";
 import DOMPurify from "dompurify";
 import RoleGuard from "../../../../../../../Components/Auth/RoleGuard";
+import { formatFullDate } from "../../../../../../../Utils/formatFullDate";
 
-export default function Post({ postContent }) {
-    const postHtml = DOMPurify.sanitize(postContent.postDescription);
+function Post({ postContent }) {
+    // console.log(postContent);
+    const postHtml = DOMPurify.sanitize(postContent.post_description);
 
     return (
         <div className="">
             <div className="flex items-start gap-2 md:gap-20 px-5 py-2 text-ascend-white bg-ascend-blue">
                 <h1 className="flex-1 min-w-0 text-size4 break-words font-semibold">
-                    {postContent.postTitle}
+                    {postContent.post_title}
                 </h1>
                 <RoleGuard allowedRoles={["admin", "faculty"]}>
                     <div className="h-8 flex items-center">
@@ -49,10 +51,17 @@ export default function Post({ postContent }) {
                 <ReactQuill value={postHtml} readOnly={true} theme={"bubble"} />
 
                 <div className="flex flex-wrap-reverse justify-between items-baseline font-nunito-sans gap-2">
-                    <span className="text-size1">Posted on March 29, 2025</span>
-                    <span className="font-bold">John Doe</span>
+                    <span className="text-size1">
+                        Posted on {formatFullDate(postContent.created_at)}
+                    </span>
+                    <span className="font-bold">
+                        {`${postContent.author.first_name}
+                        ${postContent.author.last_name}`}
+                    </span>
                 </div>
             </div>
         </div>
     );
 }
+
+export default React.memo(Post);
