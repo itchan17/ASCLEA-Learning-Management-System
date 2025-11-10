@@ -77,12 +77,11 @@ Route::prefix('admission')
 
 //student Routes
 Route::prefix('admission')
-    ->middleware(['auth', 'verified', 'preventBack', 'checkRole:student'])
+    ->middleware(['auth', 'verified', 'preventBack', 'checkRole:student,skipvalidation'])
     ->group(function () {
 
         // Route to upload admission files
         Route::post('/upload-admission-files', [AdmissionFileController::class, 'store'])
-            ->middleware(['auth', 'verified', 'preventBack'])
             ->name('admissionfiles.upload');
 });
         
