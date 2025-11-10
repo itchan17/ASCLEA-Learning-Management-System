@@ -102,7 +102,9 @@ class DashboardController extends Controller
         $query = DB::table('user_logins')
             ->join('users', 'user_logins.user_id', '=', 'users.user_id')
             ->join('roles', 'users.role_id', '=', 'roles.role_id')
-            ->where('roles.role_name', 'student');
+            ->join('students', 'users.user_id', '=', 'students.user_id') // join students table
+            ->where('roles.role_name', 'student')
+            ->where('students.enrollment_status', 'enrolled'); // only enrolled students
 
         // Filter only those students that belong to the faculty (if provided)
         if ($studentIds) {
@@ -182,9 +184,12 @@ class DashboardController extends Controller
 
     private function getStudentData($authUser)
     {
-        $studentLogins = UserLogin::where('user_id', $authUser->user_id)
-                                  ->whereNotNull('logout_at')
-                                  ->get();
+        $studentLogins = UserLogin::join('students', 'user_logins.user_id', '=', 'students.user_id')
+            ->where('user_logins.user_id', $authUser->user_id)
+            ->where('students.enrollment_status', 'enrolled')
+            ->whereNotNull('logout_at')
+            ->select('user_logins.*')
+            ->get();
 
         $dailyTimeSpent = $this->computeDailyTimeSpent($studentLogins);
 
