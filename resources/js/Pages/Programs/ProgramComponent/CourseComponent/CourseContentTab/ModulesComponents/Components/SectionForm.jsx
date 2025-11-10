@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import SecondaryButton from "../../../../../../../Components/Button/SecondaryButton";
 import PrimaryButton from "../../../../../../../Components/Button/PrimaryButton";
-import useModulesStore from "../Stores/modulesStore";
 import useSection from "../Hooks/useSection";
 import { usePage } from "@inertiajs/react";
 
@@ -11,16 +10,21 @@ export default function SectionForm({
     sectionId = null,
     formTitle,
     formWIdth,
+    sectionDetailsToEdit = null,
 }) {
     const { program, course } = usePage().props;
 
-    // Module Store
-    const sectionDetails = useModulesStore((state) => state.sectionDetails);
-    const handleSectionDetailsChange = useModulesStore(
-        (state) => state.handleSectionDetailsChange
-    );
-    const clearSectionDetails = useModulesStore(
-        (state) => state.clearSectionDetails
+    // Local state
+    const [sectionDetails, setSectionDetails] = useState(
+        sectionDetailsToEdit && isEdit
+            ? {
+                  section_title: sectionDetailsToEdit.section_title,
+                  status: sectionDetailsToEdit.status,
+              }
+            : {
+                  section_title: "",
+                  status: "draft",
+              }
     );
 
     // Custom hook
@@ -29,12 +33,14 @@ export default function SectionForm({
         courseId: course.course_id,
     });
 
-    // clear section details when unmount
+    // Functions
+    const handleSectionDetailsChange = (field, value) => {
+        setSectionDetails((prev) => ({ ...prev, [field]: value }));
+    };
+
     useEffect(() => {
-        return () => {
-            clearSectionDetails();
-        };
-    }, []);
+        console.log(sectionDetails);
+    }, [sectionDetails]);
 
     return (
         <div
@@ -84,7 +90,8 @@ export default function SectionForm({
                         handleAddUpdateSection(
                             setIsSectionFormOpen,
                             isEdit,
-                            sectionId
+                            sectionId,
+                            sectionDetails
                         );
                     }}
                     text={isEdit ? "Save" : "Add"}

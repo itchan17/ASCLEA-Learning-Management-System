@@ -28,9 +28,6 @@ import { AiFillLock } from "react-icons/ai";
 export default function Section({ sectionDetails }) {
     const { program, course, auth } = usePage().props;
     // Modules store
-    const setSectionDetails = useModulesStore(
-        (state) => state.setSectionDetails
-    );
     const setSectionItems = useModulesStore((state) => state.setSectionItems);
 
     // Custom hook
@@ -148,7 +145,7 @@ export default function Section({ sectionDetails }) {
 
     const handleClickEdit = () => {
         seIsEditSectionFormOpen(true);
-        setSectionDetails(sectionDetails);
+        // setSectionDetails(sectionDetails);
         closeDropDown();
     };
 
@@ -369,6 +366,7 @@ export default function Section({ sectionDetails }) {
                         sectionId={sectionDetails.section_id}
                         formTitle={"Edit Section"}
                         formWIdth={"max-w-200"}
+                        sectionDetailsToEdit={sectionDetails}
                     ></SectionForm>
                 </ModalContainer>
             )}

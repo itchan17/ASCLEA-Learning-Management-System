@@ -8,10 +8,6 @@ import { router } from "@inertiajs/react";
 
 export default function useSection({ programId, courseId }) {
     // Module store
-    const sectionDetails = useModulesStore((state) => state.sectionDetails);
-    const clearSectionDetails = useModulesStore(
-        (state) => state.clearSectionDetails
-    );
     const setSections = useModulesStore((state) => state.setSections);
     const addNewSection = useModulesStore((state) => state.addNewSection);
     const sectionsByCourse = useModulesStore((state) => state.sectionsByCourse);
@@ -28,10 +24,11 @@ export default function useSection({ programId, courseId }) {
     const handleAddUpdateSection = async (
         setIsSectionFormOpen,
         isEdit = false,
-        sectionId = null
+        sectionId = null,
+        sectionDetails
     ) => {
         setIsLoading(true);
-        console.log(sectionDetails);
+
         try {
             let response;
             if (!isEdit && !sectionId) {
@@ -54,9 +51,7 @@ export default function useSection({ programId, courseId }) {
                 );
                 updateSectionList(response.data.data, courseId);
             }
-            console.log(response);
             setIsSectionFormOpen(false);
-            clearSectionDetails();
             displayToast(
                 <DefaultCustomToast message={response.data.success} />,
                 "success"
@@ -129,40 +124,40 @@ export default function useSection({ programId, courseId }) {
         }
     };
 
-    const handleUpdateSection = async (sectionId) => {
-        setIsLoading(true);
-        try {
-            const response = await axios.put(
-                route("section.update", {
-                    program: programId,
-                    course: courseId,
-                    section: sectionId,
-                }),
-                sectionDetails
-            );
+    // const handleUpdateSection = async (sectionId) => {
+    //     setIsLoading(true);
+    //     try {
+    //         const response = await axios.put(
+    //             route("section.update", {
+    //                 program: programId,
+    //                 course: courseId,
+    //                 section: sectionId,
+    //             }),
+    //             sectionDetails
+    //         );
 
-            console.log(response);
-            updateSectionList(response.data.data, courseId);
-            displayToast(
-                <DefaultCustomToast message={response.data.success} />,
-                "success"
-            );
-        } catch (error) {
-            console.error(error);
-            if (error.response?.data.errors) {
-                setErrors(error.response.data.errors);
-            } else {
-                displayToast(
-                    <DefaultCustomToast
-                        message={"Something went wrong. Please try again."}
-                    />,
-                    "error"
-                );
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    //         console.log(response);
+    //         updateSectionList(response.data.data, courseId);
+    //         displayToast(
+    //             <DefaultCustomToast message={response.data.success} />,
+    //             "success"
+    //         );
+    //     } catch (error) {
+    //         console.error(error);
+    //         if (error.response?.data.errors) {
+    //             setErrors(error.response.data.errors);
+    //         } else {
+    //             displayToast(
+    //                 <DefaultCustomToast
+    //                     message={"Something went wrong. Please try again."}
+    //                 />,
+    //                 "error"
+    //             );
+    //         }
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
 
     const handleUpdateSectionStatus = async (sectionId) => {
         try {
@@ -308,7 +303,6 @@ export default function useSection({ programId, courseId }) {
         errors,
         handleAddUpdateSection,
         handleFetchSections,
-        handleUpdateSection,
         handleUpdateSectionStatus,
         handleArchiveSection,
         handleRestoreSection,
