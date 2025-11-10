@@ -8,6 +8,8 @@ import { displayToast } from "../../../../../../../Utils/displayToast";
 export default function usePost({ programId, courseId }) {
     // Post Store
     const postDetails = usePostStore((state) => state.postDetails);
+    const postByCourse = usePostStore((state) => state.postByCourse);
+    const setPosts = usePostStore((state) => state.setPosts);
 
     // Local states
     const [isLoading, setIsLoading] = useState(false);
@@ -44,8 +46,57 @@ export default function usePost({ programId, courseId }) {
         }
     };
 
-    useEffect(() => {
-        console.log(postDetails);
-    }, [postDetails]);
-    return { handleCreatePost, isLoading, errors };
+    const handleFetchPosts = async () => {
+        try {
+            setIsLoading(true);
+            let response;
+            let pageNum;
+            let postList;
+
+            if (!postByCourse[courseId]) {
+                response = await axios.get(
+                    route("posts.get", {
+                        program: programId,
+                        course: courseId,
+                        _query: {
+                            page: 1,
+                        },
+                    })
+                );
+
+                pageNum = 2;
+            } else {
+                response = await axios.get(
+                    route("posts.get", {
+                        program: programId,
+                        course: courseId,
+                        _query: {
+                            page: postByCourse[courseId].page,
+                        },
+                    })
+                );
+
+                pageNum = postByCourse[courseId].page + 1;
+            }
+
+            postList = response.data.data;
+
+            const hasMoreAssessment =
+                response.data.current_page < response.data.last_page;
+
+            setPosts(courseId, postList, pageNum, hasMoreAssessment);
+        } catch (error) {
+            console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please reload the page."}
+                />,
+                "error"
+            );
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return { handleCreatePost, isLoading, errors, handleFetchPosts };
 }

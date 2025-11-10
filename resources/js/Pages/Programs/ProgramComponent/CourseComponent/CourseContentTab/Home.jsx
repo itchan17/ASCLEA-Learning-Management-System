@@ -15,10 +15,12 @@ import { closeDropDown } from "../../../../../Utils/closeDropdown";
 import DefaultCustomToast from "../../../../../Components/CustomToast/DefaultCustomToast";
 import { displayToast } from "../../../../../Utils/displayToast";
 import AlertModal from "../../../../../Components/AlertModal";
+import PostList from "./HomeComponents/Components/PostList";
 
 export default function Home({}) {
     const { program, course } = usePage().props;
-    console.log(course);
+    const programId = program.program_id;
+    const courseId = course.course_id;
 
     // Course Store
     const setCourse = useCourseStore((state) => state.setCourseDetails);
@@ -86,6 +88,8 @@ export default function Home({}) {
         // Close the dropdown after clicked
         closeDropDown();
     };
+
+    console.log("RERENDER");
 
     return (
         <div className="space-y-5 w-full text-ascend-black font-nunito-sans">
@@ -167,16 +171,8 @@ export default function Home({}) {
                     <PostForm setIsPostFormOpen={setIsFormOpen} />
                 </div>
             )}
-            {postList?.length > 0 ? (
-                postList.map((post, index) => (
-                    <Post key={index} postContent={post} />
-                ))
-            ) : (
-                <EmptyState
-                    imgSrc={"/images/illustrations/empty.svg"}
-                    text={`“There’s a whole lot of nothing going on—time to make something happen!”`}
-                />
-            )}
+
+            <PostList courseId={courseId} programId={programId} />
 
             {/* Display EditCourse Form */}
             {openCourseForm && (
