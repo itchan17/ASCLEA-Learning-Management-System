@@ -1,23 +1,26 @@
-import { useEffect, useCallback, useRef } from "react";
+import React, { useEffect, useCallback, useRef, useMemo } from "react";
 import useModulesStore from "../Stores/modulesStore";
 import MaterialItem from "./MaterialItem";
-import { usePage } from "@inertiajs/react";
 import EmptyState from "../../../../../../../Components/EmptyState/EmptyState";
 import Loader from "../../../../../../../Components/Loader";
 import useMaterial from "../Hooks/useMaterial";
+import { shallow } from "zustand/shallow";
 
-export default function MaterialList({ setIsMaterialFormOpen }) {
-    const { program, course } = usePage().props;
-
+function MaterialList({ setIsMaterialFormOpen, programId, courseId }) {
     // Module store
     const materialsByCourse = useModulesStore(
-        (state) => state.materialsByCourse
+        (state) => state.materialsByCourse,
+        shallow
     );
+
+    const courseMaterials = useMemo(() => {
+        return materialsByCourse[courseId] || { list: [], hasMore: true };
+    }, [materialsByCourse, courseId]);
 
     // Custom hooks
     const { isLoading, handleFetchMaterials } = useMaterial({
-        programId: program.program_id,
-        courseId: course.course_id,
+        programId,
+        courseId,
     });
 
     const loaderRef = useRef(null);
@@ -52,33 +55,27 @@ export default function MaterialList({ setIsMaterialFormOpen }) {
     return (
         <div className="space-y-5">
             {/* Dropdown for material list */}
-            {materialsByCourse[course.course_id] &&
-                materialsByCourse[course.course_id].list.length > 0 && (
-                    <div className="flex flex-col space-y-5">
-                        {materialsByCourse[course.course_id].list.map(
-                            (material) => (
-                                <MaterialItem
-                                    key={material.material_id}
-                                    materialDetails={material}
-                                    setIsMaterialFormOpen={
-                                        setIsMaterialFormOpen
-                                    }
-                                />
-                            )
-                        )}
-                    </div>
-                )}
+            {courseMaterials && courseMaterials.list.length > 0 && (
+                <div className="flex flex-col space-y-5">
+                    {courseMaterials.list.map((material) => (
+                        <MaterialItem
+                            key={material.material_id}
+                            materialDetails={material}
+                            setIsMaterialFormOpen={setIsMaterialFormOpen}
+                        />
+                    ))}
+                </div>
+            )}
 
-            {(!materialsByCourse[course.course_id] ||
-                materialsByCourse[course.course_id].hasMore) && (
+            {(!courseMaterials || courseMaterials.hasMore) && (
                 <div ref={loaderRef} className=" w-full flex justify-center">
                     <Loader color="bg-ascend-blue" />
                 </div>
             )}
 
-            {materialsByCourse[course.course_id] &&
-                materialsByCourse[course.course_id].list.length === 0 &&
-                !materialsByCourse[course.course_id].hasMore && (
+            {courseMaterials &&
+                courseMaterials.list.length === 0 &&
+                !courseMaterials.hasMore && (
                     <EmptyState
                         imgSrc={"/images/illustrations/empty.svg"}
                         text={`“There’s a whole lot of nothing going on—time to make something happen!”`}
@@ -87,3 +84,5 @@ export default function MaterialList({ setIsMaterialFormOpen }) {
         </div>
     );
 }
+
+export default React.memo(MaterialList);

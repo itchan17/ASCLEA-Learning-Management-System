@@ -8,7 +8,6 @@ import { router } from "@inertiajs/react";
 
 export default function useMaterial({ programId, courseId }) {
     // Module store
-    const materialDetails = useModulesStore((state) => state.materialDetails);
     const addNewMaterial = useModulesStore((state) => state.addNewMaterial);
     const materialsByCourse = useModulesStore(
         (state) => state.materialsByCourse
@@ -16,9 +15,6 @@ export default function useMaterial({ programId, courseId }) {
     const setMaterials = useModulesStore((state) => state.setMaterials);
     const updateMaterialList = useModulesStore(
         (state) => state.updateMaterialList
-    );
-    const clearMaterialDetails = useModulesStore(
-        (state) => state.clearMaterialDetails
     );
     const addNewSectionItem = useModulesStore(
         (state) => state.addNewSectionItem
@@ -30,7 +26,7 @@ export default function useMaterial({ programId, courseId }) {
     const [errors, setErrors] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    const appendToFormData = (assessmentFormData) => {
+    const appendToFormData = (materialFormData, materialDetails) => {
         // Append data into FormData to enbale uploading files
         for (let key in materialDetails) {
             const value = materialDetails[key];
@@ -44,10 +40,10 @@ export default function useMaterial({ programId, courseId }) {
             // Append array values
             if (Array.isArray(value)) {
                 value.forEach((v, i) => {
-                    assessmentFormData.append(`${key}[${i}]`, v);
+                    materialFormData.append(`${key}[${i}]`, v);
                 });
             } else {
-                assessmentFormData.append(key, value);
+                materialFormData.append(key, value);
             }
         }
     };
@@ -56,12 +52,13 @@ export default function useMaterial({ programId, courseId }) {
         setIsMaterialFormOpen,
         isEdit = false,
         materialId = null,
-        sectionId = null
+        sectionId = null,
+        materialDetails
     ) => {
         setIsLoading(true);
         setErrors(null);
         const materialFormData = new FormData();
-        appendToFormData(materialFormData);
+        appendToFormData(materialFormData, materialDetails);
 
         try {
             let response;
@@ -104,7 +101,6 @@ export default function useMaterial({ programId, courseId }) {
                 }
             }
             setIsMaterialFormOpen(false);
-            clearMaterialDetails();
             displayToast(
                 <DefaultCustomToast message={response.data.success} />,
                 "success"
