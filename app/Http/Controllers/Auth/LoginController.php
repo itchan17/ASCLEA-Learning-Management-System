@@ -58,6 +58,18 @@ class LoginController extends Controller
         }
  
         $request->session()->regenerate();  
+
+        $user = $request->user();
+
+        // Redirect student to admission page if not enrolled
+        if ($user->role->role_name === 'student') {
+            $enrollmentStatus = optional($user->student)->enrollment_status;
+            
+            if ($enrollmentStatus !== 'enrolled') {
+                return redirect()->route('admission.index');
+            }
+        }
+
         return redirect()->route('dashboard.index');
     }
 

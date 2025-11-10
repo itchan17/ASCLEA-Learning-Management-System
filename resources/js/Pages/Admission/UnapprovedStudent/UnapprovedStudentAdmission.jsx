@@ -135,7 +135,7 @@ export default function UnapprovedStudentAdmission({student}) {
               </div>
           ) : null}
 
-          {student?.admission_status === null && (
+          {student?.admission_status === "Not Submitted" && (
               <div className="flex flex-col justify-center space-y-5">
                   <EmptyState
                       imgSrc="/images/illustrations/upload_document.svg"

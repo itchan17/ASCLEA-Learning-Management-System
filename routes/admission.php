@@ -8,7 +8,7 @@ use App\Http\Controllers\Admission\AdmissionFileController;
 
 // Admission Page
 Route::get('/admission', [AdmissionFileController::class, 'index'])
-    ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin,student'])
+    ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin,student,skipvalidation'])
     ->name('admission.index');
 
 // Admin Routes
