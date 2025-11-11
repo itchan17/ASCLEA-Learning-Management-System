@@ -162,7 +162,9 @@ export default function QuizResponsesTable({
                                         {cleanDecimal(response.score)}/
                                         {assessment.quiz.quiz_total_points}
                                     </td>
-                                    <td className="text-ascend-red">6</td>
+                                   <td className={response.detected_cheatings.length > 0 ? "text-ascend-red" : "text-ascend-green"}>
+                                    {response.detected_cheatings.length}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>

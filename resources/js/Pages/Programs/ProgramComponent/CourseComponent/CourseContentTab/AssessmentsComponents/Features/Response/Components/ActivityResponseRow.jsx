@@ -77,8 +77,13 @@ export default function ActivityResponseRow({
                         onChange={gradeActivity}
                         // Prevent user from typing "-"
                         onKeyDown={(e) => {
-                            if (e.key === "-") {
-                                e.preventDefault();
+                            console.log(e.length);
+                            if (
+                                e.key === "-" ||
+                                e.key === "e" ||
+                                e.key === "+"
+                            ) {
+                                e.preventDefault(); // prevent invalid characters
                             }
                         }}
                     />

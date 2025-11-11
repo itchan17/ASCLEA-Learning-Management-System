@@ -16,6 +16,10 @@ const PaymentHistoryPage = ({ PaymentList, student, can }) => {
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false);
   const { activeTab, setActiveTab } = usePaymentTabs();
   const [payments, setPayments] = useState(PaymentList || []);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentDownload, setCurrentDownload] = useState("PDF");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
 
   const toggleAddPayment = () => {
     setShowAddPaymentModal(!showAddPaymentModal);
@@ -115,39 +119,45 @@ const handleExport = async (type) => {
       </div>
 
       {can.download && activeTab === 0 && (
-        <div className="dropdown dropdown-end">
-          <button
-            tabIndex={0}
-            role="button"
-            className="flex items-center justify-between bg-ascend-blue text-ascend-white hover:opacity-80 transition-all duration-300 font-nunito-sans font-semibold h-10 px-4 cursor-pointer"
-          >
-            <span>Download</span>
-            <span className="self-stretch border-l border-white mx-3"></span>
-            <IoCaretDownOutline className="text-size1" />
-          </button>
+        <div className="flex space-x-[2px]">
+          {/* Main Download Button showing current selection */}
+          <PrimaryButton
+            isDisabled={isLoading}
+            isLoading={isLoading}
+            doSomething={() => handleExport(currentDownload.toLowerCase())} 
+            text={`Download ${currentDownload.toUpperCase()}`}
+          />
 
-          <ul
-            tabIndex={0}
-            className="text-size2 dropdown-content menu space-y-2 font-bold bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-          >
-            <li>
-              <button
-                onClick={() => handleExport("pdf")}
-                className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
-              >
-                Download as PDF
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => handleExport("csv")}
-                className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
-              >
-                Download as CSV
-              </button>
-            </li>
-          </ul>
+          {/* Dropdown button for changing format */}
+          <div className="dropdown dropdown-end cursor-pointer">
+            <button
+              tabIndex={0}
+              role="button"
+              className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
+            >
+              <div className="text-size1">
+                <IoCaretDownOutline />
+              </div>
+            </button>
+
+            <ul
+              tabIndex={0}
+              className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+            >
+              <li onClick={() => setCurrentDownload("PDF")}>
+                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                  Download PDF
+                </a>
+              </li>
+              <li onClick={() => setCurrentDownload("CSV")}>
+                <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                  Download CSV
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
+
       )}
 
       {/* Table */}
