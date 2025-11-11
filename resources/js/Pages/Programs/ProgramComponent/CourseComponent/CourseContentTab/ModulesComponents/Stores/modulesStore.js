@@ -380,4 +380,10 @@ const useModulesStore = create(
     )
 );
 
+if (typeof window !== "undefined") {
+    window.addEventListener("beforeunload", () => {
+        useModulesStore.persist.clearStorage();
+    });
+}
+
 export default useModulesStore;
