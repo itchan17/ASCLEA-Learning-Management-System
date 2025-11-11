@@ -249,6 +249,16 @@ export default function AssessmentForm({
                                             e.target.value
                                         )
                                     }
+                                    onKeyDown={(e) => {
+                                        console.log(e.length);
+                                        if (
+                                            e.key === "-" ||
+                                            e.key === "e" ||
+                                            e.key === "+"
+                                        ) {
+                                            e.preventDefault(); // prevent invalid characters
+                                        }
+                                    }}
                                     type="number"
                                     min="0"
                                     className={`px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue ${
