@@ -94,7 +94,7 @@ export default function ActivityReponses() {
             </div>
             <div className="w-full min-w-0">
                 <h1 className="text-size6 break-words font-semibold">
-                    First activity
+                    {assessment.assessment_title}
                 </h1>
                 <div className="space-x-5 flex flex-wrap">
                     <span className="font-medium text-nowrap">
