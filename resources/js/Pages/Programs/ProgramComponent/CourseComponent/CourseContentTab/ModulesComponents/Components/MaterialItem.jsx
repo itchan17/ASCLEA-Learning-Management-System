@@ -9,6 +9,7 @@ import MaterialForm from "./MaterialForm";
 import { closeDropDown } from "../../../../../../../Utils/closeDropdown";
 import useMaterial from "../Hooks/useMaterial";
 import { getRemainingDays } from "../../../../../../../Utils/getRemainingDays";
+import { BiSolidBook } from "react-icons/bi";
 
 function MaterialItem({ materialDetails, setIsMaterialFormOpen }) {
     const { program, course, auth } = usePage().props;
@@ -44,9 +45,14 @@ function MaterialItem({ materialDetails, setIsMaterialFormOpen }) {
             >
                 <div className="flex items-center gap-2 md:gap-20">
                     <div className="flex-1 min-w-0 flex flex-wrap gap-5">
-                        <h1 className="text-size2 truncate font-bold">
-                            New material uploaded
-                        </h1>
+                        <div className="flex items-center gap-2">
+                            <BiSolidBook className="text-ascend-blue text-size5" />
+
+                            <h1 className="text-size2 truncate font-bold">
+                                New material
+                            </h1>
+                        </div>
+
                         {materialDetails.deleted_at ? (
                             <div className="flex flex-wrap gap-2">
                                 <div className={`px-2 bg-ascend-red h-fit`}>
@@ -75,7 +81,7 @@ function MaterialItem({ materialDetails, setIsMaterialFormOpen }) {
                                 >
                                     <span className="text-size1 font-bold text-ascend-white">
                                         {materialDetails.status === "published"
-                                            ? "Publshed"
+                                            ? "Published"
                                             : "Draft"}
                                     </span>
                                 </div>

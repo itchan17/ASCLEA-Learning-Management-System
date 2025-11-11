@@ -2,24 +2,7 @@ import { use } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 const usePostStore = create((set) => ({
-    postDetails: {
-        post_title: "",
-        post_description: null,
-        status: "published",
-    },
-
     postByCourse: {},
-
-    handlePostDetailsChange: (field, value) => {
-        const { postDetails } = usePostStore.getState();
-
-        set({
-            postDetails: {
-                ...postDetails,
-                [field]: value,
-            },
-        });
-    },
 
     setAssessments: (courseId, list, page, hasMore) => {
         const { assessmentByCourse } = useAssessmentsStore.getState();
@@ -93,12 +76,23 @@ const usePostStore = create((set) => ({
         });
     },
 
-    clearPostDetails: () => {
+    // Upddate the popsst list wwhen a post was updated
+    updatePostList: (updatedPost, courseId) => {
+        const { postByCourse } = usePostStore.getState();
+
+        const courseState = postByCourse[courseId];
+
+        const updatedCoursePostList = courseState.list.map((post) =>
+            post.post_id === updatedPost.post_id ? updatedPost : post
+        );
+
         set({
-            postDetails: {
-                post_title: "",
-                post_description: null,
-                status: "published",
+            postByCourse: {
+                ...postByCourse,
+                [courseId]: {
+                    ...courseState,
+                    list: updatedCoursePostList,
+                },
             },
         });
     },

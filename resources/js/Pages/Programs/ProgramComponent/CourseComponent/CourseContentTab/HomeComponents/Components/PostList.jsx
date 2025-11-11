@@ -11,15 +11,10 @@ import { usePage } from "@inertiajs/react";
 import usePostStore from "../Stores/postStore";
 import EmptyState from "../../../../../../../Components/EmptyState/EmptyState";
 import usePost from "../Hooks/usePost";
-import { shallow } from "zustand/shallow";
 
-function PostList({ courseId, programId }) {
+export default function PostList({ courseId, programId }) {
     // Post store
-    const postByCourse = usePostStore((state) => state.postByCourse, shallow);
-
-    const coursePosts = useMemo(() => {
-        return postByCourse[courseId] || { list: [], hasMore: true };
-    }, [postByCourse, courseId]);
+    const postByCourse = usePostStore((state) => state.postByCourse);
 
     // Custom hook
     const { isLoading, handleFetchPosts } = usePost({
@@ -56,20 +51,16 @@ function PostList({ courseId, programId }) {
         };
     }, [handleObserver]);
 
-    console.log("RERENDER");
-
     return (
         <div>
             {/* <Loader color="text-ascend-blue" /> */}
-            {coursePosts && coursePosts.list.length > 0 && (
-                <div className="flex flex-col space-y-5">
-                    {coursePosts.list.map((post) => (
-                        <Post key={post.post_id} postContent={post} />
-                    ))}
-                </div>
-            )}
+            {postByCourse[courseId] &&
+                postByCourse[courseId].list.length > 0 &&
+                postByCourse[courseId].list.map((post) => (
+                    <Post key={post.post_id} postContent={post} />
+                ))}
 
-            {(!coursePosts || coursePosts.hasMore) && (
+            {(!postByCourse[courseId] || postByCourse[courseId].hasMore) && (
                 <div
                     ref={loaderRef}
                     className=" w-full flex justify-center mt-5"
@@ -78,9 +69,9 @@ function PostList({ courseId, programId }) {
                 </div>
             )}
 
-            {coursePosts &&
-                coursePosts.list.length === 0 &&
-                !coursePosts.hasMore && (
+            {postByCourse[courseId] &&
+                postByCourse[courseId].list.length === 0 &&
+                !postByCourse[courseId].hasMore && (
                     <EmptyState
                         imgSrc={"/images/illustrations/empty.svg"}
                         text={`“There’s a whole lot of nothing going on—time to make something happen!”`}
@@ -89,5 +80,3 @@ function PostList({ courseId, programId }) {
         </div>
     );
 }
-
-export default React.memo(PostList);

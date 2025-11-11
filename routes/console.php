@@ -7,6 +7,7 @@ Schedule::daily()
         Schedule::command('app:permanently-delete-assessments');
         Schedule::command('app:permanently-delete-materials');
         Schedule::command('app:permanently-delete-sections');
+        Schedule::command('app:permanently-delete-posts');
     });
 
 Schedule::everyMinute()

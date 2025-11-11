@@ -17,6 +17,8 @@ import ModalContainer from "../../../../../../Components/ModalContainer";
 import File from "../File";
 import { getRemainingDays } from "../../../../../../Utils/getRemainingDays";
 import ModalDocViewer from "../../../../../../Components/ModalDocViewer";
+import { MdQuiz } from "react-icons/md";
+import { BsFillClipboard2CheckFill } from "react-icons/bs";
 
 export default function AssessmentItem({
     assessmentDetails,
@@ -214,12 +216,21 @@ export default function AssessmentItem({
             >
                 <div className="flex items-start sm:items-center gap-2 md:gap-2">
                     <div className="flex-1 min-w-0 flex flex-wrap gap-5">
-                        <h1 className="text-size2 truncate font-bold">
+                        <div className="flex items-center gap-2">
                             {assessmentDetails.assessment_type
-                                .assessment_type === "quiz"
-                                ? "New Quiz"
-                                : "New Activity"}
-                        </h1>
+                                .assessment_type === "quiz" ? (
+                                <MdQuiz className="text-ascend-blue text-size5" />
+                            ) : (
+                                <BsFillClipboard2CheckFill className="text-ascend-blue text-size5" />
+                            )}
+
+                            <h1 className="text-size2 truncate font-bold">
+                                {assessmentDetails.assessment_type
+                                    .assessment_type === "quiz"
+                                    ? "New Quiz"
+                                    : "New Activity"}
+                            </h1>
+                        </div>
 
                         {assessmentDetails.deleted_at ? (
                             <div className="flex flex-wrap gap-2">

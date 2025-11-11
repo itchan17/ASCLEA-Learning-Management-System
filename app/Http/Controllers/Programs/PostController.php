@@ -22,7 +22,7 @@ class PostController extends Controller
     {
         $validatedData = $request->validate([
             'post_title' => 'required|string|max:255',
-            'post_description' => 'nullable|string',
+            'post_description' => 'required|string',
             'status' => 'required|in:published,draft',
         ]);
 
@@ -36,5 +36,39 @@ class PostController extends Controller
         $postList = $this->postService->listPosts($course->course_id, $request->user()->user_id);
 
         return response()->json($postList);
+    }
+
+    public function updatePost(Request $request, Program $program, Course $course, Post $post)
+    {
+        $validatedData = $request->validate([
+            'post_title' => 'required|string|max:255',
+            'post_description' => 'required|string',
+            'status' => 'required|in:published,draft',
+        ]);
+
+        $updatedPost = $this->postService->updatePost($post, $validatedData);
+
+        return response()->json(['success' => "Post updated successfully.", 'data' => $updatedPost]);
+    }
+
+    public function unpublishPost(Request $request, Program $program, Course $course, Post $post)
+    {
+        $unpublishedPost = $this->postService->updatePost($post, [], true);
+
+        return response()->json(['success' => "Post unpublished successfully.", 'data' => $unpublishedPost]);
+    }
+
+    public function archivePost(Program $program, Course $course, Post $post)
+    {
+        $archivedPost = $this->postService->archivePost($post);
+
+        return response()->json(["success" => "Post archived successfully.", "data" => $archivedPost]);
+    }
+
+    public function restorePost(Program $program, Course $course,  $post)
+    {
+        $restoredPost = $this->postService->restorePost($post);
+
+        return response()->json(["success" => "Post restored successfully.", "data" => $restoredPost]);
     }
 }

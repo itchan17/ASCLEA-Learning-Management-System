@@ -13,7 +13,7 @@ class PostService
 
         $post = Post::create($validatedData);
 
-        return $post;
+        return $this->getPostCompleteDetails($post);
     }
 
     public function listPosts(string $courseId, string $userId)
@@ -37,5 +37,43 @@ class PostService
 
 
         return $postList;
+    }
+
+    public function updatePost(Post $post, array $updatedData, bool $isUnpublish = false)
+    {
+        // Check if the request is only for unpublishing the post
+        if ($isUnpublish) {
+            // Only udpates the post status
+            $post->update(['status' => 'draft']);
+        } else {
+            $post->update($updatedData);
+        }
+
+        $post->refresh();
+
+        return $this->getPostCompleteDetails($post);
+    }
+
+    public function archivePost(Post $post)
+    {
+        $post->delete(); // Soft delete the post
+
+        return  $this->getPostCompleteDetails($post);
+    }
+
+    public function restorePost(string $postId)
+    {
+        // Get the instace of model since model binding
+        // is not working for soft deleted data
+        $post = Post::withTrashed()->findOrFail($postId);
+
+        $post->restore();
+
+        return  $this->getPostCompleteDetails($post);
+    }
+
+    public function getPostCompleteDetails(Post $post)
+    {
+        return $post->load('author:user_id,first_name,last_name');
     }
 }
