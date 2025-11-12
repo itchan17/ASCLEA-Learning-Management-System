@@ -46,4 +46,12 @@ class AdmissionFile extends Model
     {
         return $this->belongsTo(Student::class, 'student_id', 'student_id');
     }
+
+    public function resolveRouteBinding($value, $field = null)
+    {
+        return $this->withTrashed()
+                    ->where($field ?? $this->getRouteKeyName(), $value)
+                    ->first();
+    }
+
 }

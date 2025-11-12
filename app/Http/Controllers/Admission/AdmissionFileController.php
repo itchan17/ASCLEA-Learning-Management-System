@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Admission\AdmissionFile;
 use App\Models\Student;
 use Inertia\Inertia;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class AdmissionFileController extends Controller
 {
@@ -262,7 +264,12 @@ class AdmissionFileController extends Controller
         }
 
         $student->save();
-        
+
+        // Soft-delete uploaded files if rejected
+        if ($student->admission_status === 'Rejected') {
+            $student->admissionFiles()->update(['deleted_at' => now()]);
+        }
+
         // If the Student has been approved, the toast status is success and will direct the admin to the admission page
         if ($student->admission_status === 'Accepted' && $student->enrollment_status === 'enrolled') {
             return redirect()->route('admission.index')->with('success', 'Student approved successfully!');
@@ -392,12 +399,10 @@ class AdmissionFileController extends Controller
         $this->checkAdmin();
 
         // Fetch all pending students with student enrollment status of pending
-        $students = Student::with('user')
-            ->where('enrollment_status', 'pending')
-            ->get();
+        $students = Student::with('user')->where('enrollment_status', 'pending')->get();
 
-        // Use a blade view for formatting PDF
-        $pdf = Pdf::loadView('admission.pending-students-pdf', compact('students'));
+        $pdf = Pdf::setOptions(['defaultFont' => 'DejaVu Sans'])
+            ->loadView('admission.pending-students-pdf', compact('students'));
 
         return $pdf->download('pending_students.pdf');
     }
@@ -450,16 +455,16 @@ class AdmissionFileController extends Controller
     {
         $this->checkAdmin();
 
-        // Fetch all enrolled students with student enrollment status of enrolled/dropout/withdrawn
         $students = Student::with('user')
-            ->whereIn('enrollment_status', ['enrolled', 'dropout', 'withdrawn'])
+            ->where('enrollment_status', 'enrolled')
             ->get();
-
-        // Use a blade view for formatting PDF
-        $pdf = Pdf::loadView('admission.enrolled-students-pdf', compact('students'));
+        
+        $pdf = Pdf::setOptions(['defaultFont' => 'DejaVu Sans'])
+            ->loadView('admission.enrolled-students-pdf', compact('students'));
 
         return $pdf->download('enrolled_students.pdf');
     }
+
 
 
 

@@ -92,9 +92,10 @@ export default function PendingStudentsTable({ active }) {
                                     <td className="py-5">{student.user.email}</td>
                                     <td className="py-5">{new Date(student.created_at).toLocaleDateString()}</td>
                                     <td className={`py-5 ${
-                                        student.admission_status === "Accepted" ? "text-ascend-blue" :
-                                        student.admission_status === "Not Submitted" ? "text-ascend-red" :
-                                        student.admission_status === "Pending" ? "text-ascend-yellow" : "text-ascend-gray2"
+                                        student.admission_status === "Accepted" ? "text-ascend-green" :
+                                        student.admission_status === "Not Submitted" ? "text-ascend-blue" :
+                                        student.admission_status === "Pending" ? "text-ascend-yellow" : 
+                                        student.admission_status === "Rejected" ? "text-ascend-red" : ""
                                     }`}>
                                         {student.admission_status}
                                     </td>
@@ -142,7 +143,7 @@ export default function PendingStudentsTable({ active }) {
                                 <li>
                                     {/* href={route("admissions.pending.exportPdf")} */}
                                     <a
-                                        href="#"
+                                        href={route("admissions.pending.exportPdf")}
                                         className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
                                     >
                                         Download as pdf

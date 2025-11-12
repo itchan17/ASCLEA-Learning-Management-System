@@ -27,8 +27,6 @@ export default function UnapprovedStudentAdmission({student}) {
         setOpenForm(!openForm);
     };
 
-    console.log("Student Admission Status:", student?.admission_status);
-
     const handleSubmit = () => {
         if (uploadedFiles.length === 0) {
             displayToast(
@@ -125,7 +123,7 @@ export default function UnapprovedStudentAdmission({student}) {
                   <div className="flex flex-col justify-center space-y-5">
                       <EmptyState
                           imgSrc="/images/illustrations/RejectedAdmission.svg"
-                          text="“Unfortunately, your admission was not approved. You may re-upload the required documents for reconsideration.”"
+                          text={`“${student.admission_message}”`}
                       />
                       <PrimaryButton
                           doSomething={toggleForm}

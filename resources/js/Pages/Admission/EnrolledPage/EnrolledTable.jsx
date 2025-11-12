@@ -154,7 +154,7 @@ export default function EnrolledStudentsTable({ active }) {
                                 <li>
                                     {/* href={route("admissions.enrolled.exportPdf")} */}
                                     <a
-                                        href="#"
+                                        href={route("admissions.enrolled.exportPdf")}
                                         className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
                                     >
                                         Download as pdf

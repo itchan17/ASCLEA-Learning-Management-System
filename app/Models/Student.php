@@ -75,7 +75,7 @@ class Student extends Model
 
     public function admissionFiles(): HasMany
     {
-        return $this->hasMany(AdmissionFile::class, 'student_id', 'student_id');
+        return $this->hasMany(AdmissionFile::class, 'student_id', 'student_id')->withTrashed();
     }
 
     public function approver()

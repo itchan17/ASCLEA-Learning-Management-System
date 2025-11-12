@@ -15,7 +15,7 @@ class VerificationController extends Controller
 
     public function verifyEmailNotice (EmailVerificationRequest $request) {
         $request->fulfill();
-        return redirect()->route('dashboard.index');
+        return redirect()->route('admission.index'); // changed from dashboard to admission.index
     }
 
     public function verifyEmailHandler (Request $request) {
