@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Programs\PostController;
+use App\Models\Programs\Post;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('programs/{program}/courses/{course}')
@@ -8,20 +9,20 @@ Route::prefix('programs/{program}/courses/{course}')
     ->group(function () {
 
         // Create post
-        Route::post('/posts/create', [PostController::class, 'createPost'])->name('post.create');
+        Route::post('/posts/create', [PostController::class, 'createPost'])->can('createPost', [Post::class, 'course'])->name('post.create');
 
         // Get all the posts
-        Route::get('/posts', [PostController::class, 'getPosts'])->name('posts.get');
+        Route::get('/posts', [PostController::class, 'getPosts'])->can('viewPosts', [Post::class, 'course'])->name('posts.get');
 
         // Update post
-        Route::put('/posts/{post}', [PostController::class, 'updatePost'])->name('post.update');
+        Route::put('/posts/{post}', [PostController::class, 'updatePost'])->can('updatePost', 'post')->name('post.update');
 
         // Unpublish post
-        Route::put('/posts/{post}/unpublish', [PostController::class, 'unpublishPost'])->name('post.unpublish');
+        Route::put('/posts/{post}/unpublish', [PostController::class, 'unpublishPost'])->can('updatePost', 'post')->name('post.unpublish');
 
         // Archive post
-        Route::delete('/posts/{post}', [PostController::class, 'archivePost'])->name('post.archive');
+        Route::delete('/posts/{post}', [PostController::class, 'archivePost'])->can('archivePost', 'post')->name('post.archive');
 
         /// Restoree post
-        Route::put('/posts/{post}/restore', [PostController::class, 'restorePost'])->name('post.restore');
+        Route::put('/posts/{post}/restore', [PostController::class, 'restorePost'])->can('restorePost', [Post::class, 'post'])->name('post.restore');
     });
