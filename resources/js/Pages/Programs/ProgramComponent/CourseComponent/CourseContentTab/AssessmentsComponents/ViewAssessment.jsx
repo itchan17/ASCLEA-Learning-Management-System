@@ -152,7 +152,12 @@ export default function ViewAssessment({
                 </h1>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                {assessment.quiz && <Quiz quizDetails={assessment.quiz} />}
+                {assessment.quiz && (
+                    <Quiz
+                        asssessment={assessment}
+                        quizDetails={assessment.quiz}
+                    />
+                )}
                 {assessment.files.length > 0 &&
                     assessment.files.map((file) => (
                         <File

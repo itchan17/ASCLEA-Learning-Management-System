@@ -70,7 +70,7 @@ export default function AssessmentItem({
                         quiz: assessmentDetails.quiz.quiz_id,
                     })
                 );
-            } else {
+            } else if (auth.user.user_id === assessmentDetails.created_by) {
                 router.visit(
                     route("assessment.quiz-form.edit", {
                         assessment: assessmentDetails.assessment_id,
@@ -344,7 +344,12 @@ export default function AssessmentItem({
                             stopPropagation(e);
                             handleQuizClick();
                         }}
-                        className="flex h-15 items-center space-x-4 p-2 border border-ascend-gray1 bg-ascend-white hover-change-bg-color cursor-pointer"
+                        className={`flex h-15 items-center space-x-4 p-2 border border-ascend-gray1 bg-ascend-white ${
+                            auth.user.role_name === "student" ||
+                            auth.user.user_id === assessmentDetails.created_by
+                                ? "hover-change-bg-color cursor-pointer"
+                                : ""
+                        }`}
                     >
                         <div className="w-full flex overflow-hidden font-semibold font-nunito-sans text-ascebd-black">
                             <SiGoogleforms className="text-size5 text-ascend-blue" />
