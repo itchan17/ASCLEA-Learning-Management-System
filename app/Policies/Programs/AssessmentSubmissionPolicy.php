@@ -55,7 +55,8 @@ class AssessmentSubmissionPolicy
             $query->where('course_id', $course->course_id);
         })->exists();
         $isNotSubmitted = $assessmentSubmission->submitted_at === null;
-        $isNotPastDueDate = $assessment->due_datetime > Carbon::now();
+        // If assessment is has no due date return true, if not check if its past due data
+        $isNotPastDueDate = !is_null($assessment->due_datetime) ? $assessment->due_datetime > Carbon::now() : true;
         $isPublished = $assessment->status === "published";
         $isAssessmentSubmissionAuthor = $assessmentSubmission->submittedBy->member->user->user_id === $user->user_id;
 

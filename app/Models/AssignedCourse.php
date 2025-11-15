@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AssignedCourse extends Model
 {
-    use HasUuids;
+    use HasUuids, SoftDeletes;
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -42,7 +43,7 @@ class AssignedCourse extends Model
 
     public function member(): BelongsTo
     {
-        return $this->belongsTo(LearningMember::class, 'learning_member_id');
+        return $this->belongsTo(LearningMember::class, 'learning_member_id')->withTrashed();
     }
 
     public function course(): BelongsTo
