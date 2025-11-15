@@ -260,20 +260,27 @@ class DashboardController extends Controller
                 'status' => ucfirst($submission->submission_status),
             ]);
 
-        $pending = AssessmentSubmission::whereIn('submitted_by', $assignedCourseIds)
-            ->where('submission_status', 'not_submitted')
-            ->with(['assessment' => fn($q) =>
-                $q->select('assessment_id', 'assessment_title', 'due_datetime', 'total_points', 'course_id')
-                  ->with(['course:course_id,course_name,course_code'])])
-            ->select('assessment_submission_id', 'assessment_id', 'submitted_by', 'submission_status')
-            ->latest('assessment_submission_id')->paginate(5)
-            ->through(fn($submission) => [
-                'assessment_title' => $submission->assessment?->assessment_title ?? 'Untitled',
-                'course_name' => $submission->assessment?->course?->course_name ?? 'Unknown Course',
-                'course_code' => $submission->assessment?->course?->course_code ?? '-',
-                'due_date' => $submission->assessment?->due_datetime ? Carbon::parse($submission->assessment->due_datetime)->format('F d, Y') : null,
-                'possible_score' => $submission->assessment?->total_points ?? 0,
-                'status' => ucfirst($submission->submission_status),
+        $pending = Assessment::whereIn('course_id', function ($query) use ($assignedCourseIds) {
+                $query->select('course_id')
+                    ->from('assigned_courses')
+                    ->whereIn('assigned_course_id', $assignedCourseIds);
+            })
+            ->where('status', 'published')
+            ->with(['course' => fn($q) =>
+                $q->select('course_id', 'course_name', 'course_code')
+            ])
+            ->select('assessment_id', 'assessment_title', 'due_datetime', 'total_points', 'course_id')
+            ->orderBy('assessment_id', 'desc')
+            ->paginate(5)
+            ->through(fn($assessment) => [
+                'assessment_title' => $assessment->assessment_title ?? 'Untitled',
+                'course_name'      => $assessment->course?->course_name ?? 'Unknown Course',
+                'course_code'      => $assessment->course?->course_code ?? '-',
+                'due_date'         => $assessment->due_datetime
+                                        ? Carbon::parse($assessment->due_datetime)->format('F d, Y')
+                                        : null,
+                'possible_score'   => $assessment->total_points ?? 0,
+                'status'           => 'Assigned',
             ]);
 
         return [$accomplished, $pending];
