@@ -3,6 +3,7 @@ import { Chart as ChartJS } from "chart.js/auto";
 import { Line, Bar, Pie } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import CustomSelect from "../../../Components/CustomInputField/CustomSelect";
+import { formatHours } from "../../../Utils/formatMinsHours";
 
 export default function StaffCharts({ dailyLogins, avgTimePerDay, assessments }) {
     const [selectedAssessment, setSelectedAssessment] = useState("");
@@ -23,7 +24,7 @@ export default function StaffCharts({ dailyLogins, avgTimePerDay, assessments })
             <div className="space-y-5 w-full md:w-2/3">
                 {/* Avg Time Spent Chart */}
                 <div className="sm:border border-ascend-gray1 sm:shadow-shadow1 sm:p-4 space-y-5">
-                    <h1 className="text-size4 font-bold">Avg Time Spent (Hours)</h1>
+                    <h1 className="text-size4 font-bold">Students' Average Time Spent</h1>
                     <Line
                         data={{
                             labels: Object.keys(avgTimePerDay).map((d) =>
@@ -44,13 +45,25 @@ export default function StaffCharts({ dailyLogins, avgTimePerDay, assessments })
                         options={{
                             plugins: {
                                 legend: { display: false },
-                                datalabels: { color: "#01007d" },
+                                datalabels: {
+                                    color: "#01007d",
+                                    formatter: (value) => (value === 0 ? "" : formatHours(value)),
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            const label = context.dataset.label || "";
+                                            const rawValue = context.raw;
+                                            return `${label}: ${formatHours(rawValue)}`;
+                                        },
+                                    },
+                                },
                             },
                             scales: {
                                 y: {
                                     beginAtZero: true,
                                     ticks: {
-                                        callback: (value) => value + "hrs",
+                                        callback: (value) => formatHours(value),
                                     },
                                 },
                             },
@@ -61,7 +74,7 @@ export default function StaffCharts({ dailyLogins, avgTimePerDay, assessments })
 
                 {/* Daily Logins */}
                 <div className="sm:border border-ascend-gray1 sm:shadow-shadow1 sm:p-4 space-y-5">
-                    <h1 className="text-size4 font-bold">Daily Logins</h1>
+                    <h1 className="text-size4 font-bold">Students' Daily Logins</h1>
                     <Bar
                         data={{
                             labels: dailyLogins.dates.map((d) =>

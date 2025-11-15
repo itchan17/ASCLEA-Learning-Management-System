@@ -4,6 +4,17 @@ import { Line, Bar } from "react-chartjs-2";
 import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
 import CustomSelect from "../../../Components/CustomInputField/CustomSelect";
 
+function formatHours(decimalHours) {
+    if (!decimalHours || decimalHours === 0) return "0 mins";
+
+    const totalMinutes = Math.round(decimalHours * 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    if (hours === 0) return `${minutes} mins`;
+    return `${hours}:${minutes.toString().padStart(2, "0")} hrs`;
+}
+
 export default function StudentCharts({ dailyTimeSpent = [], courseImprovementRates = [] }) {
     const [selectedCourse, setSelectedCourse] = useState("");
     const selected = courseImprovementRates.find(c => c.course_name === selectedCourse);
@@ -30,9 +41,27 @@ export default function StudentCharts({ dailyTimeSpent = [], courseImprovementRa
                             }],
                         }}
                         options={{
-                            plugins: { legend: { display: false } },
+                            plugins: {
+                                legend: { display: false },
+                                datalabels: {
+                                    color: "#01007d",
+                                    formatter: (value) => (value === 0 ? "" : formatHours(value))
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            const label = context.dataset.label || "";
+                                            const rawValue = context.raw;
+                                            return `${label}: ${formatHours(rawValue)}`;
+                                        }
+                                    }
+                                }
+                            },
                             scales: {
-                                y: { beginAtZero: true, ticks: { callback: v => v + " hrs" } },
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { callback: (value) => formatHours(value) },
+                                },
                             },
                         }}
                         plugins={[ChartDataLabels]}

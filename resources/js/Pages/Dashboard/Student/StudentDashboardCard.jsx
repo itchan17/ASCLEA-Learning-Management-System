@@ -3,6 +3,36 @@ import DashboardCard from "../Component/DashboardCard";
 import { MdTask, MdQuiz, MdAccessTimeFilled } from "react-icons/md";
 import { RiFileList2Fill } from "react-icons/ri";
 
+function formatHours(decimalHours) {
+    if (!decimalHours || decimalHours === 0) 
+        return <span>0 <span className="text-sm">mins</span></span>;
+
+    const totalMinutes = Math.round(decimalHours * 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    if (hours === 0) 
+        return <span>{minutes} <span className="text-sm">mins</span></span>;
+
+    return (
+        <span>
+            {hours}:{minutes.toString().padStart(2, "0")} 
+            <span className="text-sm"> hrs</span>
+        </span>
+    );
+}
+
+/*function formatHours(decimalHours) {
+    if (!decimalHours || decimalHours === 0) return "0 mins";
+
+    const totalMinutes = Math.round(decimalHours * 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    if (hours === 0) return `${minutes} mins`;
+    return `${hours}:${minutes.toString().padStart(2, "0")} hrs`;
+}*/
+
 export default function StudentDashboardCard({
         total_learning_hours, 
         total_assigned_courses, 
@@ -28,9 +58,9 @@ export default function StudentDashboardCard({
                 label="Total Assigned Courses"
             />
             <DashboardCard
-                value={total_learning_hours || 0}
+                value={formatHours(total_learning_hours)}
                 icon={<MdAccessTimeFilled className="text-[#FF663C]" />}
-                label="Total Learning Hours"
+                label="Total Learning Time"
             />
         </div>
     );

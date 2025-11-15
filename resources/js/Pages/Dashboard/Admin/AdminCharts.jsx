@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { Chart as ChartJS } from "chart.js/auto";
 import { Line, Bar, Pie } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import { formatHours } from "../../../Utils/formatMinsHours";
 
 function StaffCharts({ studentsPerProgram, dailyLogins, avgTimePerDay }) {
     const programLabels = studentsPerProgram.map(p => p.program_name);
@@ -16,7 +17,7 @@ function StaffCharts({ studentsPerProgram, dailyLogins, avgTimePerDay }) {
                 <div className="sm:border border-ascend-gray1 sm:shadow-shadow1 sm:p-4 space-y-5">
                     <div>
                         <h1 className="text-size4 font-bold">
-                            Avg Time Spent (Hours)
+                            Students' Average Time Spent 
                         </h1>
                     </div>
                     <Line
@@ -38,13 +39,23 @@ function StaffCharts({ studentsPerProgram, dailyLogins, avgTimePerDay }) {
                                 },
                                 datalabels: {
                                     color: "#01007d",
+                                    formatter: (value) => (value === 0 ? "" : formatHours(value)),
                                 },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function (context) {
+                                            const label = context.dataset.label || "";
+                                            const rawValue = context.raw;
+                                            return `${label}: ${formatHours(rawValue)}`;
+                                        }
+                                    }
+                                }
                             },
                             scales: {
                                 y: {
                                     beginAtZero: true,
                                     ticks: {
-                                        callback: (value) => value + "hrs",
+                                        callback: (value) => formatHours(value),
                                     },
                                 },
                             },
@@ -54,7 +65,7 @@ function StaffCharts({ studentsPerProgram, dailyLogins, avgTimePerDay }) {
                 </div>
                 <div className="sm:border border-ascend-gray1 sm:shadow-shadow1 sm:p-4 space-y-5">
                     <div>
-                        <h1 className="text-size4 font-bold">Daily Logins</h1>
+                        <h1 className="text-size4 font-bold">Students' Daily Logins</h1>
                     </div>
                     <Bar
                         data={{
