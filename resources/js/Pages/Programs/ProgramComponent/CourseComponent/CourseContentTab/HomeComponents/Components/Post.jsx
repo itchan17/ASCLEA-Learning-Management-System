@@ -123,7 +123,7 @@ export default function Post({ postContent }) {
                                                 <li
                                                     onClick={() => {
                                                         handleUnpublishPost(
-                                                            postContent.post_ids
+                                                            postContent.post_id
                                                         );
 
                                                         closeDropDown();

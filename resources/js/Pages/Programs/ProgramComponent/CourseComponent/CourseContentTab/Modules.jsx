@@ -45,7 +45,12 @@ export default function Modules() {
         <div className="font-nunito-sans text-ascend-black space-y-5">
             <div className="flex flex-wrap gap-2 justify-between items-center">
                 <h1 className="text-size6 font-bold">Course Modules</h1>
-                <RoleGuard allowedRoles={["admin", "faculty"]}>
+                <RoleGuard
+                    allowedRoles={[
+                        "admin",
+                        activeTab === "materials" ? "faculty" : null,
+                    ]}
+                >
                     <div className="flex space-x-[0.5px]">
                         <PrimaryButton
                             doSomething={

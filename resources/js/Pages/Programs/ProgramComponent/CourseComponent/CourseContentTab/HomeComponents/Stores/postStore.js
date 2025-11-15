@@ -4,33 +4,6 @@ import { persist } from "zustand/middleware";
 const usePostStore = create((set) => ({
     postByCourse: {},
 
-    setAssessments: (courseId, list, page, hasMore) => {
-        const { assessmentByCourse } = useAssessmentsStore.getState();
-
-        // Check if the list for the course if it does mix the previous list to new ones
-        const assessmentList = assessmentByCourse[courseId]
-            ? [...assessmentByCourse[courseId].list, ...list]
-            : [...list];
-
-        // Map handle removing duplicate values based on the assessment id
-        const uniqueAssessments = [
-            ...new Map(
-                assessmentList.map((a) => [a.assessment_id, a])
-            ).values(),
-        ];
-
-        set(() => ({
-            assessmentByCourse: {
-                ...assessmentByCourse,
-                [courseId]: {
-                    list: uniqueAssessments,
-                    page,
-                    hasMore,
-                },
-            },
-        }));
-    },
-
     setPosts: (courseId, list, page, hasMore) => {
         const { postByCourse } = usePostStore.getState();
 

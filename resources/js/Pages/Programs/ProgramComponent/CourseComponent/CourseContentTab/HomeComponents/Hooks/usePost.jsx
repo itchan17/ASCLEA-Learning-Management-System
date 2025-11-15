@@ -126,7 +126,7 @@ export default function usePost({ programId, courseId }) {
 
     const handleUnpublishPost = async (postId) => {
         try {
-            console.log(programId);
+            console.log(postId);
             const response = await axios.put(
                 route("post.unpublish", {
                     program: programId,

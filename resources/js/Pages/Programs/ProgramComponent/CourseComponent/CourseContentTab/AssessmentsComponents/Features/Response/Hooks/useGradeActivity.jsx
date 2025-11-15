@@ -25,6 +25,7 @@ export default function useGradeActivity({
     }, []);
 
     const handleUpdateGrade = (grade) => {
+        console.log("UPDATING");
         setIsChanged(true);
         setIsloading(true);
         router.put(
