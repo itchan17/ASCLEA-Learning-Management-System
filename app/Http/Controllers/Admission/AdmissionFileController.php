@@ -95,6 +95,7 @@ class AdmissionFileController extends Controller
         $query->whereHas('user', function ($q) use ($search) {
             $q->where('first_name', 'like', "%{$search}%")
               ->orWhere('last_name', 'like', "%{$search}%")
+              ->orWhere('middle_name', 'like', "%{$search}%")
               ->orWhere('email', 'like', "%{$search}%");
         });
     }
@@ -133,6 +134,7 @@ class AdmissionFileController extends Controller
             $query->whereHas('user', function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
                   ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('middle_name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
             });
         }

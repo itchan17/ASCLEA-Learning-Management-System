@@ -321,8 +321,8 @@ const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
                 </div>
 
                 {/*===========================PROGRAM AND ENROLLMENT STATUS===========================*/}
-                <div className="grid grid-cols-1 sm:grid-cols-1 gap-5 mt-5">
-                    {/*<div className="flex flex-col">
+                {/*<div className="grid grid-cols-1 sm:grid-cols-1 gap-5 mt-5">
+                    <div className="flex flex-col">
                         <label>Program</label>
                         <select
                             name="program"
@@ -337,7 +337,7 @@ const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
                             <option value="program1">Program 1</option>
                             <option value="program2">Program 2</option>
                         </select>
-                    </div>*/}
+                    </div>
 
                     <div className="flex flex-col">
                         <label>Enrollment Status</label>
@@ -356,10 +356,27 @@ const DataFormFields = ({ student, isEditDisabled, setIsEditDisabled }) => {
                             <option value="withdrawn">Withdrawn</option>
                         </select>
                     </div>
-                </div>
+                </div>*/}
 
-                {/*===========================STUDENT CONTACT INFO===========================*/}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5">
+                {/*===========================ENROLLMENT STATUS & STUDENT CONTACT INFO===========================*/}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-5">
+                    <div className="flex flex-col">
+                        <label>Enrollment Status</label>
+                        <select
+                            name="enrollment_status"
+                            value={formData.enrollment_status}
+                            onChange={handleChange}
+                            disabled={isEditDisabled}
+                            className={`textField border px-3 py-2 ${
+                                isEditDisabled ? "text-ascend-gray1" : ""
+                            } border-ascend-gray1 focus:outline-ascend-blue`}
+                        >
+                            <option value="">Select Status</option>
+                            <option value="enrolled">Enrolled</option>
+                            <option value="dropout">Dropout</option>
+                            <option value="withdrawn">Withdrawn</option>
+                        </select>
+                    </div>
                     <div className="flex flex-col">
                         <label className="font-nunito-sans text-size2 text-ascend-black">Phone Number</label>
                         <input

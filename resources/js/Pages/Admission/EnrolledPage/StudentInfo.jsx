@@ -164,13 +164,27 @@ const StudentInfo = () => {
       </div>
 
       {/* Approval Info */}
-      <div className="mt-5 flex items-center justify-between">
-        <div className="font-nunito-sans text-size2">
+      <div className="mt-5 flex gap-5 font-nunito-sans text-size2">
+        <h1 className="font-bold">
+          Approved At:{" "}
+          <span className="font-normal">
+            {student.approved_at
+              ? new Date(student.approved_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })
+              : ""}
+          </span>
+        </h1>
+        <h1 className="font-bold">
           Approved by:{" "}
-          {student.approver
-            ? `${student.approver.first_name} ${student.approver.last_name}`
-            : ""}
-        </div>
+          <span className="font-normal">
+            {student.approver
+              ? `${student.approver.first_name} ${student.approver.last_name}`
+              : ""}
+          </span>
+        </h1>
       </div>
       {/* Data Form Fields */}
       <div className="mt-5">

@@ -36,7 +36,7 @@ const AssesstmentTable = ({ completedAssessments }) => {
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="text-center py-5 text-ascend-gray2">
+                <td colSpan={5} className="text-center py-5 text-ascend-gray2 italic">
                   No assessments completed.
                 </td>
               </tr>

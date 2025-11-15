@@ -37,8 +37,8 @@ const CoursesTable = ({ learningMembers }) => {
               ))
             ) : (
               <tr>
-                <td colSpan={3} className="text-center py-5 text-ascend-gray2">
-                  No courses enrolled.
+                <td colSpan={3} className="text-center py-5 text-ascend-gray2 italic">
+                  No programs enrolled and courses assigned.
                 </td>
               </tr>
             )}
