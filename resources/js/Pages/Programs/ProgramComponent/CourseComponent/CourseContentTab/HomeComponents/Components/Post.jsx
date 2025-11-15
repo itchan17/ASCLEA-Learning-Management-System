@@ -75,83 +75,85 @@ export default function Post({ postContent }) {
                             )
                         )}
                     </div>
-                    <RoleGuard allowedRoles={["admin", "faculty"]}>
-                        <div className="h-8 flex items-center">
-                            <div className="dropdown dropdown-end cursor-pointer">
-                                <div
-                                    tabIndex={0}
-                                    role="button"
-                                    className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue/35 transition-all duration-300"
-                                >
-                                    <BsThreeDotsVertical className="text-size3" />
-                                </div>
+                    {auth.user.user_id === postContent.created_by && (
+                        <RoleGuard allowedRoles={["admin", "faculty"]}>
+                            <div className="h-8 flex items-center">
+                                <div className="dropdown dropdown-end cursor-pointer">
+                                    <div
+                                        tabIndex={0}
+                                        role="button"
+                                        className="rounded-4xl p-1 -mr-1 hover:bg-ascend-lightblue/35 transition-all duration-300"
+                                    >
+                                        <BsThreeDotsVertical className="text-size3" />
+                                    </div>
 
-                                <ul
-                                    tabIndex={0}
-                                    className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-                                >
-                                    {postContent.deleted_at ? (
-                                        <li
-                                            onClick={() => {
-                                                handleRestorePost(
-                                                    postContent.post_id
-                                                );
-                                                closeDropDown();
-                                            }}
-                                        >
-                                            <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                Restore post
-                                            </a>
-                                        </li>
-                                    ) : (
-                                        <>
-                                            {postContent.status !==
-                                            "published" ? (
-                                                <li
-                                                    onClick={() => {
-                                                        setIsEditPostFormOpen(
-                                                            true
-                                                        );
-                                                        closeDropDown();
-                                                    }}
-                                                >
-                                                    <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                        Edit post
-                                                    </a>
-                                                </li>
-                                            ) : (
-                                                <li
-                                                    onClick={() => {
-                                                        handleUnpublishPost(
-                                                            postContent.post_id
-                                                        );
-
-                                                        closeDropDown();
-                                                    }}
-                                                >
-                                                    <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                        Unpublish post
-                                                    </a>
-                                                </li>
-                                            )}
+                                    <ul
+                                        tabIndex={0}
+                                        className="dropdown-content menu bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                                    >
+                                        {postContent.deleted_at ? (
                                             <li
                                                 onClick={() => {
-                                                    handleArchivePost(
+                                                    handleRestorePost(
                                                         postContent.post_id
                                                     );
                                                     closeDropDown();
                                                 }}
                                             >
                                                 <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                    Archive post
+                                                    Restore post
                                                 </a>
                                             </li>
-                                        </>
-                                    )}
-                                </ul>
+                                        ) : (
+                                            <>
+                                                {postContent.status !==
+                                                "published" ? (
+                                                    <li
+                                                        onClick={() => {
+                                                            setIsEditPostFormOpen(
+                                                                true
+                                                            );
+                                                            closeDropDown();
+                                                        }}
+                                                    >
+                                                        <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                            Edit post
+                                                        </a>
+                                                    </li>
+                                                ) : (
+                                                    <li
+                                                        onClick={() => {
+                                                            handleUnpublishPost(
+                                                                postContent.post_id
+                                                            );
+
+                                                            closeDropDown();
+                                                        }}
+                                                    >
+                                                        <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                            Unpublish post
+                                                        </a>
+                                                    </li>
+                                                )}
+                                                <li
+                                                    onClick={() => {
+                                                        handleArchivePost(
+                                                            postContent.post_id
+                                                        );
+                                                        closeDropDown();
+                                                    }}
+                                                >
+                                                    <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                        Archive post
+                                                    </a>
+                                                </li>
+                                            </>
+                                        )}
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
-                    </RoleGuard>
+                        </RoleGuard>
+                    )}
                 </div>
                 <div className="flex flex-col justify-between  space-y-5">
                     <h1 className="flex-1 min-w-0 text-size4 truncate font-bold">
