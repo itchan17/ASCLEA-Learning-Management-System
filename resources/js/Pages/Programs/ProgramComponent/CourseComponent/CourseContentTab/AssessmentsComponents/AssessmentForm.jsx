@@ -41,11 +41,7 @@ export default function AssessmentForm({
                   status: assessmentDetailsToEdit.status,
                   assessment_type:
                       assessmentDetailsToEdit.assessment_type.assessment_type,
-                  due_datetime: assessmentDetailsToEdit.due_datetime
-                      ? new Date(assessmentDetailsToEdit.due_datetime)
-                            .toISOString()
-                            .slice(0, 16)
-                      : null, // Converts time into format: Y-m-d\TH:i
+                  due_datetime: assessmentDetailsToEdit.due_datetime,
                   total_points: assessmentDetailsToEdit.total_points,
                   assessment_files: [],
                   uploaded_files: assessmentDetailsToEdit.files,
