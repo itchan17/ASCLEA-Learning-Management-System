@@ -173,7 +173,7 @@ export default function EnrolledStudentsTable({ active }) {
                     </div>
 
                     {/* Pagination (RIGHT) */}
-                    {enrolledStudents?.links?.length > 0 && (
+                    {enrolledStudents?.links?.length > 0 && enrolledStudents?.last_page > 1 && (
                         <div className="flex items-center [&>*]:!mt-0">
                             <Pagination
                                 links={enrolledStudents.links}

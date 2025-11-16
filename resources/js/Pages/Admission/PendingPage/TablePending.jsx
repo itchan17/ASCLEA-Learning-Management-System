@@ -162,7 +162,7 @@ export default function PendingStudentsTable({ active }) {
                     </div>
 
                     {/* Pagination (RIGHT) */}
-                    {pendingStudents?.links?.length > 0 && (
+                    {pendingStudents?.links?.length > 0 && pendingStudents?.last_page > 1 && (
                         <div className="flex items-center [&>*]:!mt-0">
                             <Pagination
                                 links={pendingStudents.links}
