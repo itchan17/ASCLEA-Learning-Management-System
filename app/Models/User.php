@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Administration\Staff;
 use App\Models\PaymentHistory\Payment;
 use App\Models\PaymentHistory\PaymentFile;
 use App\Models\Programs\Assessment;
@@ -151,5 +152,20 @@ class User extends Authenticatable implements MustVerifyEmail
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class, 'graded_by', 'user_id');
+    }
+
+    public function archivedPrograms(): HasMany
+    {
+        return $this->hasMany(Program::class, 'archived_by', 'user_id');
+    }
+
+    public function archivedCourses(): HasMany
+    {
+        return $this->hasMany(Course::class, 'archived_by', 'user_id');
+    }
+
+    public function archivedStaff(): HasMany
+    {
+        return $this->hasMany(Staff::class, 'archived_by', 'user_id');
     }
 }

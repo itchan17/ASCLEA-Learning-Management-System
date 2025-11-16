@@ -43,6 +43,7 @@ class Staff extends Model
         'user_id',
         'status',
         'created_by',
+        'archived_by'
     ];
 
     protected $dates = ['deleted_at'];
@@ -75,5 +76,10 @@ class Staff extends Model
             'user_id',              // staff.user_id
             'learning_member_id'    // learning_members.learning_member_id
         )->with('course.program'); // eager load course and program
+    }
+
+    public function archivedBy(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\User::class, 'archived_by', 'user_id')->withTrashed();
     }
 }

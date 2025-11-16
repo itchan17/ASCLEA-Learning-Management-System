@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -47,6 +48,7 @@ class Program extends Model
     protected $fillable = [
         'program_name',
         'program_description',
+        'archived_by'
     ];
 
     public function courses(): HasMany
@@ -57,5 +59,10 @@ class Program extends Model
     public function learningMembers(): HasMany
     {
         return $this->hasMany(LearningMember::class, 'program_id');
+    }
+
+    public function archivedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'archived_by', 'user_id')->withTrashed();
     }
 }

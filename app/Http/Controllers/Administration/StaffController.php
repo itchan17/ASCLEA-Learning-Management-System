@@ -293,10 +293,14 @@ class StaffController extends Controller
     /**
      * Remove the specified resource or staff user from storage.
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $this->checkAdmin();
         $staff = Staff::with('user')->findOrFail($id);
+
+        $staff->update([
+            'archived_by' => $request->user()->user_id
+        ]);
 
         // Soft delete the staff
         $staff->delete();
@@ -315,6 +319,11 @@ class StaffController extends Controller
         // Restore the staff and user data
         $staff->restore();
         $staff->user->restore();
+
+        // Remove the archived_by   
+        $staff->update([
+            'archived_by' => null
+        ]);
 
         return redirect()->back()->with('success', 'Staff restored successfully.');
     }

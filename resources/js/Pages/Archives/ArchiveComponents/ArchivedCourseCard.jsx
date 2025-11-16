@@ -62,7 +62,12 @@ export default function ArchivedCourseCard({ courseData }) {
                         Arhived on {formatFullDate(courseData.deleted_at)}
                     </span>
                     <span className="text-size1">
-                        Archived by Juan Dela Cruz
+                        Archived by{" "}
+                        {courseData.archived_by
+                            ? `${courseData.archived_by.first_name} ${courseData.archived_by.last_name}`
+                            : courseData.program.archived_by
+                            ? `${courseData.program.archived_by.first_name} ${courseData.program.archived_by.last_name}`
+                            : "N/A"}
                     </span>
                 </div>
                 <div>

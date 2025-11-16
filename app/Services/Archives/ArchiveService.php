@@ -12,7 +12,10 @@ class ArchiveService
     public function getArchivedCourses()
     {
         return Course::onlyTrashed()
-            ->with('program')
+            ->with([
+                'program.archivedBy:user_id,first_name,last_name',
+                'archivedBy:user_id,first_name,last_name',
+            ])
             ->orderBy('deleted_at', 'desc')
             ->get();
     }
@@ -20,7 +23,10 @@ class ArchiveService
     public function getArchivedStaff()
     {
         return Staff::onlyTrashed()
-            ->with('user:user_id,first_name,last_name,profile_image')
+            ->with([
+                'user:user_id,first_name,last_name,profile_image',
+                'archivedBy:user_id,first_name,last_name'
+            ])
             ->orderBy('deleted_at', 'desc')
             ->paginate(10);
     }

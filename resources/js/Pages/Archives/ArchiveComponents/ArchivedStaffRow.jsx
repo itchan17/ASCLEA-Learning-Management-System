@@ -26,7 +26,11 @@ export default function ArchivedStaffRow({ staff }) {
                     </div>
                 </div>
             </td>
-            <td>Juan Dela Cruz</td>
+            <td>
+                {staff.archived_by
+                    ? `${staff.archived_by.first_name} ${staff.archived_by.last_name}`
+                    : "N/A"}
+            </td>
             <td>{formatFullDate(staff.deleted_at)}</td>
             <td>{getRemainingDays(staff.deleted_at, 30)}d</td>
             <td className="flex gap-2">

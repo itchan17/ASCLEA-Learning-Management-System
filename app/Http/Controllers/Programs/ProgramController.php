@@ -86,8 +86,11 @@ class ProgramController extends Controller
     }
 
     // Handle archiving program through soft delete
-    public function archive(Program $program)
+    public function archive(Request $request, Program $program)
     {
+        $program->update([
+            'archived_by' => $request->user()->user_id
+        ]);
 
         $program->delete();
 

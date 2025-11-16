@@ -49,11 +49,36 @@ class CourseController extends Controller
     }
 
     // Archive course
-    public function archive(Program $program, Course $course)
+    public function archive(Request $request, Program $program, Course $course)
     {
+        $course->update([
+            'archived_by' => $request->user()->user_id
+        ]);
+
         $course->delete();
 
         return to_route('program.show', $course->program)->with('success', 'Course archived successfully.');
+    }
+
+    public function restoreCourse($programId, $courseId)
+    {
+        $course = Course::withTrashed()->findOrFail($courseId);
+        $program = Program::withTrashed()->findOrFail($programId);
+
+        // If program was archived restore it first
+        if (!is_null($program->deleted_at)) {
+            $program->restore();
+            $program->update([
+                'archived_by' => null
+            ]);
+        }
+
+        $course->restore();
+        $course->update([
+            'archived_by' => null
+        ]);
+
+        return redirect()->back()->with('success', 'Course restored successfully.');
     }
 
     // Show selected course
@@ -68,21 +93,6 @@ class CourseController extends Controller
                 'students' => fn()  =>  $this->gradeService->getStudentsToBeGraded($request, $course)
             ]
         );
-    }
-
-    public function restoreCourse($programId, $courseId)
-    {
-        $course = Course::withTrashed()->findOrFail($courseId);
-        $program = Program::withTrashed()->findOrFail($programId);
-
-        // If program was archived restore it first
-        if (!is_null($program->deleted_at)) {
-            $program->restore();
-        }
-
-        $course->restore();
-
-        return redirect()->back()->with('success', 'Course restored successfully.');
     }
 
     public function validateCourse($data)
