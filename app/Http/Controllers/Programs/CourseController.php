@@ -39,45 +39,50 @@ class CourseController extends Controller
     // Update course
     public function update(Program $program, Course $course, Request $req)
     {
-        if ($course->program_id === $program->program_id) {
-            // Validate user input
-            $validated = $this->validateCourse($req->all());
 
-            $course->update($validated);
+        // Validate user input
+        $validated = $this->validateCourse($req->all());
 
-            return back()->with('success', 'Course updated successfully.');
-        } else {
-            abort(404);
-        }
+        $course->update($validated);
+
+        return back()->with('success', 'Course updated successfully.');
     }
 
     // Archive course
     public function archive(Program $program, Course $course)
     {
-        if ($course->program_id === $program->program_id) {
-            $course->delete();
+        $course->delete();
 
-            return to_route('program.show', $course->program)->with('success', 'Course archived successfully.');
-        } else {
-            abort(404);
-        }
+        return to_route('program.show', $course->program)->with('success', 'Course archived successfully.');
     }
 
     // Show selected course
     public function showCourse(Request $request, Program $program, Course $course)
     {
-        if ($course->program_id === $program->program_id) {
-            return Inertia::render(
-                'Programs/ProgramComponent/CourseComponent/CourseContent',
-                [
-                    'program' => fn() => $program->only(['program_id']),
-                    'course' => fn() => $course->only(['course_id', 'course_code', 'course_name', 'course_description', 'course_day', 'start_time', 'end_time']),
-                    'students' => fn()  =>  $this->gradeService->getStudentsToBeGraded($request, $course)
-                ]
-            );
-        } else {
-            abort(404);
+
+        return Inertia::render(
+            'Programs/ProgramComponent/CourseComponent/CourseContent',
+            [
+                'program' => fn() => $program->only(['program_id']),
+                'course' => fn() => $course->only(['course_id', 'course_code', 'course_name', 'course_description', 'course_day', 'start_time', 'end_time']),
+                'students' => fn()  =>  $this->gradeService->getStudentsToBeGraded($request, $course)
+            ]
+        );
+    }
+
+    public function restoreCourse($programId, $courseId)
+    {
+        $course = Course::withTrashed()->findOrFail($courseId);
+        $program = Program::withTrashed()->findOrFail($programId);
+
+        // If program was archived restore it first
+        if (!is_null($program->deleted_at)) {
+            $program->restore();
         }
+
+        $course->restore();
+
+        return redirect()->back()->with('success', 'Course restored successfully.');
     }
 
     public function validateCourse($data)

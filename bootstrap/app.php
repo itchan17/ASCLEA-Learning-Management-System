@@ -56,7 +56,8 @@ return Application::configure(basePath: dirname(__DIR__))
             '/assessments',
             'assessments/*',
             'courses/*',
-            '/grades'
+            '/grades',
+            '/archives'
         ]);
         // ------ END ------
         $middleware->web(append: [

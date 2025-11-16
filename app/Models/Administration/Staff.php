@@ -52,7 +52,7 @@ class Staff extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id', 'user_id');
+        return $this->belongsTo(\App\Models\User::class, 'user_id', 'user_id')->withTrashed();
     }
 
     public function createdBy(): BelongsTo
@@ -76,6 +76,4 @@ class Staff extends Model
             'learning_member_id'    // learning_members.learning_member_id
         )->with('course.program'); // eager load course and program
     }
-
-
 }

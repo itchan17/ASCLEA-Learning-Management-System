@@ -50,7 +50,7 @@ class Course extends Model
 
     public function program(): BelongsTo
     {
-        return $this->belongsTo(Program::class, 'program_id');
+        return $this->belongsTo(Program::class, 'program_id')->withTrashed();
     }
 
     public function assignedTo(): HasMany

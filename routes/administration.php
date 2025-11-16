@@ -7,7 +7,7 @@ use App\Models\Administration;
 Route::prefix('administration')
     ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin'])
     ->group(function () {
-        
+
         // Administration dashboard
         Route::get('/', [StaffController::class, 'administrationIndex'])->name('administration.index');
 
@@ -36,6 +36,9 @@ Route::prefix('administration')
         // Soft delete (archive)
         Route::delete('staff/{id}', [StaffController::class, 'destroy'])->name('staff.destroy');
 
+        // Restore staff
+        Route::put('staff/{id}/restore', [StaffController::class, 'restoreStaff'])->name('staff.restore');
+
         // View staff details (like your old closure)
         Route::get('/{staffId}', [StaffController::class, 'administrationView'])->name('administration.view');
-});
+    });
