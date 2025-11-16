@@ -48,7 +48,9 @@ export default function AssignedCourses() {
                 </table>
             </div>
             {/*===========================Pagination: only show if there are courses===========================*/}
-            {assignedCourses?.data && assignedCourses.data.length > 0 && assignedCourses?.links && (
+            {assignedCourses?.data &&
+            assignedCourses.data.length > 0 &&
+            assignedCourses?.last_page > 1 && (   // ⬅ only show if more than 1 page
                 <Pagination
                     links={assignedCourses.links}
                     currentPage={assignedCourses.current_page}

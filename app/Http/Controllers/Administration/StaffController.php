@@ -59,7 +59,7 @@ class StaffController extends Controller
             $query->where('status', $status);
         }
         
-        //Display 5 staff per page
+        //Display 10 staff per page
         $staffs = $query->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
@@ -292,7 +292,6 @@ class StaffController extends Controller
             'contact_number' => $request->contact_number,
             'birthdate' => $request->birthdate,
             'gender' => $request->gender,
-            'status' => $request->status
         ]);
         
         $staff->user->update([
@@ -301,6 +300,10 @@ class StaffController extends Controller
             'province' => $request->province,
             'city' => $request->city,
             'barangay' => $request->barangay,
+        ]);
+
+        $staff->update([
+            'status' => $request->status,
         ]);
 
 
