@@ -41,7 +41,6 @@ export default function useArchive() {
                 program: promgramId,
                 course: courseId,
             }),
-            {},
             {
                 showProgress: false,
                 only: ["archivedCourses", "flash"],
