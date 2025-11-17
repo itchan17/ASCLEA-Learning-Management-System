@@ -1,12 +1,19 @@
-import React from "react";
+import { useState } from "react";
 import { formatFullDate } from "../../../Utils/formatFullDate";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
 import { getRemainingDays } from "../../../Utils/getRemainingDays";
-import useArchive from "./Hooks/useArchive";
 
-export default function ArchivedStaffRow({ staff }) {
-    // Custom hook
-    const { isRestoreLoading, handleRestoreStaff } = useArchive();
+export default function ArchivedStaffRow({
+    staff,
+    setOpenAlertModal,
+    setAction,
+    setStaffId,
+}) {
+    const hanleActionClick = (action) => {
+        setAction(action);
+        setOpenAlertModal(true);
+        setStaffId(staff.staff_id);
+    };
 
     return (
         <tr className="hover:bg-ascend-lightblue">
@@ -37,14 +44,12 @@ export default function ArchivedStaffRow({ staff }) {
                 <PrimaryButton
                     text={"Restore"}
                     btnColor={"bg-ascend-yellow"}
-                    doSomething={() => handleRestoreStaff(staff.staff_id)}
-                    isLoading={isRestoreLoading}
-                    isDisabled={isRestoreLoading}
+                    doSomething={() => hanleActionClick("restore")}
                 />
                 <PrimaryButton
                     text={"Delete"}
                     btnColor={"bg-ascend-red"}
-                    isDisabled={isRestoreLoading}
+                    doSomething={() => hanleActionClick("delete")}
                 />
             </td>
         </tr>

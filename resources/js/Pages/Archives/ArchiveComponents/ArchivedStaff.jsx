@@ -1,11 +1,22 @@
-import React from "react";
+import { useState } from "react";
 import { usePage } from "@inertiajs/react";
 import Pagination from "../../../Components/Pagination";
 import ArchivedStaffRow from "./ArchivedStaffRow";
 import EmptyState from "../../../Components/EmptyState/EmptyState";
+import useArchive from "./Hooks/useArchive";
+import AlertModal from "../../../Components/AlertModal";
 
 export default function ArchivedStaff() {
     const { archivedStaff } = usePage().props;
+
+    // Custom hook
+    const { isLoading, handleRestoreStaff, handleForceDeleteStaff } =
+        useArchive();
+
+    // States for alert modal
+    const [openAlerModal, setOpenAlertModal] = useState(false);
+    const [action, setAction] = useState(null);
+    const [staffId, setStaffId] = useState(null);
 
     return (
         <div className="font-nunito-sans space-y-5">
@@ -37,6 +48,9 @@ export default function ArchivedStaff() {
                                 <ArchivedStaffRow
                                     key={staff.staff_id}
                                     staff={staff}
+                                    setOpenAlertModal={setOpenAlertModal}
+                                    setAction={setAction}
+                                    setStaffId={setStaffId}
                                 />
                             ))}
                         </tbody>
@@ -58,6 +72,31 @@ export default function ArchivedStaff() {
                     />
                 )}
             </div>
+
+            {/* Display alert modal */}
+            {openAlerModal && (
+                <AlertModal
+                    title={
+                        action === "restore"
+                            ? "Restore Staff"
+                            : "Permanently Delete Staff"
+                    }
+                    description={
+                        action === "restore"
+                            ? "Are you sure you want to restore this staff?"
+                            : "Are you sure you want to permanently delete this staff? This action cannot be undone."
+                    }
+                    closeModal={() => setOpenAlertModal(false)}
+                    onConfirm={() => {
+                        if (action === "restore") {
+                            handleRestoreStaff(staffId, setOpenAlertModal);
+                        } else {
+                            handleForceDeleteStaff(staffId, setOpenAlertModal);
+                        }
+                    }}
+                    isLoading={isLoading}
+                />
+            )}
         </div>
     );
 }

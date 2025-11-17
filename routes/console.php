@@ -9,6 +9,7 @@ Schedule::daily()
         Schedule::command('app:permanently-delete-sections');
         Schedule::command('app:permanently-delete-posts');
         Schedule::command('app:permanently-delete-archived-courses');
+        Schedule::command('app:permanently-delete-archived-staff');
     });
 
 Schedule::everyMinute()

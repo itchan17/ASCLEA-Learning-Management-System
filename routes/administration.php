@@ -39,6 +39,9 @@ Route::prefix('administration')
         // Restore staff
         Route::put('staff/{id}/restore', [StaffController::class, 'restoreStaff'])->name('staff.restore');
 
+        // Restore staff
+        Route::delete('staff/{id}/force-delete', [StaffController::class, 'forceDeleteStaff'])->name('staff.force.delete');
+
         // View staff details (like your old closure)
         Route::get('/{staffId}', [StaffController::class, 'administrationView'])->name('administration.view');
     });

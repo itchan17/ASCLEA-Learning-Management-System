@@ -60,7 +60,7 @@ export default function useArchive() {
     };
 
     // Adminsitration
-    const handleRestoreStaff = (staffId) => {
+    const handleRestoreStaff = (staffId, setOpenAlertModal) => {
         setIsLoading(true);
         router.put(
             route("staff.restore", {
@@ -77,6 +77,32 @@ export default function useArchive() {
                         />,
                         "success"
                     );
+                    setOpenAlertModal(false);
+                },
+                onFinish: () => {
+                    setIsLoading(false);
+                },
+            }
+        );
+    };
+
+    const handleForceDeleteStaff = (staffId, setOpenAlertModal) => {
+        setIsLoading(true);
+        router.delete(
+            route("staff.force.delete", {
+                id: staffId,
+            }),
+            {
+                showProgress: false,
+                only: ["archivedStaff", "flash"],
+                onSuccess: (page) => {
+                    displayToast(
+                        <DefaultCustomToast
+                            message={page.props.flash.success}
+                        />,
+                        "success"
+                    );
+                    setOpenAlertModal(false);
                 },
                 onFinish: () => {
                     setIsLoading(false);
@@ -89,5 +115,6 @@ export default function useArchive() {
         handleRestoreCourse,
         handleForceDeleteCourse,
         handleRestoreStaff,
+        handleForceDeleteStaff,
     };
 }
