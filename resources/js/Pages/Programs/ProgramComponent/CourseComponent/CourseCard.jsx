@@ -35,7 +35,14 @@ export default function CourseCard({ courseDetails }) {
                     <PiNotebookFill className="text-5xl text-ascend-blue" />
                 </div>
                 <div className="w-full overflow-hidden">
-                    <h1 className="text-size3 font-bold truncate w-full">
+                    <h1
+                        title={`${
+                            courseDetails.course_code
+                                ? `${courseDetails.course_code} - `
+                                : ""
+                        } ${courseDetails.course_name}`}
+                        className="text-size3 font-bold truncate w-full"
+                    >
                         {courseDetails.course_code &&
                             `${courseDetails.course_code} - `}{" "}
                         {courseDetails.course_name}

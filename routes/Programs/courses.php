@@ -23,4 +23,7 @@ Route::prefix('programs/{program}')
 
         // Route for restoring the course
         Route::put('/courses/{course}/restore',  [CourseController::class, 'restoreCourse'])->name('program.course.restore');
+
+        // Route for force deleting the course
+        Route::delete('/courses/{course}/force-delete',  [CourseController::class, 'forceDeleteCourse'])->name('course.force.delete');
     });

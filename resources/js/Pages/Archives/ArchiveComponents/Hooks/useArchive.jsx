@@ -5,10 +5,11 @@ import { displayToast } from "../../../../Utils/displayToast";
 import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
 
 export default function useArchive() {
-    const [isRestoreLoading, setIsRestoreLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
+    // Course
     const handleRestoreCourse = (promgramId, courseId) => {
-        setIsRestoreLoading(true);
+        setIsLoading(true);
         router.put(
             route("program.course.restore", {
                 program: promgramId,
@@ -27,14 +28,41 @@ export default function useArchive() {
                     );
                 },
                 onFinish: () => {
-                    setIsRestoreLoading(false);
+                    setIsLoading(false);
                 },
             }
         );
     };
 
+    const handleForceDeleteCourse = (promgramId, courseId) => {
+        setIsLoading(true);
+        router.delete(
+            route("course.force.delete", {
+                program: promgramId,
+                course: courseId,
+            }),
+            {},
+            {
+                showProgress: false,
+                only: ["archivedCourses", "flash"],
+                onSuccess: (page) => {
+                    displayToast(
+                        <DefaultCustomToast
+                            message={page.props.flash.success}
+                        />,
+                        "success"
+                    );
+                },
+                onFinish: () => {
+                    setIsLoading(false);
+                },
+            }
+        );
+    };
+
+    // Adminsitration
     const handleRestoreStaff = (staffId) => {
-        setIsRestoreLoading(true);
+        setIsLoading(true);
         router.put(
             route("staff.restore", {
                 id: staffId,
@@ -52,10 +80,15 @@ export default function useArchive() {
                     );
                 },
                 onFinish: () => {
-                    setIsRestoreLoading(false);
+                    setIsLoading(false);
                 },
             }
         );
     };
-    return { isRestoreLoading, handleRestoreCourse, handleRestoreStaff };
+    return {
+        isLoading,
+        handleRestoreCourse,
+        handleForceDeleteCourse,
+        handleRestoreStaff,
+    };
 }
