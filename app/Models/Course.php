@@ -82,9 +82,4 @@ class Course extends Model
     {
         return $this->hasMany(Post::class, 'course_id');
     }
-
-    public function grades(): HasMany
-    {
-        return  $this->hasMany(Grade::class, 'course_id');
-    }
 }
