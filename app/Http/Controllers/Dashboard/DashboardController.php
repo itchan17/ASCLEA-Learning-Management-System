@@ -36,8 +36,8 @@ class DashboardController extends Controller
         $dailyTimeSpent = [];
 
         if ($roleName === 'faculty') {
-            [$stats, $assessments, $dailyLoginDates, $dailyLoginCounts, $avgTimePerDay] =
-            $this->getFacultyData($authUser, $stats);
+            [$stats, $assessments, $dailyLoginDates, $dailyLoginCounts, $avgTimePerDay, $staffDailyTimeSpent, $totalTimeSpent] =
+                $this->getFacultyData($authUser, $stats);
         } elseif ($roleName === 'student') {
             [
                 $dailyTimeSpent,
@@ -65,6 +65,8 @@ class DashboardController extends Controller
             ],
             'avgTimePerDay' => $avgTimePerDay,
             'dailyTimeSpent' => $dailyTimeSpent,
+            'staffDailyTimeSpent' => $staffDailyTimeSpent ?? [],
+            'totalTimeSpent' => $totalTimeSpent ?? 0,
             'total_assigned_courses' => $totalAssignedCourses,
             'assessments' => $assessments,
             'accomplished_assessments' => $accomplishedAssessments,
@@ -139,6 +141,18 @@ class DashboardController extends Controller
 
     private function getFacultyData($authUser, $stats)
     {
+
+    $staffLogins = UserLogin::join('staff', 'user_logins.user_id', '=', 'staff.user_id')
+    ->where('user_logins.user_id', $authUser->user_id)
+    ->whereNotNull('logout_at')
+    ->select('user_logins.*')
+    ->get();
+
+    $staffDailyTimeSpent = $this->computeDailyTimeSpent($staffLogins);
+
+    $totalTimeSpent = round($staffLogins->sum(fn($login) =>
+        Carbon::parse($login->login_at)->diffInMinutes(Carbon::parse($login->logout_at)) / 60
+    ), 2);
         
     $staff = Staff::where('user_id', $authUser->user_id)
         ->withCount('assignedCourses')
@@ -180,7 +194,7 @@ class DashboardController extends Controller
             ->get();
 
         // Return also the login/time data
-        return [$stats, $assessments, $dailyLoginDates, $dailyLoginCounts, $avgTimePerDay];
+        return [$stats, $assessments, $dailyLoginDates, $dailyLoginCounts, $avgTimePerDay, $staffDailyTimeSpent, $totalTimeSpent];
     }
 
     private function getStudentData($authUser)

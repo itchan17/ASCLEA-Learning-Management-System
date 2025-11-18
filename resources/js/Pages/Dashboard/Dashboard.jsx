@@ -14,7 +14,8 @@ export default function Dashboard() {
         studentsPerProgram, 
         dailyLogins, 
         avgTimePerDay, 
-        total_learning_hours, 
+        total_learning_hours,
+        totalTimeSpent, 
         total_assigned_courses, 
         dailyTimeSpent, 
         total_submitted_assessments, 
@@ -56,7 +57,8 @@ export default function Dashboard() {
                     avgTimePerDay={avgTimePerDay} />
             ) : (
                 <FacultyDashboard 
-                    stats={stats} 
+                    stats={stats}
+                    totalTimeSpent={totalTimeSpent} 
                     dailyLogins={dailyLogins} 
                     avgTimePerDay={avgTimePerDay}
                     assessments={assessments}/>
