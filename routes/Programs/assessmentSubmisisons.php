@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\Programs\AssessmentSubmissionController;
+use App\Http\Controllers\CV\DetectedCheatingController;
 use App\Http\Middleware\EnsureValidChildParentModel;
 use App\Models\Programs\AssessmentSubmission;
 use App\Models\Programs\Quiz;
+use App\Models\CV\DetectedCheating;
 use Illuminate\Support\Facades\Route;
 use Inertia\EncryptHistoryMiddleware;
 
@@ -51,3 +53,14 @@ Route::prefix('courses/{course}/assessments/{assessment}/')
         // Route for returning graded activity
         Route::put('/activity/return', [AssessmentSubmissionController::class, 'returnActivity'])->can('returnGradedActivity', [AssessmentSubmission::class, 'assessment'])->name('return.activity');
     });
+
+Route::post('/detected-cheatings', [DetectedCheatingController::class, 'store'])
+    ->name('detected-cheatings.store')
+    ->middleware(['auth', 'verified']);
+
+Route::get('/detected-cheatings/{assessment_submission_id}', [DetectedCheatingController::class, 'fetchBySubmission'])
+    ->name('detected-cheatings.fetch')
+    ->middleware(['auth', 'verified']);
+
+
+    

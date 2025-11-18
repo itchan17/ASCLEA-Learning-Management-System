@@ -207,6 +207,22 @@
                         is to help you grow, learn, and succeed with tools that
                         are simple, smart, and supportive.
                       </p>
+
+                      <!-- Temporary password section -->
+                       <!-- This section will be skip if the Account Registered is for Students -->
+                      @if(isset($password))
+                      <p>
+                          <strong>Your Temporary Password:</strong>
+                          <span style="font-family: monospace; background: #f0f0ff; padding: 5px 10px; border-radius: 6px;">
+                              {{ $password }}
+                          </span>
+                      </p>
+                      <p>
+                          Please use this temporary password to log in after verifying your email.
+                          For security, kindly change the password immediately.
+                      </p>
+                      @endif
+
                       <!-- Action -->
                       <table
                         class="body-action"

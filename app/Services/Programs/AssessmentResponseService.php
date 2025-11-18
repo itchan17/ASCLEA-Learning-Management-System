@@ -135,6 +135,7 @@ class AssessmentResponseService
         }
 
         if ($assessment->assessmentType->assessment_type === "quiz") {
+            $responses->with('detectedCheatings');
 
             $transformed = function ($response) {
                 return [
@@ -144,6 +145,7 @@ class AssessmentResponseService
                     'time_spent' => $response->time_spent,
                     'score' => $response->score,
                     'submitted_by' => $response->submittedBy->member->user,
+                    'detected_cheatings' => $response->detectedCheatings
                 ];
             };
         }
