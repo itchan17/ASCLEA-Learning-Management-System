@@ -38,6 +38,8 @@ export default function QuizReponses() {
         }
     }, []);
 
+    console.log({ responses });
+
     return (
         <div className="space-y-5 font-nunito-sans">
             <div className="flex">

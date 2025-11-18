@@ -30,7 +30,6 @@ class QuizController extends Controller
             'courseId' => $assessment->course_id,
             'assessmentId' => $assessment->assessment_id,
             'quiz' => $this->quizService->getQuizCompleteDetails($quiz),
-
         ]);
     }
 

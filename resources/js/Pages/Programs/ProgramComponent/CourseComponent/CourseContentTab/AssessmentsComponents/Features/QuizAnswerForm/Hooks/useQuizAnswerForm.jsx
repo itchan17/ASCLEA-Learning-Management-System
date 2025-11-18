@@ -44,7 +44,8 @@ export default function useQuizAnswerForm() {
                     assessment: assessmentId,
                     quiz: quizId,
                     page: page,
-                })
+                }),
+                { preserveState: true }
             );
         } else {
             window.open(

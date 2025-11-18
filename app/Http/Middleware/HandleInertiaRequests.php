@@ -42,6 +42,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user() ? [
                     ...$request->user()->only(['role_id', 'user_id', 'profile_image']) ,
                     'role_name' => $request->user()->role->role_name ?? null,
+                    'enrollment_status' => optional($request->user()->student)->enrollment_status, // New field added 
                 ] : null,
             ],
             'flash' => [

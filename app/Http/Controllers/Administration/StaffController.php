@@ -13,6 +13,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 
 class StaffController extends Controller
 {   
@@ -57,7 +59,7 @@ class StaffController extends Controller
             $query->where('status', $status);
         }
         
-        //Display 5 staff per page
+        //Display 10 staff per page
         $staffs = $query->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
@@ -183,6 +185,9 @@ class StaffController extends Controller
 
         $role = Role::where('role_name', $request->role_name)->firstOrFail();
 
+        // Generate randomizes password
+        $plainPassword = Str::random(12);
+
         // create staff user
         $user = User::create([
             'user_id' => Str::uuid(),
@@ -191,11 +196,24 @@ class StaffController extends Controller
             'middle_name' => $request->middle_name,
             'email' => $request->email,
             'role_id' => $role->role_id,
-            'password' => bcrypt('password123'), // temporary password
+            'password' => bcrypt($plainPassword), // temporary password
         ]);
 
-        // Email Verification after Staff Creation
-        event(new Registered($user));
+        // Generate verification URL
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify', 
+            now()->addMinutes(60),
+            ['id' => $user->getKey(), 'hash' => sha1($user->email)]
+        );
+
+        // Send verification email using existing verification file
+        Mail::send('emails.emailVerification', [
+            'url' => $verificationUrl,
+            'password' => $plainPassword,  // pass the password to Blade file
+        ], function ($message) use ($user) {
+            $message->to($user->email);
+            $message->subject('Verify Email Address');
+        });
 
         // create staff
         Staff::create([
@@ -274,7 +292,6 @@ class StaffController extends Controller
             'contact_number' => $request->contact_number,
             'birthdate' => $request->birthdate,
             'gender' => $request->gender,
-            'status' => $request->status
         ]);
         
         $staff->user->update([
@@ -283,6 +300,10 @@ class StaffController extends Controller
             'province' => $request->province,
             'city' => $request->city,
             'barangay' => $request->barangay,
+        ]);
+
+        $staff->update([
+            'status' => $request->status,
         ]);
 
 

@@ -5,12 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Models\Admission\AdmissionFile;
+
 class Student extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -40,7 +43,19 @@ class Student extends Model
      */
     protected $fillable = [
         'user_id',
-        'enrollment_status'
+        'enrollment_status',
+        'admission_status',
+        'admission_message',
+        'payment',
+    ];
+
+    protected $dates = ['deleted_at', 'approved_at', 'created_at', 'updated_at'];
+
+    protected $casts = [
+        'approved_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -58,5 +73,14 @@ class Student extends Model
         return $this->hasOne(LearningMember::class, 'user_id', 'user_id');
     }
 
+    public function admissionFiles(): HasMany
+    {
+        return $this->hasMany(AdmissionFile::class, 'student_id', 'student_id')->withTrashed();
+    }
+
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
 
 }
