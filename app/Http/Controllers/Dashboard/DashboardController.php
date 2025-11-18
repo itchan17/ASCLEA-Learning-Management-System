@@ -14,6 +14,7 @@ use App\Models\Programs\Assessment;
 use App\Models\Programs\AssessmentSubmission;
 use App\Models\Administration\Staff;
 use App\Models\UserLogin;
+use App\Models\AssignedCourse; // Added for cleaner usage
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -28,7 +29,8 @@ class DashboardController extends Controller
 
         $studentsPerProgram = $this->getStudentsPerProgram();
 
-        [$dailyLoginDates, $dailyLoginCounts, $avgTimePerDay] = $this->getDailyLoginsAndAverageTime();
+        // Default Admin View (All Enrolled Students)
+        [$dailyLoginDates, $dailyLoginCounts, $avgTimePerDay] = $this->getDailyLoginsAndAverageTime(null);
 
         $assessments = $accomplishedAssessments = $pendingAssessments = [];
         $totalLearningHours = $totalAssignedCourses = $totalSubmitted = $averageQuizScore = 0;
@@ -36,6 +38,7 @@ class DashboardController extends Controller
         $dailyTimeSpent = [];
 
         if ($roleName === 'faculty') {
+            // Faculty View (Overwrites the variables above)
             [$stats, $assessments, $dailyLoginDates, $dailyLoginCounts, $avgTimePerDay, $staffDailyTimeSpent, $totalTimeSpent] =
                 $this->getFacultyData($authUser, $stats);
         } elseif ($roleName === 'student') {
@@ -78,14 +81,16 @@ class DashboardController extends Controller
         ]);
     }
 
+    // ... [getDashboardStats and getStudentsPerProgram remain unchanged] ...
+
     private function getDashboardStats()
     {
         return [
             'total_students'    => Student::where('enrollment_status', 'enrolled')->count(),
             'total_educators'   => User::join('roles', 'users.role_id', '=', 'roles.role_id')
-                                       ->where('roles.role_name', 'faculty')->count(),
+                                     ->where('roles.role_name', 'faculty')->count(),
             'pending_enrollees' => Student::where('enrollment_status', 'pending')->count(),
-            'online_students'   => 0, // optional
+            'online_students'   => 0,
         ];
     }
 
@@ -100,17 +105,24 @@ class DashboardController extends Controller
             ->get();
     }
 
+    /**
+     * Calculates logins and average time.
+     * If $studentIds is NULL, it fetches for ALL enrolled students (Admin view).
+     * If $studentIds is an ARRAY (even empty), it fetches ONLY for those IDs (Faculty view).
+     */
     private function getDailyLoginsAndAverageTime($studentIds = null)
     {
         $query = DB::table('user_logins')
             ->join('users', 'user_logins.user_id', '=', 'users.user_id')
             ->join('roles', 'users.role_id', '=', 'roles.role_id')
-            ->join('students', 'users.user_id', '=', 'students.user_id') // join students table
+            ->join('students', 'users.user_id', '=', 'students.user_id')
             ->where('roles.role_name', 'student')
-            ->where('students.enrollment_status', 'enrolled'); // only enrolled students
+            ->where('students.enrollment_status', 'enrolled');
 
-        // Filter only those students that belong to the faculty (if provided)
-        if ($studentIds) {
+        // STRICT CHECK: Use !is_null.
+        // This ensures that if a faculty has an empty array of students [],
+        // we apply the filter (returning 0 results) rather than defaulting to 'All Users'.
+        if (!is_null($studentIds)) {
             $query->whereIn('user_logins.user_id', $studentIds);
         }
 
@@ -141,23 +153,24 @@ class DashboardController extends Controller
 
     private function getFacultyData($authUser, $stats)
     {
+        // 1. Staff Login Data
+        $staffLogins = UserLogin::join('staff', 'user_logins.user_id', '=', 'staff.user_id')
+            ->where('user_logins.user_id', $authUser->user_id)
+            ->whereNotNull('logout_at')
+            ->select('user_logins.*')
+            ->get();
 
-    $staffLogins = UserLogin::join('staff', 'user_logins.user_id', '=', 'staff.user_id')
-    ->where('user_logins.user_id', $authUser->user_id)
-    ->whereNotNull('logout_at')
-    ->select('user_logins.*')
-    ->get();
+        $staffDailyTimeSpent = $this->computeDailyTimeSpent($staffLogins);
 
-    $staffDailyTimeSpent = $this->computeDailyTimeSpent($staffLogins);
-
-    $totalTimeSpent = round($staffLogins->sum(fn($login) =>
-        Carbon::parse($login->login_at)->diffInMinutes(Carbon::parse($login->logout_at)) / 60
-    ), 2);
+        $totalTimeSpent = round($staffLogins->sum(fn($login) =>
+            Carbon::parse($login->login_at)->diffInMinutes(Carbon::parse($login->logout_at)) / 60
+        ), 2);
         
-    $staff = Staff::where('user_id', $authUser->user_id)
-        ->withCount('assignedCourses')
-        ->with('assignedCourses')
-        ->first();
+        // 2. Staff Course Data
+        $staff = Staff::where('user_id', $authUser->user_id)
+            ->withCount('assignedCourses')
+            ->with('assignedCourses')
+            ->first();
 
         $programCount = LearningMember::where('user_id', $authUser->user_id)
             ->distinct('program_id')
@@ -166,10 +179,10 @@ class DashboardController extends Controller
         $stats['assigned_programs'] = $programCount;
         $stats['assigned_courses'] = $staff?->assigned_courses_count ?? 0;
 
+        // 3. Get Students SPECIFICALLY assigned to this Faculty
         $assignedCourseIds = $staff?->assignedCourses->pluck('course_id') ?? [];
 
-        // Get the user IDs of students under this faculty’s courses to count the total students
-        $studentIds = \App\Models\AssignedCourse::whereIn('course_id', $assignedCourseIds)
+        $studentIds = AssignedCourse::whereIn('course_id', $assignedCourseIds)
             ->join('learning_members', 'assigned_courses.learning_member_id', '=', 'learning_members.learning_member_id')
             ->join('users', 'learning_members.user_id', '=', 'users.user_id')
             ->join('roles', 'users.role_id', '=', 'roles.role_id')
@@ -178,13 +191,15 @@ class DashboardController extends Controller
             ->pluck('learning_members.user_id')
             ->toArray();
         
+        // Update Stats to reflect only this faculty's students
         $stats['total_students'] = count($studentIds);
 
-        // Fetch logins/time only for this faculty’s students
+        // 4. Get Logins/Avg Time ONLY for these students
+        // This relies on the 'enrolled' check inside the function + the ID list here
         [$dailyLoginDates, $dailyLoginCounts, $avgTimePerDay] = $this->getDailyLoginsAndAverageTime($studentIds);
 
-        // Assessments data for faculty dashboard
-        $assessments = \App\Models\Programs\Assessment::select('assessment_id', 'assessment_title')
+        // 5. Assessment Data
+        $assessments = Assessment::select('assessment_id', 'assessment_title')
             ->whereIn('course_id', $assignedCourseIds)
             ->withCount([
                 'assessmentSubmissions as submitted_count' => fn($q) => $q->where('submission_status', 'submitted'),
@@ -193,10 +208,11 @@ class DashboardController extends Controller
             ])
             ->get();
 
-        // Return also the login/time data
         return [$stats, $assessments, $dailyLoginDates, $dailyLoginCounts, $avgTimePerDay, $staffDailyTimeSpent, $totalTimeSpent];
     }
 
+    // ... [getStudentData, computeDailyTimeSpent, etc., remain unchanged] ...
+    
     private function getStudentData($authUser)
     {
         $studentLogins = UserLogin::join('students', 'user_logins.user_id', '=', 'students.user_id')
@@ -281,6 +297,13 @@ class DashboardController extends Controller
                     ->whereIn('assigned_course_id', $assignedCourseIds);
             })
             ->where('status', 'published')
+            
+            // Exclude assessments where this student has already submitted or been returned
+            ->whereDoesntHave('assessmentSubmissions', function ($query) use ($assignedCourseIds) {
+                $query->whereIn('submitted_by', $assignedCourseIds)
+                      ->whereIn('submission_status', ['submitted', 'returned']);
+            })
+
             ->with(['course' => fn($q) =>
                 $q->select('course_id', 'course_name', 'course_code')
             ])
