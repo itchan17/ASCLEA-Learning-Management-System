@@ -185,7 +185,9 @@ export default function Administration() {
 
                     {/* Pagination (RIGHT) */}
                     <div className="flex items-center [&>*]:!mt-0">
-                        {staffs?.links && (
+                        {staffs?.data &&
+                        staffs.data.length > 0 &&
+                        staffs.last_page > 1 && (   // ⬅ Only show if more than 1 page
                             <Pagination
                                 links={staffs.links}
                                 currentPage={staffs.current_page}

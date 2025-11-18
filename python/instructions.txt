@@ -1,0 +1,10 @@
+Create a venv on your desktop or where you want it to be placed
+Ex. python -m venv C:\Users\HP\Desktop\myproject-env
+
+Then activate it like this
+C:\Users\HP\Desktop\Asclea-env\Scripts\Activate.ps1
+
+
+After activation, install requirement 
+cd python 
+pip install -r requirements.txt
