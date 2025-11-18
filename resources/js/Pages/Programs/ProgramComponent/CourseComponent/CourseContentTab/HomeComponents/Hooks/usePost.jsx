@@ -7,23 +7,49 @@ import { displayToast } from "../../../../../../../Utils/displayToast";
 
 export default function usePost({ programId, courseId }) {
     // Post Store
-    const postDetails = usePostStore((state) => state.postDetails);
+    // const postDetails = usePostStore((state) => state.postDetails);
     const postByCourse = usePostStore((state) => state.postByCourse);
     const setPosts = usePostStore((state) => state.setPosts);
+    const addNewPost = usePostStore((state) => state.addNewPost);
+    const updatePostList = usePostStore((state) => state.updatePostList);
 
     // Local states
     const [isLoading, setIsLoading] = useState(false);
     const [errors, setErrors] = useState(null);
 
-    const handleCreatePost = async (setIsPostFormOpen) => {
+    const handleCreateUpdatePost = async (
+        setIsPostFormOpen,
+        postDetails,
+        isEdit = false,
+        postId = null
+    ) => {
         try {
             setIsLoading(true);
-            const response = await axios.post(
-                route("post.create", { program: programId, course: courseId }),
-                postDetails
-            );
+            let response;
 
-            console.log(response);
+            if (isEdit && postId) {
+                response = await axios.put(
+                    route("post.update", {
+                        program: programId,
+                        course: courseId,
+                        post: postId,
+                    }),
+                    postDetails
+                );
+
+                updatePostList(response.data.data, courseId);
+            } else {
+                response = await axios.post(
+                    route("post.create", {
+                        program: programId,
+                        course: courseId,
+                    }),
+                    postDetails
+                );
+
+                addNewPost(response.data.data, courseId);
+            }
+
             setIsPostFormOpen(false);
             displayToast(
                 <DefaultCustomToast message={response.data.success} />,
@@ -98,5 +124,91 @@ export default function usePost({ programId, courseId }) {
         }
     };
 
-    return { handleCreatePost, isLoading, errors, handleFetchPosts };
+    const handleUnpublishPost = async (postId) => {
+        try {
+            console.log(postId);
+            const response = await axios.put(
+                route("post.unpublish", {
+                    program: programId,
+                    course: courseId,
+                    post: postId,
+                })
+            );
+            updatePostList(response.data.data, courseId);
+            displayToast(
+                <DefaultCustomToast message={response.data.success} />,
+                "success"
+            );
+        } catch (error) {
+            console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please try again."}
+                />,
+                "error"
+            );
+        }
+    };
+
+    const handleArchivePost = async (postId) => {
+        try {
+            console.log(programId);
+            const response = await axios.delete(
+                route("post.archive", {
+                    program: programId,
+                    course: courseId,
+                    post: postId,
+                })
+            );
+            updatePostList(response.data.data, courseId);
+            displayToast(
+                <DefaultCustomToast message={response.data.success} />,
+                "success"
+            );
+        } catch (error) {
+            console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please try again."}
+                />,
+                "error"
+            );
+        }
+    };
+
+    const handleRestorePost = async (postId) => {
+        try {
+            console.log(programId);
+            const response = await axios.put(
+                route("post.restore", {
+                    program: programId,
+                    course: courseId,
+                    post: postId,
+                })
+            );
+            updatePostList(response.data.data, courseId);
+            displayToast(
+                <DefaultCustomToast message={response.data.success} />,
+                "success"
+            );
+        } catch (error) {
+            console.error(error);
+            displayToast(
+                <DefaultCustomToast
+                    message={"Something went wrong. Please try again."}
+                />,
+                "error"
+            );
+        }
+    };
+
+    return {
+        handleCreateUpdatePost,
+        isLoading,
+        errors,
+        handleFetchPosts,
+        handleUnpublishPost,
+        handleArchivePost,
+        handleRestorePost,
+    };
 }

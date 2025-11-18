@@ -1,15 +1,28 @@
 <?php
 
 use App\Http\Controllers\Programs\PostController;
+use App\Models\Programs\Post;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('programs/{program}/courses/{course}')
-    ->middleware(['auth', 'verified', 'preventBack'])
-    ->group(function () {
+        ->middleware(['auth', 'verified', 'preventBack'])
+        ->group(function () {
 
-        // Create post
-        Route::post('/posts/create', [PostController::class, 'createPost'])->name('post.create');
+                // Create post
+                Route::post('/posts/create', [PostController::class, 'createPost'])->can('createPost', [Post::class, 'course'])->name('post.create');
 
-        // Get all the posts
-        Route::get('/posts', [PostController::class, 'getPosts'])->name('posts.get');
-    });
+                // Get all the posts
+                Route::get('/posts', [PostController::class, 'getPosts'])->can('viewPosts', [Post::class, 'course'])->name('posts.get');
+
+                // Update post
+                Route::put('/posts/{post}', [PostController::class, 'updatePost'])->can('updatePost', 'post')->name('post.update');
+
+                // Unpublish post
+                Route::put('/posts/{post}/unpublish', [PostController::class, 'unpublishPost'])->can('updatePost', 'post')->name('post.unpublish');
+
+                // Archive post
+                Route::delete('/posts/{post}', [PostController::class, 'archivePost'])->can('archivePost', 'post')->name('post.archive');
+
+                /// Restoree post
+                Route::put('/posts/{post}/restore', [PostController::class, 'restorePost'])->can('restorePost', [Post::class, 'post'])->name('post.restore');
+        });

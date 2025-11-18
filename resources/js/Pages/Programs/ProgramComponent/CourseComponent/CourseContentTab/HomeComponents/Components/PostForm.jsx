@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import TextEditor from "../../../TextEditor";
 import PrimaryButton from "../../../../../../../Components/Button/PrimaryButton";
 import SecondaryButton from "../../../../../../../Components/Button/SecondaryButton";
@@ -8,26 +8,42 @@ import usePost from "../Hooks/usePost";
 import { usePage } from "@inertiajs/react";
 import { closeDropDown } from "../../../../../../../Utils/closeDropdown";
 
-export default function PostForm({ setIsPostFormOpen }) {
+export default function PostForm({
+    setIsPostFormOpen,
+    isEdit = false,
+    postDetailsToEdit,
+    formWidth,
+    formTitle,
+}) {
     const { program, course } = usePage().props;
 
-    // Post Store
-    const handlePostDetailsChange = usePostStore(
-        (state) => state.handlePostDetailsChange
+    // Local states
+    const [postDetails, setPostDetails] = useState(
+        postDetailsToEdit && isEdit
+            ? {
+                  post_title: postDetailsToEdit.post_title,
+                  post_description: postDetailsToEdit.post_description,
+                  status: postDetailsToEdit.status,
+              }
+            : {
+                  post_title: "",
+                  post_description: null,
+                  status: "published",
+              }
     );
-    const postDetails = usePostStore((state) => state.postDetails);
-    const clearPostDetails = usePostStore((state) => state.clearPostDetails);
 
     // Custom hooks
-    const { handleCreatePost, isLoading, errors } = usePost({
+    const { handleCreateUpdatePost, isLoading, errors } = usePost({
         programId: program.program_id,
         courseId: course.course_id,
     });
 
-    // Cclearr post details on unmount
-    useEffect(() => {
-        return () => clearPostDetails();
-    }, []);
+    const handlePostDetailsChange = (field, value) => {
+        setPostDetails((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+    };
 
     const handleCLickDropDown = (status) => {
         handlePostDetailsChange("status", status);
@@ -35,9 +51,16 @@ export default function PostForm({ setIsPostFormOpen }) {
     };
 
     return (
-        <div className="border border-ascend-gray1 shadow-shadow1 p-5 space-y-5">
+        <div
+            className={`border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 bg-ascend-white w-full ${formWidth}`}
+        >
+            <h1 className="text-size4 font-bold">
+                {formTitle || "Write a Post"}
+            </h1>
             <div>
-                <label>Post Title</label>
+                <label>
+                    Post Title<span className="text-ascend-red"> *</span>
+                </label>
                 <input
                     type="text"
                     value={postDetails.post_title}
@@ -45,7 +68,7 @@ export default function PostForm({ setIsPostFormOpen }) {
                         handlePostDetailsChange("post_title", e.target.value)
                     }
                     className={`px-3 py-2 w-full border border-ascend-gray1 focus:outline-ascend-blue ${
-                        errors && errors.material_title
+                        errors && errors.post_title
                             ? "border-2 border-ascend-red"
                             : ""
                     }`}
@@ -55,12 +78,27 @@ export default function PostForm({ setIsPostFormOpen }) {
                 )}
             </div>
             <div>
-                <label htmlFor="">Description</label>
-                <TextEditor
-                    fieldName={"post_description"}
-                    value={postDetails.post_description}
-                    setValue={handlePostDetailsChange}
-                />
+                <label htmlFor="">
+                    Description <span className="text-ascend-red"> *</span>
+                </label>
+                <div
+                    className={`${
+                        errors && errors.post_description
+                            ? "border-2 border-ascend-red"
+                            : ""
+                    }`}
+                >
+                    <TextEditor
+                        fieldName={"post_description"}
+                        value={postDetails.post_description}
+                        setValue={handlePostDetailsChange}
+                    />
+                </div>
+                {errors && errors.post_description && (
+                    <span className="text-ascend-red">
+                        {errors.post_description}
+                    </span>
+                )}
             </div>
             <div className=" flex flex-wrap justify-end gap-2">
                 <SecondaryButton
@@ -69,7 +107,16 @@ export default function PostForm({ setIsPostFormOpen }) {
                 />
                 <div className="flex space-x-[0.5px]">
                     <PrimaryButton
-                        doSomething={() => handleCreatePost(setIsPostFormOpen)}
+                        doSomething={() =>
+                            handleCreateUpdatePost(
+                                setIsPostFormOpen,
+                                postDetails,
+                                isEdit,
+                                postDetailsToEdit
+                                    ? postDetailsToEdit.post_id
+                                    : null
+                            )
+                        }
                         isDisabled={isLoading}
                         isLoading={isLoading}
                         text={
