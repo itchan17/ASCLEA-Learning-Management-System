@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ContactController;
 use Inertia\Inertia;
 
 // View Landing page
@@ -12,3 +13,6 @@ Route::get('/', function () {
 Route::get('/MockQuiz', function () {
     return Inertia::render('MockQuiz/MockQuiz');
 })->middleware('guest', 'preventBack');
+
+// Contact form submission (Landing Page)
+Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
