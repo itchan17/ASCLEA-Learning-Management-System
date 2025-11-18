@@ -37,7 +37,7 @@ export default function QuizResponsesSummary({ summary, assessment }) {
                     </div>
 
                     <div className="flex items-center justify-center space-x-2">
-                        <span className="text-ascend-black">Average TIme</span>
+                        <span className="text-ascend-black">Average Time</span>
                     </div>
                 </div>
                 <div className="flex flex-col items-start justify-center border border-ascend-gray1 shadow-shadow1 p-4 font-bold">

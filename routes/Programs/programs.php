@@ -8,7 +8,7 @@ Route::prefix('programs')
     ->middleware(['auth', 'verified', 'preventBack'])
     ->group(function () {
         // Programs index page
-        Route::get('/', [ProgramController::class, 'index'])->can('viewAny', Program::class)->name('programs.index');
+        Route::get('/', [ProgramController::class, 'index'])->can('viewAny', Program::class)->middleware(['checkRole:admin,faculty,student'])->name('programs.index'); // added middleware checkRole:admin,faculty,student
        
         // Create program
         Route::post('/create',  [ProgramController::class, 'store'])->can('create', Program::class)->name('program.create');

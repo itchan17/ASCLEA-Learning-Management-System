@@ -10,6 +10,8 @@ class StudentProgressService
 {
     public function doneUndoneStudentProgress(string $assignedCourseId, SectionItem $sectionItem)
     {
+        // Create a student progress data  whenn the user done the a material forr first time
+        // is_done is automatically seet to true
         $progress = StudentProgress::firstOrCreate(
             ['section_item_id' => $sectionItem->section_item_id, 'assigned_course_id' => $assignedCourseId],
             [
@@ -20,7 +22,9 @@ class StudentProgressService
             ]
         );
 
-        // Done and undone the student progress
+        // This allows the student mark as done and undone the material
+        // It only  updates the is_done status andd done_at
+        // The condition prevents the data from updating on first creation
         if (!$progress->wasRecentlyCreated) {
             $progress->update(
                 [
