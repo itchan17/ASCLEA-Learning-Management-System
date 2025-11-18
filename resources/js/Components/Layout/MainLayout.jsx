@@ -24,26 +24,28 @@ export default function MainLayout({ children }) {
 
         console.log("user role:", user);
 
+        // if (user.role_name !== "student") return;
+
         const socket = io("http://localhost:3000"); // Connect to server
 
         // Notify server that student is online
-        socket.emit("student_online", { user_id: user.user_id });
+        socket.emit("student_online", { user: user });
 
         // Optional: send ping every 30 sec to stay online
         const pingInterval = setInterval(() => {
-            socket.emit("student_ping", { user_id: user.user_id });
+            socket.emit("student_ping", { user: user });
         }, 30000);
 
         // When window closes or unmounts, notify offline
         const handleBeforeUnload = () => {
-            socket.emit("student_offline", { user_id: user.user_id });
+            socket.emit("student_offline", { user: user });
         };
 
         window.addEventListener("beforeunload", handleBeforeUnload);
 
         return () => {
             clearInterval(pingInterval);
-            socket.emit("student_offline", { user_id: user.user_id });
+            socket.emit("student_offline", { user: user });
             socket.disconnect();
             window.removeEventListener("beforeunload", handleBeforeUnload);
         };

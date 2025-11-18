@@ -9,13 +9,13 @@ import { io } from "socket.io-client";
 
 export default function StaffDashboardCard({ stats }) {
 
-    const [onlineStudents, setOnlineStudents] = useState(stats?.online_students || 0);
+    const [onlineStudents, setOnlineStudents] = useState(0);
 
     useEffect(() => {
         const socket = io("http://localhost:3000");
 
-        socket.on("online_students", (studentIds) => {
-        setOnlineStudents(studentIds.length);
+        socket.on("online_students", (users) => {
+            setOnlineStudents(users.filter(user => user.role_name === "student").length);
         });
 
         return () => socket.disconnect();

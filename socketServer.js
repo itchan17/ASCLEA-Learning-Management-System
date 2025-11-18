@@ -16,36 +16,37 @@ const io = new Server(httpServer, {
 });
 
 // Keep track of online students
-let onlineStudents = new Map(); // key: user_id, value: socket.id
+let onlineStudents = new Map(); // key: user, value: socket.id
 
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
 
   // Student comes online
-  socket.on("student_online", ({ user_id }) => {
-    onlineStudents.set(user_id, socket.id);
+  socket.on("student_online", ({ user }) => {
+    console.log(user);
+    onlineStudents.set(user, socket.id);
     io.emit("online_students", Array.from(onlineStudents.keys()));
     console.log("Online students:", Array.from(onlineStudents.keys()));
   });
 
   // Heartbeat ping to keep online status
-  socket.on("student_ping", ({ user_id }) => {
-    if (onlineStudents.has(user_id)) {
+  socket.on("student_ping", ({ user }) => {
+    if (onlineStudents.has(user)) {
       // update timestamp or keep alive
     }
   });
 
   // Student leaves or disconnects
   socket.on("disconnect", () => {
-    for (let [user_id, sId] of onlineStudents.entries()) {
-      if (sId === socket.id) onlineStudents.delete(user_id);
+    for (let [user, sId] of onlineStudents.entries()) {
+      if (sId === socket.id) onlineStudents.delete(user);
     }
     io.emit("online_students", Array.from(onlineStudents.keys()));
     console.log("Client disconnected:", socket.id);
   });
 
-  socket.on("student_offline", ({ user_id }) => {
-    onlineStudents.delete(user_id);
+  socket.on("student_offline", ({ user }) => {
+    onlineStudents.delete(user);
     io.emit("online_students", Array.from(onlineStudents.keys()));
   });
 });
