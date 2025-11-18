@@ -6,8 +6,13 @@ import SectionForm from "./ModulesComponents/Components/SectionForm";
 import RoleGuard from "../../../../../Components/Auth/RoleGuard";
 import MaterialList from "./ModulesComponents/Components/MaterialList";
 import SectionList from "./ModulesComponents/Components/SectionList";
+import { usePage } from "@inertiajs/react";
 
 export default function Modules() {
+    const { program, course } = usePage().props;
+    const programId = program.program_id;
+    const courseId = course.course_id;
+
     // Module store
     const activeTab = useModulesStore((state) => state.activeTab);
     const setActiveTab = useModulesStore((state) => state.setActiveTab);
@@ -35,6 +40,7 @@ export default function Modules() {
         }
     }, [isMaterialFormOpen, isSectionFormOpen]);
 
+    console.log("RENDER MODULEs");
     return (
         <div className="font-nunito-sans text-ascend-black space-y-5">
             <div className="flex flex-wrap gap-2 justify-between items-center">
@@ -101,7 +107,11 @@ export default function Modules() {
 
             {/* For displaying the tab content */}
             {activeTab === "materials" ? (
-                <MaterialList setIsMaterialFormOpen={setIsMaterialFormOpen} />
+                <MaterialList
+                    setIsMaterialFormOpen={setIsMaterialFormOpen}
+                    programId={programId}
+                    courseId={courseId}
+                />
             ) : (
                 <SectionList />
             )}

@@ -12,83 +12,8 @@ const useModulesStore = create(
                 });
             },
 
-            // Material
-
-            materialDetails: {
-                material_title: "",
-                material_description: null,
-                status: "published",
-                material_files: [],
-                removed_files: [],
-            },
+            // Materia
             materialsByCourse: [],
-
-            handleMaterialDetailsChange: (field, value) => {
-                const { materialDetails } = useModulesStore.getState();
-
-                if (field === "material_files" && Array.isArray(value)) {
-                    set({
-                        materialDetails: {
-                            ...materialDetails,
-                            material_files: [
-                                ...materialDetails.material_files,
-                                ...value,
-                            ],
-                        },
-                    });
-                } else {
-                    set({
-                        materialDetails: {
-                            ...materialDetails,
-                            [field]: value,
-                        },
-                    });
-                }
-            },
-
-            handleRemoveAttachedFiles: (fileIndex) => {
-                const { materialDetails } = useModulesStore.getState();
-
-                set({
-                    materialDetails: {
-                        ...materialDetails,
-                        material_files: materialDetails.material_files.filter(
-                            (file, index) => index != fileIndex
-                        ),
-                    },
-                });
-            },
-
-            setMaterialDetails: (materialDetailsToEdit) => {
-                set({
-                    materialDetails: {
-                        material_title: materialDetailsToEdit.material_title,
-                        material_description:
-                            materialDetailsToEdit.material_description,
-                        status: materialDetailsToEdit.status,
-                        uploaded_files: materialDetailsToEdit.material_files, // Set the upaloded files
-                        material_files: [],
-                        removed_files: [],
-                    },
-                });
-            },
-
-            handlelRemoveUploadedFile: (fileId) => {
-                const { materialDetails } = useModulesStore.getState();
-
-                set({
-                    materialDetails: {
-                        ...materialDetails,
-                        uploaded_files: materialDetails.uploaded_files.filter(
-                            (file) => file.material_file_id !== fileId
-                        ),
-                        removed_files: [
-                            ...materialDetails.removed_files,
-                            fileId,
-                        ],
-                    },
-                });
-            },
 
             setMaterials: (courseId, list, page, hasMore) => {
                 const { materialsByCourse } = useModulesStore.getState();
@@ -161,52 +86,8 @@ const useModulesStore = create(
                 });
             },
 
-            clearMaterialDetails: () => {
-                set({
-                    materialDetails: {
-                        material_title: "",
-                        material_description: null,
-                        status: "published",
-                        material_files: [],
-                        removed_files: [],
-                    },
-                });
-            },
-
             // Section
-            sectionDetails: {
-                section_title: "",
-                status: "draft",
-            },
-
             sectionsByCourse: [],
-
-            setSectionDetails: (sectionDetails) => {
-                set({
-                    sectionDetails: {
-                        section_title: sectionDetails.section_title,
-                    },
-                });
-            },
-
-            handleSectionDetailsChange: (field, value) => {
-                const { sectionDetails } = useModulesStore.getState();
-                set({
-                    sectionDetails: {
-                        ...sectionDetails,
-                        [field]: value,
-                    },
-                });
-            },
-
-            clearSectionDetails: () => {
-                set({
-                    sectionDetails: {
-                        section_title: "",
-                        status: "draft",
-                    },
-                });
-            },
 
             setSections: (courseId, list, page, hasMore) => {
                 const { sectionsByCourse } = useModulesStore.getState();
@@ -498,5 +379,11 @@ const useModulesStore = create(
         }
     )
 );
+
+if (typeof window !== "undefined") {
+    window.addEventListener("beforeunload", () => {
+        useModulesStore.persist.clearStorage();
+    });
+}
 
 export default useModulesStore;

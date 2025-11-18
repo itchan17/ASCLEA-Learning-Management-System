@@ -28,9 +28,6 @@ import { AiFillLock } from "react-icons/ai";
 export default function Section({ sectionDetails }) {
     const { program, course, auth } = usePage().props;
     // Modules store
-    const setSectionDetails = useModulesStore(
-        (state) => state.setSectionDetails
-    );
     const setSectionItems = useModulesStore((state) => state.setSectionItems);
 
     // Custom hook
@@ -148,7 +145,7 @@ export default function Section({ sectionDetails }) {
 
     const handleClickEdit = () => {
         seIsEditSectionFormOpen(true);
-        setSectionDetails(sectionDetails);
+        // setSectionDetails(sectionDetails);
         closeDropDown();
     };
 
@@ -348,24 +345,25 @@ export default function Section({ sectionDetails }) {
             </div>
 
             {isMaterialFormOpen && (
-                <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
+                <ModalContainer>
                     <MaterialForm
                         setIsMaterialFormOpen={setIsMaterialFormOpen}
                         formTitle={"Add Section Material"}
                         formWidth={"max-w-200"}
                         sectionId={sectionDetails.section_id}
                     />
-                </div>
+                </ModalContainer>
             )}
+
             {isAssessmentFormOpen && (
-                <div className="fixed inset-0 bg-black/25 z-100 flex items-center justify-center">
+                <ModalContainer>
                     <AssessmentForm
                         setIsAssessmentFormOpen={setIsAssessmentFormOpen}
                         formTitle={"Add Section Assessment"}
                         formWidth={"max-w-200"}
                         sectionId={sectionDetails.section_id}
                     />
-                </div>
+                </ModalContainer>
             )}
 
             {isEditSectionFormOpen && (
@@ -376,6 +374,7 @@ export default function Section({ sectionDetails }) {
                         sectionId={sectionDetails.section_id}
                         formTitle={"Edit Section"}
                         formWIdth={"max-w-200"}
+                        sectionDetailsToEdit={sectionDetails}
                     ></SectionForm>
                 </ModalContainer>
             )}

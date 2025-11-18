@@ -2,76 +2,104 @@ import { useState, useEffect } from "react";
 import TextEditor from "../../TextEditor";
 import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
 import SecondaryButton from "../../../../../../Components/Button/SecondaryButton";
-import useAssessmentsStore from "../../../../../../Stores/Programs/CourseContent/assessmentsStore";
-import { AiFillFileAdd } from "react-icons/ai";
 import "../../../../../../../css/global.css";
 import DropFiles from "../../../../../../Components/DragNDropFiles/DropFiles";
 import FileCard from "../../FileCard";
 import { SiGoogleforms } from "react-icons/si";
-import { router, usePage } from "@inertiajs/react";
-import { route } from "ziggy-js";
 import { IoCaretDownOutline } from "react-icons/io5";
 import { closeDropDown } from "../../../../../../Utils/closeDropdown";
 import { displayToast } from "../../../../../../Utils/displayToast";
 import DefaultCustomToast from "../../../../../../Components/CustomToast/DefaultCustomToast";
 import { capitalize } from "lodash";
-import axios from "axios";
-import useModulesStore from "../ModulesComponents/Stores/modulesStore";
+import useAssessment from "./Hooks/useAssessment";
+import { usePage } from "@inertiajs/react";
 
 export default function AssessmentForm({
-    toggleForm,
     formTitle,
     formWidth,
     sectionId = null,
     isEdit = false,
     assessmentId,
     setIsAssessmentFormOpen,
+    assessmentDetailsToEdit,
 }) {
     const { program, course } = usePage().props;
 
-    // Assessments Store
-    const assessmentDetails = useAssessmentsStore(
-        (state) => state.assessmentDetails
-    );
-    const handleAssessmentChange = useAssessmentsStore(
-        (state) => state.handleAssessmentChange
-    );
-    const removeAttachedFile = useAssessmentsStore(
-        (state) => state.removeAttachedFile
-    );
-    const removeUploadedFile = useAssessmentsStore(
-        (state) => state.removeUploadedFile
-    );
-    const clearAssessmentDetails = useAssessmentsStore(
-        (state) => state.clearAssessmentDetails
-    );
-    const addNewAssessment = useAssessmentsStore(
-        (state) => state.addNewAssessment
-    );
-    const updateAssessmentInList = useAssessmentsStore(
-        (state) => state.updateAssessmentInList
+    // Custom hook
+    const { errors, isLoading, handleSubmit } = useAssessment({
+        programId: program.program_id,
+        courseId: course.course_id,
+    });
+
+    // Local state
+    const [assessmentDetails, setAssessmentDetails] = useState(
+        assessmentDetailsToEdit && isEdit
+            ? {
+                  assessment_title: assessmentDetailsToEdit.assessment_title,
+                  assessment_description:
+                      assessmentDetailsToEdit.assessment_description,
+                  status: assessmentDetailsToEdit.status,
+                  assessment_type:
+                      assessmentDetailsToEdit.assessment_type.assessment_type,
+                  due_datetime: assessmentDetailsToEdit.due_datetime
+                      ? new Date(assessmentDetailsToEdit.due_datetime)
+                            .toISOString()
+                            .slice(0, 16)
+                      : null, // Converts time into format: Y-m-d\TH:i
+                  total_points: assessmentDetailsToEdit.total_points,
+                  assessment_files: [],
+                  uploaded_files: assessmentDetailsToEdit.files,
+                  removed_files: [],
+              }
+            : {
+                  assessment_title: "",
+                  assessment_description: null,
+                  status: "published",
+                  assessment_type: "",
+                  due_datetime: "",
+                  total_points: 0,
+                  assessment_files: [],
+                  removed_files: [],
+              }
     );
 
-    // Modules store
-    const addNewSectionItem = useModulesStore(
-        (state) => state.addNewSectionItem
-    );
-    const updateSectionItems = useModulesStore(
-        (state) => state.updateSectionItems
-    );
+    // Handle changes to assessment details
+    const handleAssessmentChange = (field, value) => {
+        setAssessmentDetails((prev) => {
+            if (field === "assessment_files" && Array.isArray(value)) {
+                return {
+                    ...prev,
+                    [field]: [...prev[field], ...value], // append new files
+                };
+            } else {
+                return {
+                    ...prev,
+                    [field]: value, // update other fields
+                };
+            }
+        });
+    };
 
-    const [errors, setErrors] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
+    // Remove an attached file by index
+    const removeAttachedFile = (fileIndex) => {
+        setAssessmentDetails((prev) => ({
+            ...prev,
+            assessment_files: prev.assessment_files.filter(
+                (_, index) => index !== fileIndex
+            ),
+        }));
+    };
 
-    // Clear assessment details once form was rendered
-    // to avoid persisting state
-    useEffect(() => {
-        if (!isEdit) {
-            // If note edit this means user will create a new assessment
-            // WE have to reset the value first
-            clearAssessmentDetails();
-        }
-    }, []);
+    // Remove an uploaded file by ID and track removed files
+    const removeUploadedFile = (fileId) => {
+        setAssessmentDetails((prev) => ({
+            ...prev,
+            uploaded_files: prev.uploaded_files.filter(
+                (file) => file.assessment_file_id !== fileId
+            ),
+            removed_files: [...prev.removed_files, fileId],
+        }));
+    };
 
     useEffect(() => {
         if (sectionId) {
@@ -80,126 +108,9 @@ export default function AssessmentForm({
         }
     }, []);
 
-    const appendToFormData = (assessmentFormData) => {
-        // Append data into FormData to enbale uploading files
-        for (let key in assessmentDetails) {
-            const value = assessmentDetails[key];
-
-            // Skips appending data with null value
-            // Make sure data is nullable in backend valdiation
-            if (value === null || value === undefined) {
-                continue;
-            }
-
-            // Append array values
-            if (Array.isArray(value)) {
-                value.forEach((v, i) => {
-                    assessmentFormData.append(`${key}[${i}]`, v);
-                });
-            } else {
-                assessmentFormData.append(key, value);
-            }
-        }
-    };
-
-    // Handles axios request for adding assesment
-    const addAssessment = async () => {
-        // Append the assessment details to form data since
-        // to enable file upaloading
-        const assessmentFormData = new FormData();
-        appendToFormData(assessmentFormData);
-
-        const response = await axios.post(
-            route("assessment.create", {
-                program: program.program_id,
-                course: course.course_id,
-            }),
-            assessmentFormData,
-            {
-                headers: { "Content-Type": "multipart/form-data" },
-            }
-        );
-        if (sectionId) {
-            // Add the asssessment in the section
-            addNewSectionItem(response.data.data, course.course_id, sectionId);
-        } else {
-            addNewAssessment(response.data.data, course.course_id);
-        }
-
-        displayToast(
-            <DefaultCustomToast message={response.data.success} />,
-            "success"
-        );
-    };
-    // Handles the axios request for updating
-    const updateAssessment = async () => {
-        // Append the assessment details to form data since
-        // to enable file upaloading
-        const assessmentFormData = new FormData();
-        appendToFormData(assessmentFormData);
-        assessmentFormData.append("_method", "PUT");
-
-        const response = await axios.post(
-            route("assessment.update", {
-                program: program.program_id,
-                course: course.course_id,
-                assessment: assessmentId,
-            }),
-            assessmentFormData,
-            {
-                headers: { "Content-Type": "multipart/form-data" },
-            }
-        );
-
-        if (sectionId) {
-            updateSectionItems(response.data.data, course.course_id, sectionId);
-        } else {
-            // Change the updated assessment data in the list
-            updateAssessmentInList(response.data.data, course.course_id);
-        }
-
-        displayToast(
-            <DefaultCustomToast message={response.data.success} />,
-            "success"
-        );
-    };
-
-    const handeSubmit = async () => {
-        setIsLoading(true);
-        setErrors(null);
-
-        try {
-            if (isEdit) {
-                await updateAssessment();
-            } else {
-                await addAssessment();
-            }
-
-            setIsAssessmentFormOpen(false);
-            clearAssessmentDetails();
-        } catch (error) {
-            console.error(error);
-            // Check for value in response.data.errors
-            // This is where the valdiation errors located
-            // So we have to set it in the state that will display error
-            if (error.response.data.errors) {
-                setErrors(error.response.data.errors);
-            } else {
-                displayToast(
-                    <DefaultCustomToast
-                        message={"Something went wrong. Please try again."}
-                    />,
-                    "error"
-                );
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const cancelAssessmentForm = () => {
         setIsAssessmentFormOpen(false);
-        clearAssessmentDetails();
+        // clearAssessmentDetails();
     };
 
     // Used for dropdown button to set the status of the assessment
@@ -500,7 +411,15 @@ export default function AssessmentForm({
                             <PrimaryButton
                                 isDisabled={isLoading}
                                 isLoading={isLoading}
-                                doSomething={handeSubmit}
+                                doSomething={() =>
+                                    handleSubmit(
+                                        assessmentDetails,
+                                        sectionId,
+                                        isEdit,
+                                        setIsAssessmentFormOpen,
+                                        assessmentId
+                                    )
+                                }
                                 text={
                                     sectionId && isEdit
                                         ? "Save"

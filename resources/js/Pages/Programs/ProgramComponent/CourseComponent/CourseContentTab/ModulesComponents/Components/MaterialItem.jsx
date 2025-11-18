@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import "../../../../../../../../css/global.css";
 import { usePage } from "@inertiajs/react";
@@ -7,19 +7,11 @@ import { formatFullDate } from "../../../../../../../Utils/formatFullDate";
 import ModalContainer from "../../../../../../../Components/ModalContainer";
 import MaterialForm from "./MaterialForm";
 import { closeDropDown } from "../../../../../../../Utils/closeDropdown";
-import useModulesStore from "../Stores/modulesStore";
 import useMaterial from "../Hooks/useMaterial";
 import { getRemainingDays } from "../../../../../../../Utils/getRemainingDays";
 
-export default function MaterialItem({
-    materialDetails,
-    setIsMaterialFormOpen,
-}) {
+function MaterialItem({ materialDetails, setIsMaterialFormOpen }) {
     const { program, course, auth } = usePage().props;
-    // Module store
-    const setMaterialDetails = useModulesStore(
-        (state) => state.setMaterialDetails
-    );
 
     // Custom hook
     const {
@@ -34,15 +26,12 @@ export default function MaterialItem({
 
     const [isEditMaterialFormOpen, setIsEditMaterialFormOpen] = useState(false);
 
-    // get the id from url
-
     const stopPropagation = (e) => {
         e.stopPropagation();
     };
 
     const handleClickEdit = () => {
         setIsEditMaterialFormOpen(true);
-        setMaterialDetails(materialDetails);
         closeDropDown();
         setIsMaterialFormOpen(false);
     };
@@ -51,7 +40,7 @@ export default function MaterialItem({
         <>
             <div
                 onClick={() => handleViewMaterial(materialDetails)}
-                className="flex flex-col justify-between border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 cursor-pointer card-hover"
+                className="flex flex-col justify-between border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 cursor-pointer card-hover mt-5"
             >
                 <div className="flex items-center gap-2 md:gap-20">
                     <div className="flex-1 min-w-0 flex flex-wrap gap-5">
@@ -213,9 +202,12 @@ export default function MaterialItem({
                         materialId={materialDetails.material_id}
                         setIsMaterialFormOpen={setIsEditMaterialFormOpen}
                         formWidth="max-w-200"
+                        materialDetailsToEdit={materialDetails}
                     />
                 </ModalContainer>
             )}
         </>
     );
 }
+
+export default React.memo(MaterialItem);

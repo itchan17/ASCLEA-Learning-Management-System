@@ -1,13 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import PrimaryButton from "../../../../../Components/Button/PrimaryButton";
-import PostForm from "./HomeComponents/PostForm";
-import Post from "./HomeComponents/Post";
+import PostForm from "./HomeComponents/Components/PostForm";
+import Post from "./HomeComponents/Components/Post";
 import usePostStore from "../../../../../Stores/Programs/CourseContent/postStore";
 import EmptyState from "../../../../../Components/EmptyState/EmptyState";
 import { router, usePage } from "@inertiajs/react";
 import { route } from "ziggy-js";
-import useProgramStore from "../../../../../Stores/Programs/programStore";
 import useCourseStore from "../../../../../Stores/Programs/courseStore";
 import AddCourseForm from "../AddCourseForm";
 import RoleGuard from "../../../../../Components/Auth/RoleGuard";
@@ -16,10 +15,12 @@ import { closeDropDown } from "../../../../../Utils/closeDropdown";
 import DefaultCustomToast from "../../../../../Components/CustomToast/DefaultCustomToast";
 import { displayToast } from "../../../../../Utils/displayToast";
 import AlertModal from "../../../../../Components/AlertModal";
+import PostList from "./HomeComponents/Components/PostList";
 
 export default function Home({}) {
     const { program, course } = usePage().props;
-    console.log(course);
+    const programId = program.program_id;
+    const courseId = course.course_id;
 
     // Course Store
     const setCourse = useCourseStore((state) => state.setCourseDetails);
@@ -40,14 +41,12 @@ export default function Home({}) {
     // Scroll into the form once opened
     useEffect(() => {
         if (isFormOpen) {
-            targetForm.current?.scrollIntoView({ behavior: "smooth" });
+            targetForm.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
         }
     }, [isFormOpen]);
-
-    const toggleForm = () => {
-        setIsFormOpen(!isFormOpen);
-        clearPostDetails();
-    };
 
     const handleEditClick = () => {
         console.log(course);
@@ -89,6 +88,8 @@ export default function Home({}) {
         // Close the dropdown after clicked
         closeDropDown();
     };
+
+    console.log("RERENDER");
 
     return (
         <div className="space-y-5 w-full text-ascend-black font-nunito-sans">
@@ -159,7 +160,7 @@ export default function Home({}) {
                 <RoleGuard allowedRoles={["admin", "faculty"]}>
                     <PrimaryButton
                         isDisabled={isFormOpen}
-                        doSomething={toggleForm}
+                        doSomething={() => setIsFormOpen(true)}
                         text="Write a Post"
                     />
                 </RoleGuard>
@@ -167,19 +168,11 @@ export default function Home({}) {
 
             {isFormOpen && (
                 <div ref={targetForm}>
-                    <PostForm toggleForm={toggleForm} />
+                    <PostForm setIsPostFormOpen={setIsFormOpen} />
                 </div>
             )}
-            {postList?.length > 0 ? (
-                postList.map((post, index) => (
-                    <Post key={index} postContent={post} />
-                ))
-            ) : (
-                <EmptyState
-                    imgSrc={"/images/illustrations/empty.svg"}
-                    text={`“There’s a whole lot of nothing going on—time to make something happen!”`}
-                />
-            )}
+
+            <PostList courseId={courseId} programId={programId} />
 
             {/* Display EditCourse Form */}
             {openCourseForm && (

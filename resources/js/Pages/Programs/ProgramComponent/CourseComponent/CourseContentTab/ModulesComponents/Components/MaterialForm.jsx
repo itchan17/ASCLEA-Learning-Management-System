@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import TextEditor from "../../../TextEditor";
 import SecondaryButton from "../../../../../../../Components/Button/SecondaryButton";
 import PrimaryButton from "../../../../../../../Components/Button/PrimaryButton";
@@ -8,7 +8,6 @@ import useMaterial from "../Hooks/useMaterial";
 import { usePage } from "@inertiajs/react";
 import { IoCaretDownOutline } from "react-icons/io5";
 import { closeDropDown } from "../../../../../../../Utils/closeDropdown";
-import useModulesStore from "../Stores/modulesStore";
 
 export default function MaterialForm({
     formTitle,
@@ -17,22 +16,30 @@ export default function MaterialForm({
     isEdit = false,
     formWidth,
     materialId = null,
+    materialDetailsToEdit = null,
 }) {
     const { program, course } = usePage().props;
-
-    // Module  store
-    const materialDetails = useModulesStore((state) => state.materialDetails);
-    const handleMaterialDetailsChange = useModulesStore(
-        (state) => state.handleMaterialDetailsChange
-    );
-    const handleRemoveAttachedFiles = useModulesStore(
-        (state) => state.handleRemoveAttachedFiles
-    );
-    const handlelRemoveUploadedFile = useModulesStore(
-        (state) => state.handlelRemoveUploadedFile
-    );
-    const clearMaterialDetails = useModulesStore(
-        (state) => state.clearMaterialDetails
+    // Local states
+    // Check if materialDetailsToEdit, if  not null it means its in edit mdoe
+    // So we have to initially set the values
+    const [materialDetails, setMaterialDetails] = useState(
+        materialDetailsToEdit && isEdit
+            ? {
+                  material_title: materialDetailsToEdit.material_title,
+                  material_description:
+                      materialDetailsToEdit.material_description,
+                  status: materialDetailsToEdit.status,
+                  uploaded_files: materialDetailsToEdit.material_files, // Set the uploaded files
+                  material_files: [],
+                  removed_files: [],
+              }
+            : {
+                  material_title: "",
+                  material_description: null,
+                  status: "published",
+                  material_files: [],
+                  removed_files: [],
+              }
     );
 
     // Custom hooks
@@ -41,16 +48,49 @@ export default function MaterialForm({
         courseId: course.course_id,
     });
 
+    // Functions
     const handleCLickDropDown = (value) => {
         handleMaterialDetailsChange("status", value);
         closeDropDown();
     };
 
-    useEffect(() => {
-        return () => {
-            clearMaterialDetails();
-        };
-    }, []);
+    const handleMaterialDetailsChange = (field, value) => {
+        setMaterialDetails((prev) => {
+            if (field === "material_files" && Array.isArray(value)) {
+                return {
+                    ...prev,
+                    material_files: [...prev.material_files, ...value],
+                };
+            } else {
+                return {
+                    ...prev,
+                    [field]: value,
+                };
+            }
+        });
+    };
+
+    // Remove an attached file by index
+    const handleRemoveAttachedFile = (fileIndex) => {
+        setMaterialDetails((prev) => ({
+            ...prev,
+            material_files: prev.material_files.filter(
+                (file, index) => index !== fileIndex
+            ),
+        }));
+    };
+
+    // Remove an uploaded file by ID and track removed files
+    const handleRemoveUploadedFile = (fileId) => {
+        setMaterialDetails((prev) => ({
+            ...prev,
+            uploaded_files:
+                prev.uploaded_files?.filter(
+                    (file) => file.material_file_id !== fileId
+                ) || [],
+            removed_files: [...(prev.removed_files || []), fileId],
+        }));
+    };
 
     useEffect(() => {
         if (sectionId) {
@@ -58,9 +98,9 @@ export default function MaterialForm({
         }
     }, []);
 
-    // useEffect(() => {
-    //     console.log(materialDetails);
-    // }, [materialDetails]);
+    useEffect(() => {
+        console.log(materialDetails);
+    }, [materialDetails]);
 
     return (
         <form
@@ -147,7 +187,7 @@ export default function MaterialForm({
                                     {console.log(file)}
                                     <FileCard
                                         removeAttachedFile={() =>
-                                            handlelRemoveUploadedFile(
+                                            handleRemoveUploadedFile(
                                                 file.material_file_id
                                             )
                                         }
@@ -163,7 +203,7 @@ export default function MaterialForm({
                                 <div key={index}>
                                     <FileCard
                                         removeAttachedFile={() =>
-                                            handleRemoveAttachedFiles(index)
+                                            handleRemoveAttachedFile(index)
                                         }
                                         fileId={index}
                                         fileName={file.name}
@@ -205,7 +245,8 @@ export default function MaterialForm({
                                     setIsMaterialFormOpen,
                                     isEdit,
                                     materialId,
-                                    sectionId
+                                    sectionId,
+                                    materialDetails
                                 )
                             }
                             isDisabled={isLoading}

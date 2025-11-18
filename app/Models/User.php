@@ -7,6 +7,7 @@ use App\Models\PaymentHistory\PaymentFile;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\Grade;
 use App\Models\Programs\Material;
+use App\Models\Programs\Post;
 use App\Models\Programs\Section;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -145,5 +146,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function gradedStudents(): HasMany
     {
         return $this->hasMany(Grade::class, 'graded_by', 'user_id');
+    }
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class, 'graded_by', 'user_id');
     }
 }
