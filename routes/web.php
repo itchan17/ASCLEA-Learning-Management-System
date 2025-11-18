@@ -8,11 +8,6 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('LandingPage/LandingPage');
 })->middleware('guest', 'preventBack');
-
-
-Route::get('/MockQuiz', function () {
-    return Inertia::render('MockQuiz/MockQuiz');
-})->middleware('guest', 'preventBack');
-
+  
 // Contact form submission (Landing Page)
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');

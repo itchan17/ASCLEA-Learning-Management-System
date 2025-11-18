@@ -156,9 +156,10 @@ export default function Sidebar({
                             Array.isArray(link.roles) &&
                             link.roles.includes(user?.role)
                         ) {
-                            if (user?.role === "student") {
-                                return user?.approved ||
-                                    link.url === "/admission"
+                            if (user?.role === "student") { 
+                                if (link.url === "/admission") return link; // Admission link is always visible to students
+
+                                return user?.approved && user?.enrollment_status === "enrolled"  // Only show other links if approved and enrolled
                                     ? link
                                     : null;
                             }
