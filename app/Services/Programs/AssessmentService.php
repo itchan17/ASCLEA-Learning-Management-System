@@ -123,6 +123,7 @@ class AssessmentService
                 $query->whereNull('deleted_at')
                     ->orWhere('created_by', $user->user_id);
             })
+            ->whereDoesntHave('sectionItem') // Only gets assessments not created in section
             ->select(
                 'assessment_id',
                 'assessment_type_id',
@@ -185,9 +186,9 @@ class AssessmentService
                 if ($file->file_path !== $file->original_file_path) {
                     // Remove the two files
                     Storage::delete([$file->file_path, $file->original_file_path]);
+                } else {
+                    Storage::delete($file->file_path);
                 }
-
-                Storage::delete($file->file_path);
             }
 
             $file->delete();

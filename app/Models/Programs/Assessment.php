@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Assessment extends Model
@@ -62,5 +63,10 @@ class Assessment extends Model
     public function assessmentSubmissions(): HasMany
     {
         return $this->hasMany(AssessmentSubmission::class, 'assessment_id');
+    }
+
+    public function sectionItem(): MorphOne
+    {
+        return $this->morphOne(SectionItem::class, 'item');
     }
 }

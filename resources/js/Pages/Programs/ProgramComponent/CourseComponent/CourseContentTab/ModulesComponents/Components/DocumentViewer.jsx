@@ -1,7 +1,7 @@
 import React from "react";
 import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
 import "@cyntler/react-doc-viewer/dist/index.css";
-import "../../../../../../../css/docViewer.css";
+import "../../../../../../../../css/docViewer.css";
 
 export default function DocumentViewer({ fileUrl }) {
     // Sample pdf in public folder

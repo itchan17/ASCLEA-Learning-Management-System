@@ -6,7 +6,7 @@ import useQuizResult from "../Hooks/useQuizResult";
 
 export default function QuizSubmitted({
     courseId,
-    assessmentId,
+    assessment,
     quiz,
     assessmentSubmission,
 }) {
@@ -44,7 +44,7 @@ export default function QuizSubmitted({
                             doSomething={() =>
                                 handleViewResult(
                                     courseId,
-                                    assessmentId,
+                                    assessment.assessment_id,
                                     quiz.quiz_id,
                                     assessmentSubmission.assessment_submission_id
                                 )

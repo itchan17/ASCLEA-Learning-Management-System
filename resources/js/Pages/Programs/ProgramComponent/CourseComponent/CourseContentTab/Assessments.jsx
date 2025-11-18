@@ -30,7 +30,10 @@ export default function Assessments() {
     // Scroll into the form once opened
     useEffect(() => {
         if (isAssessmentFormOpen) {
-            targetForm.current?.scrollIntoView({ behavior: "smooth" });
+            targetForm.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
         }
     }, [isAssessmentFormOpen]);
 
@@ -58,7 +61,6 @@ export default function Assessments() {
                 );
 
                 pageNum = 2;
-                assessmentList = response.data.data;
             } else {
                 response = await axios.get(
                     route("program.course.assessments", {
@@ -71,11 +73,9 @@ export default function Assessments() {
                 );
 
                 pageNum = assessmentByCourse[course.course_id].page + 1;
-                assessmentList = [
-                    ...assessmentByCourse[course.course_id].list,
-                    ...response.data.data,
-                ];
             }
+
+            assessmentList = response.data.data;
 
             const hasMoreAssessment =
                 response.data.current_page < response.data.last_page;
@@ -143,7 +143,10 @@ export default function Assessments() {
 
             {isAssessmentFormOpen && (
                 <div ref={targetForm}>
-                    <AssessmentForm toggleForm={toggleAssessmentForm} />
+                    <AssessmentForm
+                        setIsAssessmentFormOpen={setIsAssessmentFormOpen}
+                        toggleForm={toggleAssessmentForm}
+                    />
                 </div>
             )}
 
@@ -160,8 +163,7 @@ export default function Assessments() {
                     )
                 )}
 
-            {/* Display only when assessmentList has value
-            preventing to be displayed in inital render of component */}
+            {/* Display loader if assessment list for the course  has no value or has more */}
             {(!assessmentByCourse[course.course_id] ||
                 assessmentByCourse[course.course_id].hasMore) && (
                 <div ref={loaderRef} className=" w-full flex justify-center">

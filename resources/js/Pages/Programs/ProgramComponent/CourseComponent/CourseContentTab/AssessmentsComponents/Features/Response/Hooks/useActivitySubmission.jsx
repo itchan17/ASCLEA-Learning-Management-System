@@ -1,8 +1,14 @@
 import { useState, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import { route } from "ziggy-js";
+import useModulesStore from "../../../../ModulesComponents/Stores/modulesStore";
 
 export default function useActivitySubmission({ courseId, assessmentId }) {
+    // Module store
+    const unlockSectionAndSectionItems = useModulesStore(
+        (state) => state.unlockSectionAndSectionItems
+    );
+
     const [files, setFiles] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
     const [fileUrl, setFileUrl] = useState(null);
@@ -79,7 +85,20 @@ export default function useActivitySubmission({ courseId, assessmentId }) {
             {
                 showProgress: false,
                 preserveScroll: true,
-                only: ["assessmentSubmission"],
+                only: ["assessment", "assessmentSubmission"],
+                onSuccess: (page) => {
+                    if (page.props.assessment.section_item) {
+                        const studentProgress =
+                            page.props.assessment.section_item.student_progress;
+
+                        unlockSectionAndSectionItems(
+                            courseId,
+                            page.props.assessment.section_item.section_id,
+                            page.props.assessment.section_item.section_item_id,
+                            studentProgress
+                        );
+                    }
+                },
                 onFinish: () => {
                     setIsLoading(false);
                 },
