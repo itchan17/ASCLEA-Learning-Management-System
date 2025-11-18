@@ -15,6 +15,15 @@ class VerificationController extends Controller
 
     public function verifyEmailNotice (EmailVerificationRequest $request) {
         $request->fulfill();
+
+        $user = $request->user();
+
+        // If user is a student, direct to admission first for admission approval
+        if ($user->role->role_name === 'student') {
+            return redirect()->route('admission.index'); // changed from dashboard to admission.index
+        }
+
+        // Otherwise (admin and faculty), go directly to dashboard
         return redirect()->route('dashboard.index');
     }
 

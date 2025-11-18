@@ -3,6 +3,7 @@ import { PiNotebookFill } from "react-icons/pi";
 import { router, usePage } from "@inertiajs/react";
 import "../../../../../css/global.css";
 import { route } from "ziggy-js";
+import { formatFullDate } from "../../../../Utils/formatFullDate";
 
 export default function CourseCard({ courseDetails }) {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -77,13 +78,13 @@ export default function CourseCard({ courseDetails }) {
                     )}
                 </div>
             </div>
-            <div className="flex flex-wrap justify-between items-center space-x-5">
+            <div className="flex flex-wrap justify-end items-center space-x-5">
                 <span className="text-size1">
-                    Last updated on March 29, 2025
+                    Last updated on {formatFullDate(courseDetails.updated_at)}
                 </span>
-                <span className="bg-ascend-green px-2 py-1 text-size1 font-semibold text-ascend-white">
+                {/* <span className="bg-ascend-green px-2 py-1 text-size1 font-semibold text-ascend-white">
                     Completed
-                </span>
+                </span> */}
             </div>
         </div>
     );

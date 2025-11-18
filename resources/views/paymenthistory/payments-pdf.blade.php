@@ -5,6 +5,9 @@
     <style>
         body {
             font-family: DejaVu Sans, sans-serif; /* Built-in font */
+            font-size: 13px;
+            color: #333;
+            margin: 20px;
         }
 
         h2, h3 {
