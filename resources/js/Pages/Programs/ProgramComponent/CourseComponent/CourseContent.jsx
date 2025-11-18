@@ -28,7 +28,9 @@ export default function CourseContent() {
         { name: "Home", onlyData: [] },
         { name: "Modules", onlyData: [] },
         { name: "Assessments", onlyData: ["assessments"] },
-        ...(user?.role !== "student" ? [{ name: "Grades", onlyData: [] }] : []),
+        ...(user?.role !== "student"
+            ? [{ name: "Grades", onlyData: ["students"] }]
+            : []),
     ];
 
     const handleClickTab = (tabIndex, onlyData) => {

@@ -1,43 +1,44 @@
-import { useState, useEffect, useMemo } from "react";
-import { debounce } from "lodash";
+import { useState, useMemo, useEffect } from "react";
 import { router } from "@inertiajs/react";
 import { route } from "ziggy-js";
+import { debounce } from "lodash";
+import { RiCreativeCommonsZeroLine } from "react-icons/ri";
+import { GiRazorBlade } from "react-icons/gi";
 
-export default function useGradeActivity({
+export default function useGrades({
+    programId,
     courseId,
-    assessmentId,
-    assessemntSubmissionId,
     initialGrade,
+    assignedCourseId,
 }) {
     const [grade, setGrade] = useState(initialGrade);
     const [initialRender, setInitialRender] = useState(true);
     const [isLoading, setIsloading] = useState(false);
     const [isChanged, setIsChanged] = useState(false);
 
-    const gradeActivity = (e) => {
-        setGrade(e.target.value);
+    const handleGradeChange = (value) => {
+        setGrade(value);
     };
-
     const debounceUpdateGrade = useMemo(() => {
         return debounce((grade) => {
-            handleUpdateGrade(grade);
+            handleUpdateStudentGrade(grade);
         }, 300);
     }, []);
 
-    const handleUpdateGrade = (grade) => {
+    const handleUpdateStudentGrade = (grade) => {
         setIsChanged(true);
         setIsloading(true);
-        router.put(
-            route("grade.activity", {
+        router.post(
+            route("student.grade", {
+                program: programId,
                 course: courseId,
-                assessment: assessmentId,
-                assessmentSubmission: assessemntSubmissionId,
+                assignedCourse: assignedCourseId,
             }),
-            grade,
+            { grade },
             {
                 preserveScroll: true,
                 showProgress: false,
-                only: ["responses"],
+                only: ["students"],
                 onFinish: () => {
                     setIsloading(false);
                 },
@@ -46,10 +47,8 @@ export default function useGradeActivity({
     };
 
     useEffect(() => {
-        if (!initialRender) {
-            if (grade !== "") {
-                debounceUpdateGrade(grade);
-            }
+        if (!initialRender && grade !== "") {
+            debounceUpdateGrade(grade);
         } else {
             setInitialRender(false);
         }
@@ -59,5 +58,5 @@ export default function useGradeActivity({
         };
     }, [grade]);
 
-    return { grade, gradeActivity, isLoading, isChanged };
+    return { handleGradeChange, isLoading, grade, isChanged };
 }

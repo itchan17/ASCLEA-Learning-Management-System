@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Programs;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Program;
+use App\Services\Programs\GradeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -12,6 +13,13 @@ use Inertia\Inertia;
 
 class CourseController extends Controller
 {
+
+    protected GradeService $gradeService;
+
+    public function __construct(GradeService $gradeService)
+    {
+        $this->gradeService = $gradeService;
+    }
 
     // Create a course
     public function store(Program $program, Request $req)
@@ -56,15 +64,15 @@ class CourseController extends Controller
     }
 
     // Show selected course
-    public function showCourse(Program $program, Course $course)
+    public function showCourse(Request $request, Program $program, Course $course)
     {
         if ($course->program_id === $program->program_id) {
             return Inertia::render(
                 'Programs/ProgramComponent/CourseComponent/CourseContent',
                 [
                     'program' => fn() => $program->only(['program_id']),
-
                     'course' => fn() => $course->only(['course_id', 'course_code', 'course_name', 'course_description', 'course_day', 'start_time', 'end_time']),
+                    'students' => fn()  =>  $this->gradeService->getStudentsToBeGraded($request, $course)
                 ]
             );
         } else {
