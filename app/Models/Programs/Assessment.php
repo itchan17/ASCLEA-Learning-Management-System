@@ -42,7 +42,7 @@ class Assessment extends Model
 
     public function author(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by', 'user_id');
+        return $this->belongsTo(User::class, 'created_by', 'user_id')->withTrashed();
     }
 
     public function course(): BelongsTo

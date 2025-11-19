@@ -26,7 +26,8 @@ class PeopleController extends Controller
         })->whereNotNull('email_verified_at')->whereNotIn('user_id', function ($query) use ($programId) {
             $query->select('user_id')
                 ->from('learning_members')
-                ->where('program_id', $programId); // Select users that is not a member of the current program
+                ->where('program_id', $programId)
+                ->whereNull('deleted_at'); // Select users that is not a member of the current program
         })->where(function ($query) {
             $query->whereHas('student', function ($q) {
                 $q->whereNotNull('approved_at'); // Filter users that has student relationship and not approved
@@ -112,11 +113,13 @@ class PeopleController extends Controller
                 'learning_member_id' => (string) Str::uuid(),
                 'updated_at' => $now,
                 'created_at' => $now,
+                'deleted_at' => null,
             ];
         }, $users);
 
         // Data should not have duplicate in the table before inserting
-        LearningMember::insert($data);
+        // Update deleted_at  is userr was previously added in the program
+        LearningMember::upsert($data, uniqueBy: ['program_id', 'user_id'], update: ['deleted_at']);
 
         $label = count($data) > 1 ? "Users" : "User";
 
@@ -125,10 +128,7 @@ class PeopleController extends Controller
 
     public function removeMember($programId, LearningMember $member)
     {
-
-        if ($member) {
-            $member->delete();
-        }
+        $member->delete();
 
         return back()->with('success', 'Member removed successfully.');
     }
@@ -201,10 +201,12 @@ class PeopleController extends Controller
                     'course_id' => $validCourseId,
                     'updated_at' => $now,
                     'created_at' => $now,
+                    'deleted_at' => null,
                 ];
             }, $validCourses);
 
-            AssignedCourse::insert($data);
+            // Update assigned course deleted_at if user was previously added
+            AssignedCourse::upsert($data, uniqueBy: ['learning_member_id', 'course_id'], update: ['deleted_at']);
         }
 
         $label = count($data) > 1 ? "Courses" : "Course";

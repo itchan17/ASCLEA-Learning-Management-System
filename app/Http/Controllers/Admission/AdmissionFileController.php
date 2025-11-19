@@ -25,14 +25,14 @@ class AdmissionFileController extends Controller
                 ->paginate(10);
 
             $enrolledStudents = Student::with('user')
-                ->whereIn('enrollment_status', ['enrolled','dropout','withdrawn'])
+                ->whereIn('enrollment_status', ['enrolled', 'dropout', 'withdrawn'])
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
 
             return Inertia::render('Admission/AdmissionPage', [
                 'pendingStudents' => $pendingStudents,
                 'enrolledStudents' => $enrolledStudents,
-                'activeTab' => 0, 
+                'activeTab' => 0,
             ]);
         } else {
             $student = Student::where('user_id', $user->user_id)->first();
@@ -89,21 +89,21 @@ class AdmissionFileController extends Controller
     $query = Student::with(['user', 'admissionFiles'])
         ->where('enrollment_status', 'pending');
 
-    if ($search = $request->input('search')) {
-        $query->whereHas('user', function ($q) use ($search) {
-            $q->where('first_name', 'like', "%{$search}%")
-              ->orWhere('last_name', 'like', "%{$search}%")
-              ->orWhere('middle_name', 'like', "%{$search}%")
-              ->orWhere('email', 'like', "%{$search}%");
-        });
-    }
+        if ($search = $request->input('search')) {
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('middle_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
 
-    $pendingStudents = $query->orderBy('created_at', 'desc')
-        ->paginate(10)
-        ->withQueryString();
+        $pendingStudents = $query->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
 
-    return Inertia::render('Admission/AdmissionPage', [
-        'pendingStudents' => $pendingStudents,
+        return Inertia::render('Admission/AdmissionPage', [
+            'pendingStudents' => $pendingStudents,
         ]);
     }
 
@@ -128,9 +128,9 @@ class AdmissionFileController extends Controller
         if ($search = $request->input('search')) {
             $query->whereHas('user', function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
-                  ->orWhere('last_name', 'like', "%{$search}%")
-                  ->orWhere('middle_name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('middle_name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -155,7 +155,7 @@ class AdmissionFileController extends Controller
             'courses.course',
             'courses.assessmentSubmissions.assessment',
         ])->where('user_id', $student->user_id)
-        ->get();
+            ->get();
 
         // Flatten completed assessments across all learning members
         $completedAssessments = $learningMembers->flatMap(function ($lm) {
@@ -185,43 +185,43 @@ class AdmissionFileController extends Controller
     //==================== FUNCTION OF UPDATING THE INFORMATION OF ACCEPTED/ENROLLED STUDENTS ====================//
     public function updateStudent(Request $request, Student $student)
     {
-    $validated = $request->validate([
-        'first_name' => 'required|string|max:255',
-        'last_name' => 'required|string|max:255',
-        'middle_name' => 'nullable|string|max:255',
-        'email' => 'required|email|unique:users,email,' . $student->user->user_id . ',user_id',
-        'contact_number' => 'nullable|string|max:20',
-        'birthdate' => 'nullable|date',
-        'gender' => 'nullable|in:male,female,other',
-        'program' => 'nullable|string|max:255',
-        'enrollment_status' => 'nullable|in:enrolled,pending,dropout,withdrawn', //Withdrawn enrollment status do not exist yet in the model
-        'admission_status' => 'nullable|in:Not Submitted,Pending,Accepted,Rejected',
-        'house_no' => 'nullable|string|max:255',
-        'region' => 'nullable|string|max:255',
-        'province' => 'nullable|string|max:255',
-        'city' => 'nullable|string|max:255',
-        'barangay' => 'nullable|string|max:255',
-    ]);
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $student->user->user_id . ',user_id',
+            'contact_number' => 'nullable|string|max:20',
+            'birthdate' => 'nullable|date',
+            'gender' => 'nullable|in:male,female,other',
+            'program' => 'nullable|string|max:255',
+            'enrollment_status' => 'nullable|in:enrolled,pending,dropout,withdrawn', //Withdrawn enrollment status do not exist yet in the model
+            'admission_status' => 'nullable|in:Not Submitted,Pending,Accepted,Rejected',
+            'house_no' => 'nullable|string|max:255',
+            'region' => 'nullable|string|max:255',
+            'province' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
+            'barangay' => 'nullable|string|max:255',
+        ]);
 
-    $student->user->update([
-        'first_name' => $request->first_name,
-        'last_name' => $request->last_name,
-        'middle_name' => $request->middle_name,
-        'email' => $request->email,
-        'contact_number' => $request->contact_number,
-        'birthdate' => $request->birthdate,
-        'gender' => $request->gender,
-        'house_no' => $request->house_no,
-        'region' => $request->region,
-        'province' => $request->province,
-        'city' => $request->city,
-        'barangay' => $request->barangay,
-    ]);
+        $student->user->update([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'middle_name' => $request->middle_name,
+            'email' => $request->email,
+            'contact_number' => $request->contact_number,
+            'birthdate' => $request->birthdate,
+            'gender' => $request->gender,
+            'house_no' => $request->house_no,
+            'region' => $request->region,
+            'province' => $request->province,
+            'city' => $request->city,
+            'barangay' => $request->barangay,
+        ]);
 
-    $student->update([
-        'enrollment_status' => $request->enrollment_status,
-        'admission_status' => $request->admission_status ?? $student->admission_status,
-    ]);
+        $student->update([
+            'enrollment_status' => $request->enrollment_status,
+            'admission_status' => $request->admission_status ?? $student->admission_status,
+        ]);
         return redirect()->back()->with('success', 'Student updated successfully.');
     }
 
@@ -276,8 +276,12 @@ class AdmissionFileController extends Controller
     }
 
     //==================== ARCHIVE ENROLLED STUDENTS ====================//
-    public function archive(Student $student)
+    public function archive(Request $request, Student $student)
     {
+        $student->update([
+            'archived_by' => $request->user()->user_id
+        ]);
+
         // Soft delete the enrolled student
         $student->delete();
 
@@ -286,6 +290,32 @@ class AdmissionFileController extends Controller
             $student->user->delete();
         }
         return redirect()->route('admission.index')->with('success', 'Student archived successfully.');
+    }
+
+    public function restoreStudent($studentId)
+    {
+        $student = Student::withTrashed()->findOrFail($studentId);
+
+        // Restore the student and user data
+        $student->restore();
+        $student->user->restore();
+
+        // Remove the archived_by   
+        $student->update([
+            'archived_by' => null
+        ]);
+
+        return redirect()->back()->with('success', 'Student restored successfully.');
+    }
+
+    public function forceDeleteStudent($studentId)
+    {
+        $student = Student::withTrashed()->findOrFail($studentId);
+
+        $student->forceDelete();
+        $student->user->forceDelete();
+
+        return redirect()->back()->with('success', 'Student deleted permanently.');
     }
 
     public function updateProfile(Request $request, $id)
@@ -322,7 +352,7 @@ class AdmissionFileController extends Controller
         // Stream the file from storage
         return response()->file(storage_path('app/public/' . $file->file_path));
     }
-    
+
     //==================== DOWNLOAD ADMISSION FILES OF PENDING STUDENTS ====================//
     public function downloadAdmissionFile(Student $student, AdmissionFile $file)
     {
@@ -432,15 +462,10 @@ class AdmissionFileController extends Controller
         $students = Student::with('user')
             ->where('enrollment_status', 'enrolled')
             ->get();
-        
+
         $pdf = Pdf::setOptions(['defaultFont' => 'DejaVu Sans'])
             ->loadView('admission.enrolled-students-pdf', compact('students'));
 
         return $pdf->download('enrolled_students.pdf');
     }
-
-
-
-
-
 }

@@ -1,4 +1,4 @@
-// utils/toast.js
+import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
 import "../../css/toast.css";
 
