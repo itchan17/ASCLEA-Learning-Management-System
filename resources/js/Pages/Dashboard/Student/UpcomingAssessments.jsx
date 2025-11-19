@@ -51,18 +51,16 @@ export default function UpcomingAssessments() {
                 </table>
             </div>
 
-            {/*================= Pagination (if data exists) =================*/}
-            {pending_assessments.data && pending_assessments.data.length > 0 && (
+            {/*================= Pagination (if multiple pages exist) =================*/}
+            {pending_assessments.data?.length > 0 && pending_assessments.last_page > 1 && (
                 <div className="flex justify-end mt-5">
-                    {pending_assessments?.links && (
-                        <Pagination
-                            links={pending_assessments.links}
-                            currentPage={pending_assessments.current_page}
-                            lastPage={pending_assessments.last_page}
-                            only={["pending_assessments"]}
-                            onPageChange={handlePageChange}
-                        />
-                    )}
+                    <Pagination
+                        links={pending_assessments.links}
+                        currentPage={pending_assessments.current_page}
+                        lastPage={pending_assessments.last_page}
+                        only={["pending_assessments"]}
+                        onPageChange={handlePageChange}
+                    />
                 </div>
             )}
         </div>

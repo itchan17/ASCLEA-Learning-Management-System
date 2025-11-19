@@ -51,18 +51,16 @@ export default function PastAssessments() {
                 </table>
             </div>
 
-            {/*================= Pagination (if data exists) =================*/}
-            {accomplished_assessments.data && accomplished_assessments.data.length > 0 && (
+            {/*================= Pagination (if multiple pages exist) =================*/}
+            {accomplished_assessments.data?.length > 0 && accomplished_assessments.last_page > 1 && (
                 <div className="flex justify-end mt-5">
-                    {accomplished_assessments?.links && (
-                        <Pagination
-                            links={accomplished_assessments.links}
-                            currentPage={accomplished_assessments.current_page}
-                            lastPage={accomplished_assessments.last_page}
-                            only={["accomplished_assessments"]}
-                            onPageChange={handlePageChange}
-                        />
-                    )}
+                    <Pagination
+                        links={accomplished_assessments.links}
+                        currentPage={accomplished_assessments.current_page}
+                        lastPage={accomplished_assessments.last_page}
+                        only={["accomplished_assessments"]}
+                        onPageChange={handlePageChange}
+                    />
                 </div>
             )}
         </div>
