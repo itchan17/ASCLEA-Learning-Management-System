@@ -145,6 +145,7 @@ export default function ActivityReponses() {
                             <th className="w-0">
                                 <div className="flex items-center mb-0 gap-2 text-ascend-black font-black">
                                     <input
+                                        disabled={responses.data.length === 0}
                                         type="checkbox"
                                         checked={selectAll}
                                         className="accent-ascend-blue w-4 h-4 cursor-pointer"
