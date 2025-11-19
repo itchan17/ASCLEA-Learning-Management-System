@@ -20,6 +20,7 @@ export default function Login() {
         e.preventDefault();
         post(route("login.user"), {
             replace: true,
+            showProgress: false,
             onSuccess: () => reset("password", "email"),
         });
     }
