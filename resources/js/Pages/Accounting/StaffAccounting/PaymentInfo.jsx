@@ -278,6 +278,7 @@ const filteredFiles = files.filter((file) => {
               text="Archive"
               isDisabled={isValidating}
               isLoading={isValidating}
+              loaderColor = "text-ascend-white" 
               btnColor={isEditDisabled ? "bg-ascend-red" : "bg-ascend-gray1"}
               doSomething={isEditDisabled ? () => setShowArchiveAlert(true) : undefined}
             />
@@ -287,6 +288,7 @@ const filteredFiles = files.filter((file) => {
               isDisabled={isValidating}
               isLoading={isValidating}
               btnColor="bg-ascend-green"
+              loaderColor = "text-ascend-white" 
               doSomething={() => setShowRevertPaymentAlert(true)}
             />
           )}

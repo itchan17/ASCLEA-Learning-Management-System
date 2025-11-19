@@ -440,7 +440,7 @@ class PaymentHistoryController extends Controller
             "Expires" => "0"
         ];
 
-        $columns = ['Payment Method', 'Transaction ID', 'Receipt Date', 'Payment Amount', 'Action'];
+        $columns = ['Payment Method', 'Transaction ID', 'Receipt Date', 'Payment Amount'];
 
         $callback = function() use ($payments, $columns) {
             $file = fopen('php://output', 'w');
@@ -452,7 +452,6 @@ class PaymentHistoryController extends Controller
                     $payment->transaction_id,
                     $payment->receipt_date,
                     $payment->payment_amount,
-                    'View',
                 ]);
             }
 

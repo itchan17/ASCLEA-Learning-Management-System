@@ -118,7 +118,7 @@ const handleExport = async (type) => {
         )}
       </div>
 
-      {can.download && activeTab === 0 && (
+      {can.download && activeTab === 0 && filteredPayments.length > 0 && (
         <div className="flex space-x-[2px]">
           {/* Main Download Button showing current selection */}
           <PrimaryButton
