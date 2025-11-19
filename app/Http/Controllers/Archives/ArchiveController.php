@@ -19,7 +19,8 @@ class ArchiveController extends Controller
     {
         return Inertia::render('Archives/Archives', [
             'archivedCourses' => fn() => $this->archiveService->getArchivedCourses(),
-            'archivedStaff' => fn() => $this->archiveService->getArchivedStaff()
+            'archivedStaff' => fn() => $this->archiveService->getArchivedStaff(),
+            'archivedStudents' => fn() => $this->archiveService->getArchivedStudents()
         ]);
     }
 }

@@ -110,11 +110,65 @@ export default function useArchive() {
             }
         );
     };
+
+    // Students
+    const handleRestoreStudent = (studentId, setOpenAlertModal) => {
+        setIsLoading(true);
+        router.put(
+            route("student.restore", {
+                student: studentId,
+            }),
+            {},
+            {
+                showProgress: false,
+                only: ["archivedStudents", "flash"],
+                onSuccess: (page) => {
+                    displayToast(
+                        <DefaultCustomToast
+                            message={page.props.flash.success}
+                        />,
+                        "success"
+                    );
+                    setOpenAlertModal(false);
+                },
+                onFinish: () => {
+                    setIsLoading(false);
+                },
+            }
+        );
+    };
+
+    const handleForceDeleteStudent = (studentId, setOpenAlertModal) => {
+        setIsLoading(true);
+        router.delete(
+            route("student.force.delete", {
+                student: studentId,
+            }),
+            {
+                showProgress: false,
+                only: ["archivedStudents", "flash"],
+                onSuccess: (page) => {
+                    displayToast(
+                        <DefaultCustomToast
+                            message={page.props.flash.success}
+                        />,
+                        "success"
+                    );
+                    setOpenAlertModal(false);
+                },
+                onFinish: () => {
+                    setIsLoading(false);
+                },
+            }
+        );
+    };
     return {
         isLoading,
         handleRestoreCourse,
         handleForceDeleteCourse,
         handleRestoreStaff,
         handleForceDeleteStaff,
+        handleRestoreStudent,
+        handleForceDeleteStudent,
     };
 }

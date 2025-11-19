@@ -56,22 +56,22 @@ export default function ArchivedStaff() {
                         </tbody>
                     )}
                 </table>
-                {archivedStaff.data.length > 0 && archivedStaff.total > 10 && (
-                    <Pagination
-                        links={archivedStaff.links}
-                        currentPage={archivedStaff.current_page}
-                        lastPage={archivedStaff.last_page}
-                        only={["archivedStaff"]}
-                    />
-                )}
-
-                {archivedStaff.data.length === 0 && (
-                    <EmptyState
-                        imgSrc={"/images/illustrations/blank_canvas.svg"}
-                        text={`“Looks empty! You haven’t archived any staff yet.”`}
-                    />
-                )}
             </div>
+            {archivedStaff.data.length > 0 && archivedStaff.total > 10 && (
+                <Pagination
+                    links={archivedStaff.links}
+                    currentPage={archivedStaff.current_page}
+                    lastPage={archivedStaff.last_page}
+                    only={["archivedStaff"]}
+                />
+            )}
+
+            {archivedStaff.data.length === 0 && (
+                <EmptyState
+                    imgSrc={"/images/illustrations/blank_canvas.svg"}
+                    text={`“Looks empty! You haven’t archived any staff yet.”`}
+                />
+            )}
 
             {/* Display alert modal */}
             {openAlerModal && (
@@ -84,7 +84,7 @@ export default function ArchivedStaff() {
                     description={
                         action === "restore"
                             ? "Are you sure you want to restore this staff?"
-                            : "Are you sure you want to permanently delete this staff? This action cannot be undone."
+                            : "Are you sure you want to permanently delete this staff? All data associated with this staff will be permanently lost and cannot be recovered."
                     }
                     closeModal={() => setOpenAlertModal(false)}
                     onConfirm={() => {
