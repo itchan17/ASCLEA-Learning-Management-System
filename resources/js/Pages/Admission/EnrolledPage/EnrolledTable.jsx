@@ -24,13 +24,21 @@ export default function EnrolledStudentsTable({ active }) {
     };
 
     //=========================== Debounced router call ===========================//
-    const debouncedSearch = useMemo(() => debounce((value) => {
-        router.get(route("enrolled.students"), { search: value, page: 1 }, {
-            preserveState: true,
-            showProgress: false,
-            only: ["enrolledStudents"]
-        });
-    }, 300), []);
+    const debouncedSearch = useMemo(
+        () =>
+            debounce((value) => {
+                router.get(
+                    route("enrolled.students"),
+                    { search: value, page: 1 },
+                    {
+                        preserveState: true,
+                        showProgress: false,
+                        only: ["enrolledStudents"],
+                    }
+                );
+            }, 300),
+        []
+    );
 
     useEffect(() => {
         return () => debouncedSearch.cancel(); // cleanup on unmount
@@ -40,11 +48,15 @@ export default function EnrolledStudentsTable({ active }) {
     useEffect(() => {
         if (active) {
             setSearch("");
-            router.get(route("enrolled.students"), { page: 1 }, {
-                preserveState: false,
-                showProgress: false,
-                only: ["enrolledStudents"]
-            });
+            router.get(
+                route("enrolled.students"),
+                { page: 1 },
+                {
+                    preserveState: false,
+                    showProgress: false,
+                    only: ["enrolledStudents"],
+                }
+            );
         }
     }, [active]);
 
@@ -79,7 +91,8 @@ export default function EnrolledStudentsTable({ active }) {
                     <tbody>
                         {enrolledStudents?.data?.length > 0 ? (
                             enrolledStudents.data.map((student) => {
-                                const status = student.enrollment_status?.toLowerCase();
+                                const status =
+                                    student.enrollment_status?.toLowerCase();
                                 const statusColor =
                                     status === "enrolled"
                                         ? "text-ascend-blue"
@@ -92,19 +105,31 @@ export default function EnrolledStudentsTable({ active }) {
                                 return (
                                     <tr
                                         key={student.student_id}
-                                        onClick={() => handleRowClick(student.student_id)}
-                                        className="hover:bg-ascend-lightblue cursor-pointer border-b border-ascend-gray1"
+                                        onClick={() =>
+                                            handleRowClick(student.student_id)
+                                        }
+                                        className="hover:bg-ascend-lightblue cursor-pointer"
                                     >
                                         <td className="py-5">
                                             {student.user.first_name}{" "}
-                                            {student.user.middle_name ? student.user.middle_name + " " : ""}
+                                            {student.user.middle_name
+                                                ? student.user.middle_name + " "
+                                                : ""}
                                             {student.user.last_name}
                                         </td>
-                                        <td className="py-5">{student.user.email}</td>
                                         <td className="py-5">
-                                            {student.approved_at ? new Date(student.approved_at).toLocaleDateString() : "-"}
+                                            {student.user.email}
                                         </td>
-                                        <td className={`py-5 capitalize ${statusColor}`}>
+                                        <td className="py-5">
+                                            {student.approved_at
+                                                ? new Date(
+                                                      student.approved_at
+                                                  ).toLocaleDateString()
+                                                : "-"}
+                                        </td>
+                                        <td
+                                            className={`py-5 capitalize ${statusColor}`}
+                                        >
                                             {student.enrollment_status}
                                         </td>
                                         <td className="py-5">
@@ -154,7 +179,9 @@ export default function EnrolledStudentsTable({ active }) {
                                 <li>
                                     {/* href={route("admissions.enrolled.exportPdf")} */}
                                     <a
-                                        href={route("admissions.enrolled.exportPdf")}
+                                        href={route(
+                                            "admissions.enrolled.exportPdf"
+                                        )}
                                         className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
                                     >
                                         Download as pdf
@@ -162,7 +189,9 @@ export default function EnrolledStudentsTable({ active }) {
                                 </li>
                                 <li>
                                     <a
-                                        href={route("admissions.enrolled.exportCsv")}
+                                        href={route(
+                                            "admissions.enrolled.exportCsv"
+                                        )}
                                         className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
                                     >
                                         Download as csv
@@ -173,16 +202,17 @@ export default function EnrolledStudentsTable({ active }) {
                     </div>
 
                     {/* Pagination (RIGHT) */}
-                    {enrolledStudents?.links?.length > 0 && enrolledStudents?.last_page > 1 && (
-                        <div className="flex items-center [&>*]:!mt-0">
-                            <Pagination
-                                links={enrolledStudents.links}
-                                currentPage={enrolledStudents.current_page}
-                                lastPage={enrolledStudents.last_page}
-                                only={["enrolledStudents"]}
-                            />
-                        </div>
-                    )}
+                    {enrolledStudents?.links?.length > 0 &&
+                        enrolledStudents?.last_page > 1 && (
+                            <div className="flex items-center [&>*]:!mt-0">
+                                <Pagination
+                                    links={enrolledStudents.links}
+                                    currentPage={enrolledStudents.current_page}
+                                    lastPage={enrolledStudents.last_page}
+                                    only={["enrolledStudents"]}
+                                />
+                            </div>
+                        )}
                 </div>
             )}
         </div>

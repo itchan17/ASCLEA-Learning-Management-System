@@ -205,16 +205,7 @@ export default function Courses() {
                     {programDetails.program_description}
                 </p>
             </div>
-            <div className="flex flex-wrap justify-between items-center gap-2">
-                <CustomSelect
-                    selectField={
-                        <select className="w-35 rounded-none appearance-none border border-ascend-black p-2 h-9 text-size1  focus:outline-ascend-blue">
-                            <option value="not_started">Not started</option>
-                            <option value="ongoing">Ongoing</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                    }
-                />
+            <div className="flex flex-wrap justify-end items-center gap-2">
                 <RoleGuard allowedRoles={["admin"]}>
                     <PrimaryButton
                         doSomething={toggleModal}
