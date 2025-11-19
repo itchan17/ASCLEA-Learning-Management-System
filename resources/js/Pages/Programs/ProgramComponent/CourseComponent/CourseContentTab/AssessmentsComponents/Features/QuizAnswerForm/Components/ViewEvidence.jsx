@@ -53,7 +53,11 @@ export default function ViewEvidence({ setIsEvidenceOpen, assessmentSubmissionId
                 {/* Student Info */}
                     <div className="flex flex-wrap gap-5 items-center justify-between">
                         <div className="flex items-center space-x-5">
-                            <div className="w-20 h-20 bg-ascend-gray1 rounded-full shrink-0"></div>
+                            <img
+                                src={studentData.profile ? `/storage/${studentData.profile}` : "/default-profile.png"}
+                                alt="Profile image"
+                                className="w-20 h-20 rounded-full bg-ascend-gray1/20 object-cover shrink-0"
+                            />
                             <div>
                                 <h1 className="text-size3 font-semibold">
                                     {studentData.first_name} {studentData.last_name}
