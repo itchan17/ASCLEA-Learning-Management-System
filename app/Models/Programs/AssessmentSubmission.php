@@ -25,6 +25,7 @@ class AssessmentSubmission extends Model
         'submitted_by',
         'submission_status',
         'submitted_at',
+        'time_spent',
         'end_at',
         'score',
         'feedback',
@@ -47,7 +48,7 @@ class AssessmentSubmission extends Model
 
     public function submittedBy(): BelongsTo
     {
-        return $this->belongsTo(AssignedCourse::class, 'submitted_by', 'assigned_course_id');
+        return $this->belongsTo(AssignedCourse::class, 'submitted_by', 'assigned_course_id')->withTrashed();
     }
 
     public function activityFiles(): HasMany

@@ -46,6 +46,7 @@ class Student extends Model
         'enrollment_status',
         'admission_status',
         'admission_message',
+        'archived_by',
         'payment',
     ];
 
@@ -60,7 +61,7 @@ class Student extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id')->withTrashed();
     }
 
     public function payments(): HasMany
@@ -83,4 +84,8 @@ class Student extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
+    public function archivedBy()
+    {
+        return $this->belongsTo(User::class, 'archived_by', 'user_id')->withTrashed();
+    }
 }

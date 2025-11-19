@@ -119,7 +119,7 @@ export default function Courses() {
                 <AlertModal
                     title={"Archive Confirmation"}
                     description={
-                        "This program can only be restored after restoring its associated courses. Are you sure you want to archive it?"
+                        "This program can only be restored after restoring its associated courses. If the program has no courses, it will be permanently deleted. Are you sure you want to archive it?"
                     }
                     closeModal={() => setOpenAlertModal(false)}
                     onConfirm={archiveProgram}

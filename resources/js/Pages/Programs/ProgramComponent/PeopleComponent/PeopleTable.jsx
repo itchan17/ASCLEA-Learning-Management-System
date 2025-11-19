@@ -10,6 +10,7 @@ import Pagination from "../../../../Components/Pagination";
 import { debounce } from "lodash";
 import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
 import { displayToast } from "../../../../Utils/displayToast";
+import AlertModal from "../../../../Components/AlertModal";
 
 export default function PeopleTable() {
     const { members, program, auth } = usePage().props;
@@ -17,6 +18,11 @@ export default function PeopleTable() {
     const [filter, setFilter] = useState("");
     const [search, setSearch] = useState("");
     const [initialRender, setInitialRender] = useState(true);
+
+    // State  for removing member
+    const [openAlerModal, setOpenAlertModal] = useState(false);
+    const [memberToRemove, setMemberToRemove] = useState(null);
+    const [isRemoveLoading, setIsRemoveLoading] = useState(false);
 
     const handleFilterChange = (role) => {
         setFilter(role);
@@ -71,30 +77,56 @@ export default function PeopleTable() {
         }
     };
 
-    const handleRemoveMember = (e, learningMemberId) => {
-        e.stopPropagation();
+    const handleRemoveMember = () => {
+        if (memberToRemove) {
+            setIsRemoveLoading(true);
+            router.delete(
+                route("program.remove.member", {
+                    program: program.program_id,
+                    member: memberToRemove,
+                }),
+                {
+                    showProgress: false,
+                    only: ["members", "flash"],
+                    onSuccess: (page) => {
+                        displayToast(
+                            <DefaultCustomToast
+                                message={page.props.flash.success}
+                            />,
+                            "success"
+                        );
+                    },
+                    onFinish: () => {
+                        setMemberToRemove(null);
+                        setOpenAlertModal(false);
+                        setIsRemoveLoading(false);
+                    },
+                }
+            );
+        }
+    };
 
-        router.delete(
-            route("program.remove.member", {
-                program: program.program_id,
-                member: learningMemberId,
-            }),
-            {
-                only: ["members", "flash"],
-                onSuccess: (page) => {
-                    displayToast(
-                        <DefaultCustomToast
-                            message={page.props.flash.success}
-                        />,
-                        "success"
-                    );
-                },
-            }
-        );
+    const handleOpenRemoveAlertModal = (e, learningMemberId) => {
+        e.stopPropagation();
+        setMemberToRemove(learningMemberId);
+        setOpenAlertModal(true);
     };
 
     return (
         <div className="space-y-5">
+            {/* Display alert modal */}
+            {openAlerModal && (
+                <AlertModal
+                    title={"Remove Learning Member"}
+                    description={
+                        "Are you sure you want to remove this member? The user will no longer have access to this program."
+                    }
+                    closeModal={() => setOpenAlertModal(false)}
+                    onConfirm={handleRemoveMember}
+                    isLoading={isRemoveLoading}
+                />
+            )}
+
             <div className="flex flex-col sm:flex-row justify-end gap-2">
                 <select
                     onChange={(e) => handleFilterChange(e.target.value)}
@@ -185,7 +217,7 @@ export default function PeopleTable() {
                                             <td>
                                                 <span
                                                     onClick={(e) =>
-                                                        handleRemoveMember(
+                                                        handleOpenRemoveAlertModal(
                                                             e,
                                                             member.learning_member_id
                                                         )

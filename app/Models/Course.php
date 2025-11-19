@@ -45,12 +45,13 @@ class Course extends Model
         'course_day',
         'start_time',
         'end_time',
+        'archived_by',
         'program_id',
     ];
 
     public function program(): BelongsTo
     {
-        return $this->belongsTo(Program::class, 'program_id');
+        return $this->belongsTo(Program::class, 'program_id')->withTrashed();
     }
 
     public function assignedTo(): HasMany
@@ -81,5 +82,10 @@ class Course extends Model
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class, 'course_id');
+    }
+
+    public function archivedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'archived_by', 'user_id')->withTrashed();
     }
 }

@@ -43,14 +43,22 @@ Route::prefix('admission')
         Route::delete('/students/{student}/archive', [AdmissionFileController::class, 'archive'])
             ->name('students.archive');
 
+        // Restore student
+        Route::put('/students/{student}/restore', [AdmissionFileController::class, 'restoreStudent'])
+            ->name('student.restore');
+
+        // Force delete student and user data
+        Route::delete('/students/{student}/force-delete', [AdmissionFileController::class, 'forceDeleteStudent'])
+            ->name('student.force.delete');
+
         // Update Student Profile Photo
         Route::put('/students/{student}/update-profile', [AdmissionFileController::class, 'updateProfile'])
             ->name('student.profile.update');
 
         // Route to stream admission file
         Route::get('/admission/{student}/admission-files/{file}/stream', [AdmissionFileController::class, 'streamAdmissionFile'])
-        ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin'])
-        ->name('admission.file.stream');
+            ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin'])
+            ->name('admission.file.stream');
 
         // Route to download admission file
         Route::get('/admission/{student}/admission-files/{file}/download', [AdmissionFileController::class, 'downloadAdmissionFile'])
@@ -72,7 +80,6 @@ Route::prefix('admission')
         // Route to download/Export Enrolled Students throughPDF 
         Route::get('/admissions/enrolled/export-pdf', [AdmissionFileController::class, 'exportEnrolledPdf'])
             ->name('admissions.enrolled.exportPdf');
-
     });
 
 //student Routes
@@ -83,6 +90,4 @@ Route::prefix('admission')
         // Route to upload admission files
         Route::post('/upload-admission-files', [AdmissionFileController::class, 'store'])
             ->name('admissionfiles.upload');
-});
-        
-
+    });
