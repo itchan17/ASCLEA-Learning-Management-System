@@ -91,15 +91,16 @@ class AssessmentPolicy
     public function downloadAssessmentFile(User $user, Assessment $assessment, string $courseId): bool
     {
         // User can download the file if he is an admin and author of the assessment or the assessment was published
-        // If not admin to download the file the course should be assigned to the user and the author of the assessment or the assessment was published
+        // If not admin to download the file the course should be assigned to the user and userr is a faculty and the author of the assessment or the assessment was published
         $isAdmin = $user->role->role_name == "admin";
+        $isFaculty = $user->role->role_name == "faculty";
         $isAuthor = $assessment->created_by === $user->user_id;
         $isPublished = $assessment->status === "published";
         $isCourseAssigned = $user->programs()->whereHas('courses', function ($query) use ($courseId) {
             $query->where('course_id', $courseId);
         })->exists();
 
-        $isAuthorized = ($isAdmin && ($isAuthor || $isPublished)) || ($isCourseAssigned && ($isAuthor || $isPublished));
+        $isAuthorized = ($isAdmin && ($isAuthor || $isPublished)) || ($isFaculty && $isCourseAssigned && ($isAuthor || $isPublished));
 
         return $isAuthorized;
     }

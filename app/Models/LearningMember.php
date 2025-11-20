@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class LearningMember extends Model
 {
-    use HasUuids;
+    use HasUuids, SoftDeletes;
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -37,20 +38,18 @@ class LearningMember extends Model
         'program_id',
     ];
 
-    public function program(): BelongsTo 
+    public function program(): BelongsTo
     {
         return $this->belongsTo(Program::class, 'program_id');
     }
 
-    public function user(): BelongsTo 
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id')->withTrashed();
     }
 
     public function courses(): HasMany
     {
         return $this->hasMany(AssignedCourse::class, 'learning_member_id');
     }
-
-    
 }

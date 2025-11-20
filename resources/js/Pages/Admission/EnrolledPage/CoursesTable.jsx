@@ -1,52 +1,48 @@
-import React from 'react'
-import { IoSearch } from "react-icons/io5";
+import React from 'react';
 
-const CoursesTable = ({student}) => {
-    const courses = student?.courses || [];
+const CoursesTable = ({ learningMembers }) => {
+  const allCourses = learningMembers.flatMap(lm =>
+    lm.courses.map(course => ({
+      programName: lm.program?.program_name || 'No Program',
+      courseCode: course.course?.course_code,
+      courseName: course.course?.course_name,
+    }))
+  );
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-5">
-        <div className="font-nunito-sans text-size6 font-bold">Courses</div>
-        <div className="flex justify-end">
-          <div className="relative">
-            <input
-              className="w-full sm:w-50 border h-9 pl-10 p-2 border-ascend-black focus:outline-ascend-blue"
-              type="text"
-              placeholder="Search"
-            />
-            <IoSearch className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1" />
-          </div>
-        </div>
+    <div className="font-nunito-sans space-y-2">
+      <div className="flex justify-between items-center">
+        <h1 className="text-size6 font-bold">Programs & Courses</h1>
       </div>
 
+      {/*===========================Programs & Courses Table===========================*/}
       <div className="overflow-x-auto">
-        <table className="table">
+        <table className="table w-full">
           <thead>
-            <tr className="border-b-2 border-ascend-lightblue">
-              <th>Erolled Courses</th>
-              <th>Final Grade</th>
+            <tr className="border-b-2 border-ascend-gray3 text-ascend-black font-bold">
+              <th>Program Name</th>
+              <th>Course Code</th>
+              <th>Course Name</th>
             </tr>
           </thead>
-            <tbody>
-            {courses.length > 0 ? (
-              courses.map((course, index) => (
-                <tr
-                  key={index}
-                  className="hover:bg-ascend-lightblue cursor-pointer border-b border-ascend-lightblue"
-                >
-                  <td className="py-5">{course.name}</td>
-                  <td className="py-5">{course.grade}</td>
+
+          <tbody>
+            {allCourses.length > 0 ? (
+              allCourses.map((c, index) => (
+                <tr key={index} className="hover:bg-ascend-lightblue cursor-pointer">
+                  <td>{c.programName}</td>
+                  <td>{c.courseCode}</td>
+                  <td>{c.courseName}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan="2" className="text-center py-5 text-ascend-gray2">
-                  No courses enrolled.
+                <td colSpan={3} className="text-center py-5 text-ascend-gray2 italic">
+                  No programs enrolled and courses assigned.
                 </td>
-                </tr>
+              </tr>
             )}
-            </tbody>
+          </tbody>
         </table>
       </div>
     </div>

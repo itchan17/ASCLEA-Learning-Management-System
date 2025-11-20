@@ -8,14 +8,16 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Auth\Events\Registered; 
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 
 class StaffController extends Controller
-{   
+{
 
     protected function checkAdmin()
     {
@@ -30,7 +32,7 @@ class StaffController extends Controller
      */
 
     public function administrationIndex(Request $request)
-    {   
+    {
         $this->checkAdmin();
 
         // Fetch role IDs for 'admin' and 'faculty'
@@ -38,17 +40,17 @@ class StaffController extends Controller
 
         // Query Staff with related user, filtered by role, lastlogin, and lastlogout
         $query = Staff::with(['user.role', 'user.lastLogin', 'user.lastLogout']) // load the user and their role
-        ->whereHas('user', function($q) use ($roleIds) {
-        $q->whereIn('role_id', $roleIds);
-        });
+            ->whereHas('user', function ($q) use ($roleIds) {
+                $q->whereIn('role_id', $roleIds);
+            });
 
         // Search filter by first name, last name, middle name, and email
         if ($search = $request->input('search')) {
-            $query->whereHas('user', function($q) use ($search) {
+            $query->whereHas('user', function ($q) use ($search) {
                 $q->where('users.first_name', 'like', "%{$search}%")
-                ->orWhere('users.last_name', 'like', "%{$search}%")
-                ->orWhere('users.middle_name', 'like', "%{$search}%")
-                ->orWhere('users.email', 'like', "%{$search}%");
+                    ->orWhere('users.last_name', 'like', "%{$search}%")
+                    ->orWhere('users.middle_name', 'like', "%{$search}%")
+                    ->orWhere('users.email', 'like', "%{$search}%");
             });
         }
 
@@ -56,8 +58,8 @@ class StaffController extends Controller
         if ($status = $request->input('status')) {
             $query->where('status', $status);
         }
-        
-        //Display 5 staff per page
+
+        //Display 10 staff per page
         $staffs = $query->orderBy('created_at', 'desc')
             ->paginate(10)
             ->withQueryString();
@@ -99,7 +101,7 @@ class StaffController extends Controller
 
         return Inertia::render('Administration/AdministrationComponents/ViewStaff', [
             'staffDetails' => $staff,
-            'assignedCourses' => $assignedCourses, 
+            'assignedCourses' => $assignedCourses,
         ]);
     }
 
@@ -122,7 +124,7 @@ class StaffController extends Controller
 
         $columns = ['Name', 'Email', 'Role', 'Status'];
 
-        $callback = function() use ($staffs, $columns) {
+        $callback = function () use ($staffs, $columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
 
@@ -142,7 +144,7 @@ class StaffController extends Controller
 
     // Export list of Staff through pdf using exportPdf() function 
     public function exportPdf()
-    {   
+    {
         $this->checkAdmin();
 
         $staffs = Staff::with('user.role')->get();
@@ -155,7 +157,7 @@ class StaffController extends Controller
      * Show the add staff form for creating a new resource.
      */
     public function create()
-    {   
+    {
         $this->checkAdmin();
 
         $users = User::whereNotIn('user_id', Staff::pluck('user_id'))->get();
@@ -170,7 +172,7 @@ class StaffController extends Controller
      * Store a newly created resource or user in storage.
      */
     public function store(Request $request)
-    {   
+    {
         $this->checkAdmin();
 
         $request->validate([
@@ -183,6 +185,9 @@ class StaffController extends Controller
 
         $role = Role::where('role_name', $request->role_name)->firstOrFail();
 
+        // Generate randomizes password
+        $plainPassword = Str::random(12);
+
         // create staff user
         $user = User::create([
             'user_id' => Str::uuid(),
@@ -191,11 +196,24 @@ class StaffController extends Controller
             'middle_name' => $request->middle_name,
             'email' => $request->email,
             'role_id' => $role->role_id,
-            'password' => bcrypt('password123'), // temporary password
+            'password' => bcrypt($plainPassword), // temporary password
         ]);
 
-        // Email Verification after Staff Creation
-        event(new Registered($user));
+        // Generate verification URL
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            ['id' => $user->getKey(), 'hash' => sha1($user->email)]
+        );
+
+        // Send verification email using existing verification file
+        Mail::send('emails.emailVerification', [
+            'url' => $verificationUrl,
+            'password' => $plainPassword,  // pass the password to Blade file
+        ], function ($message) use ($user) {
+            $message->to($user->email);
+            $message->subject('Verify Email Address');
+        });
 
         // create staff
         Staff::create([
@@ -213,7 +231,7 @@ class StaffController extends Controller
      * Display the specified resource or staff details.
      */
     public function show($id)
-    {   
+    {
         $this->checkAdmin();
 
         // Load the staff along with the related user info
@@ -229,7 +247,7 @@ class StaffController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit($id)
-    {   
+    {
         $this->checkAdmin();
 
         $staff = Staff::with(['user.role', 'createdBy'])->findOrFail($id);
@@ -244,7 +262,7 @@ class StaffController extends Controller
      * Update the specified resource or staff details in storage.
      */
     public function update(Request $request, $id)
-    {   
+    {
         $this->checkAdmin();
 
         $staff = Staff::with('user')->findOrFail($id);
@@ -274,15 +292,18 @@ class StaffController extends Controller
             'contact_number' => $request->contact_number,
             'birthdate' => $request->birthdate,
             'gender' => $request->gender,
-            'status' => $request->status
         ]);
-        
+
         $staff->user->update([
             'house_no' => $request->house_no,
             'region' => $request->region,
             'province' => $request->province,
             'city' => $request->city,
             'barangay' => $request->barangay,
+        ]);
+
+        $staff->update([
+            'status' => $request->status,
         ]);
 
 
@@ -293,10 +314,14 @@ class StaffController extends Controller
     /**
      * Remove the specified resource or staff user from storage.
      */
-    public function destroy($id)
-    {   
+    public function destroy(Request $request, $id)
+    {
         $this->checkAdmin();
         $staff = Staff::with('user')->findOrFail($id);
+
+        $staff->update([
+            'archived_by' => $request->user()->user_id
+        ]);
 
         // Soft delete the staff
         $staff->delete();
@@ -308,11 +333,36 @@ class StaffController extends Controller
         return redirect()->route('administration.index')->with('success', 'Staff archived successfully.');
     }
 
+    public function restoreStaff($staffId)
+    {
+        $staff = Staff::withTrashed()->findOrFail($staffId);
+
+        // Restore the staff and user data
+        $staff->restore();
+        $staff->user->restore();
+
+        // Remove the archived_by   
+        $staff->update([
+            'archived_by' => null
+        ]);
+
+        return redirect()->back()->with('success', 'Staff restored successfully.');
+    }
+
+    public function forceDeleteStaff($staffId)
+    {
+        $staff = Staff::withTrashed()->findOrFail($staffId);
+
+        $staff->forceDelete();
+        $staff->user->forceDelete();
+
+        return redirect()->back()->with('success', 'Staff deleted permanently.');
+    }
 
     public function updateProfile(Request $request, $id)
-    {   
+    {
         $this->checkAdmin();
-        
+
         $staff = Staff::with('user')->findOrFail($id);
 
         if ($request->hasFile('profile_image')) {
@@ -326,5 +376,4 @@ class StaffController extends Controller
 
         return back()->with('success', 'Profile updated successfully.');
     }
-    
 }

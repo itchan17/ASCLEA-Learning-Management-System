@@ -8,7 +8,7 @@ export function formatFullDate(input) {
             year: "numeric",
         };
 
-        // sample output: March 29, 2025
+        // Sample output: November 9, 2025
         const formatted = new Intl.DateTimeFormat("en-US", options).format(
             fullDate
         );

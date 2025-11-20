@@ -28,6 +28,7 @@ export default function AlertModal({
                             {title}
                         </h1>
                     </div>
+
                     <div className="space-y-5 px-5 pb-5">
                         {description ? (
                             <p className="text-size3 text-ascend-black">

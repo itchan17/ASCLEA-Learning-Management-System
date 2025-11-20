@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { IoSearch } from "react-icons/io5";
 import BackButton from "../../../../../../../../../Components/Button/BackButton";
 import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
@@ -94,7 +94,7 @@ export default function ActivityReponses() {
             </div>
             <div className="w-full min-w-0">
                 <h1 className="text-size6 break-words font-semibold">
-                    First activity
+                    {assessment.assessment_title}
                 </h1>
                 <div className="space-x-5 flex flex-wrap">
                     <span className="font-medium text-nowrap">
@@ -145,6 +145,7 @@ export default function ActivityReponses() {
                             <th className="w-0">
                                 <div className="flex items-center mb-0 gap-2 text-ascend-black font-black">
                                     <input
+                                        disabled={responses.data.length === 0}
                                         type="checkbox"
                                         checked={selectAll}
                                         className="accent-ascend-blue w-4 h-4 cursor-pointer"
@@ -194,9 +195,10 @@ export default function ActivityReponses() {
                     {responses.data.length > 0 && (
                         <tbody>
                             {responses.data.map((response) => (
-                                <>
+                                <React.Fragment
+                                    key={response.assessment_submission_id}
+                                >
                                     <ActivityResponseRow
-                                        key={response.assessment_submission_id}
                                         response={response}
                                         assessment={assessment}
                                         courseId={courseId}
@@ -208,7 +210,6 @@ export default function ActivityReponses() {
                                         }
                                     />
 
-                                    {/* extra row below */}
                                     {response.activityFiles &&
                                         response.activityFiles.length > 0 && (
                                             <ResponseAttachedFiles
@@ -220,7 +221,7 @@ export default function ActivityReponses() {
                                                 }
                                             />
                                         )}
-                                </>
+                                </React.Fragment>
                             ))}
                         </tbody>
                     )}
@@ -235,8 +236,8 @@ export default function ActivityReponses() {
                             imgSrc={"/images/illustrations/empty.svg"}
                             text={`“No responses have been submitted for this activity yet.”`}
                         />
-                    ) : (responses.data.length === 0 && search) ||
-                      submissionStatus ? (
+                    ) : responses.data.length === 0 &&
+                      (search || submissionStatus) ? (
                         <div className="flex justify-center py-5">
                             <p className="text-ascend-black">No data found</p>
                         </div>

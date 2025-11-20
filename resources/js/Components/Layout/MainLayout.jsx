@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar/Sidebar";
 import { usePage } from "@inertiajs/react";
 import useUserStore from "../../Stores/User/userStore";
 import { io } from "socket.io-client";
+import useModulesStore from "../../Pages/Programs/ProgramComponent/CourseComponent/CourseContentTab/ModulesComponents/Stores/modulesStore";
 
 export default function MainLayout({ children }) {
     const setAuthUser = useUserStore((state) => state.setAuthUser);
@@ -12,6 +13,17 @@ export default function MainLayout({ children }) {
 
     // Get the autheticated user data
     const { user } = usePage().props.auth;
+
+    const rehydrateModuleStore = useModulesStore.persist.rehydrate;
+
+    useEffect(() => {
+        const handleFocus = () => {
+            rehydrateModuleStore();
+        };
+
+        window.addEventListener("focus", handleFocus);
+        return () => window.removeEventListener("focus", handleFocus);
+    }, []);
 
     // Initialize the data uf auth user
     useEffect(() => {
@@ -84,13 +96,16 @@ export default function MainLayout({ children }) {
                     className="fixed inset-0 bg-black/25 z-40 lg:hidden transition-opacity duration-300"
                 />
             )}
-            <div className="flex flex-col items-center w-full h-screen overflow-x-hidden">
+            <div
+                className="flex flex-col items-center w-full h-screen overflow-x-hidden"
+                scroll-region=""
+            >
                 <Navbar
                     setIsSidebarOpen={setIsSidebarOpen}
                     isMdScreen={isMdScreen}
                 />
                 <main
-                    className="flex-1 flex justify-center items-start px-6 py-5 sm:px-8 w-full overflow-y-auto"
+                    className="flex-1 flex justify-center items-start px-6 py-5 sm:px-8 w-full"
                     scroll-region=""
                 >
                     <div className="w-full max-w-[1400px]">{children}</div>

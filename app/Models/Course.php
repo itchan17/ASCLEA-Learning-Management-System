@@ -3,6 +3,10 @@
 namespace App\Models;
 
 use App\Models\Programs\Assessment;
+use App\Models\Programs\Grade;
+use App\Models\Programs\Material;
+use App\Models\Programs\Post;
+use App\Models\Programs\Section;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -41,12 +45,13 @@ class Course extends Model
         'course_day',
         'start_time',
         'end_time',
+        'archived_by',
         'program_id',
     ];
 
     public function program(): BelongsTo
     {
-        return $this->belongsTo(Program::class, 'program_id');
+        return $this->belongsTo(Program::class, 'program_id')->withTrashed();
     }
 
     public function assignedTo(): HasMany
@@ -56,6 +61,31 @@ class Course extends Model
 
     public function assessments(): HasMany
     {
-        return  $this->hasMany(Assessment::class, 'course_id');
+        return $this->hasMany(Assessment::class, 'course_id');
+    }
+
+    public function materials(): HasMany
+    {
+        return $this->hasMany(Material::class, 'course_id');
+    }
+
+    public function sections(): HasMany
+    {
+        return $this->hasMany(Section::class, 'course_id');
+    }
+
+    public function grades(): HasMany
+    {
+        return $this->hasMany(Grade::class, 'course_id');
+    }
+
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class, 'course_id');
+    }
+
+    public function archivedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'archived_by', 'user_id')->withTrashed();
     }
 }

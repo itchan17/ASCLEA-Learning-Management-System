@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('programs/{program}')
     ->middleware(['auth', 'verified', 'preventBack'])
+    ->scopeBindings()
     ->group(function () {
 
         // Create a course
@@ -19,8 +20,10 @@ Route::prefix('programs/{program}')
 
         // Route for showing selected course in the program
         Route::get('/courses/{course}',  [CourseController::class, 'showCourse'])->can('viewCourse', 'course')->name('program.course.show');
-});
 
+        // Route for restoring the course
+        Route::put('/courses/{course}/restore',  [CourseController::class, 'restoreCourse'])->can('restoreCourse', Course::class)->name('program.course.restore');
 
-
-       
+        // Route for force deleting the course
+        Route::delete('/courses/{course}/force-delete',  [CourseController::class, 'forceDeleteCourse'])->can('forceDeleteCourse', Course::class)->name('course.force.delete');
+    });

@@ -9,7 +9,7 @@ import useQuizDetails from "./Hooks/useQuizDetails";
 import useQuizStore from "./Stores/quizStore";
 import useQuestion from "./Question/Hooks/useQuestion";
 import useQuestionStore from "./Question/Stores/questionStore";
-import useAssessmentsStore from "../../../../../../../../Stores/Programs/CourseContent/assessmentsStore";
+import useAssessmentsStore from "../../Stores/assessmentsStore";
 import {
     SortableContext,
     verticalListSortingStrategy,
@@ -67,10 +67,6 @@ export default function QuizForm({ courseId, assessmentId, quiz }) {
     const onEdit = useQuestionStore((state) => state.onEdit);
 
     // Assessment store
-    const assessmentList = useAssessmentsStore((state) => state.assessmentList);
-    const setAssessmentList = useAssessmentsStore(
-        (state) => state.setAssessmentList
-    );
     const assessmentByCourse = useAssessmentsStore(
         (state) => state.assessmentByCourse
     );
@@ -136,6 +132,7 @@ export default function QuizForm({ courseId, assessmentId, quiz }) {
         // Only render when there's a changes to the details
         // not when the quizdetails was initally set
         console.log("QUIZ FORM IS RUNNUNG");
+
         if (isQuizDetailsChanged) {
             if (quizDetails.quiz_title.trim() !== "") {
                 if (quizDetails.duration.toString().trim() === "") {

@@ -1,0 +1,18 @@
+stash@{0}: On feature/admission-backend: temp current changes before applying old stash
+stash@{1}: On feature/admission-backend: temp current changes before applying old stash
+stash@{2}: On feature/admission-backend: temp before pull
+stash@{3}: WIP on feature/cv-latest: bc93b6d Latest changes
+stash@{4}: WIP on Feature/cv: 270fd24 Merge remote-tracking branch 'origin/Feature/quizform' into Feature/cv
+stash@{5}: WIP on feature/CV: 82ee8fd Cv, moved vevn to external (desktop), added message for initial check
+stash@{6}: WIP on feature/backend-accounting: 4ad3278 fix: add space below
+stash@{7}: WIP on feature/qatesting: 82ee8fd Cv, moved vevn to external (desktop), added message for initial check
+stash@{8}: WIP on feature/CV: 950c3c2 Latest
+stash@{9}: WIP on feature/CV: 80705fc Merge branch 'dev' of https://github.com/itchan17/ASCLEA-Learning-Management-System into feature/demoCV
+stash@{10}: WIP on feature/demoCV: 42dc24f Pose
+stash@{11}: WIP on feature/demoCV: 42dc24f Pose
+stash@{12}: WIP on feature/demoCV: 547a461 Merge pull request #25 from itchan17/feature/accounting
+stash@{13}: WIP on feature/admission: d1413c7 Updated Registration From, deleted old registration and drop down plugin
+stash@{14}: WIP on feature/enrollmentpage: 2c8240a Merge pull request #13 from itchan17/feature/enrollmentpage
+stash@{15}: WIP on feature/student-analytics: 3540f66 Student analytics, added selection of program same to programs feature, added assessment and student table - data from student analytics store assessment and student, added card components and added modal using daisy ui
+stash@{16}: WIP on feature/student-analytics: 3540f66 Student analytics, added selection of program same to programs feature, added assessment and student table - data from student analytics store assessment and student, added card components and added modal using daisy ui
+stash@{17}: WIP on dev: 03c8290 Merge pull request #2 from itchan17/feature/layout

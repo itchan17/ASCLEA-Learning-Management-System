@@ -6,6 +6,7 @@ import { displayToast } from "../../../../../../../../../Utils/displayToast";
 import DefaultCustomToast from "../../../../../../../../../Components/CustomToast/DefaultCustomToast";
 import useQuizAnswerStore from "../Stores/quizAnswerStore";
 import saveAnswer from "../Services/quizAnswerService";
+import useModulesStore from "../../../../ModulesComponents/Stores/modulesStore";
 
 export default function useQuizAnswerForm() {
     const [questionRequiredError, setQuestionRequiredError] = useState(null);
@@ -14,6 +15,11 @@ export default function useQuizAnswerForm() {
     const updateStudentAnswer = useQuizAnswerStore(
         (state) => state.updateStudentAnswer
     );
+    // Module store
+    const unlockSectionAndSectionItems = useModulesStore(
+        (state) => state.unlockSectionAndSectionItems
+    );
+
     const studentAnswers = useQuizAnswerStore((state) => state.studentAnswers);
     const isLoading = useQuizAnswerStore((state) => state.isLoading);
     const setIsLoading = useQuizAnswerStore((state) => state.setIsLoading);
@@ -38,7 +44,8 @@ export default function useQuizAnswerForm() {
                     assessment: assessmentId,
                     quiz: quizId,
                     page: page,
-                })
+                }),
+                { preserveState: true }
             );
         } else {
             window.open(
@@ -175,7 +182,22 @@ export default function useQuizAnswerForm() {
                             "error"
                         );
                     },
-                    onSuccess: () => {
+                    onSuccess: (page) => {
+                        console.log(page);
+                        if (page.props.assessment.section_item) {
+                            const studentProgress =
+                                page.props.assessment.section_item
+                                    .student_progress;
+
+                            unlockSectionAndSectionItems(
+                                courseId,
+                                page.props.assessment.section_item.section_id,
+                                page.props.assessment.section_item
+                                    .section_item_id,
+                                studentProgress
+                            );
+                        }
+
                         setQuestionRequiredError(null);
                         setRemainingTime(null);
                     },

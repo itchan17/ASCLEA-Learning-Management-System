@@ -25,11 +25,9 @@ export default function useSearchSortResponses({
     const handleSortTime = () => {
         // Remove sorting of other column
         if (sortScore) {
-            console.log("RESET SORT SCORE");
             setSortScore(null);
         }
         if (sortSubmittedDate) {
-            console.log("RESET SORT SCORE");
             setSortSubmittedDate(null);
         }
 
@@ -60,7 +58,6 @@ export default function useSearchSortResponses({
     const handleSortSubmittedDate = () => {
         // Remove sorting of other column
         if (sortScore) {
-            console.log("RESET SORT SCORE");
             setSortScore(null);
         }
         if (sortTime) {

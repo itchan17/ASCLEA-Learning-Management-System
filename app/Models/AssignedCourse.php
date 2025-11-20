@@ -3,14 +3,17 @@
 namespace App\Models;
 
 use App\Models\Programs\AssessmentSubmission;
+use App\Models\Programs\Grade;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AssignedCourse extends Model
 {
-    use HasUuids;
+    use HasUuids, SoftDeletes;
 
     /**
      * Indicates if the IDs are auto-incrementing.
@@ -40,7 +43,7 @@ class AssignedCourse extends Model
 
     public function member(): BelongsTo
     {
-        return $this->belongsTo(LearningMember::class, 'learning_member_id');
+        return $this->belongsTo(LearningMember::class, 'learning_member_id')->withTrashed();
     }
 
     public function course(): BelongsTo
@@ -51,5 +54,15 @@ class AssignedCourse extends Model
     public function assessmentSubmissions(): HasMany
     {
         return $this->hasMany(AssessmentSubmission::class, 'submitted_by', 'assigned_course_id');
+    }
+
+    public function grades(): HasMany
+    {
+        return $this->hasMany(Grade::class, 'assigned_course_id');
+    }
+
+    public function grade(): HasOne
+    {
+        return $this->hasOne(Grade::class, 'assigned_course_id');
     }
 }

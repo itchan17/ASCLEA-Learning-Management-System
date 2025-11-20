@@ -74,7 +74,7 @@ export default function ViewMember() {
                 <AlertModal
                     title={"Remove Assigned Course"}
                     description={
-                        "Are you sure you want to remove this course? All associated data will be lost permanently."
+                        "Are you sure you want to remove this course? The user will no longer have access to the course."
                     }
                     closeModal={() => setOpenAlertModal(false)}
                     onConfirm={removeAssignedCourse}

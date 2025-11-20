@@ -16,7 +16,10 @@ import { regions, provinces, cities, barangays } from "select-philippines-addres
 export default function ViewStaff() {
     const route = useRoute();
     const { props } = usePage();
-    const { staffDetails } = props; 
+    const { staffDetails, auth } = props;
+    
+    // Disable Archive if the staff being viewed is the same as current user
+    const isSelf = auth.user?.user_id === staffDetails.user?.user_id;
     
     //===========================Updating Staff Information===========================//
     const [isEdit, setIsEdit] = useState(false);
@@ -277,11 +280,15 @@ export default function ViewStaff() {
             {/*===========================Back Button and Archive Button===========================*/}
             <div className="flex flex-wrap items-center justify-between">
                 <BackButton doSomething={handleClickBackBtn} />
-                <PrimaryButton
-                    btnColor={"bg-ascend-red"}
-                    text={"Archive"}
-                    doSomething={handleArchive}
-                />
+                {!isSelf && (
+                    <PrimaryButton
+                        btnColor={"bg-ascend-red"}
+                        textColor={"text-white"}
+                        text={"Archive"}
+                        doSomething={handleArchive}
+                        isDisabled={isSelf} // cannot archive self and hide the archive button
+                    />
+                )}
             </div>
 
             <div className="flex flex-wrap gap-5 items-center justify-between">
@@ -410,7 +417,21 @@ export default function ViewStaff() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-5">
+                    <div className="flex flex-col">
+                        {/*============Status============*/}
+                        <label className="font-nunito-sans text-size2 text-ascend-black">Status</label>
+                        <select
+                            value={data.status}
+                            onChange={(e) => setData("status", e.target.value)}
+                            className={`textField border px-3 py-2 ${!isEdit ? "text-ascend-gray1" : ""} border-ascend-gray1 focus:outline-ascend-blue`}
+                            disabled={!isEdit}
+                        >
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+
                     {/*============Phone Number============*/}
                     <div className="flex flex-col">
                         <label className="font-nunito-sans text-size2 text-ascend-black">Phone Number</label>

@@ -12,9 +12,10 @@ class PdfConverter
         // Command that sets the file to convert into pdf
         // includes input file which it the full path of file to be converted,
         // the outputFile wich the full path where the converted file will be stored
-        $command = "\"{$libreOffice}\" --headless --convert-to pdf --outdir "
+        $command = "\"{$libreOffice}\" --headless --nologo --nofirststartwizard --norestore --convert-to pdf --outdir "
             . escapeshellarg(dirname($outputFile)) . " "
             . escapeshellarg($inputFile);
+
 
         // Runs command in shell that will convert file to pdf
         exec($command, $output, $returnCode);

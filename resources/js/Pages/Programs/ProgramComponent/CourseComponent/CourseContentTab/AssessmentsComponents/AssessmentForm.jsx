@@ -2,179 +2,111 @@ import { useState, useEffect } from "react";
 import TextEditor from "../../TextEditor";
 import PrimaryButton from "../../../../../../Components/Button/PrimaryButton";
 import SecondaryButton from "../../../../../../Components/Button/SecondaryButton";
-import useAssessmentsStore from "../../../../../../Stores/Programs/CourseContent/assessmentsStore";
-import { AiFillFileAdd } from "react-icons/ai";
 import "../../../../../../../css/global.css";
 import DropFiles from "../../../../../../Components/DragNDropFiles/DropFiles";
 import FileCard from "../../FileCard";
 import { SiGoogleforms } from "react-icons/si";
-import { router, usePage } from "@inertiajs/react";
-import { route } from "ziggy-js";
 import { IoCaretDownOutline } from "react-icons/io5";
 import { closeDropDown } from "../../../../../../Utils/closeDropdown";
 import { displayToast } from "../../../../../../Utils/displayToast";
 import DefaultCustomToast from "../../../../../../Components/CustomToast/DefaultCustomToast";
 import { capitalize } from "lodash";
-import axios from "axios";
+import useAssessment from "./Hooks/useAssessment";
+import { usePage } from "@inertiajs/react";
 
 export default function AssessmentForm({
-    toggleForm,
     formTitle,
     formWidth,
-    sectionId,
+    sectionId = null,
     isEdit = false,
     assessmentId,
+    setIsAssessmentFormOpen,
+    assessmentDetailsToEdit,
 }) {
     const { program, course } = usePage().props;
 
-    // Assessments Store
-    const assessmentDetails = useAssessmentsStore(
-        (state) => state.assessmentDetails
-    );
-    const handleAssessmentChange = useAssessmentsStore(
-        (state) => state.handleAssessmentChange
-    );
-    const removeAttachedFile = useAssessmentsStore(
-        (state) => state.removeAttachedFile
-    );
-    const removeUploadedFile = useAssessmentsStore(
-        (state) => state.removeUploadedFile
-    );
-    const clearAssessmentDetails = useAssessmentsStore(
-        (state) => state.clearAssessmentDetails
-    );
-    const addNewAssessment = useAssessmentsStore(
-        (state) => state.addNewAssessment
-    );
-    const updateAssessmentInList = useAssessmentsStore(
-        (state) => state.updateAssessmentInList
+    // Custom hook
+    const { errors, isLoading, handleSubmit } = useAssessment({
+        programId: program.program_id,
+        courseId: course.course_id,
+    });
+
+    // Local state
+    const [assessmentDetails, setAssessmentDetails] = useState(
+        assessmentDetailsToEdit && isEdit
+            ? {
+                  assessment_title: assessmentDetailsToEdit.assessment_title,
+                  assessment_description:
+                      assessmentDetailsToEdit.assessment_description,
+                  status: assessmentDetailsToEdit.status,
+                  assessment_type:
+                      assessmentDetailsToEdit.assessment_type.assessment_type,
+                  due_datetime: assessmentDetailsToEdit.due_datetime,
+                  total_points: assessmentDetailsToEdit.total_points,
+                  assessment_files: [],
+                  uploaded_files: assessmentDetailsToEdit.files,
+                  removed_files: [],
+              }
+            : {
+                  assessment_title: "",
+                  assessment_description: null,
+                  status: "published",
+                  assessment_type: "",
+                  due_datetime: "",
+                  total_points: 0,
+                  assessment_files: [],
+                  removed_files: [],
+              }
     );
 
-    const [errors, setErrors] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
+    // Handle changes to assessment details
+    const handleAssessmentChange = (field, value) => {
+        setAssessmentDetails((prev) => {
+            if (field === "assessment_files" && Array.isArray(value)) {
+                return {
+                    ...prev,
+                    [field]: [...prev[field], ...value], // append new files
+                };
+            } else {
+                return {
+                    ...prev,
+                    [field]: value, // update other fields
+                };
+            }
+        });
+    };
 
-    // Clear assessment details once form was rendered
-    // to avoid persisting state
+    // Remove an attached file by index
+    const removeAttachedFile = (fileIndex) => {
+        setAssessmentDetails((prev) => ({
+            ...prev,
+            assessment_files: prev.assessment_files.filter(
+                (_, index) => index !== fileIndex
+            ),
+        }));
+    };
+
+    // Remove an uploaded file by ID and track removed files
+    const removeUploadedFile = (fileId) => {
+        setAssessmentDetails((prev) => ({
+            ...prev,
+            uploaded_files: prev.uploaded_files.filter(
+                (file) => file.assessment_file_id !== fileId
+            ),
+            removed_files: [...prev.removed_files, fileId],
+        }));
+    };
+
     useEffect(() => {
-        if (!isEdit) {
-            // If note edit this means user will create a new assessment
-            // WE have to reset the value first
-            clearAssessmentDetails();
+        if (sectionId) {
+            // Add the  sectionId to the assessment details
+            handleAssessmentChange("section_id", sectionId);
         }
     }, []);
 
-    const appendToFormData = (assessmentFormData) => {
-        // Append data into FormData to enbale uploading files
-        for (let key in assessmentDetails) {
-            const value = assessmentDetails[key];
-
-            // Skips appending data with null value
-            // Make sure data is nullable in backend valdiation
-            if (value === null || value === undefined) {
-                continue;
-            }
-
-            // Append array values
-            if (Array.isArray(value)) {
-                value.forEach((v, i) => {
-                    assessmentFormData.append(`${key}[${i}]`, v);
-                });
-            } else {
-                assessmentFormData.append(key, value);
-            }
-        }
-    };
-
-    // Handles axios request for adding assesment
-    const addAssessment = async () => {
-        // Append the assessment details to form data since
-        // to enable file upaloading
-        const assessmentFormData = new FormData();
-        appendToFormData(assessmentFormData);
-
-        const response = await axios.post(
-            route("assessment.create", {
-                program: program.program_id,
-                course: course.course_id,
-            }),
-            assessmentFormData,
-            {
-                headers: { "Content-Type": "multipart/form-data" },
-            }
-        );
-
-        addNewAssessment(response.data.data, course.course_id);
-
-        displayToast(
-            <DefaultCustomToast message={response.data.success} />,
-            "success"
-        );
-    };
-    // Handles the axios request for updating
-    const updateAssessment = async () => {
-        // Append the assessment details to form data since
-        // to enable file upaloading
-        const assessmentFormData = new FormData();
-        appendToFormData(assessmentFormData);
-        assessmentFormData.append("_method", "PUT");
-
-        const response = await axios.post(
-            route("assessment.update", {
-                program: program.program_id,
-                course: course.course_id,
-                assessment: assessmentId,
-            }),
-            assessmentFormData,
-            {
-                headers: { "Content-Type": "multipart/form-data" },
-            }
-        );
-
-        // Change the updated assessment data in the list
-        updateAssessmentInList(response.data.data, course.course_id);
-
-        displayToast(
-            <DefaultCustomToast message={response.data.success} />,
-            "success"
-        );
-    };
-
-    const handeSubmit = async () => {
-        setIsLoading(true);
-        setErrors(null);
-
-        try {
-            if (isEdit) {
-                await updateAssessment();
-            } else {
-                await addAssessment();
-            }
-
-            toggleForm();
-            clearAssessmentDetails();
-        } catch (error) {
-            console.error(error);
-            // Check for value in response.data.errors
-            // This is where the valdiation errors located
-            // So we have to set it in the state that will display error
-            if (error.response.data.errors) {
-                setErrors(error.response.data.errors);
-            } else {
-                displayToast(
-                    <DefaultCustomToast
-                        message={"Something went wrong. Please try again."}
-                    />,
-                    "error"
-                );
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     const cancelAssessmentForm = () => {
-        toggleForm();
-        clearAssessmentDetails();
+        setIsAssessmentFormOpen(false);
+        // clearAssessmentDetails();
     };
 
     // Used for dropdown button to set the status of the assessment
@@ -188,7 +120,7 @@ export default function AssessmentForm({
         // Check if type is quiz
         // Set the button to save as draft and status to draft
         // since user can only save quiz as draft to allow them to edit quiz form before publish
-        if (assessmentType === "quiz") {
+        if (assessmentType === "quiz" && !sectionId) {
             handleAssessmentChange("status", "draft");
         }
 
@@ -374,6 +306,7 @@ export default function AssessmentForm({
             {/* Display drop files */}
             {assessmentDetails.assessment_type === "activity" && (
                 <DropFiles
+                    disabled={isLoading}
                     handleFileChange={handleAssessmentChange}
                     fieldName={"assessment_files"}
                     withCancel={false}
@@ -469,14 +402,25 @@ export default function AssessmentForm({
                         text={"Cancel"}
                     />
 
-                    <div className="flex space-x-[2px]">
+                    <div className="flex space-x-[0.5px]">
                         {assessmentDetails.assessment_type && (
                             <PrimaryButton
                                 isDisabled={isLoading}
                                 isLoading={isLoading}
-                                doSomething={handeSubmit}
+                                doSomething={() =>
+                                    handleSubmit(
+                                        assessmentDetails,
+                                        sectionId,
+                                        isEdit,
+                                        setIsAssessmentFormOpen,
+                                        assessmentId
+                                    )
+                                }
                                 text={
-                                    assessmentDetails.status === "published"
+                                    sectionId && isEdit
+                                        ? "Save"
+                                        : assessmentDetails.status ===
+                                          "published"
                                         ? "Publish"
                                         : "Save as draft"
                                 }
@@ -484,45 +428,49 @@ export default function AssessmentForm({
                         )}
 
                         {/* Dropdown button */}
+                        {/* Always publish if material is for aa section */}
                         {(isEdit ||
-                            assessmentDetails.assessment_type ===
-                                "activity") && (
-                            <div className="dropdown dropdown-end cursor-pointer ">
-                                <button
-                                    tabIndex={0}
-                                    role="button"
-                                    className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
-                                >
-                                    <div className="text-size1 ">
-                                        {<IoCaretDownOutline />}
-                                    </div>
-                                </button>
+                            assessmentDetails.assessment_type === "activity") &&
+                            !sectionId && (
+                                <div className="dropdown dropdown-end cursor-pointer ">
+                                    <button
+                                        tabIndex={0}
+                                        role="button"
+                                        className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
+                                    >
+                                        <div className="text-size1 ">
+                                            {<IoCaretDownOutline />}
+                                        </div>
+                                    </button>
 
-                                <ul
-                                    tabIndex={0}
-                                    className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-                                >
-                                    <li
-                                        onClick={() =>
-                                            statusChange("status", "published")
-                                        }
+                                    <ul
+                                        tabIndex={0}
+                                        className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                                     >
-                                        <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                            Publish
-                                        </a>
-                                    </li>
-                                    <li
-                                        onClick={() =>
-                                            statusChange("status", "draft")
-                                        }
-                                    >
-                                        <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                            Save as draft
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        )}
+                                        <li
+                                            onClick={() =>
+                                                statusChange(
+                                                    "status",
+                                                    "published"
+                                                )
+                                            }
+                                        >
+                                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                Publish
+                                            </a>
+                                        </li>
+                                        <li
+                                            onClick={() =>
+                                                statusChange("status", "draft")
+                                            }
+                                        >
+                                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                                Save as draft
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            )}
                     </div>
                 </div>
             </div>

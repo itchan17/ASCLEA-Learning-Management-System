@@ -86,9 +86,19 @@ class ProgramController extends Controller
     }
 
     // Handle archiving program through soft delete
-    public function archive(Program $program)
+    public function archive(Request $request, Program $program)
     {
 
+        // Check of program has no courses, if tru delete it permanently
+        if ($program->courses->isEmpty()) {
+            $program->forceDelete();
+
+            return to_route('programs.index')->with('success', 'Program deleted successfully.');
+        }
+
+        $program->update([
+            'archived_by' => $request->user()->user_id
+        ]);
         $program->delete();
 
         return to_route('programs.index')->with('success', 'Program archived successfully.');

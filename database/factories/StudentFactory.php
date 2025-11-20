@@ -19,6 +19,7 @@ class StudentFactory extends Factory
         return [
             'enrollment_status' => 'enrolled',
             'approved_at' => $this->faker->date(now()),
+            'admission_status' => 'Accepted',
         ];
     }
 }

@@ -21,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 require base_path('routes/auth.php');
                 require base_path('routes/admission.php');
                 require base_path('routes/dashboard.php');
-                require base_path('routes/grades.php');
+                require base_path('routes/Grades/grades.php');
                 require base_path('routes/paymentHistory.php');
                 require base_path('routes/administration.php');
                 require base_path('routes/archives.php');
@@ -36,7 +36,9 @@ return Application::configure(basePath: dirname(__DIR__))
                 require base_path('routes/Programs/options.php');
                 require base_path('routes/Programs/assessmentSubmisisons.php');
                 require base_path('routes/Programs/studentQuizAnswer.php');
-                require base_path('routes/Programs/otherRoutes.php');
+                require base_path('routes/Programs/modules.php');
+                require base_path('routes/Programs/grades.php');
+                require base_path('routes/Programs/posts.php');
             });
         },
     )
@@ -54,6 +56,9 @@ return Application::configure(basePath: dirname(__DIR__))
             '/assessments',
             'assessments/*',
             'courses/*',
+            '/grades',
+            '/archives',
+            'admission/*'
         ]);
         // ------ END ------
         $middleware->web(append: [

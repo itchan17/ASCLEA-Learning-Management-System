@@ -25,6 +25,7 @@ export default function useGradeActivity({
     }, []);
 
     const handleUpdateGrade = (grade) => {
+        console.log("UPDATING");
         setIsChanged(true);
         setIsloading(true);
         router.put(
@@ -33,7 +34,7 @@ export default function useGradeActivity({
                 assessment: assessmentId,
                 assessmentSubmission: assessemntSubmissionId,
             }),
-            { grade },
+            grade,
             {
                 preserveScroll: true,
                 showProgress: false,
