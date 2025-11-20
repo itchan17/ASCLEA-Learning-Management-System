@@ -3,6 +3,7 @@ import Navbar from "./Navbar/Navbar";
 import Sidebar from "./Sidebar/Sidebar";
 import { usePage } from "@inertiajs/react";
 import useUserStore from "../../Stores/User/userStore";
+import { io } from "socket.io-client";
 import useModulesStore from "../../Pages/Programs/ProgramComponent/CourseComponent/CourseContentTab/ModulesComponents/Stores/modulesStore";
 
 export default function MainLayout({ children }) {
@@ -28,6 +29,40 @@ export default function MainLayout({ children }) {
     useEffect(() => {
         if (user) setAuthUser(user);
     }, []);
+
+    // ------------------- SOCKET.IO ONLINE TRACKING -------------------
+    useEffect(() => {
+        if (!user) return;
+
+        console.log("user role:", user);
+
+        // if (user.role_name !== "student") return;
+
+        const socket = io("http://localhost:3000"); // Connect to server
+
+        // Notify server that student is online
+        socket.emit("student_online", { user: user });
+
+        // Optional: send ping every 30 sec to stay online
+        const pingInterval = setInterval(() => {
+            socket.emit("student_ping", { user: user });
+        }, 30000);
+
+        // When window closes or unmounts, notify offline
+        const handleBeforeUnload = () => {
+            socket.emit("student_offline", { user: user });
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            clearInterval(pingInterval);
+            socket.emit("student_offline", { user: user });
+            socket.disconnect();
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, [user]);
+    // -------------------------------------------------------------------
 
     // Get the width of window
     useEffect(() => {
