@@ -11,6 +11,7 @@ export default function PrimaryButton({
     isDisabled = false,
     isLoading = false,
     fontWeight = "font-semibold",
+    loaderColor,
 }) {
     return (
         <button
@@ -27,7 +28,7 @@ export default function PrimaryButton({
         >
             {icon && !isLoading && <div className="text-size5">{icon}</div>}
             {isLoading ? (
-                <Loader color="text-ascend-blue" />
+                <Loader color={loaderColor || "text-ascend-blue"} />
             ) : (
                 <span
                     className={`${fontWeight} ${

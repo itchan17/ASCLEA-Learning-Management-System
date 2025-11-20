@@ -84,12 +84,10 @@ class AdmissionFileController extends Controller
     //==================== GET ALL PENDING STUDENTS ====================//
     public function getPendingStudents(Request $request)
     {
-        $this->checkAdmin();
-
-        // Fetch all students whose enrollment_status is 'pending'
-        // and eager load their related user details
-        $query = Student::with(['user', 'admissionFiles'])
-            ->where('enrollment_status', 'pending');
+    // Fetch all students whose enrollment_status is 'pending'
+    // and eager load their related user details
+    $query = Student::with(['user', 'admissionFiles'])
+        ->where('enrollment_status', 'pending');
 
         if ($search = $request->input('search')) {
             $query->whereHas('user', function ($q) use ($search) {
@@ -112,7 +110,6 @@ class AdmissionFileController extends Controller
     //==================== VIEW THE CORRESPONDING INFO RELATED TO PENDING STUDENTS ====================//
     public function viewPendingStudent(Student $student)
     {
-        $this->checkAdmin();
         $student->load(['user', 'admissionFiles']);
 
         return Inertia::render('Admission/PendingPage/EnrollmentRequest', [
@@ -125,8 +122,6 @@ class AdmissionFileController extends Controller
     {
         // Get all students whose status is 'enrolled', 'dropout', 'withdrawn' and eager load 'user'
         // Withdrawn enrollment status is not yet available to the model
-        $this->checkAdmin();
-
         $query = Student::with(['user', 'admissionFiles'])
             ->whereIn('enrollment_status', ['enrolled', 'dropout', 'withdrawn']);
 
@@ -151,8 +146,6 @@ class AdmissionFileController extends Controller
     //==================== VIEW THE CORRESPONDING INFO RELATED TO ENROLLED STUDENTS ====================//
     public function viewEnrolledStudent(Student $student)
     {
-        $this->checkAdmin();
-
         // Eager Load student information and admission files (for debugging and validation)
         $student->load(['user', 'admissionFiles', 'approver']);
 
@@ -285,8 +278,6 @@ class AdmissionFileController extends Controller
     //==================== ARCHIVE ENROLLED STUDENTS ====================//
     public function archive(Request $request, Student $student)
     {
-        $this->checkAdmin();
-
         $student->update([
             'archived_by' => $request->user()->user_id
         ]);
@@ -352,18 +343,9 @@ class AdmissionFileController extends Controller
         return back()->with('success', 'Profile photo updated successfully.');
     }
 
-    protected function checkAdmin()
-    {
-        if (!auth()->check() || auth()->user()->role->role_name !== 'admin') {
-            abort(403, 'Unauthorized');
-        }
-    }
-
     //==================== VIEW ADMISSION FILES OF PENDING STUDENT ====================//
     public function streamAdmissionFile(Student $student, AdmissionFile $file)
     {
-        $this->checkAdmin();
-
         // Ensure the file belongs to the student
         abort_if($file->student_id !== $student->student_id, 403, 'Unauthorized');
 
@@ -374,8 +356,6 @@ class AdmissionFileController extends Controller
     //==================== DOWNLOAD ADMISSION FILES OF PENDING STUDENTS ====================//
     public function downloadAdmissionFile(Student $student, AdmissionFile $file)
     {
-        $this->checkAdmin();
-
         // Ensure the file belongs to the student
         abort_if($file->student_id !== $student->student_id, 403, 'Unauthorized');
 
@@ -386,8 +366,6 @@ class AdmissionFileController extends Controller
     //==================== EXPORT PENDING STUDENTS AS CSV ====================//
     public function exportCsv()
     {
-        $this->checkAdmin();
-
         $fileName = 'pending_students.csv';
 
         // Fetch all pending students with student enrollment status of pending
@@ -428,8 +406,6 @@ class AdmissionFileController extends Controller
     //==================== EXPORT PENDING STUDENTS AS PDF ====================//
     public function exportPdf()
     {
-        $this->checkAdmin();
-
         // Fetch all pending students with student enrollment status of pending
         $students = Student::with('user')->where('enrollment_status', 'pending')->get();
 
@@ -443,8 +419,6 @@ class AdmissionFileController extends Controller
     //==================== EXPORT ENROLLED STUDENTS AS CSV ====================//
     public function exportEnrolledCsv()
     {
-        $this->checkAdmin();
-
         $fileName = 'enrolled_students.csv';
 
         // Fetch all enrolled students with student enrollment status of enrolled/dropout/withdrawn
@@ -485,8 +459,6 @@ class AdmissionFileController extends Controller
     //==================== EXPORT ENROLLED STUDENTS AS PDF ====================//
     public function exportEnrolledPdf()
     {
-        $this->checkAdmin();
-
         $students = Student::with('user')
             ->where('enrollment_status', 'enrolled')
             ->get();
