@@ -58,7 +58,7 @@ export default function Sidebar({
             url: "/archives",
             text: "Archives",
             icon: MdArchive,
-            roles: ["admin", "faculty"],
+            roles: ["admin"],
         },
         {
             url: "/grades",
@@ -156,10 +156,11 @@ export default function Sidebar({
                             Array.isArray(link.roles) &&
                             link.roles.includes(user?.role)
                         ) {
-                            if (user?.role === "student") { 
+                            if (user?.role === "student") {
                                 if (link.url === "/admission") return link; // Admission link is always visible to students
 
-                                return user?.approved && user?.enrollment_status === "enrolled"  // Only show other links if approved and enrolled
+                                return user?.approved &&
+                                    user?.enrollment_status === "enrolled" // Only show other links if approved and enrolled
                                     ? link
                                     : null;
                             }
