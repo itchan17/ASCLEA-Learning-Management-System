@@ -1,7 +1,7 @@
 import React from "react";
 import { PiNotebookFill, PiStudentFill } from "react-icons/pi";
 import { BsFillPeopleFill } from "react-icons/bs";
-import { MdRateReview } from "react-icons/md";
+import { MdRateReview, MdAccessTimeFilled } from "react-icons/md";
 import DashboardCard from "../Component/DashboardCard";
 
 function formatHours(decimalHours) {
@@ -32,16 +32,6 @@ export default function StaffDashboardCard({ stats, totalTimeSpent }) {
                 label="Total Students"
             />
             <DashboardCard
-                value={formatHours(totalTimeSpent)}
-                icon={
-                    <span className="text-size5 relative">
-                        <BsFillPeopleFill />
-                        <div className="absolute -right-1 bottom-0 bg-ascend-green w-[10px] h-[10px] rounded-xl" />
-                    </span>
-                }
-                label="Total Time Spent"
-            />
-            <DashboardCard
                 value={stats.assigned_programs || 0}
                 icon={<MdRateReview className="text-[#FF663C]" />}
                 label="Programs Assigned"
@@ -50,6 +40,11 @@ export default function StaffDashboardCard({ stats, totalTimeSpent }) {
                 value={stats?.assigned_courses || 0}
                 icon={<PiNotebookFill className="text-ascend-yellow" />}
                 label="Courses Assigned"
+            />
+            <DashboardCard
+                value={formatHours(totalTimeSpent)}
+                icon={<MdAccessTimeFilled className="text-ascend-black" />}
+                label="Total Time Spent"
             />
         </div>
     );
