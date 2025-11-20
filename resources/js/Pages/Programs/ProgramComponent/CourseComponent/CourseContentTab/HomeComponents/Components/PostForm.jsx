@@ -153,7 +153,7 @@ export default function PostForm({
                             </li>
                             <li onClick={() => handleCLickDropDown("draft")}>
                                 <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Save as drat
+                                    Save as draft
                                 </a>
                             </li>
                         </ul>
