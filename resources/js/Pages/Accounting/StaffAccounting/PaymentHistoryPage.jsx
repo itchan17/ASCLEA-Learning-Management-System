@@ -27,6 +27,8 @@ const PaymentHistoryPage = ({ PaymentList, student, can }) => {
   
 
 const handleExport = async (type) => {
+  setIsLoading(true);
+  setTimeout(async () => {
     try {
         const url = route(
             type === "pdf" ? "paymenthistory.export.pdf" : "paymenthistory.export.csv",
@@ -71,12 +73,15 @@ const handleExport = async (type) => {
             <DefaultCustomToast message={`Payment history downloaded as ${type.toUpperCase()}`} />,
             "success"
         );
+        setIsLoading(false);
     } catch (error) {
         displayToast(
             <DefaultCustomToast message="Something went wrong while exporting." />,
             "error"
         );
+        setIsLoading(false);
     }
+}, 0);
 };
 
   // Filter payments based on active tab

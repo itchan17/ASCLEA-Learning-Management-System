@@ -153,6 +153,7 @@ const Monitoring = ({onFaceDetected, options, assessmentSubmissionId}) => {
             {
               preserveScroll: true,
               preserveState: true,
+              showProgress: false,
               onError: (errors) => console.error("Cheating log error:", errors),
               onSuccess: () => console.log("Cheating log submitted successfully!"),
             }
