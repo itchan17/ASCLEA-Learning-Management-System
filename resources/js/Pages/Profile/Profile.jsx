@@ -6,13 +6,18 @@ import SecondaryButton from "../../Components/Button/SecondaryButton";
 import BackButton from "../../Components/Button/BackButton";
 import { handleClickBackBtn } from "../../Utils/handleClickBackBtn";
 import { BiSolidEditAlt } from "react-icons/bi";
-import { regions, provinces, cities, barangays } from "select-philippines-address";
+import {
+    regions,
+    provinces,
+    cities,
+    barangays,
+} from "select-philippines-address";
 import { displayToast } from "../../Utils/displayToast";
 import DefaultCustomToast from "../../Components/CustomToast/DefaultCustomToast";
 import Loader from "../../Components/Loader";
 
 export default function Profile() {
-    const { user } = usePage().props; 
+    const { user } = usePage().props;
     const [isEdit, setIsEdit] = useState(false);
     const isAdmin = user?.role?.toLowerCase() === "admin";
 
@@ -72,7 +77,7 @@ export default function Profile() {
                 showProgress: false,
                 onError: (error) => {
                     setUpdateProfileError(error); // Save error to state
-                    setIsProfileLoading(false);  // Reset loading
+                    setIsProfileLoading(false); // Reset loading
                 },
                 onFinish: () => {
                     setIsProfileLoading(false); // Always reset loading after request
@@ -97,30 +102,61 @@ export default function Profile() {
                 setRegionList(regRes);
 
                 // Set codes based on user selection
-                const foundRegion = regRes.find(r => r.region_name?.toLowerCase() === user?.region?.toLowerCase());
+                const foundRegion = regRes.find(
+                    (r) =>
+                        r.region_name?.toLowerCase() ===
+                        user?.region?.toLowerCase()
+                );
                 if (!foundRegion) return;
-                setFormData(prev => ({ ...prev, region_code: foundRegion.region_code, region: foundRegion.region_name }));
+                setFormData((prev) => ({
+                    ...prev,
+                    region_code: foundRegion.region_code,
+                    region: foundRegion.region_name,
+                }));
 
                 const provRes = await provinces(foundRegion.region_code);
                 if (!mounted) return;
                 setProvinceList(provRes);
-                const foundProv = provRes.find(p => p.province_name?.toLowerCase() === user?.province?.toLowerCase());
+                const foundProv = provRes.find(
+                    (p) =>
+                        p.province_name?.toLowerCase() ===
+                        user?.province?.toLowerCase()
+                );
                 if (!foundProv) return;
-                setFormData(prev => ({ ...prev, province_code: foundProv.province_code, province: foundProv.province_name }));
+                setFormData((prev) => ({
+                    ...prev,
+                    province_code: foundProv.province_code,
+                    province: foundProv.province_name,
+                }));
 
                 const cityRes = await cities(foundProv.province_code);
                 if (!mounted) return;
                 setCityList(cityRes);
-                const foundCity = cityRes.find(c => c.city_name?.toLowerCase() === user?.city?.toLowerCase());
+                const foundCity = cityRes.find(
+                    (c) =>
+                        c.city_name?.toLowerCase() === user?.city?.toLowerCase()
+                );
                 if (!foundCity) return;
-                setFormData(prev => ({ ...prev, city_code: foundCity.city_code, city: foundCity.city_name }));
+                setFormData((prev) => ({
+                    ...prev,
+                    city_code: foundCity.city_code,
+                    city: foundCity.city_name,
+                }));
 
                 const brgyRes = await barangays(foundCity.city_code);
                 if (!mounted) return;
                 setBarangayList(brgyRes);
-                const foundBrgy = brgyRes.find(b => b.brgy_name?.toLowerCase() === user?.barangay?.toLowerCase());
+                const foundBrgy = brgyRes.find(
+                    (b) =>
+                        b.brgy_name?.toLowerCase() ===
+                        user?.barangay?.toLowerCase()
+                );
                 if (!foundBrgy) return;
-                setFormData(prev => ({ ...prev, barangay_code: foundBrgy.brgy_code, barangay: foundBrgy.brgy_name }));
+                setFormData((prev) => ({
+                    ...prev,
+                    barangay_code: foundBrgy.brgy_code,
+                    barangay: foundBrgy.brgy_name,
+                }));
             } catch (err) {
                 console.error(err);
             }
@@ -132,9 +168,21 @@ export default function Profile() {
 
     //=================Handlers=================//
     const handleRegionChange = (regionCode) => {
-        const selectedRegion = regionList.find(r => r.region_code === regionCode);
+        const selectedRegion = regionList.find(
+            (r) => r.region_code === regionCode
+        );
         if (!selectedRegion) return;
-        setFormData(prev => ({ ...prev, region_code: selectedRegion.region_code, region: selectedRegion.region_name, province_code: "", province: "", city_code: "", city: "", barangay_code: "", barangay: "" }));
+        setFormData((prev) => ({
+            ...prev,
+            region_code: selectedRegion.region_code,
+            region: selectedRegion.region_name,
+            province_code: "",
+            province: "",
+            city_code: "",
+            city: "",
+            barangay_code: "",
+            barangay: "",
+        }));
         setProvinceList([]);
         setCityList([]);
         setBarangayList([]);
@@ -142,26 +190,46 @@ export default function Profile() {
     };
 
     const handleProvinceChange = (provinceCode) => {
-        const selectedProvince = provinceList.find(p => p.province_code === provinceCode);
+        const selectedProvince = provinceList.find(
+            (p) => p.province_code === provinceCode
+        );
         if (!selectedProvince) return;
-        setFormData(prev => ({ ...prev, province_code: selectedProvince.province_code, province: selectedProvince.province_name, city_code: "", city: "", barangay_code: "", barangay: "" }));
+        setFormData((prev) => ({
+            ...prev,
+            province_code: selectedProvince.province_code,
+            province: selectedProvince.province_name,
+            city_code: "",
+            city: "",
+            barangay_code: "",
+            barangay: "",
+        }));
         setCityList([]);
         setBarangayList([]);
         cities(provinceCode).then(setCityList);
     };
 
     const handleCityChange = (cityCode) => {
-        const selectedCity = cityList.find(c => c.city_code === cityCode);
+        const selectedCity = cityList.find((c) => c.city_code === cityCode);
         if (!selectedCity) return;
-        setFormData(prev => ({ ...prev, city_code: selectedCity.city_code, city: selectedCity.city_name, barangay_code: "", barangay: "" }));
+        setFormData((prev) => ({
+            ...prev,
+            city_code: selectedCity.city_code,
+            city: selectedCity.city_name,
+            barangay_code: "",
+            barangay: "",
+        }));
         setBarangayList([]);
         barangays(cityCode).then(setBarangayList);
     };
 
     const handleBarangayChange = (brgyCode) => {
-        const selectedBrgy = barangayList.find(b => b.brgy_code === brgyCode);
+        const selectedBrgy = barangayList.find((b) => b.brgy_code === brgyCode);
         if (!selectedBrgy) return;
-        setFormData(prev => ({ ...prev, barangay_code: selectedBrgy.brgy_code, barangay: selectedBrgy.brgy_name }));
+        setFormData((prev) => ({
+            ...prev,
+            barangay_code: selectedBrgy.brgy_code,
+            barangay: selectedBrgy.brgy_name,
+        }));
     };
 
     const handleChange = (e) => {
@@ -174,7 +242,12 @@ export default function Profile() {
             onSuccess: (page) => {
                 setIsEdit(false);
                 displayToast(
-                    <DefaultCustomToast message={page.props.flash?.success || "Profile updated successfully!"} />,
+                    <DefaultCustomToast
+                        message={
+                            page.props.flash?.success ||
+                            "Profile updated successfully!"
+                        }
+                    />,
                     "success"
                 );
             },
@@ -186,7 +259,6 @@ export default function Profile() {
             },
         });
     };
-    console.log("User:", user);
 
     return (
         <div className="space-y-5">
@@ -195,7 +267,10 @@ export default function Profile() {
 
                 {isEdit ? (
                     <div className="flex gap-2">
-                        <SecondaryButton doSomething={toggleEdit} text={"Cancel"} />
+                        <SecondaryButton
+                            doSomething={toggleEdit}
+                            text={"Cancel"}
+                        />
                         <PrimaryButton doSomething={handleSave} text={"Save"} />
                     </div>
                 ) : (
@@ -216,17 +291,29 @@ export default function Profile() {
                     )}
 
                     {/* Profile image */}
-                    <img
-                        src={
-                            profilePreview // show selected preview first
-                                ? profilePreview
-                                : user?.profile_image // fallback to current user image
+                    {profilePreview || user.profile_image ? (
+                        <img
+                            src={
+                                profilePreview // show selected preview first
+                                    ? profilePreview
+                                    : user.profile_image // fallback to current user image
                                     ? `/storage/${user.profile_image}`
                                     : "/images/default_profile.png"
-                        }
-                        alt="Profile"
-                        className="w-full h-full object-cover rounded-full"
-                    />
+                            }
+                            alt="Profile"
+                            className="w-full h-full object-cover rounded-full"
+                        />
+                    ) : (
+                        <div
+                            className={`w-full h-full bg-ascend-blue rounded-full shrink-0 flex items-center justify-center`}
+                        >
+                            <span
+                                className={`text-size7 font-bold  text-ascend-white capitalize`}
+                            >
+                                {user.firstName[0]}
+                            </span>
+                        </div>
+                    )}
 
                     {/* Edit overlay */}
                     <label
@@ -248,7 +335,8 @@ export default function Profile() {
                     {/* Optional: display upload error */}
                     {updateProfileError && (
                         <div className="absolute -bottom-6 text-red-500 text-xs">
-                            {updateProfileError.message || "Failed to update profile"}
+                            {updateProfileError.message ||
+                                "Failed to update profile"}
                         </div>
                     )}
                 </div>
@@ -277,7 +365,9 @@ export default function Profile() {
                             value={formData.lastName}
                             onChange={handleChange}
                             disabled={!isEdit || !isAdmin}
-                            className={`border px-3 py-2 ${(!isEdit || !isAdmin) ? "text-ascend-gray1" : ""} border-ascend-gray1 focus:outline-ascend-blue`}
+                            className={`border px-3 py-2 ${
+                                !isEdit || !isAdmin ? "text-ascend-gray1" : ""
+                            } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
                     </div>
                     <div className="flex flex-col">
@@ -290,7 +380,9 @@ export default function Profile() {
                             value={formData.firstName}
                             onChange={handleChange}
                             disabled={!isEdit || !isAdmin}
-                            className={`border px-3 py-2 ${(!isEdit || !isAdmin) ? "text-ascend-gray1" : ""} border-ascend-gray1 focus:outline-ascend-blue`}
+                            className={`border px-3 py-2 ${
+                                !isEdit || !isAdmin ? "text-ascend-gray1" : ""
+                            } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
                     </div>
                     <div className="flex flex-col">
@@ -303,7 +395,9 @@ export default function Profile() {
                             value={formData.middleName}
                             onChange={handleChange}
                             disabled={!isEdit || !isAdmin}
-                            className={`border px-3 py-2 ${(!isEdit || !isAdmin) ? "text-ascend-gray1" : ""} border-ascend-gray1 focus:outline-ascend-blue`}
+                            className={`border px-3 py-2 ${
+                                !isEdit || !isAdmin ? "text-ascend-gray1" : ""
+                            } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
                     </div>
                 </div>
@@ -323,7 +417,10 @@ export default function Profile() {
                                 const value = e.target.value;
                                 // Only allow digits
                                 if (/^\d*$/.test(value)) {
-                                    setFormData((prev) => ({ ...prev, phone: value }));
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        phone: value,
+                                    }));
                                 }
                             }}
                             className={`border px-3 py-2 ${
@@ -341,7 +438,10 @@ export default function Profile() {
                             value={formData.email}
                             disabled={!isEdit}
                             onChange={(e) =>
-                                setFormData((prev) => ({ ...prev, email: e.target.value }))
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    email: e.target.value,
+                                }))
                             }
                             className={`border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
@@ -361,9 +461,13 @@ export default function Profile() {
                             value={formData.birthday} // use formData state
                             disabled={!isEdit || !isAdmin}
                             onChange={(e) =>
-                                setFormData((prev) => ({ ...prev, birthday: e.target.value }))
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    birthday: e.target.value,
+                                }))
                             }
-                            className={`border px-3 py-2 ${(!isEdit || !isAdmin) ? "text-ascend-gray1" : ""
+                            className={`border px-3 py-2 ${
+                                !isEdit || !isAdmin ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
                     </div>
@@ -376,9 +480,13 @@ export default function Profile() {
                             value={formData.gender} // use formData state
                             disabled={!isEdit || !isAdmin}
                             onChange={(e) =>
-                                setFormData((prev) => ({ ...prev, gender: e.target.value }))
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    gender: e.target.value,
+                                }))
                             }
-                            className={`textField border px-3 py-2 ${(!isEdit || !isAdmin) ? "text-ascend-gray1" : ""
+                            className={`textField border px-3 py-2 ${
+                                !isEdit || !isAdmin ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         >
                             <option value="">Select Gender</option>
@@ -399,7 +507,10 @@ export default function Profile() {
                             value={formData.houseNoSt} // use formData state
                             disabled={!isEdit}
                             onChange={(e) =>
-                                setFormData((prev) => ({ ...prev, houseNoSt: e.target.value }))
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    houseNoSt: e.target.value,
+                                }))
                             }
                             className={`border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
@@ -423,7 +534,12 @@ export default function Profile() {
                         >
                             <option value="">Select Region</option>
                             {regionList.map((r) => (
-                                <option key={r.region_code} value={r.region_code}>{r.region_name}</option>
+                                <option
+                                    key={r.region_code}
+                                    value={r.region_code}
+                                >
+                                    {r.region_name}
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -434,14 +550,21 @@ export default function Profile() {
                         <select
                             disabled={!isEdit || !provinceList.length}
                             value={formData.province_code}
-                            onChange={(e) => handleProvinceChange(e.target.value)}
+                            onChange={(e) =>
+                                handleProvinceChange(e.target.value)
+                            }
                             className={`textField border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         >
                             <option value="">Select Province</option>
                             {provinceList.map((p) => (
-                                <option key={p.province_code} value={p.province_code}>{p.province_name}</option>
+                                <option
+                                    key={p.province_code}
+                                    value={p.province_code}
+                                >
+                                    {p.province_name}
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -459,7 +582,9 @@ export default function Profile() {
                         >
                             <option value="">Select City</option>
                             {cityList.map((c) => (
-                                <option key={c.city_code} value={c.city_code}>{c.city_name}</option>
+                                <option key={c.city_code} value={c.city_code}>
+                                    {c.city_name}
+                                </option>
                             ))}
                         </select>
                     </div>
@@ -471,14 +596,18 @@ export default function Profile() {
                         <select
                             disabled={!isEdit || !barangayList.length}
                             value={formData.barangay_code}
-                            onChange={(e) => handleBarangayChange(e.target.value)}
+                            onChange={(e) =>
+                                handleBarangayChange(e.target.value)
+                            }
                             className={`textField border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         >
                             <option value="">Select Barangay</option>
                             {barangayList.map((b) => (
-                                <option key={b.brgy_code} value={b.brgy_code}>{b.brgy_name}</option>
+                                <option key={b.brgy_code} value={b.brgy_code}>
+                                    {b.brgy_name}
+                                </option>
                             ))}
                         </select>
                     </div>

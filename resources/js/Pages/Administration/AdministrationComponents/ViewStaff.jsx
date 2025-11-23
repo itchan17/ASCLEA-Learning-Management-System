@@ -322,15 +322,24 @@ export default function ViewStaff() {
                                 </div>
                             </>
                         )}
-                        <img
-                            src={
-                                staffDetails?.user?.profile_image
-                                    ? `/storage/${staffDetails.user.profile_image}`
-                                    : "/images/default_profile.png"
-                            }
-                            alt="Profile"
-                            className="w-full h-full object-cover rounded-full"
-                        />
+                        {staffDetails.user.profile_image ? (
+                            <img
+                                src={`/storage/${staffDetails.user.profile_image}`}
+                                alt="Profile"
+                                className="w-full h-full object-cover rounded-full"
+                            />
+                        ) : (
+                            <div
+                                className={`w-full h-full bg-ascend-blue rounded-full shrink-0 flex items-center justify-center`}
+                            >
+                                <span
+                                    className={`text-size7 font-bold  text-ascend-white capitalize`}
+                                >
+                                    {staffDetails.user.first_name[0]}
+                                </span>
+                            </div>
+                        )}
+
                         <label
                             htmlFor="inputProfile"
                             className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 text-ascend-white opacity-0 hover:opacity-50 cursor-pointer rounded-full transition-opacity duration-200"

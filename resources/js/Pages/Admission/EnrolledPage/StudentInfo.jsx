@@ -125,15 +125,23 @@ const StudentInfo = () => {
                         </>
                     )}
 
-                    <img
-                        src={
-                            student?.user?.profile_image
-                                ? `/storage/${student.user.profile_image}`
-                                : "/images/default_profile.png"
-                        }
-                        alt="Profile"
-                        className="w-full h-full object-cover rounded-full"
-                    />
+                    {student.user.profile_image ? (
+                        <img
+                            src={`/storage/${student.user.profile_image}`}
+                            alt="Profile"
+                            className="w-full h-full object-cover rounded-full"
+                        />
+                    ) : (
+                        <div
+                            className={`w-full h-full bg-ascend-blue rounded-full shrink-0 flex items-center justify-center`}
+                        >
+                            <span
+                                className={`text-size7 font-bold  text-ascend-white capitalize`}
+                            >
+                                {student.user.first_name[0]}
+                            </span>
+                        </div>
+                    )}
 
                     <label
                         htmlFor="inputProfile"

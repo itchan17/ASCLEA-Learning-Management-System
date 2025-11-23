@@ -12,6 +12,7 @@ import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryB
 import { IoCaretDownOutline } from "react-icons/io5";
 import { closeDropDown } from "../../../../../../../../../Utils/closeDropdown";
 import EmptyState from "../../../../../../../../../Components/EmptyState/EmptyState";
+import ProfileImage from "../../../../../../../../../Components/ProfileImage";
 
 export default function QuizResponsesTable({
     programId,
@@ -136,15 +137,9 @@ export default function QuizResponsesTable({
                                 >
                                     <td>
                                         <div className="flex items-center gap-3">
-                                            <img
-                                                src={
-                                                    response.submitted_by
-                                                        .profile_image &&
-                                                    `/storage/${response.submitted_by.profile_image}`
-                                                }
-                                                alt="Profile image"
-                                                className="w-12 h-12 bg-ascend-gray1/20 rounded-4xl shrink-0"
-                                            ></img>
+                                            <ProfileImage
+                                                userData={response.submitted_by}
+                                            />
 
                                             <div className="font-bold">
                                                 {`${response.submitted_by.first_name} ${response.submitted_by.last_name}`}
@@ -162,8 +157,15 @@ export default function QuizResponsesTable({
                                         {cleanDecimal(response.score)}/
                                         {assessment.quiz.quiz_total_points}
                                     </td>
-                                   <td className={response.detected_cheatings.length > 0 ? "text-ascend-red" : "text-ascend-green"}>
-                                    {response.detected_cheatings.length}
+                                    <td
+                                        className={
+                                            response.detected_cheatings.length >
+                                            0
+                                                ? "text-ascend-red"
+                                                : "text-ascend-green"
+                                        }
+                                    >
+                                        {response.detected_cheatings.length}
                                     </td>
                                 </tr>
                             ))}

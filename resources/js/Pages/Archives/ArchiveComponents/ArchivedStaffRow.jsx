@@ -2,6 +2,7 @@ import { useState } from "react";
 import { formatFullDate } from "../../../Utils/formatFullDate";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
 import { getRemainingDays } from "../../../Utils/getRemainingDays";
+import ProfileImage from "../../../Components/ProfileImage";
 
 export default function ArchivedStaffRow({
     staff,
@@ -19,15 +20,7 @@ export default function ArchivedStaffRow({
         <tr className="hover:bg-ascend-lightblue">
             <td>
                 <div className="flex items-center gap-3">
-                    <img
-                        src={
-                            staff.user.profile_image &&
-                            `/storage/${staff.user.profile_image}`
-                        }
-                        alt="Profile image"
-                        className="w-12 h-12 bg-ascend-gray1/20 rounded-4xl shrink-0"
-                    ></img>
-
+                    <ProfileImage userData={staff.user} />
                     <div className="font-bold">
                         {`${staff.user.first_name} ${staff.user.last_name}`}
                     </div>

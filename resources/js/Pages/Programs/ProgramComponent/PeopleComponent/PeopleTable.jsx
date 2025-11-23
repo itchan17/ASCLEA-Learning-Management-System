@@ -11,6 +11,7 @@ import { debounce } from "lodash";
 import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
 import { displayToast } from "../../../../Utils/displayToast";
 import AlertModal from "../../../../Components/AlertModal";
+import ProfileImage from "../../../../Components/ProfileImage";
 
 export default function PeopleTable() {
     const { members, program, auth } = usePage().props;
@@ -177,15 +178,9 @@ export default function PeopleTable() {
                                     >
                                         <td>
                                             <div className="flex items-center gap-3">
-                                                <img
-                                                    src={
-                                                        member.user
-                                                            .profile_image &&
-                                                        `/storage/${member.user.profile_image}`
-                                                    }
-                                                    alt="Profile image"
-                                                    className="w-12 h-12 bg-ascend-gray1/20 rounded-4xl shrink-0"
-                                                ></img>
+                                                <ProfileImage
+                                                    userData={member.user}
+                                                />
 
                                                 <div
                                                     className={`font-bold ${
