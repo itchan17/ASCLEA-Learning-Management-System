@@ -59,7 +59,7 @@ class ProfileController extends Controller
                 'lastName'   => 'required|string|max:255',
                 'middleName' => 'nullable|string|max:255',
                 'birthday'   => 'nullable|date',
-                'gender'     => 'nullable|in:male,female',
+                'gender'     => 'required|in:male,female',
             ]);
             $validated = array_merge($validated, $adminValidated);
         }

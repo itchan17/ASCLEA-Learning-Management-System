@@ -15,6 +15,7 @@ export default function Profile() {
     const { user } = usePage().props; 
     const [isEdit, setIsEdit] = useState(false);
     const isAdmin = user?.role?.toLowerCase() === "admin";
+    const [emailError, setEmailError] = useState("");
 
     const [formData, setFormData] = useState({
         lastName: user?.lastName || "",
@@ -170,6 +171,34 @@ export default function Profile() {
     };
 
     const handleSave = () => {
+        const errors = [];
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,10}$/;
+
+        const requiredSelects = [];
+        if (isAdmin) {
+            requiredSelects.push({ value: formData.gender, name: "Gender" });
+        }
+
+        if (!formData.email || formData.email.trim() === "") {
+            errors.push("Email is required");
+        } else if (!emailRegex.test(formData.email)) {
+            errors.push("Email is invalid");
+        }
+
+        requiredSelects.forEach(field => {
+            if (!field.value || field.value.trim() === "") {
+                errors.push(`${field.name} is required`);
+            }
+        });
+
+        if (errors.length > 0) {
+            displayToast(
+                <DefaultCustomToast message={errors.join(", ")} />,
+                "error"
+            );
+            return;
+        }
+
         router.put(route("profile.update"), formData, {
             onSuccess: (page) => {
                 setIsEdit(false);
@@ -178,7 +207,7 @@ export default function Profile() {
                     "success"
                 );
             },
-            onError: (errors) => {
+            onError: () => {
                 displayToast(
                     <DefaultCustomToast message="Failed to update profile." />,
                     "error"
@@ -340,13 +369,21 @@ export default function Profile() {
                             name="email"
                             value={formData.email}
                             disabled={!isEdit}
-                            onChange={(e) =>
-                                setFormData((prev) => ({ ...prev, email: e.target.value }))
-                            }
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setFormData((prev) => ({ ...prev, email: value }));
+
+                                if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,10}$/.test(value)) {
+                                    setEmailError("Please enter a valid email address");
+                                } else {
+                                    setEmailError("");
+                                }
+                            }}
                             className={`border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
+                        {emailError && <span className="text-red-500 text-sm">{emailError}</span>}
                     </div>
                 </div>
 
@@ -358,7 +395,7 @@ export default function Profile() {
                         <input
                             type="date"
                             name="birthday"
-                            value={formData.birthday} // use formData state
+                            value={formData.birthday}
                             disabled={!isEdit || !isAdmin}
                             onChange={(e) =>
                                 setFormData((prev) => ({ ...prev, birthday: e.target.value }))
@@ -381,7 +418,7 @@ export default function Profile() {
                             className={`textField border px-3 py-2 ${(!isEdit || !isAdmin) ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         >
-                            <option value="">Select Gender</option>
+                            <option value="" disabled>Select Gender</option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
                         </select>
