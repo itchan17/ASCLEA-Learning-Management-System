@@ -127,13 +127,15 @@ export default function Courses() {
                 />
             )}
             <div
-                className={`relative w-full group h-70 rounded-tl-xl rounded-br-xl bg-cover bg-center ${
-                    !programDetails.background_image && "bg-ascend-gray1"
-                }`}
+                className={`relative w-full group h-70 rounded-tl-xl rounded-br-xl bg-cover bg-center`}
                 style={
-                    programDetails.background_image && {
-                        backgroundImage: `url('/storage/${programDetails.background_image}')`,
-                    }
+                    programDetails.background_image
+                        ? {
+                              backgroundImage: `url('/storage/${programDetails.background_image}')`,
+                          }
+                        : {
+                              backgroundImage: `url('/images/default_bg.jpg')`,
+                          }
                 }
             >
                 {" "}
