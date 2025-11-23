@@ -67,7 +67,6 @@ export default function PaidStudentTable({ students, filters }) {
         <thead>
           <tr className="border-b-2 border-ascend-gray3">
             <th>Name</th>
-            <th>Program</th>
             <th>Email</th>
             <th>Action</th>
           </tr>
@@ -82,7 +81,6 @@ export default function PaidStudentTable({ students, filters }) {
                 className="hover:bg-ascend-lightblue transition-all duration-300 cursor-pointer"
               >
                 <td className="py-5">{s.name}</td>
-                <td className="py-5">{s.program}</td>
                 <td className="py-5">{s.email}</td>
                 <td className="py-5">
                   <span className="text-ascend-blue underline">View More</span>
