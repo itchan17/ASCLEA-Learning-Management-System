@@ -9,6 +9,8 @@ import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToa
 
 export default function AddStaffForm({ toggleForm }) {
     const route = useRoute();
+    const [emailError, setEmailError] = React.useState("");
+
     const { data, setData, post, processing, errors, reset } = useForm({
         first_name: "",
         last_name: "",
@@ -19,6 +21,8 @@ export default function AddStaffForm({ toggleForm }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (emailError) return;
+
         post(route("staff.store"), {
             showProgress: false,
             onSuccess: (page) => {
@@ -65,7 +69,7 @@ export default function AddStaffForm({ toggleForm }) {
 
                 <div className="flex flex-col">
                     <label className="text-size2 text-ascend-black">
-                        Middle Name <span className="text-ascend-red">*</span>
+                        Middle Name
                     </label>
                     <input
                         type="text"
@@ -83,10 +87,19 @@ export default function AddStaffForm({ toggleForm }) {
                     <input
                         type="email"
                         value={data.email}
-                        onChange={(e) => setData("email", e.target.value)}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            setData("email", value);
+                            
+                            if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,10}$/.test(value)) {
+                                setEmailError("Please enter a valid email address");
+                            } else {
+                                setEmailError("");
+                            }
+                        }}
                         className="border px-3 py-2 border-ascend-gray1 focus:outline-ascend-blue"
                     />
-                    {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
+                    {emailError && <span className="text-red-500 text-sm">{emailError}</span>}
                 </div>
 
                 <div className="flex flex-col">

@@ -274,7 +274,7 @@ class StaffController extends Controller
             'email' => 'required|email|unique:users,email,' . $staff->user->user_id . ',user_id',
             'contact_number' => 'nullable|string|max:20',
             'birthdate' => 'nullable|date',
-            'gender' => 'nullable|in:male,female,other',
+            'gender' => 'required|in:male,female,other',
             'house_no' => 'nullable|string|max:255',
             'region' => 'nullable|string|max:255',
             'province' => 'nullable|string|max:255',
