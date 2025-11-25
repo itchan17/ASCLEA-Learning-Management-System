@@ -22,6 +22,7 @@ export default function ViewStaff() {
     const route = useRoute();
     const { props } = usePage();
     const { staffDetails, auth } = props;
+    const [emailError, setEmailError] = useState("");
 
     // Disable Archive if the staff being viewed is the same as current user
     const isSelf = auth.user?.user_id === staffDetails.user?.user_id;
@@ -60,6 +61,27 @@ export default function ViewStaff() {
     const toggleEdit = () => setIsEdit(!isEdit);
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        const errorsList = [];
+
+        if (!data.email) errorsList.push("Email is required");
+        else if (
+            !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,10}$/.test(
+                data.email
+            )
+        )
+            errorsList.push("Email is invalid");
+
+        if (!data.gender) errorsList.push("Gender is required");
+
+        if (errorsList.length > 0) {
+            displayToast(
+                <DefaultCustomToast message={errorsList.join(", ")} />,
+                "error"
+            );
+            return;
+        }
+
         put(route("staff.update", staffDetails.staff_id), {
             onSuccess: (page) => {
                 setIsEdit(false);
@@ -70,6 +92,7 @@ export default function ViewStaff() {
             },
         });
     };
+
     //===========================Archive Handle===========================//
     const [openAlertModal, setOpenAlertModal] = useState(false);
     const [isArchiveLoading, setIsArchiveLoading] = useState(false);
@@ -541,14 +564,30 @@ export default function ViewStaff() {
                             type="email"
                             value={data.email}
                             disabled={!isEdit}
-                            onChange={(e) => setData("email", e.target.value)}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                setData("email", value);
+
+                                // Validate email
+                                if (
+                                    !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,10}$/.test(
+                                        value
+                                    )
+                                ) {
+                                    setEmailError(
+                                        "Please enter a valid email address"
+                                    );
+                                } else {
+                                    setEmailError("");
+                                }
+                            }}
                             className={`border px-3 py-2 ${
                                 !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         />
-                        {errors.email && (
+                        {emailError && (
                             <span className="text-red-500 text-sm">
-                                {errors.email}
+                                {emailError}
                             </span>
                         )}
                     </div>
@@ -590,7 +629,9 @@ export default function ViewStaff() {
                                 !isEdit ? "text-ascend-gray1" : ""
                             } border-ascend-gray1 focus:outline-ascend-blue`}
                         >
-                            <option value="">Select Gender</option>
+                            <option value="" disabled>
+                                Select Gender
+                            </option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
                         </select>
