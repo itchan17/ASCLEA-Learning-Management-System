@@ -254,7 +254,7 @@ const startCV = async () => {
     setWebcamReady(false);
 
     try {
-      await fetch("http://127.0.0.1:5000/end_cv", {
+      await fetch("http://127.0.0.1:5000/end-cv", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
