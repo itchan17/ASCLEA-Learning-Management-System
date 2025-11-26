@@ -24,13 +24,21 @@ export default function PendingStudentsTable({ active }) {
     };
 
     //=========================== Debounced router call ===========================//
-    const debouncedSearch = useMemo(() => debounce((value) => {
-        router.get(route("pending.students"), { search: value, page: 1 }, {
-            preserveState: true,
-            showProgress: false,
-            only: ["pendingStudents"]
-        });
-    }, 300), []);
+    const debouncedSearch = useMemo(
+        () =>
+            debounce((value) => {
+                router.get(
+                    route("pending.students"),
+                    { search: value, page: 1 },
+                    {
+                        preserveState: true,
+                        showProgress: false,
+                        only: ["pendingStudents"],
+                    }
+                );
+            }, 300),
+        []
+    );
 
     useEffect(() => {
         return () => debouncedSearch.cancel(); // cleanup on unmount
@@ -40,11 +48,15 @@ export default function PendingStudentsTable({ active }) {
     useEffect(() => {
         if (active) {
             setSearch("");
-            router.get(route("pending.students"), { page: 1 }, {
-                preserveState: true,
-                showProgress: false,
-                only: ["pendingStudents"]
-            });
+            router.get(
+                route("pending.students"),
+                { page: 1 },
+                {
+                    preserveState: true,
+                    showProgress: false,
+                    only: ["pendingStudents"],
+                }
+            );
         }
     }, [active]);
 
@@ -81,26 +93,49 @@ export default function PendingStudentsTable({ active }) {
                             pendingStudents.data.map((student) => (
                                 <tr
                                     key={student.student_id}
-                                    onClick={() => handleRowClick(student.student_id)}
-                                    className="hover:bg-ascend-lightblue cursor-pointer border-b border-ascend-gray1"
+                                    onClick={() =>
+                                        handleRowClick(student.student_id)
+                                    }
+                                    className="hover:bg-ascend-lightblue cursor-pointer"
                                 >
                                     <td className="py-5">
                                         {student.user.first_name}{" "}
-                                        {student.user.middle_name ? student.user.middle_name + " " : ""}
+                                        {student.user.middle_name
+                                            ? student.user.middle_name + " "
+                                            : ""}
                                         {student.user.last_name}
                                     </td>
-                                    <td className="py-5">{student.user.email}</td>
-                                    <td className="py-5">{new Date(student.created_at).toLocaleDateString()}</td>
-                                    <td className={`py-5 ${
-                                        student.admission_status === "Accepted" ? "text-ascend-green" :
-                                        student.admission_status === "Not Submitted" ? "text-ascend-blue" :
-                                        student.admission_status === "Pending" ? "text-ascend-yellow" : 
-                                        student.admission_status === "Rejected" ? "text-ascend-red" : ""
-                                    }`}>
+                                    <td className="py-5">
+                                        {student.user.email}
+                                    </td>
+                                    <td className="py-5">
+                                        {new Date(
+                                            student.created_at
+                                        ).toLocaleDateString()}
+                                    </td>
+                                    <td
+                                        className={`py-5 ${
+                                            student.admission_status ===
+                                            "Accepted"
+                                                ? "text-ascend-green"
+                                                : student.admission_status ===
+                                                  "Not Submitted"
+                                                ? "text-ascend-blue"
+                                                : student.admission_status ===
+                                                  "Pending"
+                                                ? "text-ascend-yellow"
+                                                : student.admission_status ===
+                                                  "Rejected"
+                                                ? "text-ascend-red"
+                                                : ""
+                                        }`}
+                                    >
                                         {student.admission_status}
                                     </td>
                                     <td className="py-5">
-                                        <span className="text-ascend-blue underline">View More</span>
+                                        <span className="text-ascend-blue underline">
+                                            View More
+                                        </span>
                                     </td>
                                 </tr>
                             ))
@@ -143,7 +178,9 @@ export default function PendingStudentsTable({ active }) {
                                 <li>
                                     {/* href={route("admissions.pending.exportPdf")} */}
                                     <a
-                                        href={route("admissions.pending.exportPdf")}
+                                        href={route(
+                                            "admissions.pending.exportPdf"
+                                        )}
                                         className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
                                     >
                                         Download as pdf
@@ -151,7 +188,9 @@ export default function PendingStudentsTable({ active }) {
                                 </li>
                                 <li>
                                     <a
-                                        href={route("admissions.pending.exportCsv")}
+                                        href={route(
+                                            "admissions.pending.exportCsv"
+                                        )}
                                         className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
                                     >
                                         Download as csv
@@ -162,16 +201,17 @@ export default function PendingStudentsTable({ active }) {
                     </div>
 
                     {/* Pagination (RIGHT) */}
-                    {pendingStudents?.links?.length > 0 && pendingStudents?.last_page > 1 && (
-                        <div className="flex items-center [&>*]:!mt-0">
-                            <Pagination
-                                links={pendingStudents.links}
-                                currentPage={pendingStudents.current_page}
-                                lastPage={pendingStudents.last_page}
-                                only={["pendingStudents"]}
-                            />
-                        </div>
-                    )}
+                    {pendingStudents?.links?.length > 0 &&
+                        pendingStudents?.last_page > 1 && (
+                            <div className="flex items-center [&>*]:!mt-0">
+                                <Pagination
+                                    links={pendingStudents.links}
+                                    currentPage={pendingStudents.current_page}
+                                    lastPage={pendingStudents.last_page}
+                                    only={["pendingStudents"]}
+                                />
+                            </div>
+                        )}
                 </div>
             )}
         </div>

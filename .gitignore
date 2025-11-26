@@ -33,6 +33,7 @@ __pycache__/
 *.pyo
 *.pyd
 
+/asclea-env
 
 # OS-specific
 .DS_Store

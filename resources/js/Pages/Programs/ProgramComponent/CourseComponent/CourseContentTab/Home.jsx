@@ -106,7 +106,7 @@ export default function Home({}) {
                 />
             )}
 
-            <div className="space-y-1 pb-5 border-b border-ascend-gray1">
+            <div className="border-b border-ascend-gray1 pb-5">
                 <div className="flex items-start gap-2 md:gap-20">
                     <h1 className="flex-1 min-w-0 text-size7 break-words font-semibold">
                         {`${
@@ -144,15 +144,20 @@ export default function Home({}) {
                         </div>
                     </RoleGuard>
                 </div>
-                <span className="text-size4 font-semibold">
-                    {course.course_day &&
-                        `${
+                {course.course_day && (
+                    <span className="text-size4 font-semibold">
+                        {`${
                             course.course_day.charAt(0).toUpperCase() +
                             course.course_day.slice(1)
                         }: ${formatTime(course.start_time)} to
                     ${formatTime(course.end_time)}`}
-                </span>
-                <p className="break-words">{course?.course_description}</p>
+                    </span>
+                )}
+                {course.course_description && (
+                    <p className="break-words mt-3">
+                        {course.course_description}
+                    </p>
+                )}
             </div>
             <div className="flex flex-wrap gap-2 justify-between items-center">
                 <h1 className="text-size6 font-bold">Home</h1>
