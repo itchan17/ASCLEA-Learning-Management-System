@@ -6,6 +6,7 @@ import ViewEvidence from "./ViewEvidence";
 import { calcPercentage } from "../../../../../../../../../Utils/calcPercentage";
 import { convertDurationMinutes } from "../../../../../../../../../Utils/convertDurationMinutes";
 import { cleanDecimal } from "../../../../../../../../../Utils/cleanDecimal";
+import ProfileImage from "../../../../../../../../../Components/ProfileImage";
 
 export default function StudentQuizDetails({
     assessmentSubmission,
@@ -56,44 +57,44 @@ export default function StudentQuizDetails({
 
     useEffect(() => {
         const fetchWarnings = async () => {
-                try {
-                    const res = await fetch(`/detected-cheatings/${assessmentSubmission.assessment_submission_id}`);
-                    if (!res.ok) throw new Error("Failed to fetch warnings");
-    
-                    const data = await res.json();
-                    setWarningCount(data.cheatings?.length || 0); 
-                } catch (error) {
-                    console.error(error);
-                }
-            };
-    
-            fetchWarnings();
+            try {
+                const res = await fetch(
+                    `/detected-cheatings/${assessmentSubmission.assessment_submission_id}`
+                );
+                if (!res.ok) throw new Error("Failed to fetch warnings");
+
+                const data = await res.json();
+                setWarningCount(data.cheatings?.length || 0);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchWarnings();
     }, [assessmentSubmission.assessment_submission_id]);
-    
+
     return (
         <div className="bg-ascend-white p-5 space-y-5 border border-ascend-gray1 shadow-shadow1">
             <div className="flex items-center justify-between">
                 <h1 className="text-size6 font-bold">Student Quiz Result</h1>
             </div>
 
-            {/* <div className="flex flex-wrap gap-5 items-center justify-between">
-               
-            </div> */}
-
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div className="col-span-full lg:col-span-1 space-y-5">
                     <div className="flex items-center space-x-5">
-                        <img
-                            src={studentData.profile ? `/storage/${studentData.profile}` : "/default-profile.png"}
-                            alt="Profile image"
-                            className="w-20 h-20 rounded-full bg-ascend-gray1/20 object-cover shrink-0"
+                        <ProfileImage
+                            userData={studentData}
+                            profileImageSize={"w-20 h-20"}
+                            textSize={"text-size7"}
                         />
 
                         <div>
                             <h1 className="text-size3 font-semibold break-all">
                                 {`${studentData.first_name} ${studentData.last_name}`}
                             </h1>
-                            <span className="break-all">{studentData.email}</span>
+                            <span className="break-all">
+                                {studentData.email}
+                            </span>
                         </div>
                     </div>
                     <div className="flex flex-row flex-wrap lg:flex-col space-x-5">
@@ -138,7 +139,6 @@ export default function StudentQuizDetails({
                                 <span
                                     onClick={() =>
                                         setIsEvidenceOpen(!isEvidenceOpen)
-                                        
                                     }
                                     className="ml-2 text-ascend-black text-size1 cursor-pointer hover:text-ascend-blue transition-all duration-300 text-nowrap hover:underline"
                                 >
@@ -215,9 +215,11 @@ export default function StudentQuizDetails({
             </div>
 
             {isEvidenceOpen && (
-                <ViewEvidence 
+                <ViewEvidence
                     setIsEvidenceOpen={setIsEvidenceOpen}
-                    assessmentSubmissionId={assessmentSubmission.assessment_submission_id}
+                    assessmentSubmissionId={
+                        assessmentSubmission.assessment_submission_id
+                    }
                     studentData={studentData}
                 />
             )}

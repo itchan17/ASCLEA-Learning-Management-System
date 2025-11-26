@@ -82,13 +82,15 @@ export default function ProgramCard({
                 className="relative border border-ascend-gray1 shadow-shadow1 w-full max-w-80 h-58 flex flex-col cursor-pointer card-hover group"
             >
                 <div
-                    className={` w-full h-full p-2 flex justify-end font-nunito-sans bg-cover bg-center  ${
-                        !programDetails.background_image && "bg-ascend-gray1"
-                    }`}
+                    className={` w-full h-full p-2 flex justify-center items-center font-nunito-sans bg-cover bg-center`}
                     style={
-                        programDetails.background_image && {
-                            backgroundImage: `url('/storage/${programDetails.background_image}')`,
-                        }
+                        programDetails.background_image
+                            ? {
+                                  backgroundImage: `url('/storage/${programDetails.background_image}')`,
+                              }
+                            : {
+                                  backgroundImage: `url('/images/default_bg.jpg')`,
+                              }
                     }
                 ></div>
                 <RoleGuard allowedRoles={["admin"]}>

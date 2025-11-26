@@ -4,8 +4,12 @@ import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import useRegistrationStore from "../../Stores/Registration/registrationStore";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { regions, provinces, cities, barangays } from "select-philippines-address";
-
+import {
+    regions,
+    provinces,
+    cities,
+    barangays,
+} from "select-philippines-address";
 
 const RegistrationFields = () => {
     const route = useRoute();
@@ -27,7 +31,9 @@ const RegistrationFields = () => {
     }, []);
 
     const handleRegionChange = (regionCode) => {
-        const selectedRegion = regionList.find(r => r.region_code === regionCode);
+        const selectedRegion = regionList.find(
+            (r) => r.region_code === regionCode
+        );
         handleRegistrationChange("region", selectedRegion.region_code);
         handleRegistrationChange("region_name", selectedRegion.region_name); // new
         provinces(regionCode).then((res) => {
@@ -38,9 +44,14 @@ const RegistrationFields = () => {
     };
 
     const handleProvinceChange = (provinceCode) => {
-        const selectedProvince = provinceList.find(p => p.province_code === provinceCode);
+        const selectedProvince = provinceList.find(
+            (p) => p.province_code === provinceCode
+        );
         handleRegistrationChange("province", selectedProvince.province_code);
-        handleRegistrationChange("province_name", selectedProvince.province_name); // new
+        handleRegistrationChange(
+            "province_name",
+            selectedProvince.province_name
+        ); // new
         cities(provinceCode).then((res) => {
             setCityList(res);
             setBarangayList([]);
@@ -48,7 +59,7 @@ const RegistrationFields = () => {
     };
 
     const handleCityChange = (cityCode) => {
-        const selectedCity = cityList.find(c => c.city_code === cityCode);
+        const selectedCity = cityList.find((c) => c.city_code === cityCode);
         handleRegistrationChange("city", selectedCity.city_code);
         handleRegistrationChange("city_name", selectedCity.city_name); // new
         barangays(cityCode).then((res) => {
@@ -57,7 +68,9 @@ const RegistrationFields = () => {
     };
 
     const handleBarangayChange = (brgyCode) => {
-        const selectedBarangay = barangayList.find(b => b.brgy_code === brgyCode);
+        const selectedBarangay = barangayList.find(
+            (b) => b.brgy_code === brgyCode
+        );
         handleRegistrationChange("barangay", selectedBarangay.brgy_code);
         handleRegistrationChange("barangay_name", selectedBarangay.brgy_name); // new
     };
@@ -79,6 +92,7 @@ const RegistrationFields = () => {
 
         router.post(route("register.user"), registration, {
             replace: true, // Prevent user from going back to this page
+            showProgress: false,
             onStart: () => setLoading(true),
             onFinish: () => setLoading(false),
             onError: (error) => {
@@ -96,7 +110,7 @@ const RegistrationFields = () => {
         <>
             <div className="mx-auto max-w-4xl bg-white">
                 <p className="text-xs text-red-500 font-nunito-sans mb-3">
-                        * All Fields are Required.
+                    * All Fields are Required.
                 </p>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <div class="relative">
@@ -117,7 +131,7 @@ const RegistrationFields = () => {
                             for="LastNameOutlined"
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
-                            Last Name 
+                            Last Name
                         </label>
                     </div>
                     <div class="relative">
@@ -139,7 +153,6 @@ const RegistrationFields = () => {
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
                             First Name{" "}
-                            
                         </label>
                     </div>
                     <div class="relative">
@@ -161,7 +174,6 @@ const RegistrationFields = () => {
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
                             Middle Name{" "}
-                            
                         </label>
                     </div>
                 </div>
@@ -191,10 +203,7 @@ const RegistrationFields = () => {
                             }
                             className="textField w-full border border-ascend-gray1 px-3 py-3 text-sm focus:outline-ascend-blue"
                         >
-                            <option value="">
-                                Select sex{" "}
-                                
-                            </option>
+                            <option value="">Select sex </option>
                             <option value="male">Male</option>
                             <option value="female">Female</option>
                         </select>
@@ -221,7 +230,6 @@ const RegistrationFields = () => {
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
                             House no., Street{" "}
-                            
                         </label>
                     </div>
                 </div>
@@ -234,11 +242,12 @@ const RegistrationFields = () => {
                             onChange={(e) => handleRegionChange(e.target.value)}
                             className="textField w-full border border-ascend-gray1 px-3 py-3 text-sm focus:outline-ascend-blue"
                         >
-                            <option value="">Select Region {" "} 
-                                
-                            </option> 
+                            <option value="">Select Region </option>
                             {regionList.map((reg) => (
-                                <option key={reg.region_code} value={reg.region_code}>
+                                <option
+                                    key={reg.region_code}
+                                    value={reg.region_code}
+                                >
                                     {reg.region_name}
                                 </option>
                             ))}
@@ -248,15 +257,18 @@ const RegistrationFields = () => {
                     <div>
                         <select
                             value={registration.province}
-                            onChange={(e) => handleProvinceChange(e.target.value)}
+                            onChange={(e) =>
+                                handleProvinceChange(e.target.value)
+                            }
                             disabled={!provinceList.length}
                             className="textField w-full border border-ascend-gray1 px-3 py-3 text-sm focus:outline-ascend-blue"
                         >
-                            <option value="">Select Province {" "} 
-                                
-                            </option>
+                            <option value="">Select Province </option>
                             {provinceList.map((prov) => (
-                                <option key={prov.province_code} value={prov.province_code}>
+                                <option
+                                    key={prov.province_code}
+                                    value={prov.province_code}
+                                >
                                     {prov.province_name}
                                 </option>
                             ))}
@@ -270,9 +282,7 @@ const RegistrationFields = () => {
                             disabled={!cityList.length}
                             className="textField w-full border border-ascend-gray1 px-3 py-3 text-sm focus:outline-ascend-blue"
                         >
-                            <option value="">Select City {" "} 
-                                
-                            </option>
+                            <option value="">Select City </option>
                             {cityList.map((ct) => (
                                 <option key={ct.city_code} value={ct.city_code}>
                                     {ct.city_name}
@@ -284,15 +294,18 @@ const RegistrationFields = () => {
                     <div>
                         <select
                             value={registration.barangay}
-                            onChange={(e) => handleBarangayChange(e.target.value)}
+                            onChange={(e) =>
+                                handleBarangayChange(e.target.value)
+                            }
                             disabled={!barangayList.length}
                             className="textField w-full border border-ascend-gray1 px-3 py-3 text-sm focus:outline-ascend-blue"
                         >
-                            <option value="">Select Barangay {" "} 
-                                
-                            </option>
+                            <option value="">Select Barangay </option>
                             {barangayList.map((brgy) => (
-                                <option key={brgy.brgy_code} value={brgy.brgy_code}>
+                                <option
+                                    key={brgy.brgy_code}
+                                    value={brgy.brgy_code}
+                                >
                                     {brgy.brgy_name}
                                 </option>
                             ))}
@@ -305,9 +318,14 @@ const RegistrationFields = () => {
                             type="number"
                             value={registration.contact_number}
                             onChange={(e) => {
-                                const onlyNumbers = e.target.value.replace(/\D/g, "").slice(0, 11);
-                                handleRegistrationChange("contact_number", onlyNumbers);
-                                }}
+                                const onlyNumbers = e.target.value
+                                    .replace(/\D/g, "")
+                                    .slice(0, 11);
+                                handleRegistrationChange(
+                                    "contact_number",
+                                    onlyNumbers
+                                );
+                            }}
                             id="ContactOutlined"
                             class="block px-3 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non focus:outline-ascend-blue peer"
                             placeholder=" "
@@ -316,7 +334,7 @@ const RegistrationFields = () => {
                             for="ContactOutlined"
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
-                            Contact Number 
+                            Contact Number
                         </label>
                     </div>
                     <div class="relative">
@@ -338,17 +356,21 @@ const RegistrationFields = () => {
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
                             Email Address{" "}
-                            
                         </label>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-4">
                     <div class="relative">
-                    <input
+                        <input
                             type={showPassword ? "text" : "password"}
                             value={registration.password}
-                            onChange={(e) => handleRegistrationChange("password", e.target.value)}
+                            onChange={(e) =>
+                                handleRegistrationChange(
+                                    "password",
+                                    e.target.value
+                                )
+                            }
                             id="PasswordOutlined"
                             className="block px-3 py-3 w-full text-sm bg-transparent border border-ascend-gray1 focus:outline-ascend-blue peer"
                             placeholder=" "
@@ -370,7 +392,7 @@ const RegistrationFields = () => {
                             for="PasswordOutlined"
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
-                            Password 
+                            Password
                         </label>
                     </div>
                     <div class="relative">
@@ -378,7 +400,10 @@ const RegistrationFields = () => {
                             type={showConfirmPassword ? "text" : "password"}
                             value={registration.password_confirmation}
                             onChange={(e) =>
-                                handleRegistrationChange("password_confirmation", e.target.value)
+                                handleRegistrationChange(
+                                    "password_confirmation",
+                                    e.target.value
+                                )
                             }
                             id="CPasswordOutlined"
                             className="block px-3 py-3 w-full text-sm bg-transparent border border-ascend-gray1 focus:outline-ascend-blue peer"
@@ -386,7 +411,9 @@ const RegistrationFields = () => {
                         />
                         <button
                             type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            onClick={() =>
+                                setShowConfirmPassword(!showConfirmPassword)
+                            }
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                         >
                             {showConfirmPassword ? (
@@ -400,7 +427,6 @@ const RegistrationFields = () => {
                             class="absolute text-sm text-ascend-gray1 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] bg-white px-2 peer-focus:text-ascend-blue peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1"
                         >
                             Confirm Password{" "}
-                            
                         </label>
                     </div>
                 </div>

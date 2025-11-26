@@ -36,11 +36,11 @@ export default function Administration() {
     };
     // Debounce effects
     const debounceHandleSearch = useMemo(() => {
-        return debounce(handleSearch, 300); 
+        return debounce(handleSearch, 300);
     }, []);
 
     useEffect(() => {
-        return () => debounceHandleSearch.cancel(); 
+        return () => debounceHandleSearch.cancel();
     }, []);
 
     useEffect(() => {
@@ -48,11 +48,11 @@ export default function Administration() {
             const query = {};
             if (search.trim()) query.search = search.trim();
 
-            router.get(
-                route("administration.index"),
-                query,
-                { showProgress: false, preserveState: true, replace: true }
-            );
+            router.get(route("administration.index"), query, {
+                showProgress: false,
+                preserveState: true,
+                replace: true,
+            });
         }
     }, [search]);
 
@@ -78,9 +78,10 @@ export default function Administration() {
                         defaultValue={search}
                         onChange={(e) => debounceHandleSearch(e.target.value)}
                     />
-                    <IoSearch 
-                    onClick={() => handleSearch(search)}
-                    className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1" />
+                    <IoSearch
+                        onClick={() => handleSearch(search)}
+                        className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1"
+                    />
                 </div>
             </div>
             {/*===========================Staff Table===========================*/}
@@ -99,33 +100,66 @@ export default function Administration() {
                     <tbody>
                         {staffs.data && staffs.data.length > 0 ? (
                             staffs.data.map((staff) => (
-                            <tr
-                            key={staff.staff_id}
-                            className="group hover:bg-ascend-lightblue transition-all duration-300 cursor-pointer"
-                            onClick={() => handleStaffClick(staff.staff_id)}
-                            >
-                            <td>
-                                <div className="font-bold group-hover:underline">
-                                {staff.user
-                                    ? `${staff.user.first_name} ${staff.user.middle_name ? staff.user.middle_name + " " : ""}${staff.user.last_name}`
-                                    : "N/A"}
-                                {staff.user?.user_id === auth.user.user_id && (
-                                    <span className="text-size1 font-normal"> (You)</span>
-                                )}
-                                </div>
-                            </td>
-                            <td>{staff.user.email || "N/A"}</td>
-                            <td>{staff.user?.role?.role_name ? staff.user.role.role_name.charAt(0).toUpperCase() + staff.user.role.role_name.slice(1) : "N/A"}</td>
-                            <td>{staff.status ? staff.status.charAt(0).toUpperCase() + staff.status.slice(1) : "N/A"}</td>
-                            <td>
-                                {staff.user?.last_login?.login_at
-                                ? new Date(staff.user.last_login.login_at).toLocaleString("en-US", {
-                                    month: "short", day: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true
-                                    })
-                                : "N/A"}
-                            </td>
-                            {/*<td>{staff.user?.last_logout?.logout_at || "N/A"}</td>*/}
-                            </tr>
+                                <tr
+                                    key={staff.staff_id}
+                                    className="group hover:bg-ascend-lightblue transition-all duration-300 cursor-pointer"
+                                    onClick={() =>
+                                        handleStaffClick(staff.staff_id)
+                                    }
+                                >
+                                    <td className="py-5">
+                                        <div className="font-bold group-hover:underline">
+                                            {staff.user
+                                                ? `${staff.user.first_name} ${
+                                                      staff.user.middle_name
+                                                          ? staff.user
+                                                                .middle_name +
+                                                            " "
+                                                          : ""
+                                                  }${staff.user.last_name}`
+                                                : "N/A"}
+                                            {staff.user?.user_id ===
+                                                auth.user.user_id && (
+                                                <span className="text-size1 font-normal">
+                                                    {" "}
+                                                    (You)
+                                                </span>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td>{staff.user.email || "N/A"}</td>
+                                    <td>
+                                        {staff.user?.role?.role_name
+                                            ? staff.user.role.role_name
+                                                  .charAt(0)
+                                                  .toUpperCase() +
+                                              staff.user.role.role_name.slice(1)
+                                            : "N/A"}
+                                    </td>
+                                    <td>
+                                        {staff.status
+                                            ? staff.status
+                                                  .charAt(0)
+                                                  .toUpperCase() +
+                                              staff.status.slice(1)
+                                            : "N/A"}
+                                    </td>
+                                    <td>
+                                        {staff.user?.last_login?.login_at
+                                            ? new Date(
+                                                  staff.user.last_login.login_at
+                                              ).toLocaleString("en-US", {
+                                                  month: "short",
+                                                  day: "2-digit",
+                                                  year: "numeric",
+                                                  hour: "2-digit",
+                                                  minute: "2-digit",
+                                                  hour12: true,
+                                              })
+                                            : "N/A"}
+                                    </td>
+                                    {/*<td>{staff.user?.last_logout?.logout_at || "N/A"}</td>*/}
+                                </tr>
                             ))
                         ) : (
                             <tr>
@@ -159,7 +193,7 @@ export default function Administration() {
                                 </div>
                             </button>
 
-                            <ul 
+                            <ul
                                 tabIndex={0}
                                 className="text-size2 dropdown-content menu space-y-2 font-bold bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                             >
@@ -186,18 +220,18 @@ export default function Administration() {
                     {/* Pagination (RIGHT) */}
                     <div className="flex items-center [&>*]:!mt-0">
                         {staffs?.data &&
-                        staffs.data.length > 0 &&
-                        staffs.last_page > 1 && (   // ⬅ Only show if more than 1 page
-                            <Pagination
-                                links={staffs.links}
-                                currentPage={staffs.current_page}
-                                lastPage={staffs.last_page}
-                                only={["staffs"]}
-                            />
-                        )}
+                            staffs.data.length > 0 &&
+                            staffs.last_page > 1 && ( // ⬅ Only show if more than 1 page
+                                <Pagination
+                                    links={staffs.links}
+                                    currentPage={staffs.current_page}
+                                    lastPage={staffs.last_page}
+                                    only={["staffs"]}
+                                />
+                            )}
                     </div>
                 </div>
-            )} 
+            )}
             {/*================= Open add staff form =================*/}
             {openAddStaff && <AddStaffForm toggleForm={toggleAddStaff} />}
         </div>
