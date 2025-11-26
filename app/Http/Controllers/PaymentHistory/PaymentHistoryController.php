@@ -124,7 +124,7 @@ class PaymentHistoryController extends Controller
             'payment_method' => 'required|string',
             'transaction_id' => 'required|string|unique:payments,transaction_id',
             'receipt_date' => 'required|date',
-            'payment_amount' => 'required|integer',
+            'payment_amount' => 'required|integer|max:100000',
             'proof' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 

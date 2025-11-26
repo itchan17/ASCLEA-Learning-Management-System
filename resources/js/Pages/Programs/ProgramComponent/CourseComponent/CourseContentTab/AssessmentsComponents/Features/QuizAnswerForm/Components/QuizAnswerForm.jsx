@@ -8,7 +8,6 @@ import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryB
 import SecondaryButton from "../../../../../../../../../Components/Button/SecondaryButton";
 import useQuizAnswerForm from "../Hooks/useQuizAnswerForm";
 import useQuizAnswerStore from "../Stores/quizAnswerStore";
-import { endCV } from "@/utils/cvController";
 
 export default function QuizAnswerForm({
     courseId,
@@ -53,14 +52,11 @@ export default function QuizAnswerForm({
         if (questions.current_page === questions.last_page) {
             console.log("SUBMITTING QUIZ");
 
-            if (quiz.cheating_mitigation == 1 && typeof endCV === "function") { // Stopping CV if it's enabled
-                await endCV();
-            }           
-            
             submitQuiz({
                 courseId: courseId,
                 assessmentId: assessmentId,
                 quizId: quiz.quiz_id,
+                cheating_mitigation: quiz.cheating_mitigation,
                 assessmentSubmissionId:
                     assessmentSubmission.assessment_submission_id,
             });
