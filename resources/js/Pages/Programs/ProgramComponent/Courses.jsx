@@ -127,13 +127,15 @@ export default function Courses() {
                 />
             )}
             <div
-                className={`relative w-full group h-70 rounded-tl-xl rounded-br-xl bg-cover bg-center ${
-                    !programDetails.background_image && "bg-ascend-gray1"
-                }`}
+                className={`relative w-full group h-70 rounded-tl-xl rounded-br-xl bg-cover bg-center`}
                 style={
-                    programDetails.background_image && {
-                        backgroundImage: `url('/storage/${programDetails.background_image}')`,
-                    }
+                    programDetails.background_image
+                        ? {
+                              backgroundImage: `url('/storage/${programDetails.background_image}')`,
+                          }
+                        : {
+                              backgroundImage: `url('/images/default_bg.jpg')`,
+                          }
                 }
             >
                 {" "}
@@ -205,16 +207,7 @@ export default function Courses() {
                     {programDetails.program_description}
                 </p>
             </div>
-            <div className="flex flex-wrap justify-between items-center gap-2">
-                <CustomSelect
-                    selectField={
-                        <select className="w-35 rounded-none appearance-none border border-ascend-black p-2 h-9 text-size1  focus:outline-ascend-blue">
-                            <option value="not_started">Not started</option>
-                            <option value="ongoing">Ongoing</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                    }
-                />
+            <div className="flex flex-wrap justify-end items-center gap-2">
                 <RoleGuard allowedRoles={["admin"]}>
                     <PrimaryButton
                         doSomething={toggleModal}

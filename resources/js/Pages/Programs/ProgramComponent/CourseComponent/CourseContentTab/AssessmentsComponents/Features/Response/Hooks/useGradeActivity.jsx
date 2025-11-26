@@ -34,7 +34,7 @@ export default function useGradeActivity({
                 assessment: assessmentId,
                 assessmentSubmission: assessemntSubmissionId,
             }),
-            grade,
+            { grade },
             {
                 preserveScroll: true,
                 showProgress: false,

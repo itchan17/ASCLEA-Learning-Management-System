@@ -3,6 +3,7 @@ import { cleanDecimal } from "../../../../../../../../../Utils/cleanDecimal";
 import { capitalize } from "lodash";
 import { formatDueDateTime } from "../../../../../../../../../Utils/formatDueDateTime";
 import useGradeActivity from "../Hooks/useGradeActivity";
+import ProfileImage from "../../../../../../../../../Components/ProfileImage";
 
 export default function ActivityResponseRow({
     courseId,
@@ -40,14 +41,7 @@ export default function ActivityResponseRow({
             </td>
             <td>
                 <div className="flex items-center gap-3">
-                    <img
-                        src={
-                            response.submitted_by.profile_image &&
-                            `/storage/${response.submitted_by.profile_image}`
-                        }
-                        alt="Profile image"
-                        className="w-12 h-12 bg-ascend-gray1/20 rounded-4xl shrink-0"
-                    ></img>
+                    <ProfileImage userData={response.submitted_by} />
                     <div className="font-bold">
                         {response.submitted_by.first_name}{" "}
                         {response.submitted_by.last_name}
