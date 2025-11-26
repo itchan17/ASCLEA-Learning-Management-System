@@ -13,6 +13,7 @@ import { router } from "@inertiajs/react";
 import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
 import { displayToast } from "../../../../Utils/displayToast";
 import AlertModal from "../../../../Components/AlertModal";
+import ProfileImage from "../../../../Components/ProfileImage";
 
 export default function ViewMember() {
     const {
@@ -91,14 +92,10 @@ export default function ViewMember() {
                 </RoleGuard>
             </div>
             <div className="flex items-center space-x-5">
-                <img
-                    src={
-                        memberData.user.profile_image &&
-                        `/storage/${memberData.user.profile_image}`
-                    }
-                    alt="Profile image"
-                    className="w-16 h-16 bg-ascend-gray1/20 rounded-4xl shrink-0"
-                ></img>
+                <ProfileImage
+                    userData={memberData.user}
+                    profileImageSize={"w-16 h-16"}
+                />
 
                 <div className="flex flex-col">
                     <span className="text-size4 font-bold">{`${memberData.user.first_name} ${memberData.user.last_name}`}</span>
