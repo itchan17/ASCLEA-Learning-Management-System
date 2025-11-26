@@ -43,24 +43,6 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Excluding URIs From CSRF Protection
-        // For testing purposes only, remove this when in production 
-        // ------ START ------
-        $middleware->validateCsrfTokens(except: [
-            '/login',
-            '/logout',
-            '/programs',
-            'programs/*',
-            '/administration',
-            'administration/*',
-            '/assessments',
-            'assessments/*',
-            'courses/*',
-            '/grades',
-            '/archives',
-            'admission/*'
-        ]);
-        // ------ END ------
         $middleware->web(append: [
             HandleInertiaRequests::class,
         ]);
