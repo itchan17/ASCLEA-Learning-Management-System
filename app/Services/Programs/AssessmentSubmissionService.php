@@ -52,7 +52,7 @@ class AssessmentSubmissionService
         }
 
         if ($quiz->duration > 0 && $quiz->cheating_mitigation == 1) {
-            $endAt = Carbon::now()->addMinutes($quiz->duration + 1); 
+            $endAt = Carbon::now()->addMinutes($quiz->duration + 1);
         }
 
         $assessmentSubmission =  AssessmentSubmission::create(
@@ -251,7 +251,7 @@ class AssessmentSubmissionService
             $assessmentSubmission->update(['submission_status' => 'submitted', 'submitted_at' => Carbon::now()]);
         } else {
             // For unsubmititng
-            $assessmentSubmission->update(['submission_status' => 'not_submitted', 'submitted_at' => null]);
+            $assessmentSubmission->update(['submission_status' => 'not_submitted', 'submitted_at' => null, 'score' => 0]);
         }
     }
 
