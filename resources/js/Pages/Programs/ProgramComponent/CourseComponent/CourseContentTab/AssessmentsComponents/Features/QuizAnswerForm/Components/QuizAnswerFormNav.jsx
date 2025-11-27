@@ -7,7 +7,7 @@ import BackButton from "../../../../../../../../../Components/Button/BackButton"
 import { handleClickBackBtn } from "../../../../../../../../../Utils/handleClickBackBtn";
 import RoleGuard from "../../../../../../../../../Components/Auth/RoleGuard";
 import CvMonitor from "../../../../../../../../../Components/CheatingMitigation/CV_Indicator";
-import { endCV } from "@/utils/cvController";
+import { endCV } from "../../../../../../../../../Utils/cvController";
 
 export default function QuizAnswerFormNav() {
     const { courseId, assessmentId, assessmentSubmission, quiz, quizOptions } =
@@ -21,8 +21,7 @@ export default function QuizAnswerFormNav() {
 
     // Timer to start quiz with cv
     const [faceDetected, setFaceDetected] = useState(false);
-    const cvOptions = quizOptions?.map(o => o.options) || [];
-    
+    const cvOptions = quizOptions?.map((o) => o.options) || [];
 
     // Quiz answer store
     const remainingTime = useQuizAnswerStore((state) => state.remainingTime);
@@ -38,7 +37,10 @@ export default function QuizAnswerFormNav() {
             if (diff <= 0) {
                 clearInterval(interval);
 
-                if (quiz.cheating_mitigation == 1 && typeof endCV === "function") {
+                if (
+                    quiz.cheating_mitigation == 1 &&
+                    typeof endCV === "function"
+                ) {
                     await endCV();
                 } // Stopping CV if after time ends
 
@@ -68,7 +70,11 @@ export default function QuizAnswerFormNav() {
     };
 
     useEffect(() => {
-        if (quiz.cheating_mitigation == 0 && quiz.duration > 0 && !assessmentSubmission.submitted_at) {
+        if (
+            quiz.cheating_mitigation == 0 &&
+            quiz.duration > 0 &&
+            !assessmentSubmission.submitted_at
+        ) {
             const end = new Date(assessmentSubmission.end_at).getTime() / 1000;
 
             const interval = timer(end);
@@ -76,16 +82,19 @@ export default function QuizAnswerFormNav() {
             return () => clearInterval(interval);
         }
 
-        if (quiz.cheating_mitigation == 1 && faceDetected && quiz.duration > 0 && !assessmentSubmission.submitted_at) {
+        if (
+            quiz.cheating_mitigation == 1 &&
+            faceDetected &&
+            quiz.duration > 0 &&
+            !assessmentSubmission.submitted_at
+        ) {
             const end = new Date(assessmentSubmission.end_at).getTime() / 1000;
 
             const interval = timer(end);
 
             return () => clearInterval(interval);
-        } 
-
+        }
     }, [faceDetected]);
-    
 
     useEffect(() => {
         const handleScroll = () => {
@@ -124,19 +133,24 @@ export default function QuizAnswerFormNav() {
                     {/* Only display when the quiz hasnt been submitted */}
                     {!assessmentSubmission.submitted_at && (
                         <div className="flex flex-wrap items-center space-x-5">
-
                             {quiz.cheating_mitigation == 1 && ( // Only show CV indicator if cheating mitigation is enabled
                                 <div className="flex items-center">
-                                    <CvMonitor 
-                                        onFaceDetected={() => setFaceDetected(true)}
+                                    <CvMonitor
+                                        onFaceDetected={() =>
+                                            setFaceDetected(true)
+                                        }
                                         options={cvOptions}
-                                        assessmentSubmissionId={assessmentSubmission.assessment_submission_id}
+                                        assessmentSubmissionId={
+                                            assessmentSubmission.assessment_submission_id
+                                        }
                                         faceDetected={faceDetected}
                                     />
                                 </div>
                             )}
 
-                            <span className="font-bold">{remainingTime || ""}</span>
+                            <span className="font-bold">
+                                {remainingTime || ""}
+                            </span>
                         </div>
                     )}
                 </div>
