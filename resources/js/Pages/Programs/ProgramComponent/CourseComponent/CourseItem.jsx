@@ -1,6 +1,6 @@
 import React from "react";
 import { MdDelete } from "react-icons/md";
-import { formatTime } from "../../../../Utils/FormatTime";
+import { formatTime } from "../../../../Utils/formatTime";
 import useCourseStore from "../../../../Stores/Programs/courseStore";
 
 export default function CourseItem({ course }) {
