@@ -7,7 +7,7 @@ import RoleGuard from "../../../../Components/Auth/RoleGuard";
 import EmptyState from "../../../../Components/EmptyState/EmptyState";
 import { usePage } from "@inertiajs/react";
 import { capitalize } from "lodash";
-import { formatTime } from "../../../../Utils/FormatTime";
+import { formatTime } from "../../../../Utils/formatTime";
 import { route } from "ziggy-js";
 import { router } from "@inertiajs/react";
 import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
