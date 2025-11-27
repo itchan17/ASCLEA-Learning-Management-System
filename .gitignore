@@ -2,8 +2,8 @@
 /node_modules
 /public/build
 /public/hot
-/public/storage
 /public/BigBuckBunny.mp4
+/public/storage/**/*.*
 /storage/*.key
 /storage/pail
 /vendor
@@ -22,3 +22,18 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+
+# Python virtual environment
+/venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+/asclea-env
+
+# OS-specific
+.DS_Store

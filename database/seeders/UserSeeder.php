@@ -8,6 +8,10 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+use App\Models\Student;
+use App\Models\Payment;
+
 
 class UserSeeder extends Seeder
 {
@@ -20,6 +24,31 @@ class UserSeeder extends Seeder
         $studentRoleId = DB::table('roles')->where('role_name', 'student')->value('role_id');
         $adminRoleId = DB::table('roles')->where('role_name', 'admin')->value('role_id');
         $facultyRoleId = DB::table('roles')->where('role_name', 'faculty')->value('role_id');
+
+        // Create 50 users with student roles
+        User::factory()
+            ->count(50)
+            ->has(
+                Student::factory()
+                    ->state(function (array $attributes, User $user) {
+                        return [
+                            'user_id' => $user->user_id,
+                            'enrollment_status' => 'enrolled',
+                            'payment' => 'paid'
+                        ];
+                    })
+            )
+            ->create([
+                'role_id' =>  $studentRoleId,
+            ]);
+            
+
+        // Create 5 users with faculty role
+        User::factory()
+            ->count(5)
+            ->create([
+                'role_id' =>  $facultyRoleId,
+            ]);
 
         DB::table('users')->insert([
             [

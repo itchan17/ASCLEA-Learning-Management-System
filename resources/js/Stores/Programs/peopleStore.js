@@ -47,6 +47,8 @@ const usePeopleStore = create((set) => ({
     handleAddPeople: () => {
         const { newPeople, peopleList, clearNewPeople } =
             usePeopleStore.getState();
+
+        console.log(newPeople);
         set({
             peopleList: [...peopleList, ...newPeople],
         });

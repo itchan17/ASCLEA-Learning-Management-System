@@ -1,32 +1,30 @@
-import React from "react";
-import { BiFilter } from "react-icons/bi";
-import { IoSearch } from "react-icons/io5";
+import React, { use, useState } from "react";
 import useArchives from "../../../Stores/Archives/archivedStore";
+import { usePage } from "@inertiajs/react";
+import ArchivedStudentRow from "./ArchivedStudentRow";
+import AlertModal from "../../../Components/AlertModal";
+import Pagination from "../../../Components/Pagination";
+import EmptyState from "../../../Components/EmptyState/EmptyState";
+import useArchive from "./Hooks/useArchive";
 
 export default function ArchivedStudents() {
-    const archivedStudentList = useArchives(
-        (state) => state.archivedStudentList
-    );
+    const { archivedStudents } = usePage().props;
+
+    const [openAlertModal, setOpenAlertModal] = useState(false);
+    const [action, setAction] = useState(null);
+    const [studentId, setStudentId] = useState(null);
+
+    // Custom hook
+    const { isLoading, handleRestoreStudent, handleForceDeleteStudent } =
+        useArchive();
 
     return (
         <div className="font-nunito-sans space-y-5">
             <div className="flex justify-between items-center gap-5">
                 <h1 className="text-size6 font-bold">Archived Students</h1>
-                <div className="flex justify-end items-center">
-                    <BiFilter className="text-size5 shrink-0" />
-                    <div className="font-bold text-size2 pr-10">Filter</div>
-                    <div className="relative">
-                        <input
-                            className="w-full sm:w-50 border h-9 pl-10 p-2 border-ascend-black focus:outline-ascend-blue"
-                            type="text"
-                            placeholder="Search name"
-                        />
-                        <IoSearch className="absolute text-size4 left-3 top-1/2 -translate-y-1/2 text-ascend-gray1" />
-                    </div>
-                </div>
             </div>
 
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overflow-y-hidden">
                 <table className="table">
                     <thead className="">
                         <tr className="border-b-2 border-ascend-gray3">
@@ -44,48 +42,66 @@ export default function ArchivedStudents() {
                             </th>
                         </tr>
                     </thead>
-                    {archivedStudentList?.length > 0 && (
+                    {archivedStudents.data.length > 0 && (
                         <tbody>
-                            {archivedStudentList.map((student, index) => (
-                                <tr
-                                    key={student.id}
-                                    className="hover:bg-ascend-lightblue cursor-pointer"
-                                >
-                                    <td>
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-12 h-12 bg-ascend-gray1 rounded-4xl shrink-0"></div>
-
-                                            <div className="font-bold">
-                                                {`${student.firstName} ${student.lastName}`}
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>{student.archivedBy}</td>
-                                    <td>{student.archivedDate}</td>
-                                    <td>{student.daysRemaining} days</td>
-                                    <td>
-                                        <span className="text-ascend-yellow underline">
-                                            Restore
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span className="text-ascend-red underline">
-                                            Delete
-                                        </span>
-                                    </td>
-                                </tr>
+                            {archivedStudents.data.map((student) => (
+                                <ArchivedStudentRow
+                                    key={student.student_id}
+                                    student={student}
+                                    setOpenAlertModal={setOpenAlertModal}
+                                    setStudentId={setStudentId}
+                                    setAction={setAction}
+                                />
                             ))}
                         </tbody>
                     )}
                 </table>
-                {archivedStudentList?.length === 0 && (
-                    <EmptyState
-                        paddingY="py-0"
-                        imgSrc={"/images/illustrations/grades.svg"}
-                        text={`“Oops! No one to hand an A+ to. Add your first student to get started.”`}
+            </div>
+
+            {archivedStudents.data.length > 0 &&
+                archivedStudents.total > 10 && (
+                    <Pagination
+                        links={archivedStudents.links}
+                        currentPage={archivedStudents.current_page}
+                        lastPage={archivedStudents.last_page}
+                        only={["archivedStudents"]}
                     />
                 )}
-            </div>
+
+            {archivedStudents.data.length === 0 && (
+                <EmptyState
+                    imgSrc={"/images/illustrations/blank_canvas.svg"}
+                    text={`“Looks empty! You haven’t archived any student yet.”`}
+                />
+            )}
+
+            {/* Display alert modal */}
+            {openAlertModal && (
+                <AlertModal
+                    title={
+                        action === "restore"
+                            ? "Restore Student"
+                            : "Permanently Delete Student"
+                    }
+                    description={
+                        action === "restore"
+                            ? "Are you sure you want to restore this student?"
+                            : "Are you sure you want to permanently delete this student? All data associated with this student will be permanently lost and cannot be recovered."
+                    }
+                    closeModal={() => setOpenAlertModal(false)}
+                    onConfirm={() => {
+                        if (action === "restore") {
+                            handleRestoreStudent(studentId, setOpenAlertModal);
+                        } else {
+                            handleForceDeleteStudent(
+                                studentId,
+                                setOpenAlertModal
+                            );
+                        }
+                    }}
+                    isLoading={isLoading}
+                />
+            )}
         </div>
     );
 }

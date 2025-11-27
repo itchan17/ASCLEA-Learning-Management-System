@@ -1,106 +1,119 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import PrimaryButton from "../../../../../Components/Button/PrimaryButton";
-import PostForm from "./HomeComponents/PostForm";
-import Post from "./HomeComponents/Post";
+import PostForm from "./HomeComponents/Components/PostForm";
+import Post from "./HomeComponents/Components/Post";
 import usePostStore from "../../../../../Stores/Programs/CourseContent/postStore";
 import EmptyState from "../../../../../Components/EmptyState/EmptyState";
 import { router, usePage } from "@inertiajs/react";
-import { useRoute } from "ziggy-js";
-import useProgramStore from "../../../../../Stores/Programs/programStore";
+import { route } from "ziggy-js";
 import useCourseStore from "../../../../../Stores/Programs/courseStore";
 import AddCourseForm from "../AddCourseForm";
 import RoleGuard from "../../../../../Components/Auth/RoleGuard";
+import { formatTime } from "../../../../../Utils/formatTime";
+import { closeDropDown } from "../../../../../Utils/closeDropdown";
+import DefaultCustomToast from "../../../../../Components/CustomToast/DefaultCustomToast";
+import { displayToast } from "../../../../../Utils/displayToast";
+import AlertModal from "../../../../../Components/AlertModal";
+import PostList from "./HomeComponents/Components/PostList";
 
-export default function Home() {
-    const route = useRoute();
-    const { programId, courseId } = usePage().props;
-
-    // Program Store
-    const programList = useProgramStore((state) => state.programList);
+export default function Home({}) {
+    const { program, course } = usePage().props;
+    const programId = program.program_id;
+    const courseId = course.course_id;
 
     // Course Store
     const setCourse = useCourseStore((state) => state.setCourseDetails);
-    const archiveCourse = useCourseStore((state) => state.archiveCourse);
 
     // Post Store
     const postList = usePostStore((state) => state.postList);
     const clearPostDetails = usePostStore((state) => state.clearPostDetails);
 
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [courseDetails, setCourseDetails] = useState(null);
     const [openCourseForm, setOpenCourseForm] = useState(false);
 
+    // States for alert modal
+    const [openAlerModal, setOpenAlertModal] = useState(false);
+    const [isArchiveLoading, setIsArchiveLoading] = useState(false);
+
     const targetForm = useRef(null);
-
-    // temporarily get the data of slected assessment
-    useEffect(() => {
-        // check if id is true
-        if ((programId, courseId)) {
-            // find the assessment details in asssessment list based on the id in url
-            // this in temporary only as there's currently data passed from backend
-            // the data will come from the backend and here's we're it will be set
-            const program = programList.find(
-                (program) => program.id === Number(programId)
-            );
-
-            const course = program.courseList.find(
-                (course) => course.id === Number(courseId)
-            );
-
-            // set the data
-            setCourseDetails(course);
-        }
-    }, [programList]);
 
     // Scroll into the form once opened
     useEffect(() => {
         if (isFormOpen) {
-            targetForm.current?.scrollIntoView({ behavior: "smooth" });
+            targetForm.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
         }
     }, [isFormOpen]);
 
-    const toggleForm = () => {
-        setIsFormOpen(!isFormOpen);
-        clearPostDetails();
-    };
-
     const handleEditClick = () => {
-        setCourse(courseDetails);
+        console.log(course);
+        setCourse(course);
         setOpenCourseForm(true);
 
         // Close the dropdown after clicked
-        const elem = document.activeElement;
-        if (elem) {
-            elem?.blur();
-        }
+        closeDropDown();
     };
 
-    const handleArchiveCourse = () => {
+    const archiveCourse = () => {
         // Navigate first, then delete
-        router.visit(route("program.view", { programId }), {
-            onFinish: () => {
-                archiveCourse(Number(programId), Number(courseId));
-            },
-        });
-
-        // Close the dropdown after clicked
-        const elem = document.activeElement;
-        if (elem) {
-            elem?.blur();
-        }
+        setIsArchiveLoading(true);
+        router.delete(
+            route("course.archive", {
+                program: program.program_id,
+                course: course.course_id,
+            }),
+            {
+                showProgress: false,
+                onSuccess: (page) => {
+                    displayToast(
+                        <DefaultCustomToast
+                            message={page.props.flash.success}
+                        />,
+                        "success"
+                    );
+                },
+                onFinish: () => {
+                    setIsArchiveLoading(false);
+                    setOpenAlertModal(false);
+                },
+            }
+        );
     };
+
+    const handleArchiveCourseClick = () => {
+        setOpenAlertModal(true);
+        // Close the dropdown after clicked
+        closeDropDown();
+    };
+
+    console.log("RERENDER");
 
     return (
         <div className="space-y-5 w-full text-ascend-black font-nunito-sans">
-            <div className="space-y-1 pb-5 border-b border-ascend-gray1">
+            {/* Display alert modal */}
+            {openAlerModal && (
+                <AlertModal
+                    title={"Archive Course"}
+                    description={
+                        "Are you sure you want to archive this course? It can be restored later if necessary"
+                    }
+                    closeModal={() => setOpenAlertModal(false)}
+                    onConfirm={archiveCourse}
+                    isLoading={isArchiveLoading}
+                />
+            )}
+
+            <div className="border-b border-ascend-gray1 pb-5">
                 <div className="flex items-start gap-2 md:gap-20">
                     <h1 className="flex-1 min-w-0 text-size7 break-words font-semibold">
                         {`${
-                            courseDetails?.courseCode
-                                ? `${courseDetails?.courseCode} - `
+                            course?.course_code
+                                ? `${course?.course_code} - `
                                 : ""
-                        }${courseDetails?.courseName}`}
+                        }${course?.course_name}`}
                     </h1>
 
                     <RoleGuard allowedRoles={["admin"]}>
@@ -122,7 +135,7 @@ export default function Home() {
                                         Edit course
                                     </a>
                                 </li>
-                                <li onClick={handleArchiveCourse}>
+                                <li onClick={handleArchiveCourseClick}>
                                     <a className="w-full text-left font-bold hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                         Archive course
                                     </a>
@@ -131,10 +144,20 @@ export default function Home() {
                         </div>
                     </RoleGuard>
                 </div>
-
-                <p className="break-words">
-                    {courseDetails?.courseDescription}
-                </p>
+                {course.course_day && (
+                    <span className="text-size4 font-semibold">
+                        {`${
+                            course.course_day.charAt(0).toUpperCase() +
+                            course.course_day.slice(1)
+                        }: ${formatTime(course.start_time)} to
+                    ${formatTime(course.end_time)}`}
+                    </span>
+                )}
+                {course.course_description && (
+                    <p className="break-words mt-3">
+                        {course.course_description}
+                    </p>
+                )}
             </div>
             <div className="flex flex-wrap gap-2 justify-between items-center">
                 <h1 className="text-size6 font-bold">Home</h1>
@@ -142,7 +165,7 @@ export default function Home() {
                 <RoleGuard allowedRoles={["admin", "faculty"]}>
                     <PrimaryButton
                         isDisabled={isFormOpen}
-                        doSomething={toggleForm}
+                        doSomething={() => setIsFormOpen(true)}
                         text="Write a Post"
                     />
                 </RoleGuard>
@@ -150,19 +173,11 @@ export default function Home() {
 
             {isFormOpen && (
                 <div ref={targetForm}>
-                    <PostForm toggleForm={toggleForm} />
+                    <PostForm setIsPostFormOpen={setIsFormOpen} />
                 </div>
             )}
-            {postList?.length > 0 ? (
-                postList.map((post, index) => (
-                    <Post key={index} postContent={post} />
-                ))
-            ) : (
-                <EmptyState
-                    imgSrc={"/images/illustrations/empty.svg"}
-                    text={`“There’s a whole lot of nothing going on—time to make something happen!”`}
-                />
-            )}
+
+            <PostList courseId={courseId} programId={programId} />
 
             {/* Display EditCourse Form */}
             {openCourseForm && (

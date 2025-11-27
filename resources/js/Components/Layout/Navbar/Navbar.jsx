@@ -6,6 +6,7 @@ import NotifDropdown from "./NotifDropdown";
 
 export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
     const { url } = usePage();
+    const { auth } = usePage().props;
 
     // States
     const [pageTitle, setPageTitle] = useState("");
@@ -13,8 +14,6 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
     const dropdownRef = useRef(null);
     const notifRef = useRef(null);
     const profileRef = useRef(null);
-
-    console.log("Render Navbar");
 
     // Set the dropdown to be displayed when clicked
     const openDropdown = (dropdown) => {
@@ -36,7 +35,7 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
         } else if (url.includes("/programs")) {
             setPageTitle("Programs");
         } else if (url.includes("/accounting")) {
-            setPageTitle("Accounting");
+            setPageTitle("Payment History");
         } else if (url.includes("/archives")) {
             setPageTitle("Archives");
         } else if (url.includes("/grades")) {
@@ -69,7 +68,7 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
         <nav
             className={`relative h-20 w-full flex items-center justify-between ${
                 isMdScreen ? "pl-3 pr-6" : "px-6"
-            } font-nunito-sans text-ascend-black`}
+            } font-nunito-sans text-ascend-black shrink-0`}
         >
             <div className="flex items-center space-x-1 md:space-x-6">
                 {isMdScreen && (
@@ -97,12 +96,27 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
                     <MdNotifications className="text-size6" />
                 </div>
 
-                <img
-                    ref={profileRef}
-                    alt="Profile image"
-                    className="w-12 h-12 rounded-full cursor-pointer object-cover bg-ascend-gray1"
-                    onClick={() => openDropdown("profile")}
-                ></img>
+                {auth.user.profile_image ? (
+                    <img
+                        ref={profileRef}
+                        alt="Profile image"
+                        src={`/storage/${auth.user.profile_image}`}
+                        className="w-12 h-12 rounded-full cursor-pointer object-cover bg-ascend-gray1/20"
+                        onClick={() => openDropdown("profile")}
+                    ></img>
+                ) : (
+                    <div
+                        ref={profileRef}
+                        onClick={() => openDropdown("profile")}
+                        className={`w-12 h-12 bg-ascend-blue rounded-4xl shrink-0 flex items-center justify-center cursor-pointer`}
+                    >
+                        <span
+                            className={`text-size5 font-bold  text-ascend-white capitalize`}
+                        >
+                            {auth.user.first_name[0]}
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Dropdown */}

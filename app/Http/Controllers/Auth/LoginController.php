@@ -57,9 +57,20 @@ class LoginController extends Controller
             ]);
         }
  
-        $request->session()->regenerate();    
-        return redirect()->intended(route('dashboard.index'));
-       
+        $request->session()->regenerate();  
+
+        $user = $request->user();
+
+        // Redirect student to admission page if not enrolled
+        if ($user->role->role_name === 'student') {
+            $enrollmentStatus = optional($user->student)->enrollment_status;
+            
+            if ($enrollmentStatus !== 'enrolled') {
+                return redirect()->route('admission.index');
+            }
+        }
+
+        return redirect()->route('dashboard.index');
     }
 
     public function throttleKey()
@@ -86,6 +97,5 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('login');
     }
 }

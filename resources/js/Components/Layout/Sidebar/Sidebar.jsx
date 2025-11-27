@@ -49,8 +49,8 @@ export default function Sidebar({
             roles: ["admin", "faculty", "student"],
         },
         {
-            url: "/accounting",
-            text: "Accounting",
+            url: "/payment-history",
+            text: "Payment History",
             icon: MdPayments,
             roles: ["admin"],
         },
@@ -58,7 +58,7 @@ export default function Sidebar({
             url: "/archives",
             text: "Archives",
             icon: MdArchive,
-            roles: ["admin", "faculty"],
+            roles: ["admin"],
         },
         {
             url: "/grades",
@@ -67,7 +67,7 @@ export default function Sidebar({
             roles: ["student"],
         },
         {
-            url: "/payment-history",
+            url: "/student-payment-history",
             text: "Payment History",
             icon: MdPayments,
             roles: ["student"],
@@ -157,8 +157,10 @@ export default function Sidebar({
                             link.roles.includes(user?.role)
                         ) {
                             if (user?.role === "student") {
-                                return user?.approved ||
-                                    link.url === "/admission"
+                                if (link.url === "/admission") return link; // Admission link is always visible to students
+
+                                return user?.approved &&
+                                    user?.enrollment_status === "enrolled" // Only show other links if approved and enrolled
                                     ? link
                                     : null;
                             }

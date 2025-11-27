@@ -1,9 +1,15 @@
 <?php
 
+use App\Http\Controllers\Archives\ArchiveController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Route for Viewing Administration Page
-Route::get('/archives', function () {
-    return Inertia::render('Archives/Archives');
-})->middleware(['auth', 'verified', 'checkRole:admin,faculty'])->name('archives.index');
+
+
+Route::prefix('archives')
+    ->middleware(['auth', 'verified', 'preventBack'])
+    ->group(function () {
+
+        // Route for viewing archive page
+        Route::get('/', [ArchiveController::class, 'showArchives'])->name('archives.index');
+    });

@@ -1,7 +1,7 @@
 import AOS from "aos";
 import "aos/dist/aos.css";
 import "../../../css/animation.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
 import LandingpageNav from "./LandingpageNav";
 import {
@@ -9,13 +9,44 @@ import {
     AiOutlineMail,
     AiOutlineFacebook,
 } from "react-icons/ai";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import { Link as ReactScrollLink } from "react-scroll";
+import AlertModal from "../../Components/AlertModal";
+import { route } from "ziggy-js";
 
 export default function LandingPage({ text }) {
     useEffect(() => {
         AOS.init({ duration: 1000 });
     }, []);
+
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [message, setMessage] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+
+        router.post(
+            route("contact.submit"),
+            { name, email, message },
+            {
+                onSuccess: () => {
+                    setIsSubmitting(false);
+                    setShowConfirm(true);
+                    setName("");
+                    setEmail("");
+                    setMessage("");
+                },
+                onError: () => {
+                    setIsSubmitting(false);
+                },
+            }
+        );
+    };
     return (
         <div className="landing-page overflow-x-hidden">
             <LandingpageNav />
@@ -61,7 +92,7 @@ export default function LandingPage({ text }) {
                 id="about-us"
                 className="flex justify-center w-full px-5 lg:px-[100px] py-20 lg:py-40"
             >
-                <div className="relative border border-ascend-gray1 w-full lg:ml-40 md:w-170 lg:w-140 bg-ascend-white p-10 space-y-5 shadow-[5px_10px_15px_0px_#0a0a0a]">
+                <div className="relative border border-ascend-gray1 w-full lg:ml-40 md:w-170 lg:w-140 bg-ascend-white p-10 space-y-5">
                     <h1 className="text-4xl font-shippori font-semibold">
                         About Us
                     </h1>
@@ -209,7 +240,7 @@ export default function LandingPage({ text }) {
                     </h1>
 
                     <div className="space-y-5 w-full p-10 bg-ascend-white text-ascend-black">
-                        <div className="collapse collapse-arrow bg-ascend-white rounded-none shadow-shadow1 border border-ascend-gray1">
+                        <div className="collapse collapse-arrow bg-ascend-white rounded-none border border-ascend-gray1">
                             <input type="radio" name="my-accordion-2" />
                             <div className="collapse-title font-semibold">
                                 How can I reset my password?
@@ -221,7 +252,7 @@ export default function LandingPage({ text }) {
                             </div>
                         </div>
 
-                        <div className="collapse collapse-arrow bg-ascend-white rounded-none shadow-shadow1 border border-ascend-gray1">
+                        <div className="collapse collapse-arrow bg-ascend-white rounded-none border border-ascend-gray1">
                             <input type="radio" name="my-accordion-2" />
                             <div className="collapse-title font-semibold">
                                 Where can I view my courses?
@@ -233,7 +264,7 @@ export default function LandingPage({ text }) {
                             </div>
                         </div>
 
-                        <div className="collapse collapse-arrow bg-ascend-white rounded-none shadow-shadow1 border border-ascend-gray1">
+                        <div className="collapse collapse-arrow bg-ascend-white rounded-none border border-ascend-gray1">
                             <input type="radio" name="my-accordion-2" />
                             <div className="collapse-title font-semibold">
                                 How do I contact support?
@@ -245,7 +276,7 @@ export default function LandingPage({ text }) {
                             </div>
                         </div>
 
-                        <div className="collapse collapse-arrow bg-ascend-white rounded-none shadow-shadow1 border border-ascend-gray1">
+                        <div className="collapse collapse-arrow bg-ascend-white rounded-none border border-ascend-gray1">
                             <input type="radio" name="my-accordion-2" />
                             <div className="collapse-title font-semibold">
                                 Can I update my profile information?
@@ -258,7 +289,7 @@ export default function LandingPage({ text }) {
                             </div>
                         </div>
 
-                        <div className="collapse collapse-arrow bg-ascend-white rounded-none shadow-shadow1 border border-ascend-gray1">
+                        <div className="collapse collapse-arrow bg-ascend-white rounded-none border border-ascend-gray1">
                             <input type="radio" name="my-accordion-2" />
                             <div className="collapse-title font-semibold">
                                 Is there a mobile app available?
@@ -270,7 +301,7 @@ export default function LandingPage({ text }) {
                             </div>
                         </div>
 
-                        <div className="collapse collapse-arrow bg-ascend-white rounded-none shadow-shadow1 border border-ascend-gray1">
+                        <div className="collapse collapse-arrow bg-ascend-white rounded-none border border-ascend-gray1">
                             <input type="radio" name="my-accordion-2" />
                             <div className="collapse-title font-semibold">
                                 How do I delete my account?
@@ -315,26 +346,45 @@ export default function LandingPage({ text }) {
                             </div>
                         </div>
                         <div className="w-full md:w-1/2 space-y-6">
-                            <form className="flex flex-col space-y-4">
+                            <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
                                 <input
                                     type="text"
                                     placeholder="Your name"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
                                     className="border border-ascend-black py-3 px-5 focus:outline-ascend-blue"
+                                    required
                                 />
                                 <input
                                     type="email"
                                     placeholder="Your email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     className="border border-ascend-black py-3 px-5 focus:outline-ascend-blue"
+                                    required
                                 />
                                 <textarea
-                                    name=""
-                                    id=""
                                     placeholder="Write a message"
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
                                     className="border border-ascend-black py-3 px-5 focus:outline-ascend-blue"
                                     rows={6}
+                                    required
                                 ></textarea>
+
+                                <div className="flex justify-end">
+                                    <PrimaryButton btnType={"submit"} text={isSubmitting ? "Submitting..." : "Submit"} isDisabled={isSubmitting} />
+                                </div>
                             </form>
-                            <PrimaryButton text={"Submit"} />
+
+                            {showConfirm && (
+                                <AlertModal
+                                    title={"Request Submitted"}
+                                    description={"Thank you! We’ve received your message. We’ll get in touch soon."}
+                                    closeModal={() => setShowConfirm(false)}
+                                    onConfirm={() => setShowConfirm(false)}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>

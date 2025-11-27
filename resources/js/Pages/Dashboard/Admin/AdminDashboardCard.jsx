@@ -4,27 +4,42 @@ import { FaChalkboardTeacher } from "react-icons/fa";
 import { BsFillPeopleFill } from "react-icons/bs";
 import { RiFileList2Fill } from "react-icons/ri";
 import DashboardCard from "../Component/DashboardCard";
+import { useState, useEffect } from "react";
+import { io } from "socket.io-client";
 
-export default function StaffDashboardCard() {
+export default function StaffDashboardCard({ stats }) {
+
+    const [onlineStudents, setOnlineStudents] = useState(0);
+
+    useEffect(() => {
+        const socket = io("http://localhost:3000");
+
+        socket.on("online_students", (users) => {
+            setOnlineStudents(users.filter(user => user.role_name === "student").length);
+        });
+
+        return () => socket.disconnect();
+    }, []);
+
     return (
         <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             <DashboardCard
-                value="60"
+                value={stats?.total_students || 0}
                 icon={<PiStudentFill className="text-ascend-blue" />}
                 label="Total Students"
             />
             <DashboardCard
-                value="12"
+                value={stats?.total_educators || 0}
                 icon={<FaChalkboardTeacher className="text-ascend-yellow" />}
                 label="Total Educators"
             />
             <DashboardCard
-                value="21"
+                value={stats?.pending_enrollees || 0}
                 icon={<RiFileList2Fill className="text-[#FF663C]" />}
                 label="Pending Enrollees"
             />
             <DashboardCard
-                value="21"
+                value={onlineStudents} // if you implement online_students
                 icon={
                     <span className="text-size5 relative">
                         <BsFillPeopleFill />

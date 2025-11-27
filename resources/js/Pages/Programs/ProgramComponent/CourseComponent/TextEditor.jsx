@@ -1,6 +1,7 @@
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
 import "../../../../../css/quillTextEditor.css";
+import { useMemo } from "react";
 
 export default function TextEditor({ value, setValue, fieldName }) {
     const toolBarOptions = [
@@ -16,19 +17,27 @@ export default function TextEditor({ value, setValue, fieldName }) {
 
         ["clean"],
     ];
-    const module = {
-        toolbar: toolBarOptions,
-        uploader: {
-            handler: () => {},
-        },
-    };
-    console.log(value);
+
+    const module = useMemo(
+        () => ({
+            toolbar: toolBarOptions,
+            uploader: { handler: () => {} },
+        }),
+        []
+    );
+
     return (
         <ReactQuill
+            value={value}
             modules={module}
             theme="snow"
-            value={value}
-            onChange={(value) => setValue(fieldName, value)}
+            onChange={(val) => {
+                const newVal = val === "<p><br></p>" ? null : val;
+
+                if (newVal !== value) {
+                    setValue(fieldName, newVal);
+                }
+            }}
         />
     );
 }

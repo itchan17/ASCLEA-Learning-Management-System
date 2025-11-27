@@ -20,6 +20,7 @@ export default function Login() {
         e.preventDefault();
         post(route("login.user"), {
             replace: true,
+            showProgress: false,
             onSuccess: () => reset("password", "email"),
         });
     }
@@ -167,6 +168,7 @@ export default function Login() {
                             btnType="submit"
                             text="Login"
                             isDisabled={processing}
+                            isLoading={processing}
                         />
                     </div>
                 </form>
@@ -201,7 +203,7 @@ export default function Login() {
                                     Register now to gain access and start your
                                     review journey!
                                 </p>
-                                <Link href={"/register"}>
+                                <Link replace href={"/register"}>
                                     <div className="flex justify-center">
                                         <PrimaryButton
                                             text="Register"

@@ -1,31 +1,28 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import PrimaryButton from "../../../../../Components/Button/PrimaryButton";
-import EmptyState from "../../../../../Components/EmptyState/EmptyState";
 import AssessmentForm from "./AssessmentsComponents/AssessmentForm";
-import AssessmentItem from "./AssessmentsComponents/AssessmentItem";
-import useAssessmentsStore from "../../../../../Stores/Programs/CourseContent/assessmentsStore";
 import RoleGuard from "../../../../../Components/Auth/RoleGuard";
+import AssesssmentList from "./AssessmentsComponents/AssesssmentList";
 
 export default function Assessments() {
-    // Assessments Store
-    const isFormOpen = useAssessmentsStore((state) => state.isFormOpen);
-    const toggleAssessmentForm = useAssessmentsStore(
-        (state) => state.toggleAssessmentForm
-    );
-    const assessmentList = useAssessmentsStore((state) => state.assessmentList);
+    const [isAssessmentFormOpen, setIsAssessmentFormOpen] = useState(false);
 
-    const targetForm = useRef(null);
+    const targetForm = useRef(null); // use to reference the loader
 
     // Scroll into the form once opened
     useEffect(() => {
-        if (isFormOpen) {
-            targetForm.current?.scrollIntoView({ behavior: "smooth" });
+        if (isAssessmentFormOpen) {
+            targetForm.current?.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
         }
-    }, [isFormOpen]);
+    }, [isAssessmentFormOpen]);
 
-    useEffect(() => {
-        console.log(assessmentList);
-    }, [assessmentList]);
+    const toggleAssessmentForm = () => {
+        setIsAssessmentFormOpen(!isAssessmentFormOpen);
+    };
+
     return (
         <div className="font-nunito-sans text-ascend-black space-y-5">
             <div className="flex flex-wrap gap-2 justify-between items-center">
@@ -33,30 +30,25 @@ export default function Assessments() {
 
                 <RoleGuard allowedRoles={["admin", "faculty"]}>
                     <PrimaryButton
-                        isDisabled={isFormOpen}
+                        isDisabled={isAssessmentFormOpen}
                         doSomething={toggleAssessmentForm}
                         text="Add Assessment"
                     />
                 </RoleGuard>
             </div>
 
-            {isFormOpen && (
+            {isAssessmentFormOpen && (
                 <div ref={targetForm}>
-                    <AssessmentForm toggleForm={toggleAssessmentForm} />
+                    <AssessmentForm
+                        setIsAssessmentFormOpen={setIsAssessmentFormOpen}
+                        toggleForm={toggleAssessmentForm}
+                    />
                 </div>
             )}
 
-            {/* <AssessmentItem /> */}
-            {assessmentList.length > 0 ? (
-                assessmentList.map((assessment, i) => (
-                    <AssessmentItem key={i} assessmentDetails={assessment} />
-                ))
-            ) : (
-                <EmptyState
-                    imgSrc={"/images/illustrations/empty.svg"}
-                    text={`“There’s a whole lot of nothing going on—time to make something happen!”`}
-                />
-            )}
+            <AssesssmentList
+                setIsAssessmentFormOpen={setIsAssessmentFormOpen}
+            />
         </div>
     );
 }

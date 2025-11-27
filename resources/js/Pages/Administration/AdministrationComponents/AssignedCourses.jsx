@@ -1,59 +1,63 @@
 import React from "react";
-import useCourseList from "../../../Stores/Programs/courseLIstStore";
-import RoleGuard from "../../../Components/Auth/RoleGuard";
+import { usePage, router } from "@inertiajs/react";
 import EmptyState from "../../../Components/EmptyState/EmptyState";
+import Pagination from "@/Components/Pagination";
 
 export default function AssignedCourses() {
-    // User Store
-    const courseList = useCourseList((state) => state.courseList);
+    const { assignedCourses } = usePage().props;
+
     return (
-        <div className="font-nunito-sans spave-y-5">
-            <h1 className="text-size6 font-bold">Assigned Courses</h1>
+        <div className="font-nunito-sans space-y-2">
+            <div className="flex justify-between items-center">
+                <h1 className="text-size6 font-bold">Assigned Courses</h1>
+            </div>
+            {/*===========================Assigned Courses Table===========================*/}
             <div className="overflow-x-auto">
-                <table className="table">
-                    {/* head */}
+                <table className="table w-full">
                     <thead>
                         <tr className="border-b-2 border-ascend-gray3 text-ascend-black font-bold">
+                            <th>Program Name</th>
                             <th>Course Code</th>
                             <th>Course Name</th>
-                            <th>Course Status</th>
-                            <th>Permision</th>
                         </tr>
                     </thead>
+
                     <tbody>
-                        {courseList &&
-                            courseList?.length > 0 &&
-                            courseList.map((course) => (
+                        {assignedCourses?.data && assignedCourses.data.length > 0 ? (
+                            assignedCourses.data.map((course, index) => (
                                 <tr
-                                    key={course.id}
+                                    key={index}
                                     className="hover:bg-ascend-lightblue cursor-pointer"
                                 >
-                                    <td>{course.courseCode}</td>
-                                    <td>{course.courseName}</td>
-                                    <td>{course.courseStatus}</td>
-                                    <RoleGuard allowedRoles={["admin"]}>
-                                        <td>
-                                            <select className="textField w-25 py-2 ">
-                                                <option value="view_only">
-                                                    View only
-                                                </option>
-                                                <option value="can_edit">
-                                                    Can edit
-                                                </option>
-                                            </select>
-                                        </td>
-                                    </RoleGuard>
+                                    <td>{course.program_name}</td>
+                                    <td>{course.course_code}</td>
+                                    <td>{course.course_name}</td>
                                 </tr>
-                            ))}
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={3}>
+                                    <EmptyState
+                                        imgSrc={"/images/illustrations/not_assigned.svg"}
+                                        text={`No assigned courses found. Head over to Programs to assign a course.`}
+                                    />
+                                </td>
+                            </tr>
+                        )}
                     </tbody>
                 </table>
-                {courseList?.length === 0 && (
-                    <EmptyState
-                        imgSrc={"/images/illustrations/not_assigned.svg"}
-                        text={`No assigned courses found. Head over to Programs to assign a course.`}
-                    />
-                )}
             </div>
+            {/*===========================Pagination: only show if there are courses===========================*/}
+            {assignedCourses?.data &&
+            assignedCourses.data.length > 0 &&
+            assignedCourses?.last_page > 1 && (   // ⬅ only show if more than 1 page
+                <Pagination
+                    links={assignedCourses.links}
+                    currentPage={assignedCourses.current_page}
+                    lastPage={assignedCourses.last_page}
+                    only={["assignedCourses"]}
+                />
+            )}
         </div>
     );
 }
