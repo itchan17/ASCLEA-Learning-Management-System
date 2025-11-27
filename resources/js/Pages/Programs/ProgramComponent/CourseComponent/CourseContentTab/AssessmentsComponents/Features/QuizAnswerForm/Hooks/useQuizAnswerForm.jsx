@@ -7,7 +7,7 @@ import DefaultCustomToast from "../../../../../../../../../Components/CustomToas
 import useQuizAnswerStore from "../Stores/quizAnswerStore";
 import saveAnswer from "../Services/quizAnswerService";
 import useModulesStore from "../../../../ModulesComponents/Stores/modulesStore";
-import { endCV } from "@/utils/cvController";
+import { endCV } from "../../../../../../../../../Utils/cvController";
 
 export default function useQuizAnswerForm() {
     const [questionRequiredError, setQuestionRequiredError] = useState(null);
@@ -199,7 +199,11 @@ export default function useQuizAnswerForm() {
                                 studentProgress
                             );
                         }
-                        if (cheating_mitigation == true && typeof endCV === "function") { // Stopping CV if it's enabled
+                        if (
+                            cheating_mitigation == true &&
+                            typeof endCV === "function"
+                        ) {
+                            // Stopping CV if it's enabled
                             endCV();
                         }
 
