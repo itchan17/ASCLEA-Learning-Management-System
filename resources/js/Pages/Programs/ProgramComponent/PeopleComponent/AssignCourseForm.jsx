@@ -5,7 +5,7 @@ import axios from "axios";
 import { route } from "ziggy-js";
 import { router, usePage } from "@inertiajs/react";
 import { capitalize } from "lodash";
-import { formatTime } from "../../../../Utils/FormatTime";
+import { formatTime } from "../../../../Utils/formatTime";
 import Loader from "../../../../Components/Loader";
 import DefaultCustomToast from "../../../../Components/CustomToast/DefaultCustomToast";
 import { displayToast } from "../../../../Utils/displayToast";
