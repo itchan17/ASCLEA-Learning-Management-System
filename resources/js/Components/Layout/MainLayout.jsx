@@ -31,6 +31,9 @@ export default function MainLayout({ children }) {
     }, []);
 
     // ------------------- SOCKET.IO ONLINE TRACKING -------------------
+    const host = import.meta.env.VITE_SOCKET_IO_HOST;
+    const port = import.meta.env.VITE_SOCKET_IO_PORT;
+
     useEffect(() => {
         if (!user) return;
 
@@ -38,7 +41,7 @@ export default function MainLayout({ children }) {
 
         // if (user.role_name !== "student") return;
 
-        const socket = io("http://localhost:3000"); // Connect to server
+        const socket = io(`${host}:${port}`); // Connect to server
 
         // Notify server that student is online
         socket.emit("student_online", { user: user });
