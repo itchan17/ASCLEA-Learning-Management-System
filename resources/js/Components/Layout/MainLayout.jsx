@@ -31,7 +31,7 @@ export default function MainLayout({ children }) {
     }, []);
 
     // ------------------- SOCKET.IO ONLINE TRACKING -------------------
-    const host = import.meta.env.VITE_SOCKET_IO_HOST;
+    const host = import.meta.env.VITE_MAIN_URL;
     const port = import.meta.env.VITE_SOCKET_IO_PORT;
 
     useEffect(() => {

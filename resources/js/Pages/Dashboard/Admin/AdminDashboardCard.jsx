@@ -10,7 +10,7 @@ import { io } from "socket.io-client";
 export default function StaffDashboardCard({ stats }) {
     const [onlineStudents, setOnlineStudents] = useState(0);
 
-    const host = import.meta.env.VITE_SOCKET_IO_HOST;
+    const host = import.meta.env.VITE_MAIN_URL;
     const port = import.meta.env.VITE_SOCKET_IO_PORT;
 
     useEffect(() => {
