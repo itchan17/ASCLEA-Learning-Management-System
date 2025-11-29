@@ -6,23 +6,31 @@ class PdfConverter
 {
     public static function convertToPdf(string $inputFile, string $outputFile)
     {
-        // Path for the libreoffice application that is respoonsible for file conversion
+        // Path to the LibreOffice binary
         $libreOffice = env('LIBREOFFICE_PATH', 'soffice');
+
+        // Use a LibreOffice user profile in production to avoid permission issues
+        $userInstallation = '';
+        if (app()->environment('production')) {
+            $userInstallation = '-env:UserInstallation=file:///tmp/libreoffice_profile';
+        }
 
         // Command that sets the file to convert into pdf
         // includes input file which it the full path of file to be converted,
-        // the outputFile wich the full path where the converted file will be stored
-        $command = "\"{$libreOffice}\" --headless --nologo --nofirststartwizard --norestore --convert-to pdf --outdir "
-            . escapeshellarg(dirname($outputFile)) . " "
+        // the outputFile wich the full path where the converted file will be stored    
+        $command = "\"{$libreOffice}\" --headless --nologo --nofirststartwizard --norestore "
+            . ($userInstallation ? $userInstallation . ' ' : '')
+            . '--convert-to pdf --outdir '
+            . escapeshellarg(dirname($outputFile)) . ' '
             . escapeshellarg($inputFile);
 
-
-        // Runs command in shell that will convert file to pdf
+        // Run the command
         exec($command, $output, $returnCode);
 
-        // Throws an exception error if file covnersion failed
+        // Throw exception if conversion failed
         if ($returnCode !== 0) {
-            throw new \Exception("Conversion failed for file: " . $inputFile);
+            $errorOutput = implode("\n", $output);
+            throw new \Exception("Conversion failed for file: {$inputFile}. Output: {$errorOutput}");
         }
     }
 }

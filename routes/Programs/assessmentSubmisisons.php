@@ -4,14 +4,10 @@ use App\Http\Controllers\Programs\AssessmentSubmissionController;
 use App\Http\Controllers\CV\DetectedCheatingController;
 use App\Http\Middleware\EnsureValidChildParentModel;
 use App\Models\Programs\AssessmentSubmission;
-use App\Models\Programs\Quiz;
-use App\Models\CV\DetectedCheating;
 use Illuminate\Support\Facades\Route;
-use Inertia\EncryptHistoryMiddleware;
-
 
 Route::prefix('courses/{course}/assessments/{assessment}/')
-    ->middleware(['auth', 'verified', 'preventBack', EncryptHistoryMiddleware::class, EnsureValidChildParentModel::class])
+    ->middleware(['auth', 'verified', 'preventBack', EnsureValidChildParentModel::class])
     ->group(function () {
 
         // Route for displaying the quiz instructions page
@@ -61,6 +57,3 @@ Route::post('/detected-cheatings', [DetectedCheatingController::class, 'store'])
 Route::get('/detected-cheatings/{assessment_submission_id}', [DetectedCheatingController::class, 'fetchBySubmission'])
     ->name('detected-cheatings.fetch')
     ->middleware(['auth', 'verified']);
-
-
-    
