@@ -27,6 +27,11 @@ const Monitoring = ({ onFaceDetected, options, assessmentSubmissionId }) => {
 
     const detectionIntervalRef = React.useRef(null);
 
+    const host = import.meta.env.VITE_MAIN_URL;
+    const port = import.meta.env.VITE_CV_PORT;
+
+    const CV_BASE_URL = `${host}:${port}`;
+
     const detectionHeadMap = {
         up: "Looking Up",
         down: "Looking Down",
@@ -190,7 +195,7 @@ const Monitoring = ({ onFaceDetected, options, assessmentSubmissionId }) => {
             setCameraStarted(true);
             isRunningRef.current = true;
 
-            await fetch("http://127.0.0.1:5000/reset_cv", {
+            await fetch(`${CV_BASE_URL}/reset_cv`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
             });
@@ -216,7 +221,7 @@ const Monitoring = ({ onFaceDetected, options, assessmentSubmissionId }) => {
 
                 try {
                     const response = await fetch(
-                        "http://127.0.0.1:5000/Asclea_Detection",
+                        `${CV_BASE_URL}/Asclea_Detection`,
                         {
                             method: "POST",
                             headers: {
@@ -268,7 +273,7 @@ const Monitoring = ({ onFaceDetected, options, assessmentSubmissionId }) => {
         setWebcamReady(false);
 
         try {
-            await fetch("http://127.0.0.1:5000/end-cv", {
+            await fetch(`${CV_BASE_URL}/end-cv`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
             });

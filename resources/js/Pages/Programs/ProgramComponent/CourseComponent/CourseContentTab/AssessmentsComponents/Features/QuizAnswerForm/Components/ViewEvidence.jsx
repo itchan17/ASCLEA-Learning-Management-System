@@ -3,6 +3,7 @@ import { MdOutlineClose } from "react-icons/md";
 import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
 import { IoCaretDownOutline } from "react-icons/io5";
 import ProfileImage from "../../../../../../../../../Components/ProfileImage";
+import Loader from "../../../../../../../../../Components/Loader";
 
 export default function ViewEvidence({
     setIsEvidenceOpen,
@@ -36,8 +37,8 @@ export default function ViewEvidence({
     if (loading) {
         return (
             <div className="fixed inset-0 bg-black/25 z-999 flex items-center justify-center font-nunito-sans">
-                <div className="bg-ascend-white p-10 text-center text-size4 font-semibold">
-                    Loading evidence...
+                <div className="bg-ascend-white w-200 p-10 max-h-[calc(100vh-5rem)] text-center text-size4 font-semibold">
+                    <Loader color="text-ascend-blue" />
                 </div>
             </div>
         );
@@ -74,36 +75,6 @@ export default function ViewEvidence({
                             <span>{studentData.email}</span>
                         </div>
                     </div>
-
-                    <div className="flex  space-x-[0.5px]">
-                        <PrimaryButton text={"Download"} />
-                        <div className="dropdown dropdown-end cursor-pointer ">
-                            <button
-                                tabIndex={0}
-                                role="button"
-                                className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
-                            >
-                                <div className="text-size1 ">
-                                    {<IoCaretDownOutline />}
-                                </div>
-                            </button>
-                            <ul
-                                tabIndex={0}
-                                className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
-                            >
-                                <li>
-                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                        Download as PDF
-                                    </a>
-                                </li>
-                                <li>
-                                    <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                        Download as CSV
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
                 </div>
 
                 {/* Cheating messages and screenshots */}
@@ -119,7 +90,7 @@ export default function ViewEvidence({
                                     key={idx}
                                     src={file.file_path}
                                     alt={file.file_name}
-                                    className="w-full max-h-[400px] object-contain bg-ascend-gray1 rounded-lg"
+                                    className="w-full max-h-[400px] object-contain bg-ascend-gray1"
                                 />
                             ))
                         ) : (
