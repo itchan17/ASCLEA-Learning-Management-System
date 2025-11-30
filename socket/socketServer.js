@@ -12,7 +12,6 @@ app.use(cors());
 const httpServer = createServer(app);
 
 const port = process.env.SOCKET_IO_PORT || 3000;
-const host = process.env.SOCKET_IO_HOST || "http://localhost";
 
 const io = new Server(httpServer, {
     cors: {
@@ -56,6 +55,6 @@ io.on("connection", (socket) => {
     });
 });
 
-httpServer.listen(port, () => {
-    console.log(`Socket.IO server running on ${host}:${port}`);
+httpServer.listen(port, "0.0.0.0", () => {
+    console.log(`Socket.IO server running on port ${port}`);
 });
