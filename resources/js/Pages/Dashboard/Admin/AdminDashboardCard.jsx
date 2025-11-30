@@ -11,10 +11,17 @@ export default function StaffDashboardCard({ stats }) {
     const [onlineStudents, setOnlineStudents] = useState(0);
 
     const host = import.meta.env.VITE_MAIN_URL;
+    const path = import.meta.env.VITE_SOCKET_IO_PATH;
+
     const port = import.meta.env.VITE_SOCKET_IO_PORT;
 
+    const url = port ? `${host}:${port}` : host;
+
     useEffect(() => {
-        const socket = io(`${host}:${port}`);
+        const socket = io(url, {
+            path, // use /socket.io for dev, /online for prod
+            transports: ["websocket"],
+        });
 
         socket.on("online_students", (users) => {
             setOnlineStudents(
