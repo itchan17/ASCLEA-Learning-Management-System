@@ -117,7 +117,7 @@ class AssessmentController extends Controller
     {
         $archivedAssessment = $this->assessmentService->archiveAssessment($assessment);
 
-        return response()->json(["success" => "Assessment archived successfully.", "archivedAssessment" => $archivedAssessment]);
+        return response()->json(["success" => "Assessment " .  ($assessment->sectionItem ? "deleted" : "archived") .  " successfully.", "data" => $archivedAssessment]);
     }
 
     public function restoreAssessment($program, $course,  $assessment)

@@ -16,6 +16,15 @@ use Illuminate\Support\Facades\Storage;
 class AssessmentService
 {
 
+    protected SectionService $sectionService;
+    protected SectionItemService $sectionItemService;
+
+    public function __construct(SectionService $sectionService, SectionItemService $sectionItemService)
+    {
+        $this->sectionService = $sectionService;
+        $this->sectionItemService = $sectionItemService;
+    }
+
     public function saveAssessment(array $validatedAssessment, string $courseId)
     {
 
@@ -197,9 +206,16 @@ class AssessmentService
 
     public function archiveAssessment(Assessment $assessment)
     {
+
         $assessment->delete(); // Soft delete the assessment
 
-        return  $this->getAssessmentCompleteDetails($assessment);
+        if (!is_null($assessment->sectionItem)) {
+            $assessment->sectionItem->delete();
+            $this->sectionItemService->decrementSectionItems($assessment->sectionItem);
+            return $this->sectionService->getSectionCompleteDetails($assessment->sectionItem->section);
+        } else {
+            return  $this->getAssessmentCompleteDetails($assessment);
+        }
     }
 
     public function restoreAssessment(string $assessmentId)

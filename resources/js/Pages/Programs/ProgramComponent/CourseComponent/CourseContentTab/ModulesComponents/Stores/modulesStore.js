@@ -264,6 +264,36 @@ const useModulesStore = create(
                 });
             },
 
+            // This is for deleting the section item material or assessment
+            removeSectionItem: (updatedSectionItems, courseId, sectionId) => {
+                const { sectionsByCourse } = useModulesStore.getState();
+
+                const courseState = sectionsByCourse[courseId] || {
+                    list: [],
+                    page: 1,
+                    hasMore: true,
+                };
+
+                const updatedSectionList = courseState.list.map((section) => {
+                    if (section.section_id === sectionId) {
+                        return { ...section, items: updatedSectionItems };
+                    }
+
+                    return section;
+                });
+
+                set({
+                    sectionsByCourse: {
+                        ...sectionsByCourse,
+                        [courseId]: {
+                            ...courseState,
+                            list: updatedSectionList,
+                        },
+                    },
+                });
+            },
+
+            // Handle logic ffor unlocking the next assessment or material
             unlockSectionAndSectionItems: (
                 courseId,
                 sectionId,
