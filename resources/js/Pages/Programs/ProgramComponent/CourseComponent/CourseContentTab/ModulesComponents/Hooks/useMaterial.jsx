@@ -22,9 +22,7 @@ export default function useMaterial({ programId, courseId }) {
     const updateSectionItems = useModulesStore(
         (state) => state.updateSectionItems
     );
-    const removeSectionItem = useModulesStore(
-        (state) => state.removeSectionItem
-    );
+    const setSectionItems = useModulesStore((state) => state.setSectionItems);
 
     const [errors, setErrors] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -224,11 +222,7 @@ export default function useMaterial({ programId, courseId }) {
             // Check if sectionId has value
             // If true tthis mean material is a part of section
             if (sectionId) {
-                removeSectionItem(
-                    response.data.data.items,
-                    courseId,
-                    sectionId
-                );
+                setSectionItems(courseId, sectionId, response.data.data.items);
             } else {
                 updateMaterialList(response.data.data, courseId);
             }

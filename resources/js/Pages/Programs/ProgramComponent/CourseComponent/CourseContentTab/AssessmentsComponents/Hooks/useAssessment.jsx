@@ -30,9 +30,7 @@ export default function useAssessment({ programId, courseId }) {
     const updateSectionItems = useModulesStore(
         (state) => state.updateSectionItems
     );
-    const removeSectionItem = useModulesStore(
-        (state) => state.removeSectionItem
-    );
+    const setSectionItems = useModulesStore((state) => state.setSectionItems);
 
     const appendToFormData = (assessmentFormData, assessmentDetails) => {
         // Append data into FormData to enbale uploading files
@@ -211,11 +209,7 @@ export default function useAssessment({ programId, courseId }) {
             // Check if sectionId has value
             // If true tthis mean material is a part of section
             if (sectionId) {
-                removeSectionItem(
-                    response.data.data.items,
-                    courseId,
-                    sectionId
-                );
+                setSectionItems(courseId, sectionId, response.data.data.items);
             } else {
                 updateAssessmentInList(response.data.data, courseId);
             }
