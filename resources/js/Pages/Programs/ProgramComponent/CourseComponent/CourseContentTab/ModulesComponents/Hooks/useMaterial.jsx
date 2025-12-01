@@ -22,9 +22,14 @@ export default function useMaterial({ programId, courseId }) {
     const updateSectionItems = useModulesStore(
         (state) => state.updateSectionItems
     );
+    const setSectionItems = useModulesStore((state) => state.setSectionItems);
 
     const [errors, setErrors] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+
+    // For alert modal  when archivingg section material
+    const [isArchiveMaterialLoading, setIsArchiveMaterialLoading] =
+        useState(false);
 
     const appendToFormData = (materialFormData, materialDetails) => {
         // Append data into FormData to enbale uploading files
@@ -203,8 +208,9 @@ export default function useMaterial({ programId, courseId }) {
         }
     };
 
-    const handleArchiveMaterial = async (materialId) => {
+    const handleArchiveMaterial = async (materialId, sectionId) => {
         try {
+            setIsArchiveMaterialLoading(true);
             const response = await axios.delete(
                 route("material.archive", {
                     program: programId,
@@ -213,7 +219,14 @@ export default function useMaterial({ programId, courseId }) {
                 })
             );
 
-            updateMaterialList(response.data.data, courseId);
+            // Check if sectionId has value
+            // If true tthis mean material is a part of section
+            if (sectionId) {
+                setSectionItems(courseId, sectionId, response.data.data.items);
+            } else {
+                updateMaterialList(response.data.data, courseId);
+            }
+
             displayToast(
                 <DefaultCustomToast message={response.data.success} />,
                 "success"
@@ -226,6 +239,8 @@ export default function useMaterial({ programId, courseId }) {
                 />,
                 "error"
             );
+        } finally {
+            setIsArchiveMaterialLoading(false);
         }
     };
 
@@ -273,6 +288,7 @@ export default function useMaterial({ programId, courseId }) {
     return {
         errors,
         isLoading,
+        isArchiveMaterialLoading,
         handleAddUpdateMaterial,
         handleFetchMaterials,
         handleUnpublishMaterial,

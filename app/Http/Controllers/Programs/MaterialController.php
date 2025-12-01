@@ -102,7 +102,10 @@ class MaterialController extends Controller
     {
         $archivedMaterial = $this->materialService->archiveMaterial($material);
 
-        return response()->json(["success" => "Material archived successfully.", "data" => $archivedMaterial]);
+        return response()->json([
+            "success" => "Material " . ($material->sectionItem ? 'deleted' : 'archived') . " successfully.",
+            "data" => $archivedMaterial
+        ]);
     }
 
     public function restoreMaterial(Program $program, Course $course, $material)

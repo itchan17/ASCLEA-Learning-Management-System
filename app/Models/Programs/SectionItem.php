@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SectionItem extends Model
 {
-    use HasUuids;
+    use HasUuids, SoftDeletes;
 
     public $incrementing = false;
 
@@ -33,7 +34,7 @@ class SectionItem extends Model
 
     public function section(): BelongsTo
     {
-        return $this->belongsTo(Section::class, 'secction_id');
+        return $this->belongsTo(Section::class, 'section_id');
     }
 
     public function studentProgress(): HasOne

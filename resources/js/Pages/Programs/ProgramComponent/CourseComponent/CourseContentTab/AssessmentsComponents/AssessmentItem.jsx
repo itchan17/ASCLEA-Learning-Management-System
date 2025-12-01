@@ -9,31 +9,30 @@ import RoleGuard from "../../../../../../Components/Auth/RoleGuard";
 import { capitalize } from "lodash";
 import AssessmentForm from "./AssessmentForm";
 import { closeDropDown } from "../../../../../../Utils/closeDropdown";
-import useAssessmentsStore from "./Stores/assessmentsStore";
-import { displayToast } from "../../../../../../Utils/displayToast";
-import DefaultCustomToast from "../../../../../../Components/CustomToast/DefaultCustomToast";
-import axios from "axios";
 import ModalContainer from "../../../../../../Components/ModalContainer";
 import File from "../File";
 import { getRemainingDays } from "../../../../../../Utils/getRemainingDays";
 import ModalDocViewer from "../../../../../../Components/ModalDocViewer";
 import { MdQuiz } from "react-icons/md";
 import { BsFillClipboard2CheckFill } from "react-icons/bs";
+import useAssessment from "./Hooks/useAssessment";
 
 export default function AssessmentItem({
     assessmentDetails,
     setIsAssessmentFormOpen,
 }) {
-    // Assessment Store
-    const setAssessmentDetails = useAssessmentsStore(
-        (state) => state.setAssessmentDetails
-    );
-    const updateAssessmentInList = useAssessmentsStore(
-        (state) => state.updateAssessmentInList
-    );
-
     // get the id from url
     const { course, program, auth } = usePage().props;
+
+    // Custom hook
+    const {
+        unpublishAssessment,
+        handleArchiveAsessment,
+        handleRestoreAsessment,
+    } = useAssessment({
+        programId: program.program_id,
+        courseId: course.course_id,
+    });
 
     const [isEdit, setIsEdit] = useState(false);
     const [fileUrl, setFileUrl] = useState(null);
@@ -87,99 +86,6 @@ export default function AssessmentItem({
         closeDropDown();
         setIsEdit(true);
         setIsAssessmentFormOpen(false); // Close the add assessment form if open
-    };
-
-    const unpublishAssessment = async () => {
-        closeDropDown();
-
-        try {
-            const response = await axios.put(
-                route("assessment.unpublish", {
-                    program: program.program_id,
-                    course: course.course_id,
-                    assessment: assessmentDetails.assessment_id,
-                })
-            );
-
-            updateAssessmentInList(response.data.data, course.course_id);
-
-            displayToast(
-                <DefaultCustomToast message={response.data.success} />,
-                "success"
-            );
-        } catch (error) {
-            console.error(error);
-            displayToast(
-                <DefaultCustomToast
-                    message={"Something went wrong. Please try again."}
-                />,
-                "error"
-            );
-        }
-    };
-
-    const handleArchiveAsessment = async () => {
-        closeDropDown();
-        console.log(assessmentDetails.assessment_id);
-        try {
-            const response = await axios.delete(
-                route("assessment.archive", {
-                    program: program.program_id,
-                    course: course.course_id,
-                    assessment: assessmentDetails.assessment_id,
-                })
-            );
-            console.log(response);
-            updateAssessmentInList(
-                response.data.archivedAssessment,
-                course.course_id
-            );
-
-            displayToast(
-                <DefaultCustomToast message={response.data.success} />,
-                "success"
-            );
-        } catch (error) {
-            console.error(error);
-            displayToast(
-                <DefaultCustomToast
-                    message={"Something went wrong. Please try again."}
-                />,
-                "error"
-            );
-        }
-    };
-
-    const handleRestoreAsessment = async () => {
-        closeDropDown();
-        console.log(assessmentDetails.assessment_id);
-        try {
-            const response = await axios.put(
-                route("assessment.restore", {
-                    program: program.program_id,
-                    course: course.course_id,
-                    assessment: assessmentDetails.assessment_id,
-                })
-            );
-            console.log(response);
-            updateAssessmentInList(
-                response.data.restoredAssessment,
-                course.course_id
-            );
-
-            displayToast(
-                <DefaultCustomToast message={response.data.success} />,
-                "success"
-            );
-        } catch (error) {
-            console.error(error);
-            displayToast(
-                <DefaultCustomToast
-                    message={"Something went wrong. Please try again"}
-                />,
-                "error"
-            );
-        }
     };
 
     const handleFileClick = (fileId, fileName) => {
@@ -290,7 +196,11 @@ export default function AssessmentItem({
                                     >
                                         {assessmentDetails.deleted_at ? (
                                             <li
-                                                onClick={handleRestoreAsessment}
+                                                onClick={() =>
+                                                    handleRestoreAsessment(
+                                                        assessmentDetails.assessment_id
+                                                    )
+                                                }
                                             >
                                                 <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                                     Restore assessment
@@ -311,8 +221,10 @@ export default function AssessmentItem({
                                                     </li>
                                                 ) : (
                                                     <li
-                                                        onClick={
-                                                            unpublishAssessment
+                                                        onClick={() =>
+                                                            unpublishAssessment(
+                                                                assessmentDetails.assessment_id
+                                                            )
                                                         }
                                                     >
                                                         <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
@@ -321,8 +233,10 @@ export default function AssessmentItem({
                                                     </li>
                                                 )}
                                                 <li
-                                                    onClick={
-                                                        handleArchiveAsessment
+                                                    onClick={() =>
+                                                        handleArchiveAsessment(
+                                                            assessmentDetails.assessment_id
+                                                        )
                                                     }
                                                 >
                                                     <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
