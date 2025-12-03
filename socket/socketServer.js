@@ -20,38 +20,65 @@ const io = new Server(httpServer, {
 });
 
 // Keep track of online students
-let onlineStudents = new Map(); // key: user, value: socket.id
+let onlineUsers = new Map(); // key: user, value: socket.id
 
 io.on("connection", (socket) => {
     console.log("New client connected:", socket.id);
 
     // Student comes online
-    socket.on("student_online", ({ user }) => {
+    socket.on("user_online", ({ user }) => {
         console.log(user);
-        onlineStudents.set(user, socket.id);
-        io.emit("online_students", Array.from(onlineStudents.keys()));
-        console.log("Online students:", Array.from(onlineStudents.keys()));
+
+        // Store user info along with their socket id
+        onlineUsers.set(user.user_id, { ...user, socketId: socket.id });
+
+        console.log("Online users:", onlineUsers);
+
+        // Filter only students
+        const students = Array.from(onlineUsers.values()).filter(
+            (u) => u.role_name === "student"
+        );
+
+        // Emit array of students including their socketId
+        io.emit("online_students", students);
+
+        console.log("Online students:", students);
     });
 
     // Heartbeat ping to keep online status
     socket.on("student_ping", ({ user }) => {
-        if (onlineStudents.has(user)) {
+        if (onlineUsers.has(user)) {
             // update timestamp or keep alive
         }
     });
 
     // Student leaves or disconnects
     socket.on("disconnect", () => {
-        for (let [user, sId] of onlineStudents.entries()) {
-            if (sId === socket.id) onlineStudents.delete(user);
+        // Remove any user whose socketId matches the disconnected socket
+        for (let [userId, userObj] of onlineUsers.entries()) {
+            if (userObj.socketId === socket.id) {
+                onlineUsers.delete(userId);
+            }
         }
-        io.emit("online_students", Array.from(onlineStudents.keys()));
+
+        // Emit only students
+        const students = Array.from(onlineUsers.values()).filter(
+            (u) => u.role_name === "student"
+        );
+
+        io.emit("online_students", students);
         console.log("Client disconnected:", socket.id);
     });
 
     socket.on("student_offline", ({ user }) => {
-        onlineStudents.delete(user);
-        io.emit("online_students", Array.from(onlineStudents.keys()));
+        // Remove by user_id
+        onlineUsers.delete(user.user_id);
+
+        const students = Array.from(onlineUsers.values()).filter(
+            (u) => u.role_name === "student"
+        );
+
+        io.emit("online_students", students);
     });
 });
 
