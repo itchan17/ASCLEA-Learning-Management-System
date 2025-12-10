@@ -243,7 +243,8 @@ class AssessmentSubmissionService
         // In this way we can allow activity submission even the student has no uploaded file
         $assessmentSubmission = AssessmentSubmission::firstOrCreate([
             'assessment_id' => $assessmentId,
-            'submitted_by' => $assignedCourseId
+            'submitted_by' => $assignedCourseId,
+            'submission_status' => 'not_submitted',
         ]);
 
         if ($assessmentSubmission->submission_status === "not_submitted") {
