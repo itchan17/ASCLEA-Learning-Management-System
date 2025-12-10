@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Programs;
 
 use App\Http\Controllers\Controller;
 use App\Models\AssignedCourse;
+use App\Models\Course;
 use App\Models\LearningMember;
 use App\Models\Program;
 use App\Models\Role;
@@ -190,6 +191,8 @@ class PeopleController extends Controller
     {
         $courses = $req->courses_to_assign;
 
+
+
         if (!empty($courses)) {
             $validCourses = $program->courses() // Get the courses of the program
                 ->whereIn('course_id', $courses) // Get courses that is in the selected courses
@@ -212,8 +215,21 @@ class PeopleController extends Controller
                 ];
             }, $validCourses);
 
+            if (count($courses) === 1) {
+                $course = Course::where('course_id', $courses[0])
+                    ->select('course_name')
+                    ->first();
+
+                $title = "New Course Assigned";
+                $body = "The course \"" . $course->course_name . "\" has been assigned to you.";
+            } else {
+                $title = "New Courses Assigned";
+                $body = count($courses) . " new courses have been assigned to you.";
+            }
+
+
             // Notify the user
-            $this->notificationService->notifyUser($member->user, "New Course", "New courses have been assigned to you!");
+            $this->notificationService->notifyUser($member->user, $title,  $body);
 
             // Update assigned course deleted_at if user was previously added
             AssignedCourse::upsert($data, uniqueBy: ['learning_member_id', 'course_id'], update: ['deleted_at']);

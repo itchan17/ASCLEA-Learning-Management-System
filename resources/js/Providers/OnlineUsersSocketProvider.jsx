@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import useOnlineStudentStore from "../Pages/Dashboard/Stores/onlineStudentStore";
+import useNotificationStore from "../Stores/Notification/notificationStore";
+import { displayToast } from "../Utils/displayToast";
+import DefaultCustomToast from "../Components/CustomToast/DefaultCustomToast";
 
 const SocketContext = createContext(null);
 export const useSocket = () => useContext(SocketContext);
@@ -8,6 +11,10 @@ export const useSocket = () => useContext(SocketContext);
 export default function OnlineUsersSocketProvider({ children, user }) {
     const setOnlineStudents = useOnlineStudentStore(
         (state) => state.setOnlineStudents
+    );
+
+    const addNewNotification = useNotificationStore(
+        (state) => state.addNewNotification
     );
 
     const socketRef = useRef(null);
@@ -41,9 +48,15 @@ export default function OnlineUsersSocketProvider({ children, user }) {
         // Get the list of online users
         socket.on("online_students", setOnlineStudents);
 
-        socket.on("notification", (data) =>
-            console.log("Received notification:", data)
-        );
+        // Add the new notification
+        socket.on("notification", (data) => {
+            addNewNotification(data.notification);
+
+            displayToast(
+                <DefaultCustomToast message={data.notification.data.title} />,
+                "info"
+            );
+        });
 
         return () => {
             clearInterval(ping);

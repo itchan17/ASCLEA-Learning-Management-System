@@ -39,10 +39,34 @@ return Application::configure(basePath: dirname(__DIR__))
                 require base_path('routes/Programs/modules.php');
                 require base_path('routes/Programs/grades.php');
                 require base_path('routes/Programs/posts.php');
+
+                // Notification
+                require base_path('routes/notifications.php');
             });
         },
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Excluding URIs From CSRF Protection
+        // For testing purposes only, remove this when in production 
+        // ------ START ------
+        $middleware->validateCsrfTokens(except: [
+            '/login',
+            '/logout',
+            '/programs',
+            'programs/*',
+            '/administration',
+            'administration/*',
+            '/assessments',
+            'assessments/*',
+            'courses/*',
+            '/grades',
+            '/archives',
+            'admission/*',
+            'notifications',
+            'notifications/*'
+        ]);
+        // ------ END ------
+
         $middleware->web(append: [
             HandleInertiaRequests::class,
         ]);

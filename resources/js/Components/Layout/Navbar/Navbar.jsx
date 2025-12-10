@@ -3,6 +3,7 @@ import { MdNotifications } from "react-icons/md";
 import { usePage } from "@inertiajs/react";
 import ProfileDropdown from "../Navbar/ProfileDropdown";
 import NotifDropdown from "./NotifDropdown";
+import useNotificationStore from "../../../Stores/Notification/notificationStore";
 
 export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
     const { url } = usePage();
@@ -15,9 +16,17 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
     const notifRef = useRef(null);
     const profileRef = useRef(null);
 
+    const isThereNewNotif = useNotificationStore(
+        (state) => state.isThereNewNotif
+    );
+    const setIsThereNewNotif = useNotificationStore(
+        (state) => state.setIsThereNewNotif
+    );
+
     // Set the dropdown to be displayed when clicked
     const openDropdown = (dropdown) => {
         setDropdown((prev) => (dropdown === prev ? "" : dropdown));
+        setIsThereNewNotif(false);
     };
 
     // Open sidebar
@@ -92,7 +101,11 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
                     onClick={() => openDropdown("notif")}
                     className="hover:bg-ascend-lightblue p-3 rounded-[50px] cursor-pointer relative transition-hover duration-300"
                 >
-                    <div className=" h-[10px] w-[10px] border rounded-xl bg-ascend-blue absolute right-[15px] top-4 border-ascend-white"></div>
+                    {console.log(isThereNewNotif)}
+                    {isThereNewNotif && (
+                        <div className=" h-[10px] w-[10px] border rounded-xl bg-ascend-blue absolute right-[15px] top-4 border-ascend-white"></div>
+                    )}
+
                     <MdNotifications className="text-size6" />
                 </div>
 
