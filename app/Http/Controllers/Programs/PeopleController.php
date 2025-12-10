@@ -8,6 +8,7 @@ use App\Models\LearningMember;
 use App\Models\Program;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -15,6 +16,13 @@ use Inertia\Inertia;
 
 class PeopleController extends Controller
 {
+    protected NotificationService $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService  = $notificationService;
+    }
+
     public function listUsers(Program $program, Request $req)
     {
         $programId = $program->program_id;
@@ -178,32 +186,34 @@ class PeopleController extends Controller
         return response()->json($courses);
     }
 
-    public function assignCourses(Program $program, $memberId, Request $req)
+    public function assignCourses(Program $program, LearningMember $member, Request $req)
     {
         $courses = $req->courses_to_assign;
 
         if (!empty($courses)) {
             $validCourses = $program->courses() // Get the courses of the program
                 ->whereIn('course_id', $courses) // Get courses that is in the selected courses
-                ->whereDoesntHave('assignedTo', function ($query) use ($memberId) { // Filter out courses that alreading assigned
-                    $query->where('learning_member_id', $memberId);
+                ->whereDoesntHave('assignedTo', function ($query) use ($member) { // Filter out courses that alreading assigned
+                    $query->where('learning_member_id', $member->learning_member_id);
                 })
                 ->pluck('course_id')
                 ->toArray();
 
-
             $now = Carbon::now();
 
-            $data = array_map(function ($validCourseId) use ($memberId, $now) {
+            $data = array_map(function ($validCourseId) use ($member, $now) {
                 return   [
                     'assigned_course_id' => (string) Str::uuid(),
-                    'learning_member_id' => $memberId,
+                    'learning_member_id' => $member->learning_member_id,
                     'course_id' => $validCourseId,
                     'updated_at' => $now,
                     'created_at' => $now,
                     'deleted_at' => null,
                 ];
             }, $validCourses);
+
+            // Notify the user
+            $this->notificationService->notifyUser($member->user, "New Course", "New courses have been assigned to you!");
 
             // Update assigned course deleted_at if user was previously added
             AssignedCourse::upsert($data, uniqueBy: ['learning_member_id', 'course_id'], update: ['deleted_at']);

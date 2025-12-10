@@ -41,6 +41,10 @@ export default function OnlineUsersSocketProvider({ children, user }) {
         // Get the list of online users
         socket.on("online_students", setOnlineStudents);
 
+        socket.on("notification", (data) =>
+            console.log("Received notification:", data)
+        );
+
         return () => {
             clearInterval(ping);
             window.removeEventListener("beforeunload", handleUnload);
