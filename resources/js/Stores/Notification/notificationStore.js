@@ -31,6 +31,21 @@ const useNotificationStore = create((set) => ({
             isLoaded: val,
         });
     },
+
+    updateNotifications: (redNotification) => {
+        const { notifications } = useNotificationStore.getState();
+
+        // Update the notifications
+        const udpatedNotifications = notifications.map((notification) =>
+            notification.notification_id === redNotification.notification_id
+                ? redNotification
+                : notification
+        );
+
+        set({
+            notifications: udpatedNotifications,
+        });
+    },
 }));
 
 export default useNotificationStore;

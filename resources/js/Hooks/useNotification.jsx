@@ -12,6 +12,9 @@ export default function useNotification() {
     );
     const setIsLoaded = useNotificationStore((state) => state.setIsLoaded);
     const isLoaded = useNotificationStore((state) => state.isLoaded);
+    const updateNotifications = useNotificationStore(
+        (state) => state.updateNotifications
+    );
 
     const getNotifications = async () => {
         if (!isLoaded) {
@@ -32,5 +35,17 @@ export default function useNotification() {
         getNotifications();
     }, []);
 
-    return { isLoading };
+    const readNotification = async (notificationId) => {
+        try {
+            const res = await axios.put(
+                route("read.notification", { notification: notificationId })
+            );
+
+            updateNotifications(res.data.notification);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    return { isLoading, readNotification };
 }

@@ -133,7 +133,9 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
             </div>
 
             {/* Dropdown */}
-            {dropDown === "notif" && <NotifDropdown ref={dropdownRef} />}
+            {dropDown === "notif" && (
+                <NotifDropdown setDropdown={setDropdown} ref={dropdownRef} />
+            )}
             {dropDown === "profile" && (
                 <ProfileDropdown setDropdown={setDropdown} ref={dropdownRef} />
             )}

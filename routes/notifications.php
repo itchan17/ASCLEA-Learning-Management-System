@@ -8,4 +8,6 @@ Route::prefix('notifications')
     ->group(function () {
 
         Route::get('/', [NotificationController::class, 'getNotifications'])->name('get.notifications');
+
+        Route::put('/{notification}', [NotificationController::class, 'readNotification'])->name('read.notification');
     });

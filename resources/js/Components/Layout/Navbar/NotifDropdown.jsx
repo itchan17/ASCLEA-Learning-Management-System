@@ -5,6 +5,7 @@ import useNotificationStore from "../../../Stores/Notification/notificationStore
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Loader from "../../Loader";
+import { router } from "@inertiajs/react";
 
 dayjs.extend(relativeTime);
 
@@ -14,9 +15,20 @@ const NotifDropdown = forwardRef((props, ref) => {
     // Notification store
     const notifications = useNotificationStore((state) => state.notifications);
 
-    const { isLoading } = useNotification();
+    const { isLoading, readNotification } = useNotification();
 
-    console.log(notifications);
+    const handleClickNotif = (notification) => {
+        // Close the dropdown
+        props.setDropdown("");
+
+        //  Updatethe read at in the database
+        if (!notification.read_at) {
+            readNotification(notification.notification_id);
+        }
+
+        // Navigate to the notification action url
+        router.visit(notification.action_url);
+    };
 
     return (
         <div
@@ -50,8 +62,11 @@ const NotifDropdown = forwardRef((props, ref) => {
                         notifications.length > 0 &&
                         notifications.map((notification) => (
                             <div
+                                onClick={() => handleClickNotif(notification)}
                                 key={notification.notification_id}
-                                className="font-semibold hover:bg-ascend-lightblue transition-all duration-300 pl-5 pr-3 flex items-start cursor-pointer space-x-5 py-2"
+                                className={`${
+                                    notification.read_at ? "" : "font-bold"
+                                } hover:bg-ascend-lightblue transition-all duration-300 pl-5 pr-3 flex items-start cursor-pointer space-x-5 py-2`}
                             >
                                 <div className="p-4 mt-2 bg-ascend-lightblue rounded-[50px]">
                                     <MdOutlineNotifications className="text-size6 text-ascend-blue" />
