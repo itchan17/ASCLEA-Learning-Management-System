@@ -11,8 +11,7 @@ class NotificationController extends Controller
     {
         $notifcations = $request->user()
             ->notifications()
-            ->select('id', 'notifiable_id', 'data', 'read_at', 'created_at')
-            ->orderBy('created_at', 'asc')
+            ->orderBy('created_at', 'desc')
             ->get();
 
         return response()->json(['notifications' => $notifcations]);

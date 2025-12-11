@@ -87,22 +87,18 @@ io.on("connection", (socket) => {
 app.post("/notify", (req, res) => {
     const data = req.body;
 
-    const { notification } = data;
+    const { notifications } = data;
     console.log(data);
     res.json({ success: true });
 
     // Send notfication to one user
-    if (notification) {
-        // Get the user from online users
+    notifications.forEach((notification) => {
         const user = onlineUsers.get(notification.notifiable_id);
-        console.log(user);
         if (user) {
-            console.log(`SOCCKEET ID; ${user.socketId}`);
-            io.to(user.socketId).emit("notification", {
-                notification,
-            });
+            console.log(`SOCKET ID: ${user.socketId}`);
+            io.to(user.socketId).emit("notification", { notification });
         }
-    }
+    });
 });
 
 httpServer.listen(port, "0.0.0.0", () => {

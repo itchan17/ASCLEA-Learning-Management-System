@@ -16,6 +16,8 @@ const NotifDropdown = forwardRef((props, ref) => {
 
     const { isLoading } = useNotification();
 
+    console.log(notifications);
+
     return (
         <div
             ref={ref}
@@ -38,26 +40,6 @@ const NotifDropdown = forwardRef((props, ref) => {
                     </div>
                 </div>
                 <div className="h-full">
-                    {console.log(notifications)}
-                    {!isLoading &&
-                        notifications.length > 0 &&
-                        notifications.map((notification) => (
-                            <div className=" hover:bg-ascend-lightblue transition-all duration-300 pl-5 pr-3 flex items-start cursor-pointer space-x-5 py-2">
-                                <div className="p-4 mt-2 bg-ascend-lightblue rounded-[50px]">
-                                    <MdOutlineNotifications className="text-size6 text-ascend-blue" />
-                                </div>
-                                <div className="h-full py-2 flex flex-col justify-between">
-                                    <p className="">{notification.data.body}</p>
-
-                                    <span className="text-size1">
-                                        {dayjs(
-                                            notification.created_at
-                                        ).fromNow()}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-
                     {isLoading && notifications.length === 0 && (
                         <div className="h-full w-full flex  items-center justify-center">
                             <Loader color="text-ascend-blue" />
@@ -67,12 +49,17 @@ const NotifDropdown = forwardRef((props, ref) => {
                     {!isLoading &&
                         notifications.length > 0 &&
                         notifications.map((notification) => (
-                            <div className=" hover:bg-ascend-lightblue transition-all duration-300 pl-5 pr-3 flex items-start cursor-pointer space-x-5 py-2">
+                            <div
+                                key={notification.notification_id}
+                                className="font-semibold hover:bg-ascend-lightblue transition-all duration-300 pl-5 pr-3 flex items-start cursor-pointer space-x-5 py-2"
+                            >
                                 <div className="p-4 mt-2 bg-ascend-lightblue rounded-[50px]">
                                     <MdOutlineNotifications className="text-size6 text-ascend-blue" />
                                 </div>
                                 <div className="h-full py-2 flex flex-col justify-between">
-                                    <p className="">{notification.data.body}</p>
+                                    <p className="">
+                                        {notification.notification_body}
+                                    </p>
 
                                     <span className="text-size1">
                                         {dayjs(

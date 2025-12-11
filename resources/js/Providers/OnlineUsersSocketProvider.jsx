@@ -50,10 +50,13 @@ export default function OnlineUsersSocketProvider({ children, user }) {
 
         // Add the new notification
         socket.on("notification", (data) => {
+            console.log(data);
             addNewNotification(data.notification);
 
             displayToast(
-                <DefaultCustomToast message={data.notification.data.title} />,
+                <DefaultCustomToast
+                    message={data.notification.notification_title}
+                />,
                 "info"
             );
         });
@@ -62,8 +65,9 @@ export default function OnlineUsersSocketProvider({ children, user }) {
             clearInterval(ping);
             window.removeEventListener("beforeunload", handleUnload);
             socket.off("online_students", setOnlineStudents);
+            socket.off("notification");
         };
-    }, [user]);
+    }, []);
 
     return (
         <SocketContext.Provider value={socketRef.current}>

@@ -191,8 +191,6 @@ class PeopleController extends Controller
     {
         $courses = $req->courses_to_assign;
 
-
-
         if (!empty($courses)) {
             $validCourses = $program->courses() // Get the courses of the program
                 ->whereIn('course_id', $courses) // Get courses that is in the selected courses
@@ -227,15 +225,18 @@ class PeopleController extends Controller
                 $body = count($courses) . " new courses have been assigned to you.";
             }
 
+            // Creates url where user can navigate the notification
+            $baseUrl = config('app.app_base_url');
+            $actionUrl = "{$baseUrl}/programs/{$program->program_id}/members/{$member->learning_member_id}";
 
             // Notify the user
-            $this->notificationService->notifyUser($member->user, $title,  $body);
+            $this->notificationService->notifyUser($member->user, $title,  $body, $actionUrl);
 
             // Update assigned course deleted_at if user was previously added
             AssignedCourse::upsert($data, uniqueBy: ['learning_member_id', 'course_id'], update: ['deleted_at']);
-        }
 
-        $label = count($data) > 1 ? "Courses" : "Course";
+            $label = count($data) > 1 ? "Courses" : "Course";
+        }
 
         return back()->with('success', "$label assigned successfully.");
     }
