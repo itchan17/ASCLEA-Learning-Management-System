@@ -213,6 +213,10 @@ class PeopleController extends Controller
                 ];
             }, $validCourses);
 
+
+            // Update assigned course deleted_at if user was previously added
+            AssignedCourse::upsert($data, uniqueBy: ['learning_member_id', 'course_id'], update: ['deleted_at']);
+
             if (count($courses) === 1) {
                 $course = Course::where('course_id', $courses[0])
                     ->select('course_name')
@@ -230,10 +234,7 @@ class PeopleController extends Controller
             $actionUrl = "{$baseUrl}/programs/{$program->program_id}/members/{$member->learning_member_id}";
 
             // Notify the user
-            $this->notificationService->notifyUser($member->user, $title,  $body, $actionUrl);
-
-            // Update assigned course deleted_at if user was previously added
-            AssignedCourse::upsert($data, uniqueBy: ['learning_member_id', 'course_id'], update: ['deleted_at']);
+            $this->notificationService->notifyUser($member->user->user_id, $title,  $body, $actionUrl);
 
             $label = count($data) > 1 ? "Courses" : "Course";
         }
