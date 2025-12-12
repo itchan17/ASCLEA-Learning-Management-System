@@ -182,7 +182,6 @@ const Monitoring = ({ onFaceDetected, options, assessmentSubmissionId }) => {
     }, [objectDetected, missingFace, lookingAway]);
 
     const startCV = async () => {
-        console.log("startCV triggered");
 
         try {
             setError(null);
