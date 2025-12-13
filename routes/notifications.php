@@ -9,5 +9,9 @@ Route::prefix('notifications')
 
         Route::get('/', [NotificationController::class, 'getNotifications'])->name('get.notifications');
 
+        Route::put('/read-all', [NotificationController::class, 'readAllNotifications'])->name('read.all.notifications');
+
         Route::put('/{notification}', [NotificationController::class, 'readNotification'])->name('read.notification');
+
+        Route::delete('/clear-all', [NotificationController::class, 'clearAllNotifications'])->name('clear.all.notifications');
     });

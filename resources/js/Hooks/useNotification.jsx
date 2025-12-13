@@ -15,6 +15,9 @@ export default function useNotification() {
     const updateNotifications = useNotificationStore(
         (state) => state.updateNotifications
     );
+    const clearAllNotificatiions = useNotificationStore(
+        (state) => state.clearAllNotificatiions
+    );
 
     const getNotifications = async () => {
         if (!isLoaded) {
@@ -36,6 +39,7 @@ export default function useNotification() {
     }, []);
 
     const readNotification = async (notificationId) => {
+        setIsLoading(true);
         try {
             const res = await axios.put(
                 route("read.notification", { notification: notificationId })
@@ -44,8 +48,37 @@ export default function useNotification() {
             updateNotifications(res.data.notification);
         } catch (error) {
             console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    return { isLoading, readNotification };
+    const markAllAsRead = async () => {
+        setIsLoading(true);
+        try {
+            const res = await axios.put(route("read.all.notifications"));
+
+            // Set the red notifications
+            setNotifications(res.data.redNotifications);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const clearAll = async () => {
+        setIsLoading(true);
+        try {
+            await axios.delete(route("clear.all.notifications"));
+
+            clearAllNotificatiions();
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return { isLoading, readNotification, markAllAsRead, clearAll };
 }

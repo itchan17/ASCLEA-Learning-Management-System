@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Notification;
+use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
@@ -56,5 +57,29 @@ class NotificationService
         Http::post($this->notificationRoute, [
             'notifications' =>  $notifications
         ]);
+    }
+
+    public function getNotifications(User $user)
+    {
+        $notifcations = $user
+            ->notifications()
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return $notifcations;
+    }
+
+    public function readNotification(Notification $notification)
+    {
+        $notification->update(['read_at' => now()]);
+
+        return $notification->refresh();
+    }
+
+    public function markAllAsRead(User $user)
+    {
+        $user->notifications()
+            ->whereNull('read_at')
+            ->update(['read_at' =>  now()]);
     }
 }

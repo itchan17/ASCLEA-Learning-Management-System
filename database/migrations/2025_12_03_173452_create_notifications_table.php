@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('notification_body');
             $table->string('action_url')->nullable();
             $table->timestamp('read_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -46,6 +46,11 @@ const useNotificationStore = create((set) => ({
             notifications: udpatedNotifications,
         });
     },
+
+    clearAllNotificatiions: () =>
+        set({
+            notifications: [],
+        }),
 }));
 
 export default useNotificationStore;
