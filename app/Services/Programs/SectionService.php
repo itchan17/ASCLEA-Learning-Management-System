@@ -2,14 +2,24 @@
 
 namespace App\Services\Programs;
 
+use App\Models\Course;
+use App\Models\Program;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\Material;
 use App\Models\Programs\Section;
 use App\Models\Programs\SectionItem;
 use App\Models\User;
+use App\Services\NotificationService;
 
 class SectionService
 {
+    protected NotificationService $notificationService;
+
+    public function __construct(NotificationService $notoficationService)
+    {
+        $this->notificationService = $notoficationService;
+    }
+
     public function getSectionCompleteDetails(Section $section)
     {
         return $section->load(
@@ -191,5 +201,32 @@ class SectionService
             ->first();
 
         return $assignedCourseId;
+    }
+
+    public function getUsersToNotify($courseId)
+    {
+        $users = User::where(function ($query) use ($courseId) {
+            $query->whereHas('programs.courses', function ($q) use ($courseId) {
+                $q->where('course_id', $courseId);
+            })
+                ->orWhereHas('role', function ($q) {
+                    $q->where('role_name', 'admin');
+                });
+        })
+            ->where('user_id', '!=', request()->user()->user_id)
+            ->pluck('user_id')
+            ->toArray();
+
+        return $users;
+    }
+
+    public function sendSectionNotification(Section $section, Course $course)
+    {
+        $users = $this->getUsersToNotify($course->course_id);
+
+        $title = "New section available";
+        $body = "A new section {$section->section_title} is now available in {$course->course_name}.";
+
+        $this->notificationService->notifyUsers($users, $title, $body);
     }
 }

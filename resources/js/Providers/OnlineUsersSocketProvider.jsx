@@ -16,6 +16,9 @@ export default function OnlineUsersSocketProvider({ children, user }) {
     const addNewNotification = useNotificationStore(
         (state) => state.addNewNotification
     );
+    const setNumOfUnreadNotifications = useNotificationStore(
+        (state) => state.setNumOfUnreadNotifications
+    );
 
     const socketRef = useRef(null);
 
@@ -52,7 +55,7 @@ export default function OnlineUsersSocketProvider({ children, user }) {
         socket.on("notification", (data) => {
             console.log(data);
             addNewNotification(data.notification);
-
+            setNumOfUnreadNotifications(1);
             displayToast(
                 <DefaultCustomToast
                     message={data.notification.notification_title}

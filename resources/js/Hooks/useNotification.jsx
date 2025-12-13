@@ -5,11 +5,16 @@ import useNotificationStore from "../Stores/Notification/notificationStore";
 
 export default function useNotification() {
     const [isLoading, setIsLoading] = useState(false);
+    const [isInitialRender, setIsInitialRender] = useState(true);
 
     // Notification store
     const setNotifications = useNotificationStore(
         (state) => state.setNotifications
     );
+    const setNumOfUnreadNotifications = useNotificationStore(
+        (state) => state.setNumOfUnreadNotifications
+    );
+
     const setIsLoaded = useNotificationStore((state) => state.setIsLoaded);
     const isLoaded = useNotificationStore((state) => state.isLoaded);
     const updateNotifications = useNotificationStore(
@@ -27,6 +32,7 @@ export default function useNotification() {
                 console.log(res.data.notifications);
                 setNotifications(res.data.notifications);
                 setIsLoaded(true);
+                setIsInitialRender(false);
             } catch (error) {
                 console.error(error);
             } finally {
@@ -46,6 +52,7 @@ export default function useNotification() {
             );
 
             updateNotifications(res.data.notification);
+            setNumOfUnreadNotifications(-1);
         } catch (error) {
             console.error(error);
         } finally {
@@ -60,6 +67,7 @@ export default function useNotification() {
 
             // Set the red notifications
             setNotifications(res.data.redNotifications);
+            setNumOfUnreadNotifications(0);
         } catch (error) {
             console.error(error);
         } finally {
@@ -73,6 +81,7 @@ export default function useNotification() {
             await axios.delete(route("clear.all.notifications"));
 
             clearAllNotificatiions();
+            setNumOfUnreadNotifications(0);
         } catch (error) {
             console.error(error);
         } finally {
@@ -80,5 +89,11 @@ export default function useNotification() {
         }
     };
 
-    return { isLoading, readNotification, markAllAsRead, clearAll };
+    return {
+        isLoading,
+        isInitialRender,
+        readNotification,
+        markAllAsRead,
+        clearAll,
+    };
 }

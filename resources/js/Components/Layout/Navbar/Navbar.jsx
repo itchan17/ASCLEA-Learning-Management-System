@@ -22,6 +22,12 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
     const setIsThereNewNotif = useNotificationStore(
         (state) => state.setIsThereNewNotif
     );
+    const numOfUnreadNotifications = useNotificationStore(
+        (state) => state.numOfUnreadNotifications
+    );
+    const setNumOfUnreadNotifications = useNotificationStore(
+        (state) => state.setNumOfUnreadNotifications
+    );
 
     // Set the dropdown to be displayed when clicked
     const openDropdown = (dropdown) => {
@@ -69,6 +75,10 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
         }
 
         document.addEventListener("mousedown", handleClickOutside);
+
+        // Set the count of unread notifications
+        setNumOfUnreadNotifications(auth.user.unread_notifications);
+
         return () =>
             document.removeEventListener("mousedown", handleClickOutside);
     }, []);
@@ -101,12 +111,22 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
                     onClick={() => openDropdown("notif")}
                     className="hover:bg-ascend-lightblue p-3 rounded-[50px] cursor-pointer relative transition-hover duration-300"
                 >
-                    {console.log(isThereNewNotif)}
-                    {isThereNewNotif && (
-                        <div className=" h-[10px] w-[10px] border rounded-xl bg-ascend-blue absolute right-[15px] top-4 border-ascend-white"></div>
+                    {(isThereNewNotif || numOfUnreadNotifications > 0) && (
+                        <div
+                            className={`rounded-full px-[6px] flex justify-center items-center bg-ascend-blue absolute   ${
+                                numOfUnreadNotifications > 9
+                                    ? " right-1"
+                                    : " right-2"
+                            }
+                                 top-3 border-ascend-white text-ascend-white text-size1`}
+                        >
+                            {numOfUnreadNotifications > 9
+                                ? "9+"
+                                : numOfUnreadNotifications}
+                        </div>
                     )}
 
-                    <MdNotifications className="text-size6" />
+                    <MdNotifications className="text-size7" />
                 </div>
 
                 {auth.user.profile_image ? (

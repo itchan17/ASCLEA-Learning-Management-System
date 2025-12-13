@@ -17,7 +17,7 @@ class NotificationService
         $this->notificationRoute = config('app.vite_main_url') . ':' . config('app.vite_socket_io_port') . '/notify';
     }
 
-    public function notifyUser(string $userId, string $title, string $body, string $actionUrl)
+    public function notifyUser(string $userId, string $title, string $body, ?string $actionUrl = null)
     {
         // Creates notification in database
         $newNotification = Notification::create([
@@ -33,7 +33,7 @@ class NotificationService
         ]);
     }
 
-    public function notifyUsers(array $userIds, string $title, string $body, string $actionUrl)
+    public function notifyUsers(array $userIds, string $title, string $body, ?string $actionUrl = null)
     {
         $notifications = [];
 

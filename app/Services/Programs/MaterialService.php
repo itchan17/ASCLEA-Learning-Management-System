@@ -2,8 +2,12 @@
 
 namespace App\Services\Programs;
 
+use App\Models\Course;
+use App\Models\Program;
 use App\Models\Programs\Material;
 use App\Models\Programs\MaterialFile;
+use App\Models\User;
+use App\Services\NotificationService;
 use App\Services\PdfConverter;
 use Carbon\Carbon;
 use Exception;
@@ -15,11 +19,13 @@ class MaterialService
 {
     protected SectionService $sectionService;
     protected SectionItemService $sectionItemService;
+    protected NotificationService $notificationService;
 
-    public function __construct(SectionService $sectionService, SectionItemService $sectionItemService)
+    public function __construct(SectionService $sectionService, SectionItemService $sectionItemService, NotificationService $notificationService)
     {
         $this->sectionService = $sectionService;
         $this->sectionItemService = $sectionItemService;
+        $this->notificationService = $notificationService;
     }
 
     public function saveMaterialFiles(array $materialFiles, Material $material)
@@ -163,5 +169,35 @@ class MaterialService
         $material->restore();
 
         return  $this->getmaterialCompleteDetails($material);
+    }
+
+    public function getUsersToNotify($courseId)
+    {
+        $users = User::where(function ($query) use ($courseId) {
+            $query->whereHas('programs.courses', function ($q) use ($courseId) {
+                $q->where('course_id', $courseId);
+            })
+                ->orWhereHas('role', function ($q) {
+                    $q->where('role_name', 'admin');
+                });
+        })
+            ->where('user_id', '!=', request()->user()->user_id)
+            ->pluck('user_id')
+            ->toArray();
+
+        return $users;
+    }
+
+    public function sendMaterialNotification(Material $material, Course $course, Program $program)
+    {
+        $users = $this->getUsersToNotify($course->course_id);
+
+        $title = "New material available";
+        $body = "A new material {$material->material_title} is now available in {$course->course_name}.";
+
+        $baseUrl = config('app.app_base_url');
+        $actionUrl = "{$baseUrl}/programs/{$program->program_id}/courses/{$course->course_id}/materials/{$material->material_id}";
+
+        $this->notificationService->notifyUsers($users, $title, $body, $actionUrl);
     }
 }

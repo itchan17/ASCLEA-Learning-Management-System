@@ -241,16 +241,18 @@ class AssessmentSubmissionService
     {
         // Find or Create assessment submission when thse user submit the activity
         // In this way we can allow activity submission even the student has no uploaded file
-        $assessmentSubmission = AssessmentSubmission::firstOrCreate([
-            'assessment_id' => $assessmentId,
-            'submitted_by' => $assignedCourseId,
-            'submission_status' => 'not_submitted',
-        ]);
+        $assessmentSubmission = AssessmentSubmission::firstOrCreate(
+            [
+                'assessment_id' => $assessmentId,
+                'submitted_by' => $assignedCourseId,
+            ],
+            ['submission_status' => 'not_submitted']
+        );
 
         if ($assessmentSubmission->submission_status === "not_submitted") {
             // Then we updated the submisison status and set the submitted time
             $assessmentSubmission->update(['submission_status' => 'submitted', 'submitted_at' => Carbon::now()]);
-        } else {
+        } else if ($assessmentSubmission->submission_status === "submitted") {
             // For unsubmititng
             $assessmentSubmission->update(['submission_status' => 'not_submitted', 'submitted_at' => null, 'score' => 0]);
         }

@@ -16,8 +16,13 @@ const NotifDropdown = forwardRef((props, ref) => {
     // Notification store
     const notifications = useNotificationStore((state) => state.notifications);
 
-    const { isLoading, readNotification, markAllAsRead, clearAll } =
-        useNotification();
+    const {
+        isLoading,
+        isInitialRender,
+        readNotification,
+        markAllAsRead,
+        clearAll,
+    } = useNotification();
 
     const handleClickNotif = (notification) => {
         // Close the dropdown
@@ -79,15 +84,16 @@ const NotifDropdown = forwardRef((props, ref) => {
                     </div>
                 </div>
                 <div className="h-full overflow-x-hidden">
-                    {isLoading && notifications.length === 0 && (
-                        <div className="h-full w-full flex  items-center justify-center">
-                            <Loader color="text-ascend-blue" />
-                        </div>
-                    )}
+                    {isLoading &&
+                        (notifications.length === 0 || isInitialRender) && (
+                            <div className="h-full w-full flex  items-center justify-center">
+                                <Loader color="text-ascend-blue" />
+                            </div>
+                        )}
 
                     {/* Animate clearing the notifications */}
                     <AnimatePresence>
-                        {notifications.length > 0 &&
+                        {(!isInitialRender || notifications.length > 0) &&
                             notifications.map((notification) => (
                                 <motion.div
                                     onClick={() =>

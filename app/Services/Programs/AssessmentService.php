@@ -3,10 +3,13 @@
 namespace App\Services\Programs;
 
 use App\Models\Course;
+use App\Models\Program;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\AssessmentFile;
 use App\Models\Programs\AssessmentType;
 use App\Models\Programs\Quiz;
+use App\Models\User;
+use App\Services\NotificationService;
 use App\Services\PdfConverter;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -18,11 +21,13 @@ class AssessmentService
 
     protected SectionService $sectionService;
     protected SectionItemService $sectionItemService;
+    protected NotificationService $notificationService;
 
-    public function __construct(SectionService $sectionService, SectionItemService $sectionItemService)
+    public function __construct(SectionService $sectionService, SectionItemService $sectionItemService, NotificationService $notificationService)
     {
         $this->sectionService = $sectionService;
         $this->sectionItemService = $sectionItemService;
+        $this->notificationService = $notificationService;
     }
 
     public function saveAssessment(array $validatedAssessment, string $courseId)
@@ -227,5 +232,35 @@ class AssessmentService
         $assessment->restore();
 
         return  $this->getAssessmentCompleteDetails($assessment);
+    }
+
+    public function getUsersToNotify($courseId)
+    {
+        $users = User::where(function ($query) use ($courseId) {
+            $query->whereHas('programs.courses', function ($q) use ($courseId) {
+                $q->where('course_id', $courseId);
+            })
+                ->orWhereHas('role', function ($q) {
+                    $q->where('role_name', 'admin');
+                });
+        })
+            ->where('user_id', '!=', request()->user()->user_id)
+            ->pluck('user_id')
+            ->toArray();
+
+        return $users;
+    }
+
+    public function sendAssessmentNotification(Assessment $assessment, Course $course, Program $program)
+    {
+        $users = $this->getUsersToNotify($course->course_id);
+
+        $title = "New assessment available";
+        $body = "A new assessment {$assessment->assessment_title} is now available in {$course->course_name}.";
+
+        $baseUrl = config('app.app_base_url');
+        $actionUrl = "{$baseUrl}/programs/{$program->program_id}/courses/{$course->course_id}/assessments/{$assessment->assessment_id}";
+
+        $this->notificationService->notifyUsers($users, $title, $body, $actionUrl);
     }
 }
