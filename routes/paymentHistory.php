@@ -54,17 +54,17 @@ Route::prefix('payment-history')
     Route::prefix('student-payment-history')
         ->middleware(['auth', 'verified', 'preventBack'])
         ->group(function () {
-            Route::get('/', function() {
-                return redirect()->route('paymenthistory.payment.history', auth()->id());
-            })->name('student.paymenthistory.me');
 
-            Route::get('/payment-info/{paymentId}', [PaymentHistoryController::class, 'viewStudentPaymentInfo'])
+            Route::get('/', [PaymentHistoryController::class, 'myPaymentHistory'])
+                ->name('student.paymenthistory.me');
+
+            Route::get('/payment-info/{paymentId}', [PaymentHistoryController::class, 'viewPaymentInfo'])
                 ->name('student.paymenthistory.paymentInfo.view');
 
-            Route::get('/payment-info/{paymentId}/files/{fileId}', [PaymentHistoryController::class, 'viewStudentPaymentFile'])
+            Route::get('/payment-info/{paymentId}/files/{fileId}', [PaymentHistoryController::class, 'viewPaymentFile'])
                 ->name('student.paymenthistory.payment.file.view');
 
-            Route::get('/payment-info/{paymentId}/files/{fileId}/stream', [PaymentHistoryController::class, 'streamStudentPaymentFile'])
+            Route::get('/payment-info/{paymentId}/files/{fileId}/stream', [PaymentHistoryController::class, 'streamPaymentFile'])
                 ->name('student.paymenthistory.payment.file.stream');
         });
 
