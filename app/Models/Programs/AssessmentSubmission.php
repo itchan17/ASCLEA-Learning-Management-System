@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\CV\DetectedCheating; 
+use App\Models\CV\tabDetect;
 
 
 class AssessmentSubmission extends Model
@@ -39,6 +40,11 @@ class AssessmentSubmission extends Model
     public function detectedCheatings(): HasMany
     {
         return $this->hasMany(DetectedCheating::class, 'assessment_submission_id');
+    }
+    
+    public function tabDetects(): HasMany
+    {
+        return $this->hasMany(tabDetect::class, 'assessment_submission_id');
     }
 
     public function assessment(): BelongsTo

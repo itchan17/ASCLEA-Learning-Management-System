@@ -340,6 +340,7 @@ const filteredFiles = files.filter((file) => {
                 text="Save"
                 isDisabled={isValidatingEdit} 
                 isLoading={isValidatingEdit}
+                loaderColor = "text-ascend-white" 
                 btnColor="bg-ascend-blue"
                 doSomething={handleSave}
               />
