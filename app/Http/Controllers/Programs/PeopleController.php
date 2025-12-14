@@ -10,6 +10,7 @@ use App\Models\Program;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\NotificationService;
+use App\Services\Programs\PeopleService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
@@ -18,106 +19,31 @@ use Inertia\Inertia;
 class PeopleController extends Controller
 {
     protected NotificationService $notificationService;
+    protected PeopleService $peopleService;
 
-    public function __construct(NotificationService $notificationService)
+    public function __construct(NotificationService $notificationService, PeopleService $peopleService)
     {
         $this->notificationService  = $notificationService;
+        $this->peopleService  = $peopleService;
     }
 
-    public function listUsers(Program $program, Request $req)
+    public function listUsers(Program $program, Request $request)
     {
-        $programId = $program->program_id;
-
-        // Inital query without filter or search
-        // Get users that is not an admin and not a member of the program
-        $result = User::with('role')->select('user_id', 'first_name', 'last_name', 'email', 'profile_image', 'role_id')->whereHas('role', function ($query) {
-            $query->where('role_name', '!=', 'admin'); // Filter out admin users
-        })->whereNotNull('email_verified_at')->whereNotIn('user_id', function ($query) use ($programId) {
-            $query->select('user_id')
-                ->from('learning_members')
-                ->where('program_id', $programId)
-                ->whereNull('deleted_at'); // Select users that is not a member of the current program
-        })->where(function ($query) {
-            $query->whereHas('student', function ($q) {
-                $q->whereNotNull('approved_at'); // Filter users that has student relationship and not approved
-            })
-                ->orWhereDoesntHave('student'); // Include users with no student relationship specifically faculty
-        });
-
-        if ($role = $req->input('role')) {
-            $filteredRoleId = Role::where('role_name', $role)->value('role_id'); // Get the filtered role from the request query
-
-            $result->where('role_id', '=', $filteredRoleId); // Filter based on the role
-        }
-        // Searching is after filtering role to ensure that the user that will be search is only based on the role
-        if ($search = $req->input('search')) {
-
-            // Filter based on the search value from 3 columns
-            $result->where(function ($query) use ($search) {
-                $query->whereLike('first_name', "%$search%")
-                    ->orWhereLike('last_name', "%$search%")
-                    ->orWhereLike('email', "%$search%")
-                    ->orwhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]); // Allows searching for both first and last name
-            });
-        }
-
-        // Sort and paginate by 10
-        $users = $result->orderBy('created_at', 'desc')->orderBy('user_id', 'desc')->paginate(10);
+        $users = $this->peopleService->getUsersToList($program, $request);
 
         return response()->json($users);
     }
 
-    public function addMember($programId, Request $req)
+    public function addMember(Program $program, Request $request)
     {
 
-        if ($req->is_select_all) {
-            $users = User::query();
-
-            // Retrieve users that not is a member of the current program and not an admin
-            $users->whereHas('role', function ($q) {
-                $q->where('role_name', '!=', 'admin');
-            })->whereDoesntHave('programs', function ($query) use ($programId) {
-                $query->where('program_id', $programId);
-            });
-
-            if (!empty($req->unselected_users)) {
-                // Rerieve users that are not unselected and not an admin
-                $users->whereHas('role', function ($q) {
-                    $q->where('role_name', '!=', 'admin');
-                })->whereNotIn('user_id', $req->unselected_users);
-            }
-
-            // Select all users similar to the search
-            if ($search = $req->search) {
-                $users->where(function ($query) use ($search) {
-                    $query->whereLike('first_name', "%$search%")
-                        ->orWhereLike('last_name', "%$search%")
-                        ->orWhereLike('email', "%$search%")
-                        ->orwhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$search}%"]); // Allows searching for both first and last name
-                });
-            }
-
-            // Select all users similar to the filter
-            if ($filter = $req->filter) {
-                $users->whereHas('role', function ($query) use ($filter) {
-                    $query->where('role_name', $filter);
-                });
-            }
-
-            $users = $users->pluck('user_id')->toArray();
-        } else {
-            $users = User::whereIn('user_id', $req->selected_users)
-                ->whereDoesntHave('programs', function ($query) use ($programId) { // Filter out users that already member 
-                    $query->where('program_id', $programId);
-                })
-                ->pluck('user_id')->toArray(); // Retrieve users based on the selected IDs
-        }
+        $users = $this->peopleService->getUsersToAdd($program, $request);
 
         $now = Carbon::now();
 
-        $data = array_map(function ($userId) use ($programId, $now) {
+        $data = array_map(function ($userId) use ($program, $now) {
             return   [
-                'program_id' => $programId,
+                'program_id' => $program->program_id,
                 'user_id' => $userId,
                 'learning_member_id' => (string) Str::uuid(),
                 'updated_at' => $now,
@@ -129,6 +55,9 @@ class PeopleController extends Controller
         // Data should not have duplicate in the table before inserting
         // Update deleted_at  is userr was previously added in the program
         LearningMember::upsert($data, uniqueBy: ['program_id', 'user_id'], update: ['deleted_at']);
+
+        // Send notification to added users
+        $this->peopleService->sendAddedProgramNotifcation($users, $program);
 
         $label = count($data) > 1 ? "Users" : "User";
 
@@ -179,10 +108,12 @@ class PeopleController extends Controller
 
     public function listCourses(Program $program, LearningMember $member)
     {
-
-        $courses = $program->courses()->whereDoesntHave('assignedTo',  function ($query) use ($member) {
-            $query->where('learning_member_id', $member->learning_member_id);
-        })->select('course_id', 'course_code', 'course_name', 'course_day', 'start_time', 'end_time')->orderBy('created_at', 'desc')->get();
+        $courses = $program->courses()
+            ->whereDoesntHave('assignedTo',  function ($query) use ($member) {
+                $query->where('learning_member_id', $member->learning_member_id);
+            })
+            ->select('course_id', 'course_code', 'course_name', 'course_day', 'start_time', 'end_time')
+            ->orderBy('created_at', 'desc')->get();
 
         return response()->json($courses);
     }
@@ -217,24 +148,8 @@ class PeopleController extends Controller
             // Update assigned course deleted_at if user was previously added
             AssignedCourse::upsert($data, uniqueBy: ['learning_member_id', 'course_id'], update: ['deleted_at']);
 
-            if (count($courses) === 1) {
-                $course = Course::where('course_id', $courses[0])
-                    ->select('course_name')
-                    ->first();
-
-                $title = "New Course Assigned";
-                $body = "The course \"" . $course->course_name . "\" has been assigned to you.";
-            } else {
-                $title = "New Courses Assigned";
-                $body = count($courses) . " new courses have been assigned to you.";
-            }
-
-            // Creates url where user can navigate the notification
-            $baseUrl = config('app.app_base_url');
-            $actionUrl = "{$baseUrl}/programs/{$program->program_id}/members/{$member->learning_member_id}";
-
-            // Notify the user
-            $this->notificationService->notifyUser($member->user->user_id, $title,  $body, $actionUrl);
+            // Send notifcation
+            $this->peopleService->sendNewCourseNotifcation($courses, $program, $member);
 
             $label = count($data) > 1 ? "Courses" : "Course";
         }
