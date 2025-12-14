@@ -120,7 +120,9 @@ export default function QuizResponsesTable({
                             <th className="text-ascend-black font-black">
                                 Warnings
                             </th>
-                            <th className="text-ascend-black font-black"></th>
+                            <th className="text-ascend-black font-black">
+                                Tab Changes
+                            </th>
                         </tr>
                     </thead>
                     {responses.data.length > 0 && (
@@ -167,7 +169,21 @@ export default function QuizResponsesTable({
                                     >
                                         {response.detected_cheatings.length}
                                     </td>
+                                    <td
+                                        className={
+                                            response.detected_tabChange.length >
+                                            0
+                                                ? "text-ascend-red"
+                                                : "text-ascend-green"
+                                        }
+                                    >
+                                        {
+                                            response.detected_tabChange.length
+                                            
+                                        }
+                                    </td>
                                 </tr>
+
                             ))}
                         </tbody>
                     )}
