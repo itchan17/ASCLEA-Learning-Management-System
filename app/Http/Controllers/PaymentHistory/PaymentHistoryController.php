@@ -13,9 +13,17 @@ use Illuminate\Support\Str;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Validation\Rule;
 use App\Policies\PaymentHistory\PaymentPolicy;
+use App\Services\PaymentHistory\PaymentHistoryService;
 
 class PaymentHistoryController extends Controller
 {
+    protected  PaymentHistoryService $paymentHistoryService;
+
+    public function __construct(PaymentHistoryService $paymentHistoryService)
+    {
+        $this->paymentHistoryService = $paymentHistoryService;
+    }
+
     public function paidStudents(Request $request)
     {
         $user = auth()->user();
@@ -111,7 +119,6 @@ class PaymentHistoryController extends Controller
 
     public function storePayment(Request $request)
     {
-
         $policy = new PaymentPolicy();
         $user = auth()->user();
 
@@ -153,6 +160,9 @@ class PaymentHistoryController extends Controller
                 'uploaded_at'     => now(),
             ]);
         }
+
+        // Send notification
+        $this->paymentHistoryService->sendPaymentHistoryNotification($payment->user_id);
 
         return redirect()->back()->with('success', 'Payment added successfully!');
     }
