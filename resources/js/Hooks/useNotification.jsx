@@ -5,7 +5,6 @@ import useNotificationStore from "../Stores/Notification/notificationStore";
 
 export default function useNotification() {
     const [isLoading, setIsLoading] = useState(false);
-    const [isInitialRender, setIsInitialRender] = useState(true);
 
     // Notification store
     const setNotifications = useNotificationStore(
@@ -13,6 +12,9 @@ export default function useNotification() {
     );
     const setNumOfUnreadNotifications = useNotificationStore(
         (state) => state.setNumOfUnreadNotifications
+    );
+    const setIsInitialRender = useNotificationStore(
+        (state) => state.setIsInitialRender
     );
 
     const setIsLoaded = useNotificationStore((state) => state.setIsLoaded);
@@ -91,7 +93,6 @@ export default function useNotification() {
 
     return {
         isLoading,
-        isInitialRender,
         readNotification,
         markAllAsRead,
         clearAll,

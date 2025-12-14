@@ -1,5 +1,5 @@
 import { forwardRef, useState } from "react";
-import { MdOutlineAssignment, MdOutlineNotifications } from "react-icons/md";
+import { MdOutlineAssignment, MdNotifications } from "react-icons/md";
 import useNotification from "../../../Hooks/useNotification";
 import useNotificationStore from "../../../Stores/Notification/notificationStore";
 import dayjs from "dayjs";
@@ -15,14 +15,12 @@ const NotifDropdown = forwardRef((props, ref) => {
 
     // Notification store
     const notifications = useNotificationStore((state) => state.notifications);
+    const isInitialRender = useNotificationStore(
+        (state) => state.isInitialRender
+    );
 
-    const {
-        isLoading,
-        isInitialRender,
-        readNotification,
-        markAllAsRead,
-        clearAll,
-    } = useNotification();
+    const { isLoading, readNotification, markAllAsRead, clearAll } =
+        useNotification();
 
     const handleClickNotif = (notification) => {
         // Close the dropdown
@@ -46,6 +44,7 @@ const NotifDropdown = forwardRef((props, ref) => {
                 <div className="px-5 pt-3 pb-2 space-y-2">
                     <h1 className="font-bold text-size4">Notifications</h1>
                     <div className="flex flex-wrap text-right">
+                        {console.log(notifications)}
                         <button
                             disabled={
                                 isLoading ||
@@ -84,12 +83,12 @@ const NotifDropdown = forwardRef((props, ref) => {
                     </div>
                 </div>
                 <div className="h-full overflow-x-hidden">
-                    {isLoading &&
-                        (notifications.length === 0 || isInitialRender) && (
-                            <div className="h-full w-full flex  items-center justify-center">
-                                <Loader color="text-ascend-blue" />
-                            </div>
-                        )}
+                    {console.log(isInitialRender)}
+                    {isLoading && isInitialRender && (
+                        <div className="h-full w-full flex  items-center justify-center">
+                            <Loader color="text-ascend-blue" />
+                        </div>
+                    )}
 
                     {/* Animate clearing the notifications */}
                     <AnimatePresence>
@@ -107,8 +106,8 @@ const NotifDropdown = forwardRef((props, ref) => {
                                         notification.read_at ? "" : "font-bold"
                                     } hover:bg-ascend-lightblue transition-all duration-300 pl-5 pr-3 flex items-start cursor-pointer space-x-5 py-2`}
                                 >
-                                    <div className="p-4 mt-2 bg-ascend-lightblue rounded-[50px]">
-                                        <MdOutlineNotifications className="text-size6 text-ascend-blue" />
+                                    <div className="p-4 mt-2 bg-ascend-lightyellow rounded-[50px]">
+                                        <MdNotifications className="text-size6 text-ascend-yellow" />
                                     </div>
                                     <div className="h-full py-2 flex flex-col justify-between">
                                         <p className="">

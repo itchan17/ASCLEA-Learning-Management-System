@@ -25,6 +25,7 @@ class NotificationService
             'notification_title' => $title,
             'notification_body' => $body,
             'action_url' => $actionUrl,
+            'read_at' => null,
         ]);
 
         // Send notification in the socket server

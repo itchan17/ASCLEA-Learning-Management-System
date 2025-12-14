@@ -5,6 +5,7 @@ const useNotificationStore = create((set) => ({
     isThereNewNotif: false,
     isLoaded: false,
     numOfUnreadNotifications: 0,
+    isInitialRender: true,
 
     setNotifications: (notifications) => {
         set({
@@ -59,6 +60,8 @@ const useNotificationStore = create((set) => ({
                 count === 0 ? 0 : state.numOfUnreadNotifications + count,
         }));
     },
+
+    setIsInitialRender: (val) => set({ isInitialRender: val }),
 }));
 
 export default useNotificationStore;

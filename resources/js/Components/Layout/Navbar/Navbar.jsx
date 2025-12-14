@@ -109,7 +109,7 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
                 <div
                     ref={notifRef}
                     onClick={() => openDropdown("notif")}
-                    className="hover:bg-ascend-lightblue p-3 rounded-[50px] cursor-pointer relative transition-hover duration-300"
+                    className="group hover:bg-ascend-lightblue p-3 rounded-[50px] cursor-pointer relative transition-hover duration-300"
                 >
                     {(isThereNewNotif || numOfUnreadNotifications > 0) && (
                         <div
@@ -126,7 +126,7 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
                         </div>
                     )}
 
-                    <MdNotifications className="text-size7" />
+                    <MdNotifications className="text-size7 group-hover:text-ascend-blue" />
                 </div>
 
                 {auth.user.profile_image ? (

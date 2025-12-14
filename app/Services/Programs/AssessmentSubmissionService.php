@@ -2,10 +2,13 @@
 
 namespace App\Services\Programs;
 
+use App\Models\Course;
 use App\Models\Programs\ActivityFile;
+use App\Models\Programs\Assessment;
 use App\Models\Programs\AssessmentSubmission;
 use App\Models\Programs\Quiz;
 use App\Models\User;
+use App\Services\NotificationService;
 use App\Services\PdfConverter;
 use Carbon\Carbon;
 use Exception;
@@ -16,6 +19,12 @@ use Illuminate\Support\Facades\Storage;
 
 class AssessmentSubmissionService
 {
+    protected NotificationService $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
 
     public function getAssignedCourseId(User $user, string $courseId,)
     {
@@ -262,7 +271,9 @@ class AssessmentSubmissionService
         bool $selectAll,
         array $selectedSubmittedActivities,
         array $unselectedSubmittedActivities,
-        string $assessmentId
+        string $assessmentId,
+        Course $course,
+        Assessment $assessment
     ) {
         $assessmentSubmissions = AssessmentSubmission::where('assessment_id', $assessmentId)
             ->where('submission_status', '!=', 'not_submitted');
@@ -280,5 +291,25 @@ class AssessmentSubmissionService
         $assessmentSubmissions->update([
             'submission_status' => 'returned',
         ]);
+
+        // Get the user ids of students with returned activity grade
+        $userIds = $assessmentSubmissions->get()->pluck('submittedBy.member.user.user_id')->toArray();
+
+        // Send notifcation
+        $this->sendActivityGradeNotification($course,  $assessment, $userIds);
+    }
+
+    public function sendActivityGradeNotification(Course $course, Assessment $assessment, array $userIds)
+    {
+        // Send notification
+        $title = "Activity Graded";
+        $body = "The activity {$assessment->assessment_title} has been graded. Check your results now.";
+
+        // Creates url where user can navigate the notification
+        $baseUrl = config('app.app_base_url');
+        $actionUrl = "{$baseUrl}/programs/{$course->program->program_id}/courses/{$course->course_id}/assessments/{$assessment->assessment_id}";
+
+        // Notify the user
+        $this->notificationService->notifyUsers($userIds, $title,  $body, $actionUrl);
     }
 }
