@@ -53,6 +53,7 @@ class AssessmentSubmissionService
     // This create the initial data of the assessment submission when the user start answering the quiz
     public function createQuizAssessmentSubmission(string $assignedCourseId, string $assessmentId, Quiz $quiz)
     {
+
         $endAt = null;
 
         // Check if quiz has a timer then set the end time
@@ -64,11 +65,20 @@ class AssessmentSubmissionService
             $endAt = Carbon::now()->addMinutes($quiz->duration + 1);
         }
 
+        $questionIds = $quiz->questions()->pluck('question_id');
+        // Check if randomize qquestion is enabled
+        if ($quiz->randomize) {
+            // Get the questions idd and shuffle it
+            // This will be used to fetcch the quesstions in  random order
+            $questionIds = $questionIds->shuffle();
+        }
+
         $assessmentSubmission =  AssessmentSubmission::create(
             [
                 'assessment_id' => $assessmentId,
                 'submitted_by' => $assignedCourseId,
-                'end_at' => $endAt
+                'end_at' => $endAt,
+                'question_order' => $questionIds->values()
             ]
         );
 

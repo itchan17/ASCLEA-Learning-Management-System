@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\CV\DetectedCheating; 
+use App\Models\CV\DetectedCheating;
 
 
 class AssessmentSubmission extends Model
@@ -29,6 +29,11 @@ class AssessmentSubmission extends Model
         'end_at',
         'score',
         'feedback',
+        'question_order',
+    ];
+
+    protected $casts = [
+        'question_order' => 'array',
     ];
 
     public function quizAnswers(): HasMany
