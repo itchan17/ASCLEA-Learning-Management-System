@@ -3,6 +3,7 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 import { Bar } from "react-chartjs-2";
 import { MdArrowUpward } from "react-icons/md";
 import ViewEvidence from "./ViewEvidence";
+import ViewTabEvidence from "./ViewTabEvidence";
 import { calcPercentage } from "../../../../../../../../../Utils/calcPercentage";
 import { convertDurationMinutes } from "../../../../../../../../../Utils/convertDurationMinutes";
 import { cleanDecimal } from "../../../../../../../../../Utils/cleanDecimal";
@@ -16,6 +17,7 @@ export default function StudentQuizDetails({
     warningsCount,
 }) {
     const [isEvidenceOpen, setIsEvidenceOpen] = useState(false);
+    const [tabSwitchEvidenceOpen, setTabSwitchEvidenceOpen] = useState(false);
     const [improvementRateDetails, setImprovementRateDetails] = useState({
         label: [],
         data: [],
@@ -54,6 +56,7 @@ export default function StudentQuizDetails({
     }, [assessmentSubmission]);
 
     const [warningCount, setWarningCount] = useState(0);
+    const [tabSwitchCount, setTabSwitchCount] = useState(0);
 
     useEffect(() => {
         const fetchWarnings = async () => {
@@ -70,7 +73,22 @@ export default function StudentQuizDetails({
             }
         };
 
+        const fetchTabSwitches = async () => {
+            try {
+                const res = await fetch(
+                    `/tab-switching/${assessmentSubmission.assessment_submission_id}`
+                );
+                if (!res.ok) throw new Error("Failed to fetch tab switches");
+
+                const data = await res.json();
+                setTabSwitchCount(data.tab_detects?.length || 0);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
         fetchWarnings();
+        fetchTabSwitches();
     }, [assessmentSubmission.assessment_submission_id]);
 
     return (
@@ -151,6 +169,25 @@ export default function StudentQuizDetails({
                                 </span>
                             </div>
                         </div>
+
+                        <div>
+                            <h1 className="text-size4 font-bold text-ascend-gray3">
+                                Tab Switches
+                                <span
+                                    onClick={() =>
+                                        setTabSwitchEvidenceOpen(!tabSwitchEvidenceOpen)
+                                    }
+                                    className="ml-2 text-ascend-black text-size1 cursor-pointer hover:text-ascend-blue transition-all duration-300 text-nowrap hover:underline"
+                                >
+                                    See details
+                                </span>
+                            </h1>
+                            <div className="flex items-center gap-1">
+                                <span className="text-size7 font-semibold">
+                                    {tabSwitchCount}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div className="sm:col-span-2 space-y-5">
@@ -223,6 +260,17 @@ export default function StudentQuizDetails({
                     studentData={studentData}
                 />
             )}
+
+            {tabSwitchEvidenceOpen && (
+                <ViewTabEvidence
+                    setIsEvidenceOpen={setTabSwitchEvidenceOpen}
+                    assessmentSubmissionId={
+                        assessmentSubmission.assessment_submission_id
+                    }
+                    studentData={studentData}
+                />
+            )}
+            
         </div>
     );
 }

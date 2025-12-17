@@ -57,3 +57,11 @@ Route::post('/detected-cheatings', [DetectedCheatingController::class, 'store'])
 Route::get('/detected-cheatings/{assessment_submission_id}', [DetectedCheatingController::class, 'fetchBySubmission'])
     ->name('detected-cheatings.fetch')
     ->middleware(['auth', 'verified']);
+
+Route::post('/tab-switching', [DetectedCheatingController::class, 'storeTabDetect'])
+    ->name('tab-switching.store')
+    ->middleware(['auth', 'verified']);
+
+Route::get('/tab-switching/{assessment_submission_id}', [DetectedCheatingController::class, 'fetchTabDetectBySubmission'])
+    ->name('tab-switching.fetch')
+    ->middleware(['auth', 'verified']);
