@@ -285,6 +285,6 @@ class AssessmentController extends Controller
     {
         $this->assessmentResponseService->deleteAssessmentSubmissions($assessment);
 
-        return response()->json(['success' => "Assessment reset sucessfully."]);
+        return back()->with('success', "Assessment reset sucessfully.");
     }
 }
