@@ -118,26 +118,19 @@ class AssessmentService
         // also get soft deleted assessment but with conditon
         // that it only displays assessment deleted by the user
         $assessmentList = Assessment::where('course_id', $courseId)
-            ->with('assessmentType')
-            ->with(['author' => function ($query) {
-                $query->select('user_id', 'first_name', 'last_name');
-            }])
-            ->where(function ($query) use ($user) {
-                $query->where('created_by', $user->user_id)
-                    ->orWhere('status', 'published');
-            })
-            ->with(['quiz' => function ($query) {
-                $query->select('assessment_id', 'quiz_id', 'quiz_title');
-            }])
-            ->with(['files' => function ($query) {
-                $query->select('assessment_id', 'assessment_file_id', 'file_name', 'file_path');
-            }])
+            ->with([
+                'assessmentType',
+                'author:user_id,first_name,last_name',
+                'quiz:assessment_id,quiz_id,quiz_title',
+                'files:assessment_id,assessment_file_id,file_name,file_path'
+            ])
             ->withTrashed()
-            ->where(function ($query) use ($user) {
-                $query->whereNull('deleted_at')
-                    ->orWhere('created_by', $user->user_id);
+            ->when($user->role->role_name === 'student', function ($q) {
+                $q->where('status', 'published')
+                    ->whereNull('deleted_at');
             })
             ->whereDoesntHave('sectionItem') // Only gets assessments not created in section
+            ->whereNull('permanently_deleted_at')
             ->select(
                 'assessment_id',
                 'assessment_type_id',
@@ -211,7 +204,6 @@ class AssessmentService
 
     public function archiveAssessment(Assessment $assessment)
     {
-
         $assessment->delete(); // Soft delete the assessment
 
         if (!is_null($assessment->sectionItem)) {

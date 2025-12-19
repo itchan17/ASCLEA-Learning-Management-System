@@ -37,25 +37,33 @@ class PermanentlyDeleteAssessments extends Command
 
             foreach ($archivedAssessments as $assessment) {
 
-                // If assessment has files we have to delete it 
-                if ($assessment->files->isNotEmpty()) {
+                // Permanently delete the assessment
+                // Check if the assessment has subbmission or a progress in the section
+                // We will just update the permanently_deleted_at
+                // If not force delete it since it has no  important datta
+                if ($assessment->assessmentSubmissions->count() > 0 || !is_null($assessment?->sectionItem?->studentProgress)) {
+                    $assessment->permanently_deleted_at = now();
+                    $assessment->save();
+                } else {
+                    // If assessment has files we have to delete it 
+                    if ($assessment->files->isNotEmpty()) {
 
-                    // The method that will delete needs an array of ID
-                    // We need to store the ID of the the file
-                    $files = [];
+                        // The method that will delete needs an array of ID
+                        // We need to store the ID of the the file
+                        $files = [];
 
-                    foreach ($assessment->files as $index => $file) {
+                        foreach ($assessment->files as $index => $file) {
 
-                        $files[$index] = $file->assessment_file_id;
+                            $files[$index] = $file->assessment_file_id;
+                        }
+
+                        // This is the method that will delete the files
+                        // We will pass ehre the files array that contains file id
+                        $this->assessmentService->removeAssessmentFiiles($files);
                     }
 
-                    // This is the method that will delete the files
-                    // We will pass ehre the files array that contains file id
-                    $this->assessmentService->removeAssessmentFiiles($files);
+                    $assessment->forceDelete();
                 }
-
-                // Permemanently deleting the assessment
-                $assessment->forceDelete();
             }
         }
 
