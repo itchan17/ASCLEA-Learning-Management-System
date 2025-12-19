@@ -48,7 +48,7 @@ Route::prefix('admission')
             ->name('student.restore');
 
         // Force delete student and user data
-        Route::delete('/students/{student}/force-delete', [AdmissionFileController::class, 'forceDeleteStudent'])
+        Route::delete('/students/{student}/permanent-delete', [AdmissionFileController::class, 'permanentlyDeleteStudent'])
             ->name('student.force.delete');
 
         // Update Student Profile Photo

@@ -133,7 +133,10 @@ export default function ArchivedCourseCard({ courseData }) {
                     <div>
                         <span className="text-size1 font-bold">
                             Permanently deletes in{" "}
-                            {getRemainingDays(courseData.deleted_at, 30)}d
+                            {getRemainingDays(courseData.deleted_at, 30) < 0
+                                ? 0
+                                : getRemainingDays(courseData.deleted_at, 30)}
+                            d
                         </span>
                     </div>
                 </div>

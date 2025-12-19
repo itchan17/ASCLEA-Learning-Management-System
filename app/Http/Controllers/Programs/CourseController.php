@@ -104,22 +104,12 @@ class CourseController extends Controller
         return redirect()->back()->with('success', 'Course restored successfully.');
     }
 
-    public function forceDeleteCourse($programId, $courseId)
+    public function permanentlyDeleteCourse($programId, $courseId)
     {
         $course = Course::withTrashed()->findOrFail($courseId);
-        $program = Program::withTrashed()->findOrFail($programId);
 
-        // Get the number of archived courses of the program
-        $numOfDeletedCourses = $program->courses()->onlyTrashed()->count();
-
-        // Check if program was archived
-        // If the number of archived courses is only 1, this mean the course to be deleted
-        // is the last in the archived program so the program has to be deleted
-        if (!is_null($program->deleted_at) && $numOfDeletedCourses ===  1) {
-            $program->forceDelete();
-        } else {
-            $course->forceDelete();
-        }
+        $course->permanently_deleted_at = now();
+        $course->save();
 
         return redirect()->back()->with('success', 'Course was deleted permanently.');
     }

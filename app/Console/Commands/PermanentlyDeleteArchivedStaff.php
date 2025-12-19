@@ -20,7 +20,7 @@ class PermanentlyDeleteArchivedStaff extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Delete archived staff that is over 30 days treshold';
 
     /**
      * Execute the console command.
@@ -39,8 +39,8 @@ class PermanentlyDeleteArchivedStaff extends Command
             foreach ($archivedStaff as $staff) {
 
                 // Permanently deleting the staff and user data
-                $staff->user->forceDelete();
-                $staff->forceDelete();
+                $staff->permanently_deleted_at = now();
+                $staff->save();
             }
         }
 
