@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\CV\DetectedCheating;
 use App\Models\CV\tabDetect;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AssessmentSubmission extends Model
 {
-    use HasUuids;
+    use HasUuids, SoftDeletes;
 
     public $incrementing = false;
 

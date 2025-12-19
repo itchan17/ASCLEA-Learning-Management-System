@@ -134,4 +134,14 @@ class AssessmentPolicy
 
         return $isAuthorized;
     }
+
+    public function  resetAssessment(User $user, Assessment $assessment): bool
+    {
+        $isAdmin = $user->role->role_name == "admin";
+        $isAuthor = $assessment->created_by === $user->user_id;
+
+        $isAuthorized = $isAdmin || $isAuthor;
+
+        return $isAuthorized;
+    }
 }
