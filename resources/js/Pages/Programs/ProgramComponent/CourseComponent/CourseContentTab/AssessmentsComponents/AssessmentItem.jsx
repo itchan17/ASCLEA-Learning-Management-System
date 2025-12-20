@@ -158,7 +158,7 @@ export default function AssessmentItem({
                                 </span>
                             </div>
                         ) : (
-                            auth.user.role_name != "student" && (
+                            auth.user.role_name !== "student" && (
                                 <div
                                     className={`px-2 ${
                                         assessmentDetails.status === "published"

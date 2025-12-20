@@ -70,19 +70,21 @@ function MaterialItem({ materialDetails, setIsMaterialFormOpen }) {
                                 </span>
                             </div>
                         ) : (
-                            <div
-                                className={`px-2 ${
-                                    materialDetails.status === "published"
-                                        ? "px-2 bg-ascend-green"
-                                        : "px-2 bg-ascend-yellow"
-                                }`}
-                            >
-                                <span className="text-size1 font-bold text-ascend-white">
-                                    {materialDetails.status === "published"
-                                        ? "Published"
-                                        : "Draft"}
-                                </span>
-                            </div>
+                            auth.user.role_name !== "student" && (
+                                <div
+                                    className={`px-2 ${
+                                        materialDetails.status === "published"
+                                            ? "px-2 bg-ascend-green"
+                                            : "px-2 bg-ascend-yellow"
+                                    }`}
+                                >
+                                    <span className="text-size1 font-bold text-ascend-white">
+                                        {materialDetails.status === "published"
+                                            ? "Published"
+                                            : "Draft"}
+                                    </span>
+                                </div>
+                            )
                         )}
                     </div>
 

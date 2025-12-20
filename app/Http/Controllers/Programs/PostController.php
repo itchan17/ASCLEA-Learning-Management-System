@@ -38,7 +38,7 @@ class PostController extends Controller
 
     public function getPosts(Request $request, Program $program, Course $course)
     {
-        $postList = $this->postService->listPosts($course->course_id, $request->user()->user_id);
+        $postList = $this->postService->listPosts($course->course_id, $request->user());
 
         return response()->json($postList);
     }
