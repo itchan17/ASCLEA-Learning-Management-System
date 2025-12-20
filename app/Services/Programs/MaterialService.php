@@ -13,6 +13,15 @@ use Illuminate\Support\Facades\Storage;
 
 class MaterialService
 {
+    protected SectionService $sectionService;
+    protected SectionItemService $sectionItemService;
+
+    public function __construct(SectionService $sectionService, SectionItemService $sectionItemService)
+    {
+        $this->sectionService = $sectionService;
+        $this->sectionItemService = $sectionItemService;
+    }
+
     public function saveMaterialFiles(array $materialFiles, Material $material)
     {
         $uploadedFiles = [];
@@ -134,9 +143,15 @@ class MaterialService
 
     public function archiveMaterial(Material $material)
     {
-        $material->delete(); // Soft delete the material
 
-        return  $this->getmaterialCompleteDetails($material);
+        $material->delete(); // Soft delete the material 
+        if (!is_null($material->sectionItem)) {
+            $material->sectionItem->delete();
+            $this->sectionItemService->decrementSectionItems($material->sectionItem);
+            return $this->sectionService->getSectionCompleteDetails($material->sectionItem->section);
+        } else {
+            return  $this->getmaterialCompleteDetails($material);
+        }
     }
 
     public function restoreMaterial(string $materialId)

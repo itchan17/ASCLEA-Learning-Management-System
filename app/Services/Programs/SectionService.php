@@ -5,6 +5,7 @@ namespace App\Services\Programs;
 use App\Models\Programs\Assessment;
 use App\Models\Programs\Material;
 use App\Models\Programs\Section;
+use App\Models\Programs\SectionItem;
 use App\Models\User;
 
 class SectionService
