@@ -65,28 +65,30 @@ export default function SectionContent({
     };
 
     const handleSectionContentClick = () => {
-        if (itemDetails.item_type === "App\\Models\\Programs\\Material") {
-            router.visit(
-                route("material.view", {
-                    program: program.program_id,
-                    course: course.course_id,
-                    material: itemDetails.item.material_id,
-                }),
-                {
-                    preserveScroll: false,
-                }
-            );
-        } else {
-            router.visit(
-                route("program.course.assessment.view", {
-                    program: program.program_id,
-                    course: course.course_id,
-                    assessment: itemDetails.item.assessment_id,
-                }),
-                {
-                    preserveScroll: false,
-                }
-            );
+        if (!sectionDetails.deleted_at) {
+            if (itemDetails.item_type === "App\\Models\\Programs\\Material") {
+                router.visit(
+                    route("material.view", {
+                        program: program.program_id,
+                        course: course.course_id,
+                        material: itemDetails.item.material_id,
+                    }),
+                    {
+                        preserveScroll: false,
+                    }
+                );
+            } else {
+                router.visit(
+                    route("program.course.assessment.view", {
+                        program: program.program_id,
+                        course: course.course_id,
+                        assessment: itemDetails.item.assessment_id,
+                    }),
+                    {
+                        preserveScroll: false,
+                    }
+                );
+            }
         }
     };
 
@@ -142,9 +144,9 @@ export default function SectionContent({
                         </div>
                     )}
                     <div
-                        className={`flex items-center gap-2 md:gap-20 justify-between pr-5 pl-5 pb-5 cursor-pointer ${
-                            disabled ? "pt-5" : null
-                        } text-ascend-black`}
+                        className={`flex items-center gap-2 md:gap-20 justify-between pr-5 pl-5 pb-5 ${
+                            sectionDetails.deleted_at ? "" : "cursor-pointer"
+                        } ${disabled ? "pt-5" : null} text-ascend-black`}
                     >
                         <div className="flex items-center space-x-5">
                             <RoleGuard allowedRoles={["student"]}>

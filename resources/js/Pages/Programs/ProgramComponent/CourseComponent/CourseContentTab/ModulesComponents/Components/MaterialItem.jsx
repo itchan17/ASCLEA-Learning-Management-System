@@ -70,26 +70,24 @@ function MaterialItem({ materialDetails, setIsMaterialFormOpen }) {
                                 </span>
                             </div>
                         ) : (
-                            materialDetails.author.user_id ===
-                                auth.user.user_id && (
-                                <div
-                                    className={`px-2 ${
-                                        materialDetails.status === "published"
-                                            ? "px-2 bg-ascend-green"
-                                            : "px-2 bg-ascend-yellow"
-                                    }`}
-                                >
-                                    <span className="text-size1 font-bold text-ascend-white">
-                                        {materialDetails.status === "published"
-                                            ? "Published"
-                                            : "Draft"}
-                                    </span>
-                                </div>
-                            )
+                            <div
+                                className={`px-2 ${
+                                    materialDetails.status === "published"
+                                        ? "px-2 bg-ascend-green"
+                                        : "px-2 bg-ascend-yellow"
+                                }`}
+                            >
+                                <span className="text-size1 font-bold text-ascend-white">
+                                    {materialDetails.status === "published"
+                                        ? "Published"
+                                        : "Draft"}
+                                </span>
+                            </div>
                         )}
                     </div>
 
-                    {auth.user.user_id === materialDetails.created_by && (
+                    {(auth.user.user_id === materialDetails.created_by ||
+                        auth.user.role_name === "admin") && (
                         <RoleGuard allowedRoles={["admin", "faculty"]}>
                             <div className="h-8 flex items-center">
                                 <div

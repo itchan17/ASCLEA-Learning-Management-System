@@ -31,7 +31,10 @@ class PermanentlyDeleteArchivedStudents extends Command
         $threshholdDate = Carbon::now()->subDays(30);
 
         // Get the all the students passed the grace period
-        $archivedStudents = Student::onlyTrashed()->where("deleted_at", "<",  $threshholdDate)->get();
+        $archivedStudents = Student::onlyTrashed()
+            ->where("deleted_at", "<",  $threshholdDate)
+            ->whereNull('permanently_deleted_at')
+            ->get();
 
         // Check first if its not empty
         if ($archivedStudents->isNotEmpty()) {

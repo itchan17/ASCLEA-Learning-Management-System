@@ -29,7 +29,7 @@ class SectionItem extends Model
 
     public function item(): MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo()->withTrashed();
     }
 
     public function section(): BelongsTo

@@ -30,7 +30,11 @@ class PermanentlyDeleteAssessments extends Command
         $threshholdDate = Carbon::now()->subDays(30);
 
         // Get the all the assessments passed the grace period
-        $archivedAssessments = Assessment::onlyTrashed()->where("deleted_at", "<",  $threshholdDate)->with('files')->get();
+        $archivedAssessments = Assessment::onlyTrashed()
+            ->where("deleted_at", "<",  $threshholdDate)
+            ->whereNull('permanently_deleted_at')
+            ->with('files')
+            ->get();
 
         // Check first if its not empty
         if ($archivedAssessments->isNotEmpty()) {

@@ -31,32 +31,43 @@ class PermanentlyDeleteMaterials extends Command
         $threshholdDate = Carbon::now()->subDays(30);
 
         // Get the all the assessments passed the grace period
-        $archivedMaterials = Material::onlyTrashed()->where("deleted_at", "<",  $threshholdDate)->with('materialFiles')->get();
+        $archivedMaterials = Material::onlyTrashed()
+            ->where("deleted_at", "<",  $threshholdDate)
+            ->with('materialFiles')
+            ->whereNull('permanently_deleted_at')
+            ->get();
 
         // Check first if its not empty
         if ($archivedMaterials->isNotEmpty()) {
 
             foreach ($archivedMaterials as $material) {
 
-                // If material has files we have to delete it 
-                if ($material->materialFiles->isNotEmpty()) {
+                // Check if material is part of a section and has a student progress data
+                if (!is_null($material?->sectionItem?->studentProgress)) {
 
-                    // The method that will delete needs an array of ID
-                    // We need to store the ID of the the file
-                    $files = [];
+                    $material->permanently_deleted_at = now();
+                    $material->save();
+                } else {
+                    // If material has files we have to delete it 
+                    if ($material->materialFiles->isNotEmpty()) {
 
-                    foreach ($material->materialFiles as $index => $file) {
+                        // The method that will delete needs an array of ID
+                        // We need to store the ID of the the file
+                        $files = [];
 
-                        $files[$index] = $file->material_file_id;
+                        foreach ($material->materialFiles as $index => $file) {
+
+                            $files[$index] = $file->material_file_id;
+                        }
+
+                        // This is the method that will delete the files
+                        // We will pass ehre the files array that contains file id
+                        $this->materialService->removeMaterialFiles($files);
                     }
 
-                    // This is the method that will delete the files
-                    // We will pass ehre the files array that contains file id
-                    $this->materialService->removeMaterialFiles($files);
+                    // Permemanently deleting the assessment
+                    $material->forceDelete();
                 }
-
-                // Permemanently deleting the assessment
-                $material->forceDelete();
             }
         }
 

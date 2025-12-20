@@ -31,7 +31,10 @@ class PermanentlyDeleteArchivedStaff extends Command
         $threshholdDate = Carbon::now()->subDays(30);
 
         // Get the all the staff past the grace period
-        $archivedStaff = Staff::onlyTrashed()->where("deleted_at", "<",  $threshholdDate)->get();
+        $archivedStaff = Staff::onlyTrashed()
+            ->where("deleted_at", "<",  $threshholdDate)
+            ->whereNull('permanently_deleted_at')
+            ->get();
 
         // Check first if its not empty
         if ($archivedStaff->isNotEmpty()) {
