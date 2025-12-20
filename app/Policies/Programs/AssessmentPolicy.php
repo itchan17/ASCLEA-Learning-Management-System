@@ -2,6 +2,7 @@
 
 namespace App\Policies\Programs;
 
+use App\Models\Course;
 use App\Models\programs\Assessment;
 use App\Models\User;
 
@@ -36,13 +37,20 @@ class AssessmentPolicy
         return $isAuthorized;
     }
 
-    public function createAssessment(User $user, string $courseId): bool
+    public function createAssessment(User $user, Course $course): bool
     {
+
         // Check if user is an admin
         // If not check whether the user is faculty and the course was assigned
-        return $user->role->role_name === 'admin' || ($user->role->role_name === 'faculty' && $user->programs()->whereHas('courses', function ($query) use ($courseId) {
-            $query->where('course_id', $courseId);
-        })->exists());
+        $isAdmin = $user->role->role_name == "admin";
+        $isFaculty = $user->role->role_name === 'faculty';
+        $isCourseAssigned = $user->programs()->whereHas('courses', function ($query) use ($course) {
+            $query->where('course_id', $course->course_id);
+        })->exists();
+
+        $isAuthorized = $isAdmin  || ($isFaculty && $isCourseAssigned);
+
+        return  $isAuthorized;
     }
 
     public function updateAssessment(User $user, Assessment $assessment): bool
