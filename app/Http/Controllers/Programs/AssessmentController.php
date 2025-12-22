@@ -54,7 +54,7 @@ class AssessmentController extends Controller
             $sectionItem = $this->sectionItemService->createSectionItem($validatedAssessment['section_id'], $assessment->assessment_id, Assessment::class);
 
             // Return the section item with material details
-            return response()->json(['success' => "Material added in section successfully.", 'data' => $sectionItem]);
+            return response()->json(['success' => "Assessment added in section successfully.", 'data' => $sectionItem]);
         } else {
 
             $assessmentCompleteDetails = $this->assessmentService->getAssessmentCompleteDetails($assessment);
@@ -117,7 +117,7 @@ class AssessmentController extends Controller
     {
         $archivedAssessment = $this->assessmentService->archiveAssessment($assessment);
 
-        return response()->json(["success" => "Assessment archived successfully.", "archivedAssessment" => $archivedAssessment]);
+        return response()->json(["success" => "Assessment " .  ($assessment->sectionItem ? "deleted" : "archived") .  " successfully.", "data" => $archivedAssessment]);
     }
 
     public function restoreAssessment($program, $course,  $assessment)
