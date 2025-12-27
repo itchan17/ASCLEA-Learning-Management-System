@@ -349,12 +349,12 @@ class StaffController extends Controller
         return redirect()->back()->with('success', 'Staff restored successfully.');
     }
 
-    public function forceDeleteStaff($staffId)
+    public function permanentlyDeleteStaff($staffId)
     {
         $staff = Staff::withTrashed()->findOrFail($staffId);
 
-        $staff->forceDelete();
-        $staff->user->forceDelete();
+        $staff->permanently_deleted_at = now();
+        $staff->save();
 
         return redirect()->back()->with('success', 'Staff deleted permanently.');
     }

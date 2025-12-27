@@ -66,7 +66,7 @@ class MaterialController extends Controller
 
     public function getMaterials(Request $request, Program $program, Course $course)
     {
-        $materialList = $this->materialService->getMaterialList($request->user()->user_id, $course->course_id);
+        $materialList = $this->materialService->getMaterialList($request->user(), $course->course_id);
 
         return response()->json($materialList);
     }

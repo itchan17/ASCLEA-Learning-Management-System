@@ -19,15 +19,30 @@ class PermanentlyDeleteSections extends Command
         $threshholdDate = Carbon::now()->subDays(30);
 
         // Get the all the sections passed the grace period
-        $archivedSections = Section::onlyTrashed()->where("deleted_at", "<",  $threshholdDate)->get();
+        $archivedSections = Section::onlyTrashed()
+            ->where("deleted_at", "<",  $threshholdDate)
+            ->whereNull('permanently_deleted_at')
+            ->get();
 
         // Check first if its not empty
         if ($archivedSections->isNotEmpty()) {
 
             foreach ($archivedSections as $section) {
 
-                // Permemanently deleting the section
-                $section->forceDelete();
+                $hasProgress = $section->items()
+                    ->withTrashed()
+                    ->whereHas('studentProgress')
+                    ->exists();
+
+                // If section has items wwith student progress we will only update it as permanently deleted
+                //  Else force delete it since it has no student data
+                if ($hasProgress) {
+                    $section->permanently_deleted_at = now();
+                    $section->save();
+                } else {
+                    // Permanently deleting the section
+                    $section->forceDelete();
+                }
             }
         }
 

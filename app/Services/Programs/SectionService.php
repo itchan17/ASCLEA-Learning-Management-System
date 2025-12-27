@@ -80,17 +80,12 @@ class SectionService
                     $query->where('assigned_course_id', $assignedCourseId);
                 },
             ])
-            ->where(function ($query) use ($user) {
-                // Display section added by the user or section that was publsiehd
-                $query->where('created_by', $user->user_id)
-                    ->orWhere('status', 'published');
-            })
             ->withTrashed()
-            ->where(function ($query) use ($user) {
-                // Display not deleted sections or if deleted the user  must be the owmner
-                $query->whereNull('deleted_at')
-                    ->orWhere('created_by', $user->user_id);
+            ->when(in_array($user->role->role_name, ['student', 'faculty']), function ($q) {
+                $q->where('status', 'published')
+                    ->whereNull('deleted_at');
             })
+            ->whereNull('permanently_deleted_at')
             ->orderBy('created_at', $userRole === 'admin' ? 'desc' : 'asc')
             ->orderBy('section_id', 'desc')
             ->paginate(5)
@@ -170,6 +165,15 @@ class SectionService
 
     public function archiveSection(Section $section)
     {
+        // Sofft delete first the items of the section
+        $sectionItems = $section->items;
+
+        if (!$sectionItems->isEmpty()) {
+            foreach ($sectionItems  as $sectionItem) {
+                $sectionItem->item->delete();
+            }
+        }
+
         $section->delete(); // Soft delete the section
 
         return  $this->getSectionCompleteDetails($section);
@@ -180,6 +184,15 @@ class SectionService
         // Get the instace of model since model binding
         // is not working for soft deleted data
         $section = Section::withTrashed()->findOrFail($sectionId);
+
+        // Restore first the deleted items of the section (Materials and Assessments)
+        $sectionItems = $section->items;
+
+        if (!$sectionItems->isEmpty()) {
+            foreach ($sectionItems  as $sectionItem) {
+                $sectionItem->item->restore();
+            }
+        }
 
         $section->restore();
 

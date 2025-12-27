@@ -299,4 +299,15 @@ class AssessmentResponseService
 
         return $callback;
     }
+
+    // Responsible foor soft deleting the assessment submission when it was reset
+    public function deleteAssessmentSubmissions(Assessment $assessment)
+    {
+        $assessment->assessmentSubmissions()->delete();
+
+        // Need to remove feedback since no submission will be display
+        $assessment->update([
+            'feedback' => null
+        ]);
+    }
 }

@@ -57,8 +57,7 @@ export default function Post({ postContent }) {
                                 </span>
                             </div>
                         ) : (
-                            postContent.author.user_id ===
-                                auth.user.user_id && (
+                            auth.user.role_name !== "student" && (
                                 <div
                                     className={`px-2 ${
                                         postContent.status === "published"
@@ -75,7 +74,8 @@ export default function Post({ postContent }) {
                             )
                         )}
                     </div>
-                    {auth.user.user_id === postContent.created_by && (
+                    {(auth.user.user_id === postContent.created_by ||
+                        auth.user.role_name === "admin") && (
                         <RoleGuard allowedRoles={["admin", "faculty"]}>
                             <div className="h-8 flex items-center">
                                 <div className="dropdown dropdown-end cursor-pointer">

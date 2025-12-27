@@ -20,7 +20,7 @@ class PermanentlyDeleteArchivedStaff extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Delete archived staff that is over 30 days treshold';
 
     /**
      * Execute the console command.
@@ -31,7 +31,10 @@ class PermanentlyDeleteArchivedStaff extends Command
         $threshholdDate = Carbon::now()->subDays(30);
 
         // Get the all the staff past the grace period
-        $archivedStaff = Staff::onlyTrashed()->where("deleted_at", "<",  $threshholdDate)->get();
+        $archivedStaff = Staff::onlyTrashed()
+            ->where("deleted_at", "<",  $threshholdDate)
+            ->whereNull('permanently_deleted_at')
+            ->get();
 
         // Check first if its not empty
         if ($archivedStaff->isNotEmpty()) {
@@ -39,8 +42,8 @@ class PermanentlyDeleteArchivedStaff extends Command
             foreach ($archivedStaff as $staff) {
 
                 // Permanently deleting the staff and user data
-                $staff->user->forceDelete();
-                $staff->forceDelete();
+                $staff->permanently_deleted_at = now();
+                $staff->save();
             }
         }
 

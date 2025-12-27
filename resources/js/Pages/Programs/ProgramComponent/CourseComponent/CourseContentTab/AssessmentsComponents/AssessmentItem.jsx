@@ -71,7 +71,10 @@ export default function AssessmentItem({
                         quiz: assessmentDetails.quiz.quiz_id,
                     })
                 );
-            } else if (auth.user.user_id === assessmentDetails.created_by) {
+            } else if (
+                auth.user.user_id === assessmentDetails.created_by ||
+                auth.user.role_name === "admin"
+            ) {
                 router.visit(
                     route("assessment.quiz-form.edit", {
                         assessment: assessmentDetails.assessment_id,
@@ -155,8 +158,7 @@ export default function AssessmentItem({
                                 </span>
                             </div>
                         ) : (
-                            assessmentDetails.author.user_id ===
-                                auth.user.user_id && (
+                            auth.user.role_name !== "student" && (
                                 <div
                                     className={`px-2 ${
                                         assessmentDetails.status === "published"
@@ -175,7 +177,8 @@ export default function AssessmentItem({
                         )}
                     </div>
 
-                    {auth.user.user_id === assessmentDetails.created_by && (
+                    {(auth.user.user_id === assessmentDetails.created_by ||
+                        auth.user.role_name === "admin") && (
                         <RoleGuard allowedRoles={["admin", "faculty"]}>
                             <div className="flex items-center">
                                 <div
@@ -271,7 +274,9 @@ export default function AssessmentItem({
                         }}
                         className={`flex h-15 items-center space-x-4 p-2 border border-ascend-gray1 bg-ascend-white ${
                             auth.user.role_name === "student" ||
-                            auth.user.user_id === assessmentDetails.created_by
+                            auth.user.user_id ===
+                                assessmentDetails.created_by ||
+                            auth.user.role_name === "admin"
                                 ? "hover-change-bg-color cursor-pointer"
                                 : ""
                         }`}

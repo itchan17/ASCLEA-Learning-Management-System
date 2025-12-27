@@ -280,4 +280,11 @@ class AssessmentController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
+
+    public function resetAssessment(Program $program, Course $course, Assessment $assessment)
+    {
+        $this->assessmentResponseService->deleteAssessmentSubmissions($assessment);
+
+        return back()->with('success', "Assessment reset sucessfully.");
+    }
 }

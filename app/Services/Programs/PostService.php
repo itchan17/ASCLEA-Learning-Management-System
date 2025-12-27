@@ -27,21 +27,16 @@ class PostService
         return $this->getPostCompleteDetails($post);
     }
 
-    public function listPosts(string $courseId, string $userId)
+    public function listPosts(string $courseId, User $user)
     {
         $postList = Post::where('course_id', $courseId)
-            ->with(['author' => function ($query) {
-                $query->select('user_id', 'first_name', 'last_name');
-            }])
-            ->where(function ($query) use ($userId) {
-                $query->where('created_by', $userId)
-                    ->orWhere('status', 'published');
-            })
+            ->with(['author:user_id,first_name,last_name'])
             ->withTrashed()
-            ->where(function ($query) use ($userId) {
-                $query->whereNull('deleted_at')
-                    ->orWhere('created_by', $userId);
+            ->when($user->role->role_name === 'student', function ($q) {
+                $q->where('status', 'published')
+                    ->whereNull('deleted_at');
             })
+            ->whereNull('permanently_deleted_at')
             ->orderBy('created_at', 'desc')
             ->orderBy('Post_id', 'desc')
             ->paginate(5);

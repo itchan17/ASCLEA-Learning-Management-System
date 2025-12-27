@@ -13,6 +13,7 @@ class ArchiveService
     public function getArchivedCourses()
     {
         return Course::onlyTrashed()
+            ->whereNull('permanently_deleted_at')
             ->with([
                 'program.archivedBy:user_id,first_name,last_name',
                 'archivedBy:user_id,first_name,last_name',
@@ -24,6 +25,7 @@ class ArchiveService
     public function getArchivedStaff()
     {
         return Staff::onlyTrashed()
+            ->whereNull('permanently_deleted_at')
             ->with([
                 'user:user_id,first_name,last_name,profile_image',
                 'archivedBy:user_id,first_name,last_name'
@@ -35,6 +37,7 @@ class ArchiveService
     public function getArchivedStudents()
     {
         return Student::onlyTrashed()
+            ->whereNull('permanently_deleted_at')
             ->with([
                 'user:user_id,first_name,last_name,profile_image',
                 'archivedBy:user_id,first_name,last_name'

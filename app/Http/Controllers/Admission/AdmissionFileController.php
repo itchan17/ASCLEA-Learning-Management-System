@@ -321,12 +321,12 @@ class AdmissionFileController extends Controller
         return redirect()->back()->with('success', 'Student restored successfully.');
     }
 
-    public function forceDeleteStudent($studentId)
+    public function permanentlyDeleteStudent($studentId)
     {
         $student = Student::withTrashed()->findOrFail($studentId);
 
-        $student->forceDelete();
-        $student->user->forceDelete();
+        $student->permanently_deleted_at = now();
+        $student->save();
 
         return redirect()->back()->with('success', 'Student deleted permanently.');
     }
