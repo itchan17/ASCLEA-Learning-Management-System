@@ -119,8 +119,8 @@ class PaymentHistoryController extends Controller
 
     public function myPaymentHistory()
     {
-        $userId = auth()->id(); 
-        return $this->paymentHistory($userId); 
+        $userId = auth()->id();
+        return $this->paymentHistory($userId);
     }
 
 
@@ -170,7 +170,7 @@ class PaymentHistoryController extends Controller
         }
 
         // Send notification
-        $this->paymentHistoryService->sendPaymentHistoryNotification($payment->user_id);
+        $this->paymentHistoryService->sendPaymentHistoryNotification($payment);
 
         return redirect()->back()->with('success', 'Payment added successfully!');
     }
