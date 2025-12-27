@@ -249,7 +249,7 @@ class AdmissionFileController extends Controller
     {
         $validated = $request->validate([
             'admission_status' => 'required|in:Not Submitted,Pending,Accepted,Rejected',
-            'admission_message' => 'nullable|string|max:500',
+            'admission_message' => 'nullable|string|max:500|',
         ]);
 
         $student = Student::findOrFail($id);

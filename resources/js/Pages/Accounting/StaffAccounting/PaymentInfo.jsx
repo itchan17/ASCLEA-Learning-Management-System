@@ -15,7 +15,7 @@ import { usePaymentTabs } from "../../../Stores/PaymentHistory/usePaymentTabs";
 import { route } from "ziggy-js";
 import ProfileImage from "../../../Components/ProfileImage";
 
-const PaymentInfo = ({ can }) => {
+const PaymentInfo = ({ can, userRole }) => {
     const { props } = usePage(); // props come from Inertia
     const payment = props; // payment data sent from controller
     const fileInputRef = React.useRef(null);
@@ -159,12 +159,21 @@ const PaymentInfo = ({ can }) => {
     };
 
     const handleFileClick = (fileId) => {
-        router.get(
-            route("paymenthistory.payment.file.view", {
-                paymentId: payment.paymentId,
-                fileId: fileId,
-            })
-        );
+        if (userRole === "student") {
+            router.get(
+                route("student.paymenthistory.payment.file.view", {
+                    paymentId: payment.paymentId,
+                    fileId: fileId,
+                })
+            );
+        } else {
+            router.get(
+                route("paymenthistory.payment.file.view", {
+                    paymentId: payment.paymentId,
+                    fileId: fileId,
+                })
+            );
+        }
     };
 
     files.forEach((f) => console.log(f.id, f.deleted_at, typeof f.deleted_at));
