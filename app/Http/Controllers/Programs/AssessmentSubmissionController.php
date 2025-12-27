@@ -263,7 +263,9 @@ class AssessmentSubmissionController extends Controller
             $validated['selectAll'],
             $validated['selectedSubmittedActivities'] ?? [],
             $validated['unselectedSubmittedActivities'] ?? [],
-            $assessment->assessment_id
+            $assessment->assessment_id,
+            $course,
+            $assessment
         );
     }
 }

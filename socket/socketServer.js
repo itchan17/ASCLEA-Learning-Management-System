@@ -8,6 +8,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 const httpServer = createServer(app);
 
@@ -79,6 +80,24 @@ io.on("connection", (socket) => {
         );
 
         io.emit("online_students", students);
+    });
+});
+
+// HTTP Endpoints for sending notification
+app.post("/notify", (req, res) => {
+    const data = req.body;
+
+    const { notifications } = data;
+    console.log(data);
+    res.json({ success: true });
+
+    // Send notfication to one user
+    notifications.forEach((notification) => {
+        const user = onlineUsers.get(notification.notifiable_id);
+        if (user) {
+            console.log(`SOCKET ID: ${user.socketId}`);
+            io.to(user.socketId).emit("notification", { notification });
+        }
     });
 });
 

@@ -8,12 +8,22 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Admission\AdmissionFile;
 use App\Models\Student;
+use App\Services\Admissions\AdmissionService;
+use App\Services\NotificationService;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class AdmissionFileController extends Controller
 {
+
+    protected AdmissionService $admissionService;
+
+    public function __construct(AdmissionService $admissionService)
+    {
+        $this->admissionService = $admissionService;
+    }
+
     public function index(Request $request)
     {
         $user = auth()->user();
@@ -75,6 +85,9 @@ class AdmissionFileController extends Controller
 
             $student->update(['admission_status' => 'Pending']);
 
+            // Send notification
+            $this->admissionService->sendAdmissionNotification($student);
+
             return back()->with('success', 'Files uploaded successfully!');
         }
 
@@ -84,10 +97,10 @@ class AdmissionFileController extends Controller
     //==================== GET ALL PENDING STUDENTS ====================//
     public function getPendingStudents(Request $request)
     {
-    // Fetch all students whose enrollment_status is 'pending'
-    // and eager load their related user details
-    $query = Student::with(['user', 'admissionFiles'])
-        ->where('enrollment_status', 'pending');
+        // Fetch all students whose enrollment_status is 'pending'
+        // and eager load their related user details
+        $query = Student::with(['user', 'admissionFiles'])
+            ->where('enrollment_status', 'pending');
 
         if ($search = $request->input('search')) {
             $query->whereHas('user', function ($q) use ($search) {

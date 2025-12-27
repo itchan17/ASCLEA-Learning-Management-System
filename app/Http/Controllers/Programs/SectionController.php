@@ -65,6 +65,8 @@ class SectionController extends Controller
         } else {
             $section->update(['status' => 'published']);
 
+            $this->sectionService->sendSectionNotification($section, $course);
+
             return response()->json(['success' => "Section published successfully.", 'data' => $this->sectionService->getSectionCompleteDetails($section->refresh())]);
         }
     }

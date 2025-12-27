@@ -2,10 +2,21 @@
 
 namespace App\Services\Programs;
 
+use App\Models\Course;
+use App\Models\Program;
 use App\Models\Programs\Post;
+use App\Models\User;
+use App\Services\NotificationService;
 
 class PostService
 {
+    protected NotificationService $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
+    }
+
     public function savePost(array $validatedData, string $courseId, string $userId)
     {
         $validatedData['course_id'] = $courseId;
@@ -75,5 +86,35 @@ class PostService
     public function getPostCompleteDetails(Post $post)
     {
         return $post->load('author:user_id,first_name,last_name');
+    }
+
+    public function getUsersToNotify($courseId)
+    {
+        $users = User::where(function ($query) use ($courseId) {
+            $query->whereHas('programs.courses', function ($q) use ($courseId) {
+                $q->where('course_id', $courseId);
+            })
+                ->orWhereHas('role', function ($q) {
+                    $q->where('role_name', 'admin');
+                });
+        })
+            ->where('user_id', '!=', request()->user()->user_id)
+            ->pluck('user_id')
+            ->toArray();
+
+        return $users;
+    }
+
+    public function sendNewPostNotification(Post $newPost, Course $course, Program $program)
+    {
+        $users = $this->getUsersToNotify($course->course_id);
+
+        $title = "New post available";
+        $body = "A new post {$newPost->post_title} is now available in {$course->course_name}.";
+
+        $baseUrl = config('app.app_base_url');
+        $actionUrl = "{$baseUrl}/programs/{$program->program_id}/courses/{$course->course_id}";
+
+        $this->notificationService->notifyUsers($users, $title, $body, $actionUrl);
     }
 }

@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import useOnlineStudentStore from "../Pages/Dashboard/Stores/onlineStudentStore";
+import useNotificationStore from "../Stores/Notification/notificationStore";
+import { displayToast } from "../Utils/displayToast";
+import DefaultCustomToast from "../Components/CustomToast/DefaultCustomToast";
 
 const SocketContext = createContext(null);
 export const useSocket = () => useContext(SocketContext);
@@ -8,6 +11,13 @@ export const useSocket = () => useContext(SocketContext);
 export default function OnlineUsersSocketProvider({ children, user }) {
     const setOnlineStudents = useOnlineStudentStore(
         (state) => state.setOnlineStudents
+    );
+
+    const addNewNotification = useNotificationStore(
+        (state) => state.addNewNotification
+    );
+    const setNumOfUnreadNotifications = useNotificationStore(
+        (state) => state.setNumOfUnreadNotifications
     );
 
     const socketRef = useRef(null);
@@ -41,12 +51,26 @@ export default function OnlineUsersSocketProvider({ children, user }) {
         // Get the list of online users
         socket.on("online_students", setOnlineStudents);
 
+        // Add the new notification
+        socket.on("notification", (data) => {
+            console.log(data);
+            addNewNotification(data.notification);
+            setNumOfUnreadNotifications(1);
+            displayToast(
+                <DefaultCustomToast
+                    message={data.notification.notification_title}
+                />,
+                "info"
+            );
+        });
+
         return () => {
             clearInterval(ping);
             window.removeEventListener("beforeunload", handleUnload);
             socket.off("online_students", setOnlineStudents);
+            socket.off("notification");
         };
-    }, [user]);
+    }, []);
 
     return (
         <SocketContext.Provider value={socketRef.current}>
