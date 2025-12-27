@@ -2,6 +2,7 @@
 
 namespace App\Services\PaymentHistory;
 
+use App\Models\PaymentHistory\Payment;
 use App\Services\NotificationService;
 
 class PaymentHistoryService
@@ -13,7 +14,7 @@ class PaymentHistoryService
         $this->notificationService = $notificationService;
     }
 
-    public function sendPaymentHistoryNotification(string $userId)
+    public function sendPaymentHistoryNotification(Payment $payment)
     {
         // Create title and body for notification
         $title = "Payment History Available";
@@ -21,9 +22,9 @@ class PaymentHistoryService
 
         // Creates url where user can navigate the notification
         $baseUrl = config('app.app_base_url');
-        $actionUrl = "{$baseUrl}/payment-history/{$userId}";
+        $actionUrl = "{$baseUrl}/student-payment-history/payment-info/{$payment->payment_id}";
 
         // Notify the user
-        $this->notificationService->notifyUser($userId, $title,  $body, $actionUrl);
+        $this->notificationService->notifyUser($payment->user_id, $title,  $body, $actionUrl);
     }
 }
