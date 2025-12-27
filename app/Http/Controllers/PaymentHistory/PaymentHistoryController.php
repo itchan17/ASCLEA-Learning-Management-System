@@ -113,8 +113,16 @@ class PaymentHistoryController extends Controller
             ],
             'PaymentList' => $payments,
             'can'         => $can,
+            'userRole' => auth()->user()->role->role_name,
         ]);
     }
+
+    public function myPaymentHistory()
+    {
+        $userId = auth()->id(); 
+        return $this->paymentHistory($userId); 
+    }
+
 
 
     public function storePayment(Request $request)
@@ -219,6 +227,7 @@ class PaymentHistoryController extends Controller
                 'deleted_at' => $file->deleted_at,
             ]),
             'can' => $can,
+            'userRole' => auth()->user()->role->role_name,
         ]);
     }
 

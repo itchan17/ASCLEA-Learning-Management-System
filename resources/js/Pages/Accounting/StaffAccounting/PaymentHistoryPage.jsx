@@ -8,9 +8,14 @@ import { usePaymentTabs } from "../../../Stores/PaymentHistory/usePaymentTabs";
 import { IoCaretDownOutline } from "react-icons/io5";
 import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToast";
 
-const PaymentHistoryPage = ({ PaymentList, student, can }) => {
+const PaymentHistoryPage = ({ PaymentList, student, can, userRole }) => {
   const handleRowClick = (paymentId) => {
+    if (userRole === 'student') {
+    router.visit(route('student.paymenthistory.paymentInfo.view', paymentId));
+  } else {
     router.visit(route('paymenthistory.paymentInfo.view', paymentId));
+  }
+
   };
 
   const [showAddPaymentModal, setShowAddPaymentModal] = useState(false);
