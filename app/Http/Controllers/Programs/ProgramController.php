@@ -24,7 +24,7 @@ class ProgramController extends Controller
     public function listPrograms()
     {
 
-        $query = Program::select('program_id', 'program_name', 'background_image');
+        $query = Program::select('program_id', 'program_name', 'program_description', 'background_image');
 
         // Check is user is not admin
         if (Auth::user()->role->role_name !== 'admin') {
