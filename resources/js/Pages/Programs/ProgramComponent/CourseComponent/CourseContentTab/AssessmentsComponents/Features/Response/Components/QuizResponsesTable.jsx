@@ -177,13 +177,9 @@ export default function QuizResponsesTable({
                                                 : "text-ascend-green"
                                         }
                                     >
-                                        {
-                                            response.detected_tabChange.length
-                                            
-                                        }
+                                        {response.detected_tabChange.length}
                                     </td>
                                 </tr>
-
                             ))}
                         </tbody>
                     )}

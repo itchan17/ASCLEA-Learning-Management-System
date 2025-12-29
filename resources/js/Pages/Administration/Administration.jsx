@@ -89,11 +89,21 @@ export default function Administration() {
                 <table className="table">
                     <thead className="text-ascend-black">
                         <tr className="border-b-2 border-ascend-gray3">
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>Last login</th>
+                            <th className="text-ascend-black font-black">
+                                Name
+                            </th>
+                            <th className="text-ascend-black font-black">
+                                Email
+                            </th>
+                            <th className="text-ascend-black font-black">
+                                Role
+                            </th>
+                            <th className="text-ascend-black font-black">
+                                Status
+                            </th>
+                            <th className="text-ascend-black font-black">
+                                Last login
+                            </th>
                             {/*<th className="text-ascend-black font-black">Last Logout</th>*/}
                         </tr>
                     </thead>
