@@ -76,14 +76,15 @@ export default function LandingPage({ text }) {
                     </div>
 
                     <Link href={"/register"}>
-                    <button
-                        className="w-60 py-3 space-x-1 bg-ascend-blue
+                        <button
+                            className="w-60 py-3 space-x-1 bg-ascend-blue
                         hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
-                    >
-                        <span className="font-semibold text-2xl">
-                            Register Now
-                        </span>
-                    </button></Link>
+                        >
+                            <span className="font-semibold text-2xl">
+                                Register Now
+                            </span>
+                        </button>
+                    </Link>
                 </div>
             </header>
 
@@ -243,73 +244,61 @@ export default function LandingPage({ text }) {
                         <div className="collapse collapse-arrow bg-ascend-white rounded-none border border-ascend-gray1">
                             <input type="radio" name="my-accordion-2" />
                             <div className="collapse-title font-semibold">
-                                How can I reset my password?
+                                What programs does ASCEND currently offer?
                             </div>
-                            <div className="collapse-content text-sm">
-                                Lorem ipsum dolor sit amet, consectetur
-                                adipiscing elit. Nulla quis lorem ut libero
-                                malesuada feugiat.
-                            </div>
-                        </div>
-
-                        <div className="collapse collapse-arrow bg-ascend-white rounded-none border border-ascend-gray1">
-                            <input type="radio" name="my-accordion-2" />
-                            <div className="collapse-title font-semibold">
-                                Where can I view my courses?
-                            </div>
-                            <div className="collapse-content text-sm">
-                                Lorem ipsum dolor sit amet, consectetur
-                                adipiscing elit. Pellentesque in ipsum id orci
-                                porta dapibus.
+                            <div className="collapse-content text-sm font-medium">
+                                The ASCEND Tutorial, Training and Review Center
+                                currently offers the Licensure Examination for
+                                Teachers (LET) Program and the Certificate in
+                                Teaching Program (CTP).
                             </div>
                         </div>
 
                         <div className="collapse collapse-arrow bg-ascend-white rounded-none border border-ascend-gray1">
                             <input type="radio" name="my-accordion-2" />
                             <div className="collapse-title font-semibold">
-                                How do I contact support?
+                                How long is the review duration for the LET and
+                                CTP programs?
                             </div>
-                            <div className="collapse-content text-sm">
-                                Lorem ipsum dolor sit amet, consectetur
-                                adipiscing elit. Vestibulum ante ipsum primis in
-                                faucibus orci luctus et.
-                            </div>
-                        </div>
-
-                        <div className="collapse collapse-arrow bg-ascend-white rounded-none border border-ascend-gray1">
-                            <input type="radio" name="my-accordion-2" />
-                            <div className="collapse-title font-semibold">
-                                Can I update my profile information?
-                            </div>
-                            <div className="collapse-content text-sm">
-                                Lorem ipsum dolor sit amet, consectetur
-                                adipiscing elit. Done shadow-shadow1
-                                bascend-gray1 border-gray1c sollicitudin
-                                molestie malesuada.
+                            <div className="collapse-content text-sm font-medium">
+                                The review duration for both LET and CTP
+                                programs is 2 to 3 months.
                             </div>
                         </div>
 
                         <div className="collapse collapse-arrow bg-ascend-white rounded-none border border-ascend-gray1">
                             <input type="radio" name="my-accordion-2" />
                             <div className="collapse-title font-semibold">
-                                Is there a mobile app available?
+                                Do you provide certification after the program
+                                review ends?
                             </div>
-                            <div className="collapse-content text-sm">
-                                Lorem ipsum dolor sit amet, consectetur
-                                adipiscing elit. Cras ultricies ligula sed magna
-                                dictum porta.
+                            <div className="collapse-content text-sm font-medium">
+                                Yes. ASCEND provides both a soft copy and a hard
+                                copy of the Certificate of Attendance as proof
+                                of participation upon completion of the program.
                             </div>
                         </div>
 
                         <div className="collapse collapse-arrow bg-ascend-white rounded-none border border-ascend-gray1">
                             <input type="radio" name="my-accordion-2" />
                             <div className="collapse-title font-semibold">
-                                How do I delete my account?
+                                Is ASCEND accredited by the Commission on Higher
+                                Education (CHED)?
                             </div>
-                            <div className="collapse-content text-sm">
-                                Lorem ipsum dolor sit amet, consectetur
-                                adipiscing elit. Curabitur arcu erat, accumsan
-                                id imperdiet et, porttitor at sem.
+                            <div className="collapse-content text-sm font-medium">
+                                Yes, ASCEND is accredited by the Commission on
+                                Higher Education (CHED).
+                            </div>
+                        </div>
+
+                        <div className="collapse collapse-arrow bg-ascend-white rounded-none border border-ascend-gray1">
+                            <input type="radio" name="my-accordion-2" />
+                            <div className="collapse-title font-semibold">
+                                What are the class schedules?
+                            </div>
+                            <div className="collapse-content text-sm font-medium">
+                                To accommodate working students and reviewees,
+                                classes are conducted every weekend.
                             </div>
                         </div>
                     </div>
@@ -346,7 +335,10 @@ export default function LandingPage({ text }) {
                             </div>
                         </div>
                         <div className="w-full md:w-1/2 space-y-6">
-                            <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+                            <form
+                                onSubmit={handleSubmit}
+                                className="flex flex-col space-y-4"
+                            >
                                 <input
                                     type="text"
                                     placeholder="Your name"
@@ -373,14 +365,24 @@ export default function LandingPage({ text }) {
                                 ></textarea>
 
                                 <div className="flex justify-end">
-                                    <PrimaryButton btnType={"submit"} text={isSubmitting ? "Submitting..." : "Submit"} isDisabled={isSubmitting} />
+                                    <PrimaryButton
+                                        btnType={"submit"}
+                                        text={
+                                            isSubmitting
+                                                ? "Submitting..."
+                                                : "Submit"
+                                        }
+                                        isDisabled={isSubmitting}
+                                    />
                                 </div>
                             </form>
 
                             {showConfirm && (
                                 <AlertModal
                                     title={"Request Submitted"}
-                                    description={"Thank you! We’ve received your message. We’ll get in touch soon."}
+                                    description={
+                                        "Thank you! We’ve received your message. We’ll get in touch soon."
+                                    }
                                     closeModal={() => setShowConfirm(false)}
                                     onConfirm={() => setShowConfirm(false)}
                                 />
@@ -414,7 +416,10 @@ export default function LandingPage({ text }) {
                                     { label: "Home", href: "home" },
                                     { label: "About Us", href: "about-us" },
                                     { label: "Programs", href: "programs" },
-                                    { label: "FAQ", href: "frequently-asked-questions" },
+                                    {
+                                        label: "FAQ",
+                                        href: "frequently-asked-questions",
+                                    },
                                     { label: "Contact", href: "contact" },
                                 ].map((item) => (
                                     <li key={item.href}>
