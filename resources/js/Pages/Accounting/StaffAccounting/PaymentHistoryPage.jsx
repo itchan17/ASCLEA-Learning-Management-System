@@ -171,12 +171,12 @@ const PaymentHistoryPage = ({ PaymentList, student, can, userRole }) => {
                         >
                             <li onClick={() => setCurrentDownload("PDF")}>
                                 <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Download PDF
+                                    Download as PDF
                                 </a>
                             </li>
                             <li onClick={() => setCurrentDownload("CSV")}>
                                 <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                    Download CSV
+                                    Download as CSV
                                 </a>
                             </li>
                         </ul>

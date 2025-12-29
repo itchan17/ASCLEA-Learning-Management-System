@@ -7,7 +7,7 @@ export default function AssignedCourses() {
     const { assignedCourses } = usePage().props;
 
     return (
-        <div className="font-nunito-sans space-y-2">
+        <div className="font-nunito-sans space-y-5">
             <div className="flex justify-between items-center">
                 <h1 className="text-size6 font-bold">Assigned Courses</h1>
             </div>
@@ -57,6 +57,7 @@ export default function AssignedCourses() {
                 </table>
             </div>
             {/*===========================Pagination: only show if there are courses===========================*/}
+
             {assignedCourses?.data &&
                 assignedCourses.data.length > 0 &&
                 assignedCourses?.last_page > 1 && ( // ⬅ only show if more than 1 page

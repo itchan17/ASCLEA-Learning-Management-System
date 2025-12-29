@@ -118,17 +118,17 @@ export default function PaidStudentTable({ students, filters }) {
                         </tbody>
                     )}
                 </table>
-
-                {/*Pagination with search persistence */}
-                {students?.links && (
-                    <Pagination
-                        links={students.links}
-                        currentPage={students.current_page}
-                        lastPage={students.last_page}
-                        onPageChange={handlePageChange}
-                    />
-                )}
             </div>
+
+            {/*Pagination with search persistence */}
+            {students?.links && (
+                <Pagination
+                    links={students.links}
+                    currentPage={students.current_page}
+                    lastPage={students.last_page}
+                    onPageChange={handlePageChange}
+                />
+            )}
         </div>
     );
 }

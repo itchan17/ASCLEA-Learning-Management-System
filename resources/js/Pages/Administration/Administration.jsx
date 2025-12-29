@@ -187,10 +187,16 @@ export default function Administration() {
             </div>
             {/*=================Download and Pagination will only show if data exists=================*/}
             {staffs.data && staffs.data.length > 0 && (
-                <div className="flex flex-wrap gap-5 justify-between items-center mt-5">
+                <div className="flex flex-wrap-reverse items-center justify-between gap-5">
                     {/* Download Button (LEFT) */}
-                    <div className="flex items-center space-x-[0.5px] [&>*]:!mt-0">
-                        <PrimaryButton text="Download" />
+                    <div className="flex items-center gap-[1px]">
+                        <PrimaryButton
+                            text="Download PDF"
+                            doSomething={() => {
+                                window.location.href =
+                                    route("staff.export.pdf");
+                            }}
+                        />
                         {/* Dropdown button */}
                         <div className="dropdown dropdown-end cursor-pointer">
                             <button
@@ -212,7 +218,7 @@ export default function Administration() {
                                         href={route("staff.export.pdf")}
                                         className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
                                     >
-                                        Download as pdf
+                                        Download as PDF
                                     </a>
                                 </li>
                                 <li>
@@ -220,7 +226,7 @@ export default function Administration() {
                                         href={route("staff.export.csv")}
                                         className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300"
                                     >
-                                        Download as csv
+                                        Download as CSV
                                     </a>
                                 </li>
                             </ul>
@@ -228,18 +234,19 @@ export default function Administration() {
                     </div>
 
                     {/* Pagination (RIGHT) */}
-                    <div className="flex items-center [&>*]:!mt-0">
-                        {staffs?.data &&
-                            staffs.data.length > 0 &&
-                            staffs.last_page > 1 && ( // ⬅ Only show if more than 1 page
+
+                    {staffs?.data &&
+                        staffs.data.length > 0 &&
+                        staffs.last_page > 1 && ( // ⬅ Only show if more than 1 page
+                            <div className="w-full sm:w-fit">
                                 <Pagination
                                     links={staffs.links}
                                     currentPage={staffs.current_page}
                                     lastPage={staffs.last_page}
                                     only={["staffs"]}
                                 />
-                            )}
-                    </div>
+                            </div>
+                        )}
                 </div>
             )}
             {/*================= Open add staff form =================*/}
