@@ -80,22 +80,26 @@ export default function ResultFeedback({
                             <MdOutlineAccessTimeFilled className="text-ascend-blue text-5xl" />
                             <div>
                                 <h1>Time Spent</h1>
-                                <p className="font-bold">
-                                    {hours > 0
-                                        ? hours === 1
-                                            ? `${hours} hour`
-                                            : `${hours} hours`
-                                        : ""}
-                                    {minutes > 0
-                                        ? minutes === 1
-                                            ? ` ${
-                                                  hours > 0 ? "and" : ""
-                                              } ${minutes} minute`
-                                            : ` ${
-                                                  hours > 0 ? "and" : ""
-                                              } ${minutes} minutes`
-                                        : ""}
-                                </p>
+                                {assessmentSubmission.time_spent > 0 ? (
+                                    <p className="font-bold">
+                                        {hours > 0
+                                            ? hours === 1
+                                                ? `${hours} hour`
+                                                : `${hours} hours`
+                                            : ""}
+                                        {minutes > 0
+                                            ? minutes === 1
+                                                ? ` ${
+                                                      hours > 0 ? "and" : ""
+                                                  } ${minutes} minute`
+                                                : ` ${
+                                                      hours > 0 ? "and" : ""
+                                                  } ${minutes} minutes`
+                                            : ""}
+                                    </p>
+                                ) : (
+                                    <p className="font-bold">0</p>
+                                )}
                             </div>
                         </div>
                     )}
