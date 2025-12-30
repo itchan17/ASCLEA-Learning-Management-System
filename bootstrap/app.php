@@ -42,6 +42,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 // Notification
                 require base_path('routes/notifications.php');
+
+                // Backup and Restore
+                require base_path('routes/backupAndRestore/backupAndRestore.php');
             });
         },
     )
@@ -63,7 +66,9 @@ return Application::configure(basePath: dirname(__DIR__))
             '/archives',
             'admission/*',
             'notifications',
-            'notifications/*'
+            'notifications/*',
+            'backup-and-restore',
+            'backup-and-restore/*',
         ]);
         // ------ END ------
 
