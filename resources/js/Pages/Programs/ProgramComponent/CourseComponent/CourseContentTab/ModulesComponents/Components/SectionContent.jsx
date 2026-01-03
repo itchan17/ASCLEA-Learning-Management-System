@@ -167,10 +167,10 @@ export default function SectionContent({
                         </div>
 
                         {!disabled && (
-                            <RoleGuard allowedRoles={["admin", "faculty"]}>
+                            <RoleGuard allowedRoles={["admin"]}>
                                 <div
                                     onClick={stopPropagation}
-                                    className="dropdown dropdown-end cursor-pointer relative"
+                                    className="dropdown dropdown-end cursor-pointer"
                                 >
                                     <div
                                         tabIndex={0}
@@ -182,7 +182,7 @@ export default function SectionContent({
 
                                     <ul
                                         tabIndex={0}
-                                        className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black absolute z-999"
+                                        className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                                     >
                                         <li onClick={handleClickEdit}>
                                             <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">

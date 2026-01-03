@@ -290,7 +290,7 @@ export default function Section({ sectionDetails }) {
                 </div>
 
                 <div
-                    className={`relative border-r bg-ascend-lightblue border-l border-b border-ascend-gray1 overflow-hidden transition-all duration-500 ease-in-out ${
+                    className={`relative border-r bg-ascend-lightblue border-l border-b border-ascend-gray1 transition-all duration-500 ease-in-out ${
                         isExpanded
                             ? "max-h-200 opacity-100"
                             : "max-h-0 opacity-0"
@@ -308,7 +308,7 @@ export default function Section({ sectionDetails }) {
                         </div>
                     )}
                     <div
-                        className={`max-h-[500px] space-y-3 overflow-y-auto ${
+                        className={`flex flex-col gap-3 ${
                             isExpanded ? "p-5" : "px-5 py-0"
                         }`}
                     >

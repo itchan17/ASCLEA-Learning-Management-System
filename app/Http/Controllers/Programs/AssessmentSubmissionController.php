@@ -116,7 +116,7 @@ class AssessmentSubmissionController extends Controller
                 },
             ]),
             'quiz' => $quiz,
-            'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'submitted_at'])
+            'assessmentSubmission' => fn() => $assessmentSubmission->only(['assessment_id', 'assessment_submission_id', 'created_at', 'submitted_at', 'feedback'])
         ]);
     }
 
