@@ -5,11 +5,13 @@ namespace App\Http\Controllers\BackupAndRestore;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Jobs\GenerateBackup;
+use App\Jobs\RestoreBackup;
 use App\Models\Backups\Backup;
 use App\Services\BackupAndRestore\BackupService;
 use App\Services\BackupAndRestore\RestoreService;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class BackupRestoreController extends Controller
 {
@@ -22,27 +24,61 @@ class BackupRestoreController extends Controller
         $this->restoreService  = $restoreService;
     }
 
-    public function backup(Request $request)
+    public function index()
     {
-        // Run a job that will create bakup in the background
-        GenerateBackup::dispatch($request->user());
-
-        return response()->json('Backup is currently in progress.');
+        return Inertia::render('BackupAndRestore/BackupAndRestore', [
+            'backups' => $this->backupService->getBackups()
+        ]);
     }
 
-    public function restore(Request $request, Backup $backup)
+    public function backup(Request $request)
     {
-        $extractPath = $this->restoreService->extractFile($backup->file_path);
+        // $this->backupService->sendBackupData("This is backup  data", $request->user()->user_id);
+        // Run a job that will create bakup in the background
 
-        $this->restoreService->restoreDatabase($extractPath);
+        GenerateBackup::dispatch($request->user()->user_id);
 
-        $this->restoreService->restoreFiles($extractPath);
+        return back()->with([
+            'message' => 'Backup is currently in progress.'
+        ]);
+    }
 
-        $this->restoreService->cleanupExtractedFiles($extractPath);
+    public function restore(Backup $backup)
+    {
+        set_time_limit(600);
+        ini_set('memory_limit', '512M');
 
-        // Force logout user
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        try {
+            $restoreService = app(RestoreService::class);
+
+            $extractPath = $restoreService->extractFile($backup->file_path);
+            $restoreService->restoreDatabase($extractPath);
+            $restoreService->restoreFiles($extractPath);
+            $restoreService->cleanupExtractedFiles($extractPath);
+            Auth::logout();
+            request()->session()->invalidate();
+
+            return redirect()->route('login')
+                ->with('success', 'Database restored successfully!');
+        } catch (\Exception $e) {
+
+            return back()->withErrors([
+                'error' => 'Unable to restore backup. Please try again.'
+            ]);
+        }
+    }
+
+    public function delete(Backup $backup)
+    {
+        try {
+            $backup->delete();
+
+            return back()->with('success', "Backup deleted successfully.");
+        } catch (\Exception $e) {
+
+            return back()->withErrors([
+                'error' => 'Unable to delete backup. Please try again.'
+            ]);
+        }
     }
 }

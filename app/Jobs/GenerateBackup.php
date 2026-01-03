@@ -10,18 +10,19 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class GenerateBackup implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected User $user;
+    protected string $userId;
     /**
      * Create a new job instance.
      */
-    public function __construct(User $user)
+    public function __construct(string $userId)
     {
-        $this->user = $user;
+        $this->userId = $userId;
     }
 
     /**
@@ -31,16 +32,18 @@ class GenerateBackup implements ShouldQueue
     {
         $backupService = app(BackupService::class);
 
-        // Run Spatie backup
+        // Run Spatie backup    
         $exitCode = Artisan::call('backup:run');
-        $output = Artisan::output();
 
         if ($exitCode === 0) {
             $backupInfo = $backupService->getBackupFileInfo();
 
-            $backupService->saveBackupFileInfo($backupInfo);
+            $newbackupData = $backupService->saveBackupFileInfo($backupInfo);
 
             // Send notification after finishing the job
+            $backupService->sendBackupNotification($this->userId);
+
+            $backupService->sendBackupData($newbackupData, $this->userId);
         }
     }
 }

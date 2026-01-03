@@ -55,8 +55,13 @@ export default function Navbar({ setIsSidebarOpen, isMdScreen }) {
             setPageTitle("Archives");
         } else if (url.includes("/grades")) {
             setPageTitle("Grades");
-        } else if (url.includes("/payment-history")) {
+        } else if (
+            url.includes("/payment-history") ||
+            url.includes("/student-payment-history")
+        ) {
             setPageTitle("Payment History");
+        } else if (url.includes("/backup-and-restore")) {
+            setPageTitle("Backup and Restore");
         } else {
             setPageTitle("");
         }

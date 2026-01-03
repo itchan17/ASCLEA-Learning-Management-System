@@ -4,6 +4,7 @@ import useOnlineStudentStore from "../Pages/Dashboard/Stores/onlineStudentStore"
 import useNotificationStore from "../Stores/Notification/notificationStore";
 import { displayToast } from "../Utils/displayToast";
 import DefaultCustomToast from "../Components/CustomToast/DefaultCustomToast";
+import useBackupAndRestoreStore from "../Pages/BackupAndRestore/Stores/backupAndRestoreStore";
 
 const SocketContext = createContext(null);
 export const useSocket = () => useContext(SocketContext);
@@ -19,6 +20,7 @@ export default function OnlineUsersSocketProvider({ children, user }) {
     const setNumOfUnreadNotifications = useNotificationStore(
         (state) => state.setNumOfUnreadNotifications
     );
+    const setRefresh = useBackupAndRestoreStore((state) => state.setRefresh);
 
     const socketRef = useRef(null);
 
@@ -64,11 +66,20 @@ export default function OnlineUsersSocketProvider({ children, user }) {
             );
         });
 
+        // Listens to new backup data
+        // If there's new data we refresh a state to reload the BackupAndRestore component
+        socket.on("backup", (data) => {
+            if (data.backup) {
+                setRefresh();
+            }
+        });
+
         return () => {
             clearInterval(ping);
             window.removeEventListener("beforeunload", handleUnload);
             socket.off("online_students", setOnlineStudents);
             socket.off("notification");
+            socket.off("backup");
         };
     }, []);
 

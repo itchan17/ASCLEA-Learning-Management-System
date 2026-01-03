@@ -3,6 +3,7 @@
 namespace App\Services\BackupAndRestore;
 
 use App\Models\Backups\Backup;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 use Illuminate\Support\Facades\File;
@@ -28,26 +29,25 @@ class RestoreService
 
     public function restoreDatabase(string $extractPath)
     {
-        $sqlFile = $extractPath . '/db-dumps/mysql-asclea_lms.sql';
+        $sqlFile = $extractPath . DIRECTORY_SEPARATOR . 'db-dumps' . DIRECTORY_SEPARATOR . 'mysql-asclea_lms.sql';
 
-        $database = env('DB_DATABASE');
-        $username = env('DB_USERNAME');
-        $password = env('DB_PASSWORD');
-        $host = env('DB_HOST');
+        // Check if the SQL file exists
+        if (!file_exists($sqlFile)) {
+            throw new \Exception("SQL file not found: {$sqlFile}");
+        }
 
-        $command = sprintf(
-            'mysql -h%s -u%s -p%s %s < %s',
-            escapeshellarg($host),
-            escapeshellarg($username),
-            escapeshellarg($password),
-            escapeshellarg($database),
-            escapeshellarg($sqlFile)
-        );
+        // Read the SQL file content
+        $sql = file_get_contents($sqlFile);
 
-        exec($command, $output, $returnVar);
+        if ($sql === false) {
+            throw new \Exception("Failed to read SQL file: {$sqlFile}");
+        }
 
-        if ($returnVar !== 0) {
-            throw new \Exception('Database restore failed: ' . implode("\n", $output));
+        // Use Laravel's DB connection to execute the SQL
+        try {
+            DB::unprepared($sql);
+        } catch (\Exception $e) {
+            throw new \Exception('Database restore failed: ' . $e->getMessage());
         }
     }
 
