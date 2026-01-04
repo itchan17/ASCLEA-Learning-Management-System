@@ -38,7 +38,7 @@ class BackupService
     public function getBackupFileInfo()
     {
         $backupDisk = Storage::disk('backups'); // Make sure 'backups' disk is configured
-        $files = $backupDisk->files('Asclea'); // get all files in the backup folde
+        $files = $backupDisk->files(config('app.name')); // get all files in the backup folde
 
         // Filter only ZIP files
         $zipFiles = array_filter($files, fn($file) => str_ends_with($file, '.zip'));
