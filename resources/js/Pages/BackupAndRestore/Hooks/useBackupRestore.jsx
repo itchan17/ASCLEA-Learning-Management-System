@@ -3,8 +3,20 @@ import { route } from "ziggy-js";
 import { router } from "@inertiajs/react";
 import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToast";
 import { displayToast } from "../../../Utils/displayToast";
+import useNotificationStore from "../../../Stores/Notification/notificationStore";
 
 export default function useBackupRestore() {
+    // Store
+    const setIsInitialRender = useNotificationStore(
+        (state) => state.setIsInitialRender
+    );
+    const setNotifications = useNotificationStore(
+        (state) => state.setNotifications
+    );
+    const setIsThereNewNotif = useNotificationStore(
+        (state) => state.setIsThereNewNotif
+    );
+
     const [isLoading, setIsLoading] = useState(false);
     const [isGenerateBackupLoading, setIsGenerateBackupLoading] =
         useState(false);
@@ -46,6 +58,14 @@ export default function useBackupRestore() {
             {
                 showProgress: false,
                 onSuccess: () => {
+                    // Clear notification states
+                    // When user bacckups it creates notification
+                    // When the user immediately restore these state persist after logout causing 0 notification to show
+                    // and the previous notification data to show when the user open the nootification
+                    setIsInitialRender(true);
+                    setNotifications([]);
+                    setIsThereNewNotif(false);
+
                     setOpenRestoreModal(false);
                     setBackupId(null);
                 },

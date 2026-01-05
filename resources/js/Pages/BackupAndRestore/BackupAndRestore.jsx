@@ -99,7 +99,10 @@ export default function BackupAndRestore({ backups }) {
                     <tbody>
                         {backups.data && backups.data.length > 0 ? (
                             backups.data.map((backup) => (
-                                <tr className="group hover:bg-ascend-lightblue transition-all duration-300">
+                                <tr
+                                    key={backup.backup_id}
+                                    className="group hover:bg-ascend-lightblue transition-all duration-300"
+                                >
                                     <td className="py-5">{backup.file_name}</td>
                                     <td className="py-5">
                                         {dayjs(backup.created_at).format(
@@ -200,7 +203,7 @@ export default function BackupAndRestore({ backups }) {
                             <input
                                 type="text"
                                 onChange={(e) => setRestoreText(e.target.value)}
-                                class={`block px-4 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non  peer password-input focus:outline-ascend-blue ${
+                                className={`block px-4 py-3 w-full text-sm bg-transparent border-1 border-ascend-gray1 appearance-non  peer password-input focus:outline-ascend-blue ${
                                     error
                                         ? "border-ascend-red"
                                         : "border-ascend-gray1"
