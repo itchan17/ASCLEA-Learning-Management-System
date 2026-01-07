@@ -101,6 +101,20 @@ app.post("/notify", (req, res) => {
     });
 });
 
+app.post("/backup", (req, res) => {
+    const data = req.body;
+
+    const { backup } = data;
+    console.log(data);
+    res.json({ success: true });
+
+    const user = onlineUsers.get(backup.user_id);
+    if (user) {
+        console.log(`SOCKET ID: ${user.socketId}`);
+        io.to(user.socketId).emit("backup", { backup });
+    }
+});
+
 httpServer.listen(port, "0.0.0.0", () => {
     console.log(`Socket.IO server running on port ${port}`);
 });
