@@ -44,6 +44,17 @@ class AdmissionFileController extends Controller
                 'enrolledStudents' => $enrolledStudents,
                 'activeTab' => 0,
             ]);
+        } elseif ($user->role->role_name === 'faculty') {
+            
+            $enrolledStudents = Student::with('user')
+                ->whereIn('enrollment_status', ['enrolled', 'dropout', 'withdrawn'])
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+
+            return Inertia::render('Admission/AdmissionPage', [
+                'enrolledStudents' => $enrolledStudents,
+            ]);
+        
         } else {
             $student = Student::where('user_id', $user->user_id)->first();
             return Inertia::render('Admission/AdmissionPage', [
@@ -192,6 +203,7 @@ class AdmissionFileController extends Controller
             'student' => $student,
             'learningMembers' => $learningMembers,
             'completedAssessments' => $completedAssessments,
+            'role' => auth()->user()->role->role_name,
         ]);
     }
 
