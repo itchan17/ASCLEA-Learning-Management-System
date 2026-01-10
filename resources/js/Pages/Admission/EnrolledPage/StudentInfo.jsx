@@ -146,21 +146,25 @@ const StudentInfo = ({ role }) => {
                         </div>
                     )}
 
-                    <label
-                        htmlFor="inputProfile"
-                        className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 text-ascend-white opacity-0 hover:opacity-50 cursor-pointer rounded-full transition-opacity duration-200"
-                    >
-                        <BiSolidEditAlt className="text-size4" />
-                    </label>
+                    {role === "admin" && (
+                        <> 
+                            <label
+                                htmlFor="inputProfile"
+                                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 text-ascend-white opacity-0 hover:opacity-50 cursor-pointer rounded-full transition-opacity duration-200"
+                            >
+                                <BiSolidEditAlt className="text-size4" />
+                            </label>
 
-                    <input
-                        id="inputProfile"
-                        type="file"
-                        className="hidden"
-                        accept="image/*"
-                        onChange={handleProfileChange}
-                    />
-                </div>
+                            <input
+                                id="inputProfile"
+                                type="file"
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handleProfileChange}
+                            />
+                        </>
+                    )}
+                    </div>
 
                 {/* Student Header */}
                 <div className="flex flex-col ml-2">
