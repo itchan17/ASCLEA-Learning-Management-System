@@ -8,6 +8,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Admission\AdmissionFile;
 use App\Models\Student;
+use App\Models\LearningMember;
+use App\Models\AssignedCourse;
 use App\Services\Admissions\AdmissionService;
 use App\Services\NotificationService;
 use Inertia\Inertia;
@@ -45,11 +47,29 @@ class AdmissionFileController extends Controller
                 'activeTab' => 0,
             ]);
         } elseif ($user->role->role_name === 'faculty') {
-            
+
+            $facultyLearningMemberIds = LearningMember::where('user_id', $user->user_id)
+                ->pluck('learning_member_id');
+
+            $facultyCoursesIds = AssignedCourse::whereIn('learning_member_id', $facultyLearningMemberIds)
+                ->pluck('course_id');
+
+            $studentLearningMemberIds = AssignedCourse::whereIn('course_id', $facultyCoursesIds)
+                ->pluck('learning_member_id');
+
             $enrolledStudents = Student::with('user')
+                ->whereIn('user_id', function($query) use ($studentLearningMemberIds) {
+                    $query->select('user_id')
+                        ->from('learning_members')
+                        ->whereIn('learning_member_id', $studentLearningMemberIds);
+                })
                 ->whereIn('enrollment_status', ['enrolled', 'dropout', 'withdrawn'])
                 ->orderBy('created_at', 'desc')
                 ->paginate(10);
+
+        return Inertia::render('Admission/AdmissionPage', [
+            'enrolledStudents' => $enrolledStudents,
+        ]);
 
             return Inertia::render('Admission/AdmissionPage', [
                 'enrolledStudents' => $enrolledStudents,
@@ -164,6 +184,7 @@ class AdmissionFileController extends Controller
 
         return Inertia::render('Admission/AdmissionPage', [
             'enrolledStudents' => $enrolledStudents,
+            'role' => auth()->user()->role->role_name,
         ]);
     }
 
