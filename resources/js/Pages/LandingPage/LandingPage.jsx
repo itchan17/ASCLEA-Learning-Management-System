@@ -11,7 +11,6 @@ import {
 } from "react-icons/ai";
 import { Link, router } from "@inertiajs/react";
 import { Link as ReactScrollLink } from "react-scroll";
-import AlertModal from "../../Components/AlertModal";
 import { route } from "ziggy-js";
 
 export default function LandingPage({ text }) {
@@ -23,7 +22,7 @@ export default function LandingPage({ text }) {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
+    const [emailSentMsg, setEmailSentMsg] = useState(null);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -34,12 +33,17 @@ export default function LandingPage({ text }) {
             route("contact.submit"),
             { name, email, message },
             {
-                onSuccess: () => {
+                showProgress: false,
+                preserveScroll: true,
+                onSuccess: (page) => {
                     setIsSubmitting(false);
-                    setShowConfirm(true);
                     setName("");
                     setEmail("");
                     setMessage("");
+
+                    setEmailSentMsg(
+                        "Success! Your message has been delivered."
+                    );
                 },
                 onError: () => {
                     setIsSubmitting(false);
@@ -364,29 +368,40 @@ export default function LandingPage({ text }) {
                                     required
                                 ></textarea>
 
+                                {emailSentMsg && (
+                                    <div
+                                        role="alert"
+                                        className="alert alert-success rounded-none font-nunito-sans"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-6 w-6 shrink-0 stroke-current"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth="2"
+                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                            />
+                                        </svg>
+                                        <span>
+                                            Success! Your message has been
+                                            delivered.
+                                        </span>
+                                    </div>
+                                )}
+
                                 <div className="flex justify-end">
                                     <PrimaryButton
                                         btnType={"submit"}
-                                        text={
-                                            isSubmitting
-                                                ? "Submitting..."
-                                                : "Submit"
-                                        }
+                                        isLoading={isSubmitting}
                                         isDisabled={isSubmitting}
+                                        text={"Submit"}
                                     />
                                 </div>
                             </form>
-
-                            {showConfirm && (
-                                <AlertModal
-                                    title={"Request Submitted"}
-                                    description={
-                                        "Thank you! We’ve received your message. We’ll get in touch soon."
-                                    }
-                                    closeModal={() => setShowConfirm(false)}
-                                    onConfirm={() => setShowConfirm(false)}
-                                />
-                            )}
                         </div>
                     </div>
                 </div>
