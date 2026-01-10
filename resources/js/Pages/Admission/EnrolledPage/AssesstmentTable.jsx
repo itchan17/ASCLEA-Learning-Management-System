@@ -35,7 +35,7 @@ const AssesstmentTable = ({ completedAssessments }) => {
                             completedAssessments.map((assessment, index) => (
                                 <tr
                                     key={index}
-                                    className="hover:bg-ascend-lightblue cursor-pointer"
+                                    className="hover:bg-ascend-lightblue"
                                 >
                                     <td>{assessment.assessment_name}</td>
                                     <td>{assessment.course_name}</td>

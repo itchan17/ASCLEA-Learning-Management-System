@@ -8,6 +8,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Admission\AdmissionFile;
 use App\Models\Student;
+use App\Models\LearningMember;
+use App\Models\AssignedCourse;
 use App\Services\Admissions\AdmissionService;
 use App\Services\NotificationService;
 use Inertia\Inertia;
@@ -44,6 +46,35 @@ class AdmissionFileController extends Controller
                 'enrolledStudents' => $enrolledStudents,
                 'activeTab' => 0,
             ]);
+        } elseif ($user->role->role_name === 'faculty') {
+
+            $facultyLearningMemberIds = LearningMember::where('user_id', $user->user_id)
+                ->pluck('learning_member_id');
+
+            $facultyCoursesIds = AssignedCourse::whereIn('learning_member_id', $facultyLearningMemberIds)
+                ->pluck('course_id');
+
+            $studentLearningMemberIds = AssignedCourse::whereIn('course_id', $facultyCoursesIds)
+                ->pluck('learning_member_id');
+
+            $enrolledStudents = Student::with('user')
+                ->whereIn('user_id', function($query) use ($studentLearningMemberIds) {
+                    $query->select('user_id')
+                        ->from('learning_members')
+                        ->whereIn('learning_member_id', $studentLearningMemberIds);
+                })
+                ->whereIn('enrollment_status', ['enrolled', 'dropout', 'withdrawn'])
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+
+        return Inertia::render('Admission/AdmissionPage', [
+            'enrolledStudents' => $enrolledStudents,
+        ]);
+
+            return Inertia::render('Admission/AdmissionPage', [
+                'enrolledStudents' => $enrolledStudents,
+            ]);
+        
         } else {
             $student = Student::where('user_id', $user->user_id)->first();
             return Inertia::render('Admission/AdmissionPage', [
@@ -132,68 +163,91 @@ class AdmissionFileController extends Controller
 
     //==================== GET ALL PENDING STUDENTS ====================//
     public function getEnrolledStudents(Request $request)
-    {
-        // Get all students whose status is 'enrolled', 'dropout', 'withdrawn' and eager load 'user'
-        // Withdrawn enrollment status is not yet available to the model
-        $query = Student::with(['user', 'admissionFiles'])
-            ->whereIn('enrollment_status', ['enrolled', 'dropout', 'withdrawn']);
+{
+    $user = auth()->user();
+    $query = Student::with(['user', 'admissionFiles'])
+        ->whereIn('enrollment_status', ['enrolled', 'dropout', 'withdrawn']);
 
-        if ($search = $request->input('search')) {
-            $query->whereHas('user', function ($q) use ($search) {
-                $q->where('first_name', 'like', "%{$search}%")
-                    ->orWhere('last_name', 'like', "%{$search}%")
-                    ->orWhere('middle_name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+    // If Faculty, filter students who are in courses assigned to this faculty
+    if ($user->role->role_name === 'faculty') {
+        $query->whereHas('user.learningMembers.courses', function ($q) use ($user) {
+            $q->where('learning_member_id', function($sub) use ($user) {
+                $sub->select('learning_member_id')
+                    ->from('learning_members')
+                    ->where('user_id', $user->user_id);
             });
-        }
-
-        $enrolledStudents = $query->orderBy('created_at', 'desc')
-            ->paginate(10)
-            ->withQueryString();
-
-        return Inertia::render('Admission/AdmissionPage', [
-            'enrolledStudents' => $enrolledStudents,
-        ]);
+        });
     }
+
+    if ($search = $request->input('search')) {
+        $query->whereHas('user', function ($q) use ($search) {
+            $q->where('first_name', 'like', "%{$search}%")
+              ->orWhere('last_name', 'like', "%{$search}%");
+        });
+    }
+
+    $enrolledStudents = $query->orderBy('created_at', 'desc')->paginate(10);
+
+    return Inertia::render('Admission/AdmissionPage', [
+        'enrolledStudents' => $enrolledStudents,
+        'role' => $user->role->role_name,
+    ]);
+}
 
     //==================== VIEW THE CORRESPONDING INFO RELATED TO ENROLLED STUDENTS ====================//
     public function viewEnrolledStudent(Student $student)
-    {
-        // Eager Load student information and admission files (for debugging and validation)
-        $student->load(['user', 'admissionFiles', 'approver']);
+{
+    $user = auth()->user();
+    $student->load(['user', 'admissionFiles', 'approver']);
 
-        // Get all learning members for this student via user_id
-        $learningMembers = \App\Models\LearningMember::with([
-            'program',
-            'courses.course',
-            'courses.assessmentSubmissions.assessment',
-        ])->where('user_id', $student->user_id)
-            ->get();
+    // 1. Get the Faculty's own Learning Member ID (to find their courses)
+    $facultyMemberIds = \App\Models\LearningMember::where('user_id', $user->user_id)
+        ->pluck('learning_member_id');
 
-        // Flatten completed assessments across all learning members
-        $completedAssessments = $learningMembers->flatMap(function ($lm) {
-            return $lm->courses->flatMap(function ($assignedCourse) use ($lm) {
-                return $assignedCourse->assessmentSubmissions
-                    ->whereIn('submission_status', ['submitted', 'returned'])
-                    ->map(function ($submission) use ($assignedCourse, $lm) {
-                        return [
-                            'assessment_name' => $submission->assessment->assessment_title ?? 'N/A',
-                            'course_name' => $assignedCourse->course->course_name ?? 'N/A',
-                            'program_name' => $lm->program->program_name ?? 'N/A',
-                            'score' => $submission->score,
-                            'submitted_at' => $submission->submitted_at,
-                            'status' => $submission->submission_status,
-                        ];
-                    });
-            });
+    // 2. Get the IDs of courses this faculty teaches
+    $facultyCourseIds = \App\Models\AssignedCourse::whereIn('learning_member_id', $facultyMemberIds)
+        ->pluck('course_id');
+
+    // 3. Load Learning Members (Programs) but filter the nested courses
+    $learningMembers = \App\Models\LearningMember::with([
+        'program',
+        'courses' => function($query) use ($facultyCourseIds, $user) {
+            // ONLY show courses taught by this faculty
+            if ($user->role->role_name === 'faculty') {
+                $query->whereIn('course_id', $facultyCourseIds);
+            }
+        },
+        'courses.course',
+        'courses.assessmentSubmissions.assessment'
+    ])
+    ->where('user_id', $student->user_id)
+    ->get()
+    // Filter out programs that now have 0 visible courses for this faculty
+    ->filter(function($lm) use ($user) {
+        return $user->role->role_name !== 'faculty' || $lm->courses->count() > 0;
+    });
+
+    // 4. Flatten only the relevant assessments
+    $completedAssessments = $learningMembers->flatMap(function ($lm) {
+        return $lm->courses->flatMap(function ($assignedCourse) {
+            return $assignedCourse->assessmentSubmissions
+                ->whereIn('submission_status', ['submitted', 'returned'])
+                ->map(fn($submission) => [
+                    'assessment_name' => $submission->assessment->assessment_title ?? 'N/A',
+                    'course_name' => $assignedCourse->course->course_name ?? 'N/A',
+                    'score' => $submission->score,
+                    'status' => $submission->submission_status,
+                ]);
         });
+    });
 
-        return Inertia::render('Admission/EnrolledPage/StudentInfo', [
-            'student' => $student,
-            'learningMembers' => $learningMembers,
-            'completedAssessments' => $completedAssessments,
-        ]);
-    }
+    return Inertia::render('Admission/EnrolledPage/StudentInfo', [
+        'student' => $student,
+        'learningMembers' => $learningMembers->values(), // values() resets array keys for JSON
+        'completedAssessments' => $completedAssessments,
+        'role' => $user->role->role_name,
+    ]);
+}
 
     //==================== FUNCTION OF UPDATING THE INFORMATION OF ACCEPTED/ENROLLED STUDENTS ====================//
     public function updateStudent(Request $request, Student $student)
