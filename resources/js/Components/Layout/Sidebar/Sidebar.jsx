@@ -41,7 +41,7 @@ export default function Sidebar({
             url: "/admission",
             text: "Admission",
             icon: MdSchool,
-            roles: ["admin", "student"],
+            roles: ["admin", "student", "faculty"],
         },
         {
             url: "/programs",

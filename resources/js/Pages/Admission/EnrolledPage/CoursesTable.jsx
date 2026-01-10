@@ -37,7 +37,7 @@ const CoursesTable = ({ learningMembers }) => {
                             allCourses.map((c, index) => (
                                 <tr
                                     key={index}
-                                    className="hover:bg-ascend-lightblue cursor-pointer"
+                                    className="hover:bg-ascend-lightblue"
                                 >
                                     <td>{c.programName}</td>
                                     <td>{c.courseCode}</td>

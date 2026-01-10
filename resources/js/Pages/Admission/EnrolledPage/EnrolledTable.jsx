@@ -7,7 +7,7 @@ import { IoSearch, IoCaretDownOutline } from "react-icons/io5";
 import { debounce } from "lodash";
 import PrimaryButton from "../../../Components/Button/PrimaryButton";
 
-export default function EnrolledStudentsTable({ active }) {
+export default function EnrolledStudentsTable({ active, role }) {
     const route = useRoute();
     const { enrolledStudents } = usePage().props;
     const [search, setSearch] = useState("");
@@ -156,7 +156,7 @@ export default function EnrolledStudentsTable({ active }) {
             </div>
 
             {/*=========================== Download & Pagination ===========================*/}
-            {enrolledStudents?.data?.length > 0 && (
+            {enrolledStudents?.data?.length > 0 && role === 'admin' && (
                 <div className="flex flex-wrap-reverse items-center justify-between gap-5">
                     {/* Download Section (LEFT) */}
                     <div className="flex gap-[1px]">

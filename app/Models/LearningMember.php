@@ -45,7 +45,7 @@ class LearningMember extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id')->withTrashed();
+        return $this->belongsTo(User::class, 's')->withTrashed();
     }
 
     public function courses(): HasMany

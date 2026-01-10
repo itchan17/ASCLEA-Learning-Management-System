@@ -13,7 +13,7 @@ import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToa
 import { BiSolidEditAlt } from "react-icons/bi";
 import Loader from "../../../Components/Loader";
 
-const StudentInfo = () => {
+const StudentInfo = ({ role }) => {
     const { student, learningMembers, completedAssessments } = usePage().props;
     const [isEditDisabled, setIsEditDisabled] = useState(true);
 
@@ -106,11 +106,14 @@ const StudentInfo = () => {
 
             <div className="flex items-center justify-between">
                 <BackButton doSomething={() => window.history.back()} />
+                
+                {role === "admin" && (
                 <PrimaryButton
                     text="Archive"
                     btnColor="bg-ascend-red"
                     doSomething={() => setOpenAlertModal(true)}
-                />
+                />)}
+
             </div>
 
             <div className="flex items-center mt-5">
@@ -216,6 +219,7 @@ const StudentInfo = () => {
                     student={student}
                     setIsEditDisabled={setIsEditDisabled}
                     isEditDisabled={isEditDisabled}
+                    role={role}
                 />
             </div>
             {/* Courses Table */}
