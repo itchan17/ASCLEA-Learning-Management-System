@@ -1,6 +1,8 @@
 import React from "react";
+import { formatFullDate } from "../../../Utils/formatFullDate";
 
 const AssesstmentTable = ({ completedAssessments }) => {
+    console.log(completedAssessments)
     return (
         <div className="font-nunito-sans space-y-2">
             <div className="flex justify-between items-center">
@@ -22,14 +24,11 @@ const AssesstmentTable = ({ completedAssessments }) => {
                                 Points
                             </th>
                             <th className="text-ascend-black font-black">
-                                Status
-                            </th>
-                            <th className="text-ascend-black font-black">
                                 Date Submitted
                             </th>
                         </tr>
                     </thead>
-
+                    
                     <tbody>
                         {completedAssessments.length > 0 ? (
                             completedAssessments.map((assessment, index) => (
@@ -40,11 +39,10 @@ const AssesstmentTable = ({ completedAssessments }) => {
                                     <td>{assessment.assessment_name}</td>
                                     <td>{assessment.course_name}</td>
                                     <td>{assessment.score}</td>
-                                    <td>{assessment.status}</td>
                                     <td>
                                         {new Date(
                                             assessment.submitted_at
-                                        ).toLocaleString()}
+                                        ).toLocaleString()}     
                                     </td>
                                 </tr>
                             ))

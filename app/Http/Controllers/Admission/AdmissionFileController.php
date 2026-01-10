@@ -236,7 +236,7 @@ class AdmissionFileController extends Controller
                     'assessment_name' => $submission->assessment->assessment_title ?? 'N/A',
                     'course_name' => $assignedCourse->course->course_name ?? 'N/A',
                     'score' => $submission->score,
-                    'status' => $submission->submission_status,
+                    'submitted_at' => $submission->submitted_at,
                 ]);
         });
     });
