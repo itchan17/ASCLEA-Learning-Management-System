@@ -12,6 +12,9 @@ import MaterialForm from "./MaterialForm";
 import AssessmentForm from "../../AssessmentsComponents/AssessmentForm";
 import { AiFillLock } from "react-icons/ai";
 import { AiFillCheckCircle } from "react-icons/ai";
+import useMaterial from "../Hooks/useMaterial";
+import useAssessment from "../../AssessmentsComponents/Hooks/useAssessment";
+import AlertModal from "../../../../../../../Components/AlertModal";
 
 export default function SectionContent({
     disabled,
@@ -24,6 +27,20 @@ export default function SectionContent({
     const { program, course } = usePage().props;
 
     const [openEditForm, setOpenEditForm] = useState(false);
+
+    // State for alert modal
+    const [openAlerModal, setOpenAlertModal] = useState(false);
+
+    // Custom hooks
+    const { handleArchiveMaterial, isArchiveMaterialLoading } = useMaterial({
+        programId: program.program_id,
+        courseId: course.course_id,
+    });
+    const { handleArchiveAsessment, isArchiveAssessmentLoading } =
+        useAssessment({
+            programId: program.program_id,
+            courseId: course.course_id,
+        });
 
     const {
         attributes,
@@ -48,38 +65,46 @@ export default function SectionContent({
     };
 
     const handleSectionContentClick = () => {
-        console.log("Clicked");
+        if (!sectionDetails.deleted_at) {
+            if (itemDetails.item_type === "App\\Models\\Programs\\Material") {
+                router.visit(
+                    route("material.view", {
+                        program: program.program_id,
+                        course: course.course_id,
+                        material: itemDetails.item.material_id,
+                    }),
+                    {
+                        preserveScroll: false,
+                    }
+                );
+            } else {
+                router.visit(
+                    route("program.course.assessment.view", {
+                        program: program.program_id,
+                        course: course.course_id,
+                        assessment: itemDetails.item.assessment_id,
+                    }),
+                    {
+                        preserveScroll: false,
+                    }
+                );
+            }
+        }
+    };
 
-        // Code here for route
-
-        // To add the route for this it need to have a contentType that will check if its activity or assessment to specify the route
-        // Currently cant make this functionality as data display in view assessment or view materials is coming from materialList or assessmentList
-        // While data here is coming from sectionContentList inside sectionDetails
-        // If coding backend started the data on view assessment or view materials should be directly coming from backend not on lists in the stores
-
+    const handleDeleteItem = () => {
         if (itemDetails.item_type === "App\\Models\\Programs\\Material") {
-            router.visit(
-                route("material.view", {
-                    program: program.program_id,
-                    course: course.course_id,
-                    material: itemDetails.item.material_id,
-                }),
-                {
-                    preserveScroll: false,
-                }
+            handleArchiveMaterial(
+                itemDetails.item.material_id,
+                itemDetails.section_id
             );
         } else {
-            router.visit(
-                route("program.course.assessment.view", {
-                    program: program.program_id,
-                    course: course.course_id,
-                    assessment: itemDetails.item.assessment_id,
-                }),
-                {
-                    preserveScroll: false,
-                }
+            handleArchiveAsessment(
+                itemDetails.item.assessment_id,
+                itemDetails.section_id
             );
         }
+        closeDropDown();
     };
 
     const stopPropagation = (e) => {
@@ -119,9 +144,9 @@ export default function SectionContent({
                         </div>
                     )}
                     <div
-                        className={`flex items-center gap-2 md:gap-20 justify-between pr-5 pl-5 pb-5 cursor-pointer ${
-                            disabled ? "pt-5" : null
-                        } text-ascend-black`}
+                        className={`flex items-center gap-2 md:gap-20 justify-between pr-5 pl-5 pb-5 ${
+                            sectionDetails.deleted_at ? "" : "cursor-pointer"
+                        } ${disabled ? "pt-5" : null} text-ascend-black`}
                     >
                         <div className="flex items-center space-x-5">
                             <RoleGuard allowedRoles={["student"]}>
@@ -142,10 +167,10 @@ export default function SectionContent({
                         </div>
 
                         {!disabled && (
-                            <RoleGuard allowedRoles={["admin", "faculty"]}>
+                            <RoleGuard allowedRoles={["admin"]}>
                                 <div
                                     onClick={stopPropagation}
-                                    className="dropdown dropdown-end cursor-pointer relative"
+                                    className="dropdown dropdown-end cursor-pointer"
                                 >
                                     <div
                                         tabIndex={0}
@@ -157,14 +182,19 @@ export default function SectionContent({
 
                                     <ul
                                         tabIndex={0}
-                                        className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black absolute z-999"
+                                        className="dropdown-content menu space-y-2 font-bold bg-ascend-white w-32 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                                     >
                                         <li onClick={handleClickEdit}>
                                             <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                                 Edit
                                             </a>
                                         </li>
-                                        <li>
+                                        <li
+                                            onClick={() => {
+                                                setOpenAlertModal(true);
+                                                closeDropDown();
+                                            }}
+                                        >
                                             <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                                 Delete
                                             </a>
@@ -176,6 +206,24 @@ export default function SectionContent({
                     </div>
                 </div>
             </div>
+
+            {/* Display alert modal */}
+            {openAlerModal && (
+                <AlertModal
+                    title={"Delete Confirmation"}
+                    description={
+                        "This action is permanent and cannot be undone. Are you sure you want to delete this item?"
+                    }
+                    closeModal={() => setOpenAlertModal(false)}
+                    onConfirm={handleDeleteItem}
+                    isLoading={
+                        itemDetails.item_type ===
+                        "App\\Models\\Programs\\Material"
+                            ? isArchiveMaterialLoading
+                            : isArchiveAssessmentLoading
+                    }
+                />
+            )}
 
             {openEditForm && (
                 <ModalContainer>

@@ -31,7 +31,10 @@ class PermanentlyDeletePosts extends Command
         $threshholdDate = Carbon::now()->subDays(30);
 
         // Get the all the posts passed the grace period
-        $archivedPosts = Post::onlyTrashed()->where("deleted_at", "<",  $threshholdDate)->get();
+        $archivedPosts = Post::onlyTrashed()
+            ->where("deleted_at", "<",  $threshholdDate)
+            ->whereNull('permanently_deleted_at')
+            ->get();
 
         // Check first if its not empty
         if ($archivedPosts->isNotEmpty()) {
@@ -39,7 +42,8 @@ class PermanentlyDeletePosts extends Command
             foreach ($archivedPosts as $post) {
 
                 // Permemanently deleting the post
-                $post->forceDelete();
+                $post->permanently_deleted_at = now();
+                $post->save();
             }
         }
 

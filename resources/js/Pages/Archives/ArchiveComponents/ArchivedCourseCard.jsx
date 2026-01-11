@@ -84,7 +84,7 @@ export default function ArchivedCourseCard({ courseData }) {
                             {courseData.course_name}
                         </h1>
                         <span className="font-semibold">
-                            Pogram: {courseData.program.program_name}
+                            Program: {courseData.program.program_name}
                         </span>
                         {courseData.course_description && (
                             <p className="text-size1 mt-2">
@@ -119,7 +119,7 @@ export default function ArchivedCourseCard({ courseData }) {
                 <div className="flex  items-center">
                     <div className="flex flex-wrap justify-between items-center space-x-5">
                         <span className="text-size1">
-                            Arhived on {formatFullDate(courseData.deleted_at)}
+                            Archived on {formatFullDate(courseData.deleted_at)}
                         </span>
                         <span className="text-size1">
                             Archived by{" "}
@@ -133,7 +133,10 @@ export default function ArchivedCourseCard({ courseData }) {
                     <div>
                         <span className="text-size1 font-bold">
                             Permanently deletes in{" "}
-                            {getRemainingDays(courseData.deleted_at, 30)}d
+                            {getRemainingDays(courseData.deleted_at, 30) < 0
+                                ? 0
+                                : getRemainingDays(courseData.deleted_at, 30)}
+                            d
                         </span>
                     </div>
                 </div>

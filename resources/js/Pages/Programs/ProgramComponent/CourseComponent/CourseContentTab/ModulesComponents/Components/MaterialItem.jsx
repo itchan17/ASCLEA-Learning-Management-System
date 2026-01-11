@@ -70,8 +70,7 @@ function MaterialItem({ materialDetails, setIsMaterialFormOpen }) {
                                 </span>
                             </div>
                         ) : (
-                            materialDetails.author.user_id ===
-                                auth.user.user_id && (
+                            auth.user.role_name !== "student" && (
                                 <div
                                     className={`px-2 ${
                                         materialDetails.status === "published"
@@ -89,7 +88,8 @@ function MaterialItem({ materialDetails, setIsMaterialFormOpen }) {
                         )}
                     </div>
 
-                    {auth.user.user_id === materialDetails.created_by && (
+                    {(auth.user.user_id === materialDetails.created_by ||
+                        auth.user.role_name === "admin") && (
                         <RoleGuard allowedRoles={["admin", "faculty"]}>
                             <div className="h-8 flex items-center">
                                 <div
