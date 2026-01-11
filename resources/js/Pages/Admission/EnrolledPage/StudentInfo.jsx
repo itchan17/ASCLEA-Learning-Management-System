@@ -7,15 +7,21 @@ import useEnrolledStore from "../../../Stores/Admission/EnrolledStore";
 import DataFormFields from "./DataFormFields";
 import CoursesTable from "./CoursesTable";
 import AssesstmentTable from "./AssesstmentTable";
+import AdmissionFiles from "./AdmissionFiles";
+import GradesTable from "./GradesTable";
 import AlertModal from "../../../Components/AlertModal";
 import { displayToast } from "../../../Utils/displayToast";
 import DefaultCustomToast from "../../../Components/CustomToast/DefaultCustomToast";
 import { BiSolidEditAlt } from "react-icons/bi";
 import Loader from "../../../Components/Loader";
+import { IoCaretDownOutline } from "react-icons/io5";
 
 const StudentInfo = ({ role }) => {
-    const { student, learningMembers, completedAssessments } = usePage().props;
+    const {student, learningMembers, completedAssessments, Grades } = usePage().props;
     const [isEditDisabled, setIsEditDisabled] = useState(true);
+
+    const [isLoading, setIsLoading] = useState(false);
+    const [currentDownload, setCurrentDownload] = useState("PDF");
 
     // ================== ARCHIVE STUDENT HANDLER ==================
     const [openAlertModal, setOpenAlertModal] = useState(false);
@@ -226,8 +232,53 @@ const StudentInfo = ({ role }) => {
                     role={role}
                 />
             </div>
+
+             {/*=========================== Tables Section (Downloadable) ===========================*/}         
+
+            {/* Download Button */}    
+            <div className="flex space-x-[2px] justify-end mt-10">
+                {/* Main Download Button showing current selection */}
+                <PrimaryButton
+                    isDisabled={isLoading}
+                    isLoading={isLoading}
+                    doSomething={() =>
+                        handleExport(currentDownload.toLowerCase())
+                    }
+                    text={`Download ${currentDownload.toUpperCase()}`}
+                />
+
+                {/* Dropdown button for changing format */}
+                <div className="dropdown dropdown-end cursor-pointer">
+                    <button
+                        tabIndex={0}
+                        role="button"
+                        className="px-3 h-10 bg-ascend-blue hover:opacity-80 flex items-center justify-center cursor-pointer text-ascend-white transition-all duration-300"
+                    >
+                        <div className="text-size1">
+                            <IoCaretDownOutline />
+                        </div>
+                    </button>
+
+                    <ul
+                        tabIndex={0}
+                        className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
+                    >
+                        <li onClick={() => setCurrentDownload("PDF")}>
+                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                Download as PDF
+                            </a>
+                        </li>
+                        <li onClick={() => setCurrentDownload("CSV")}>
+                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
+                                Download as CSV
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
             {/* Courses Table */}
-            <div className="mt-10">
+            <div>
                 <CoursesTable learningMembers={learningMembers} />
             </div>
             {/* Assessment Table */}
@@ -236,6 +287,17 @@ const StudentInfo = ({ role }) => {
                     completedAssessments={completedAssessments ?? []}
                 />
             </div>
+            {/* Grades Table */}
+            <div className="mt-10">
+                <GradesTable
+                    Grades={Grades ?? []}
+                />
+            </div>
+            {role === "admin" && (
+            <div className="mt-10">
+                <AdmissionFiles student={student} />
+            </div>
+            )}
         </>
     );
 };

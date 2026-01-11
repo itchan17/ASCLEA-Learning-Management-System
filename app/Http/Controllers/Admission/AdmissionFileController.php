@@ -159,6 +159,7 @@ class AdmissionFileController extends Controller
         return Inertia::render('Admission/PendingPage/EnrollmentRequest', [
             'student' => $student,
         ]);
+        
     }
 
     //==================== GET ALL PENDING STUDENTS ====================//
@@ -241,10 +242,14 @@ class AdmissionFileController extends Controller
         });
     });
 
+    // 5. Prepare Grades data dito lalagay
+    $Grades = [];
+
     return Inertia::render('Admission/EnrolledPage/StudentInfo', [
         'student' => $student,
         'learningMembers' => $learningMembers->values(), // values() resets array keys for JSON
         'completedAssessments' => $completedAssessments,
+        'Grades' => $Grades,
         'role' => $user->role->role_name,
     ]);
 }
