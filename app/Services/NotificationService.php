@@ -14,7 +14,13 @@ class NotificationService
     public function __construct()
     {
         // Set the url where the nootification will be sent real time
-        $this->notificationRoute = config('app.vite_main_url') . ':' . config('app.vite_socket_io_port') . '/notify';
+        $baseUrl = config('app.vite_main_url');
+        $port = config('app.vite_socket_io_port');
+
+        // If port is empty, use base URL (for HTTPS proxy)
+        $this->notificationRoute = $port
+            ? "{$baseUrl}:{$port}/notify"
+            : "{$baseUrl}/notify";
     }
 
     public function notifyUser(string $userId, string $title, string $body, ?string $actionUrl = null)

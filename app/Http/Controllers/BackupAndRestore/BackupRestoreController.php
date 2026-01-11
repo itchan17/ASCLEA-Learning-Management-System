@@ -11,6 +11,7 @@ use App\Services\BackupAndRestore\BackupService;
 use App\Services\BackupAndRestore\RestoreService;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class BackupRestoreController extends Controller
@@ -39,7 +40,7 @@ class BackupRestoreController extends Controller
         GenerateBackup::dispatch($request->user()->user_id);
 
         return back()->with([
-            'message' => 'Backup is currently in progress.'
+            'message' => 'Backup is currently in progress. Please wait.'
         ]);
     }
 
@@ -55,8 +56,13 @@ class BackupRestoreController extends Controller
             $restoreService->restoreDatabase($extractPath);
             $restoreService->restoreFiles($extractPath);
             $restoreService->cleanupExtractedFiles($extractPath);
+
+            // Logout all users
+            DB::table(config('session.table', 'sessions'))->truncate();
+
             Auth::logout();
             request()->session()->invalidate();
+            request()->session()->regenerateToken();
 
             return redirect()->route('login')
                 ->with('success', 'Database restored successfully!');
