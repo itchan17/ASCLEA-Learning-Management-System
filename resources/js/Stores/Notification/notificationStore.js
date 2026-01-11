@@ -62,6 +62,16 @@ const useNotificationStore = create((set) => ({
     },
 
     setIsInitialRender: (val) => set({ isInitialRender: val }),
+
+    clearNotificationState: () => {
+        set({
+            notifications: [],
+            isThereNewNotif: false,
+            isLoaded: false,
+            numOfUnreadNotifications: 0,
+            isInitialRender: true,
+        });
+    },
 }));
 
 export default useNotificationStore;
