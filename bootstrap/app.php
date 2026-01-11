@@ -44,7 +44,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 require base_path('routes/notifications.php');
 
                 // Backup and Restore
-                require base_path('routes/backupAndRestore/backupAndRestore.php');
+                require base_path('routes/BackupAndRestore/backupAndRestore.php');
             });
         },
     )
