@@ -10,6 +10,7 @@ use App\Models\Admission\AdmissionFile;
 use App\Models\Student;
 use App\Models\LearningMember;
 use App\Models\AssignedCourse;
+use App\Models\Programs\Grade;
 use App\Services\Admissions\AdmissionService;
 use App\Services\NotificationService;
 use Inertia\Inertia;
@@ -243,7 +244,26 @@ class AdmissionFileController extends Controller
     });
 
     // 5. Prepare Grades data dito lalagay
-    $Grades = [];
+    $GradesQuery = \App\Models\Programs\Grade::where('status', 'returned')
+        ->whereHas('student.member', function ($query) use ($student) {
+            $query->where('user_id', $student->user_id);
+        });
+
+    // Apply course restriction ONLY for faculty
+    if ($user->role->role_name === 'faculty') {
+        $GradesQuery->whereHas('course', function ($query) use ($facultyCourseIds) {
+            $query->whereIn('course_id', $facultyCourseIds);
+        });
+    }
+
+    $Grades = $GradesQuery
+        ->with('course.program')
+        ->get()
+        ->map(fn ($grade) => [
+            'course_name'  => $grade->course->course_name ?? 'N/A',
+            'program_name' => $grade->course->program->program_name ?? 'N/A',
+            'grade'        => $grade->grade,
+        ]);
 
     return Inertia::render('Admission/EnrolledPage/StudentInfo', [
         'student' => $student,
