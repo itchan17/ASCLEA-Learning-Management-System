@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
+import TermsConditionModal from "./Components/TermsConditionModal";
 import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import useRegistrationStore from "../../Stores/Registration/registrationStore";
@@ -24,11 +25,24 @@ const RegistrationFields = () => {
     const [cityList, setCityList] = useState([]);
     const [barangayList, setBarangayList] = useState([]);
 
+    //Modal Terms and Condition
+    const [isTermsConditionOpen, setIsTermsConditionOpen] = useState(false);
+    const [approvedTerms, setApprovedTerms] = useState(false);
+
     useEffect(() => {
         regions().then((res) => {
             setRegionList(res);
         });
     }, []);
+
+    const closeTermsConditionModal = () => {
+        setIsTermsConditionOpen(false);
+    };
+
+    const approveTerms = () => {
+        setApprovedTerms(true);
+        setIsTermsConditionOpen(false);
+    };
 
     const handleRegionChange = (regionCode) => {
         const selectedRegion = regionList.find(
@@ -89,6 +103,11 @@ const RegistrationFields = () => {
 
     const register = () => {
         setErrorMessage("");
+
+        if (!approvedTerms) {
+            setErrorMessage({ error: "You must agree to the terms and conditions." });
+            return;
+        }
 
         router.post(route("register.user"), registration, {
             replace: true, // Prevent user from going back to this page
@@ -431,6 +450,20 @@ const RegistrationFields = () => {
                     </div>
                 </div>
 
+                <div className="pt-4 flex items-center gap-2">
+                <input
+                    type="checkbox"
+                    className="accent-ascend-blue w-4 h-4 cursor-pointer"
+                    checked={approvedTerms}
+                    onChange={() => {
+                    if (!approvedTerms) {
+                        setIsTermsConditionOpen(true); // open modal only once
+                    }
+                    }}
+                />
+                <span>Terms and Conditions</span>
+                </div>
+
                 {errorMessage.error && (
                     <div
                         role="alert"
@@ -462,6 +495,12 @@ const RegistrationFields = () => {
                     />
                 </div>
             </div>
+
+            {isTermsConditionOpen && (
+                <TermsConditionModal closeTermsConditionModal={closeTermsConditionModal} approveTerms={approveTerms}>
+                    Testasdasd
+                </TermsConditionModal>
+            )}
         </>
     );
 };
