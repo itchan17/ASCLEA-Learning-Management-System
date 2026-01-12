@@ -84,6 +84,9 @@ Route::prefix('admission')
         Route::get('/enrolled/{student}', [AdmissionFileController::class, 'viewEnrolledStudent'])
             ->name('enrolled.student.view');
 
+        Route::get('/admission/{student}/export/{format}', [AdmissionFileController::class, 'exportStudentData'])
+            ->name('admission.export.student');
+
     });
 
 

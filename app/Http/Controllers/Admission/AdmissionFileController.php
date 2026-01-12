@@ -15,6 +15,7 @@ use App\Services\Admissions\AdmissionService;
 use App\Services\NotificationService;
 use Inertia\Inertia;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 
 class AdmissionFileController extends Controller
@@ -560,5 +561,126 @@ class AdmissionFileController extends Controller
             ->loadView('admission.enrolled-students-pdf', compact('students'));
 
         return $pdf->download('enrolled_students.pdf');
+    }
+
+    public function exportStudentData(Request $request, Student $student, string $format)
+    {
+        $user = auth()->user();
+        
+        // Define the dynamic filename based on the student's last name
+        $lastName = $student->user->last_name ?? 'Student';
+        $baseFilename = "{$lastName}_Student_Record";
+
+        // Determine Faculty Restrictions
+        $facultyCourseIds = [];
+        if ($user->role->role_name === 'faculty') {
+            $facultyMemberIds = \App\Models\LearningMember::where('user_id', $user->user_id)
+                ->pluck('learning_member_id');
+                
+            $facultyCourseIds = \App\Models\AssignedCourse::whereIn('learning_member_id', $facultyMemberIds)
+                ->pluck('course_id');
+        }
+
+        // Fetch Programs & Courses (Filtered)
+        $learningMembers = LearningMember::with(['program', 'courses' => function($q) use ($user, $facultyCourseIds) {
+                if ($user->role->role_name === 'faculty') {
+                    $q->whereIn('course_id', $facultyCourseIds);
+                }
+            }, 'courses.course', 'courses.assessmentSubmissions.assessment'])
+            ->where('user_id', $student->user_id)
+            ->get()
+            ->filter(function($lm) use ($user) {
+                return $user->role->role_name !== 'faculty' || $lm->courses->count() > 0;
+            });
+
+        // Flatten Assessments (Filtered)
+        $assessments = $learningMembers->flatMap(function ($lm) {
+            return $lm->courses->flatMap(function ($course) {
+                return $course->assessmentSubmissions
+                    ->whereIn('submission_status', ['submitted', 'returned', 'graded'])
+                    ->map(function ($s) use ($course) {
+                        $submittedAt = $s->submitted_at ? \Carbon\Carbon::parse($s->submitted_at) : null;
+                        return [
+                            'assessment'   => $s->assessment->assessment_title ?? 'N/A',
+                            'course'       => $course->course->course_name ?? 'N/A',
+                            'score'        => $s->score ?? 'Not Graded',
+                            'submitted_at' => $submittedAt ? $submittedAt->format('Y-m-d h:i A') : 'N/A',
+                        ];
+                    });
+            });
+        });
+
+        // Fetch Final Grades (Filtered)
+        $gradesQuery = Grade::where('status', 'returned')
+            ->whereHas('student.member', fn($q) => $q->where('user_id', $student->user_id));
+            
+        if ($user->role->role_name === 'faculty') {
+            $gradesQuery->whereHas('course', fn($q) => $q->whereIn('course_id', $facultyCourseIds));
+        }
+        $grades = $gradesQuery->with(['course.program'])->get();
+
+        // ================== EXPORT LOGIC ==================
+        if (strtolower($format) === 'pdf') {
+            $pdf = Pdf::loadView('admission.student-full-pdf', [
+                'student'         => $student->load('user'),
+                'learningMembers' => $learningMembers,
+                'assessments'     => $assessments,
+                'grades'          => $grades,
+                'exportedBy'      => $user->role->role_name
+            ]);
+
+            // Uses dynamic [LastName]_Student_Record.pdf
+            return $pdf->download("{$baseFilename}.pdf");
+        } 
+        
+        // CSV Export
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename={$baseFilename}.csv", // Uses dynamic [LastName]_Student_Record.csv
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $callback = function() use ($student, $learningMembers, $assessments, $grades) {
+            $file = fopen('php://output', 'w');
+
+            fputcsv($file, ['STUDENT RECORD EXPORT']);
+            fputcsv($file, ['Name', $student->user->first_name . ' ' . $student->user->last_name]);
+            fputcsv($file, ['Email', $student->user->email]);
+            fputcsv($file, []); 
+
+            fputcsv($file, ['--- PROGRAMS & COURSES ---']);
+            fputcsv($file, ['Program Name', 'Course Code', 'Course Name']);
+            foreach ($learningMembers as $lm) {
+                foreach ($lm->courses as $c) {
+                    fputcsv($file, [
+                        $lm->program->program_name ?? 'N/A',
+                        $c->course->course_code ?? 'N/A',
+                        $c->course->course_name ?? 'N/A'
+                    ]);
+                }
+            }
+            fputcsv($file, []); 
+
+            fputcsv($file, ['--- COMPLETED ASSESSMENTS ---']);
+            fputcsv($file, ['Assessment Name', 'Course Name', 'Score/Status', 'Date Submitted']);
+            foreach ($assessments as $a) {
+                fputcsv($file, [$a['assessment'], $a['course'], $a['score'], $a['submitted_at']]);
+            }
+            fputcsv($file, []); 
+
+            fputcsv($file, ['--- FINAL GRADES ---']);
+            fputcsv($file, ['Program', 'Course', 'Grade']);
+            foreach ($grades as $g) {
+                fputcsv($file, [
+                    $g->course->program->program_name ?? 'N/A',
+                    $g->course->course_name ?? 'N/A',
+                    $g->grade
+                ]);
+            }
+            fclose($file);
+        };
+        return response()->stream($callback, 200, $headers);
     }
 }

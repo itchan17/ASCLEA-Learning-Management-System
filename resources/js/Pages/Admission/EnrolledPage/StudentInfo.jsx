@@ -95,6 +95,21 @@ const StudentInfo = ({ role }) => {
         );
     };
 
+    const handleQuickExport = (format) => {
+        setCurrentDownload(format);
+        window.location.href = route("admission.export.student", {
+            student: student.student_id,
+            format: format.toLowerCase(),
+        });
+    };
+
+    const handleExport = () => {
+    window.location.href = route("admission.export.student", {
+        student: student.student_id,
+        format: currentDownload.toLowerCase(),
+    });
+};
+
     return (
         <>
             {/*===========================Alert Modal for Archiving Student===========================*/}
@@ -241,10 +256,8 @@ const StudentInfo = ({ role }) => {
                 <PrimaryButton
                     isDisabled={isLoading}
                     isLoading={isLoading}
-                    doSomething={() =>
-                        handleExport(currentDownload.toLowerCase())
-                    }
-                    text={`Download ${currentDownload.toUpperCase()}`}
+                    doSomething={handleExport}
+                    text={`Download ${currentDownload}`}
                 />
 
                 {/* Dropdown button for changing format */}
@@ -263,12 +276,12 @@ const StudentInfo = ({ role }) => {
                         tabIndex={0}
                         className="text-size2 dropdown-content menu space-y-2 font-medium bg-ascend-white min-w-40 mt-1 px-0 border border-ascend-gray1 shadow-lg !transition-none text-ascend-black"
                     >
-                        <li onClick={() => setCurrentDownload("PDF")}>
+                        <li onClick={() => handleQuickExport("PDF")}>
                             <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                 Download as PDF
                             </a>
                         </li>
-                        <li onClick={() => setCurrentDownload("CSV")}>
+                        <li onClick={() => handleQuickExport("CSV")}>
                             <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
                                 Download as CSV
                             </a>
