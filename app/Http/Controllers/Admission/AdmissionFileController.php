@@ -233,11 +233,12 @@ class AdmissionFileController extends Controller
     $completedAssessments = $learningMembers->flatMap(function ($lm) {
         return $lm->courses->flatMap(function ($assignedCourse) {
             return $assignedCourse->assessmentSubmissions
-                ->whereIn('submission_status', ['submitted', 'returned'])
+                ->whereIn('submission_status', ['submitted', 'returned', 'graded', 'not_submitted'])
                 ->map(fn($submission) => [
                     'assessment_name' => $submission->assessment->assessment_title ?? 'N/A',
                     'course_name' => $assignedCourse->course->course_name ?? 'N/A',
                     'score' => $submission->score,
+                    'status' => $submission->submission_status,
                     'submitted_at' => $submission->submitted_at,
                 ]);
         });
@@ -267,7 +268,7 @@ class AdmissionFileController extends Controller
 
     return Inertia::render('Admission/EnrolledPage/StudentInfo', [
         'student' => $student,
-        'learningMembers' => $learningMembers->values(), // values() resets array keys for JSON
+        'learningMembers' => $learningMembers->values(), 
         'completedAssessments' => $completedAssessments,
         'Grades' => $Grades,
         'role' => $user->role->role_name,

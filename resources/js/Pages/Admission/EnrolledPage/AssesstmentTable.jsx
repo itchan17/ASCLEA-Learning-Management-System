@@ -37,7 +37,11 @@ const AssesstmentTable = ({ completedAssessments }) => {
                                 >
                                     <td>{assessment.assessment_name}</td>
                                     <td>{assessment.course_name}</td>
+                                    {assessment.status === 'submitted' ? (
+                                        <td className="text-ascend-red">Not Graded</td>
+                                    ) : (
                                     <td>{assessment.score}</td>
+                                    )}
                                     <td>
                                         {new Date(
                                             assessment.submitted_at
