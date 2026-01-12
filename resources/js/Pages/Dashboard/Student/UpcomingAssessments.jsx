@@ -31,7 +31,7 @@ export default function UpcomingAssessments() {
                                 Due Date
                             </th>
                             <th className="text-ascend-black font-black">
-                                Possible Score
+                                Score
                             </th>
                         </tr>
                     </thead>
