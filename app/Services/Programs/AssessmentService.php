@@ -130,7 +130,6 @@ class AssessmentService
                     ->whereNull('deleted_at');
             })
             ->whereDoesntHave('sectionItem') // Only gets assessments not created in section
-            ->whereNull('permanently_deleted_at')
             ->select(
                 'assessment_id',
                 'assessment_type_id',
@@ -206,13 +205,7 @@ class AssessmentService
     {
         $assessment->delete(); // Soft delete the assessment
 
-        if (!is_null($assessment->sectionItem)) {
-            $assessment->sectionItem->delete();
-            $this->sectionItemService->decrementSectionItems($assessment->sectionItem);
-            return $this->sectionService->getSectionCompleteDetails($assessment->sectionItem->section);
-        } else {
-            return  $this->getAssessmentCompleteDetails($assessment);
-        }
+        return  $this->getAssessmentCompleteDetails($assessment);
     }
 
     public function restoreAssessment(string $assessmentId)

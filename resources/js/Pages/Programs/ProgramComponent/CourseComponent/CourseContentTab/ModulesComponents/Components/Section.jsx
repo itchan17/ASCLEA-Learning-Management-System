@@ -173,14 +173,6 @@ export default function Section({ sectionDetails }) {
                                         {"Archived"}
                                     </span>
                                 </div>
-                                <span className="font-bold">
-                                    {`Permanently deleted in
-                                                           ${getRemainingDays(
-                                                               sectionDetails.deleted_at,
-                                                               30
-                                                           )}
-                                                            days`}
-                                </span>
                             </div>
                         ) : (
                             <RoleGuard allowedRoles={["admin"]}>

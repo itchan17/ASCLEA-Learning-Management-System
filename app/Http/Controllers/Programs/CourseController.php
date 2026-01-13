@@ -104,16 +104,6 @@ class CourseController extends Controller
         return redirect()->back()->with('success', 'Course restored successfully.');
     }
 
-    public function permanentlyDeleteCourse($programId, $courseId)
-    {
-        $course = Course::withTrashed()->findOrFail($courseId);
-
-        $course->permanently_deleted_at = now();
-        $course->save();
-
-        return redirect()->back()->with('success', 'Course was deleted permanently.');
-    }
-
     // Show selected course
     public function showCourse(Request $request, Program $program, Course $course)
     {

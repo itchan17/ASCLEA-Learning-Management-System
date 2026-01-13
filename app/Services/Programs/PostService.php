@@ -36,7 +36,6 @@ class PostService
                 $q->where('status', 'published')
                     ->whereNull('deleted_at');
             })
-            ->whereNull('permanently_deleted_at')
             ->orderBy('created_at', 'desc')
             ->orderBy('Post_id', 'desc')
             ->paginate(5);

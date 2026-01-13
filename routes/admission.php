@@ -40,10 +40,6 @@ Route::prefix('admission')
         Route::put('/students/{student}/restore', [AdmissionFileController::class, 'restoreStudent'])
             ->name('student.restore');
 
-        // Force delete
-        Route::delete('/students/{student}/permanent-delete', [AdmissionFileController::class, 'permanentlyDeleteStudent'])
-            ->name('student.force.delete');
-
         // Update profile photo
         Route::put('/students/{student}/update-profile', [AdmissionFileController::class, 'updateProfile'])
             ->name('student.profile.update');
@@ -71,7 +67,7 @@ Route::prefix('admission')
             ->name('admission.file.download');
     });
 
-    //Admin and Faculty Routes
+//Admin and Faculty Routes
 Route::prefix('admission')
     ->middleware(['auth', 'verified', 'preventBack', 'checkRole:admin,faculty'])
     ->group(function () {
@@ -86,7 +82,6 @@ Route::prefix('admission')
 
         Route::get('/admission/{student}/export/{format}', [AdmissionFileController::class, 'exportStudentData'])
             ->name('admission.export.student');
-
     });
 
 

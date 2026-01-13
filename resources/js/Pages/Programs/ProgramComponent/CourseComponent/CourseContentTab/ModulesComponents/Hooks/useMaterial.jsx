@@ -208,7 +208,7 @@ export default function useMaterial({ programId, courseId }) {
         }
     };
 
-    const handleArchiveMaterial = async (materialId, sectionId) => {
+    const handleArchiveMaterial = async (materialId) => {
         try {
             setIsArchiveMaterialLoading(true);
             const response = await axios.delete(
@@ -219,13 +219,7 @@ export default function useMaterial({ programId, courseId }) {
                 })
             );
 
-            // Check if sectionId has value
-            // If true tthis mean material is a part of section
-            if (sectionId) {
-                setSectionItems(courseId, sectionId, response.data.data.items);
-            } else {
-                updateMaterialList(response.data.data, courseId);
-            }
+            updateMaterialList(response.data.data, courseId);
 
             displayToast(
                 <DefaultCustomToast message={response.data.success} />,
