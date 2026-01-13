@@ -1,11 +1,10 @@
 import React from "react";
 
-const AssesstmentTable = ({ completedAssessments }) => {
-    console.log(completedAssessments)
+const GradesTable = ({ Grades }) => {
     return (
         <div className="font-nunito-sans space-y-2">
             <div className="flex justify-between items-center">
-                <h1 className="text-size6 font-bold">Completed Assessments</h1>
+                <h1 className="text-size6 font-bold">Grades</h1>
             </div>
 
             {/*=========================== Assessments Table ===========================*/}
@@ -14,39 +13,27 @@ const AssesstmentTable = ({ completedAssessments }) => {
                     <thead>
                         <tr className="border-b-2 border-ascend-gray3">
                             <th className="text-ascend-black font-black">
-                                Assessment Name
+                                Program Name
                             </th>
                             <th className="text-ascend-black font-black">
                                 Course Name
                             </th>
                             <th className="text-ascend-black font-black">
-                                Points
-                            </th>
-                            <th className="text-ascend-black font-black">
-                                Date Submitted
+                                Grade
                             </th>
                         </tr>
                     </thead>
                     
                     <tbody>
-                        {completedAssessments.length > 0 ? (
-                            completedAssessments.map((assessment, index) => (
+                        {Grades.length > 0 ? (
+                            Grades.map((grade, index) => (
                                 <tr
                                     key={index}
                                     className="hover:bg-ascend-lightblue"
                                 >
-                                    <td>{assessment.assessment_name}</td>
-                                    <td>{assessment.course_name}</td>
-                                    {assessment.status === 'submitted' ? (
-                                        <td className="text-ascend-red">Not Graded</td>
-                                    ) : (
-                                    <td>{assessment.score}</td>
-                                    )}
-                                    <td>
-                                        {new Date(
-                                            assessment.submitted_at
-                                        ).toLocaleString()}     
-                                    </td>
+                                    <td>{grade.program_name}</td>
+                                    <td>{grade.course_name}</td>
+                                    <td>{grade.grade}</td>
                                 </tr>
                             ))
                         ) : (
@@ -55,7 +42,7 @@ const AssesstmentTable = ({ completedAssessments }) => {
                                     colSpan={5}
                                     className="text-center py-5 text-ascend-gray2 italic"
                                 >
-                                    No assessments completed.
+                                    No Grades yet.
                                 </td>
                             </tr>
                         )}
@@ -66,4 +53,4 @@ const AssesstmentTable = ({ completedAssessments }) => {
     );
 };
 
-export default AssesstmentTable;
+export default GradesTable;
