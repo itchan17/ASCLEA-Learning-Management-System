@@ -8,6 +8,10 @@ import { calcPercentage } from "../../../../../../../../../Utils/calcPercentage"
 import { convertDurationMinutes } from "../../../../../../../../../Utils/convertDurationMinutes";
 import { cleanDecimal } from "../../../../../../../../../Utils/cleanDecimal";
 import ProfileImage from "../../../../../../../../../Components/ProfileImage";
+import PrimaryButton from "../../../../../../../../../Components/Button/PrimaryButton";
+import AlertModal from "../../../../../../../../../Components/AlertModal";
+import useQuizResult from "../Hooks/useQuizResult";
+import { usePage } from "@inertiajs/react";
 
 export default function StudentQuizDetails({
     assessmentSubmission,
@@ -16,6 +20,8 @@ export default function StudentQuizDetails({
     quiz,
     warningsCount,
 }) {
+    const { assessment, courseId } = usePage().props;
+
     const [isEvidenceOpen, setIsEvidenceOpen] = useState(false);
     const [tabSwitchEvidenceOpen, setTabSwitchEvidenceOpen] = useState(false);
     const [improvementRateDetails, setImprovementRateDetails] = useState({
@@ -23,6 +29,10 @@ export default function StudentQuizDetails({
         data: [],
         improvementPercent: 0,
     });
+    const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+
+    // Custom hook
+    const { handleResetStudentResponse, isResetLoading } = useQuizResult();
 
     const calculateImprovementRate = () => {
         let improvementRateDetails = {};
@@ -85,7 +95,7 @@ export default function StudentQuizDetails({
             } catch (error) {
                 console.error(error);
             }
-        }
+        };
 
         fetchWarnings();
         fetchTabSwitches();
@@ -95,7 +105,32 @@ export default function StudentQuizDetails({
         <div className="bg-ascend-white p-5 space-y-5 border border-ascend-gray1 shadow-shadow1">
             <div className="flex items-center justify-between">
                 <h1 className="text-size6 font-bold">Student Quiz Result</h1>
+                <PrimaryButton
+                    text={"Reset"}
+                    btnColor={"bg-ascend-yellow"}
+                    doSomething={() => setIsAlertModalOpen(true)}
+                />
             </div>
+
+            {isAlertModalOpen && (
+                <AlertModal
+                    title={"Confirm Reset"}
+                    description={
+                        "This will permanently reset the selected student’s response. Do you want to continue?"
+                    }
+                    closeModal={() => setIsAlertModalOpen(false)}
+                    onConfirm={() =>
+                        handleResetStudentResponse(
+                            courseId,
+                            quiz.quiz_id,
+                            assessment.assessment_id,
+                            assessmentSubmission.assessment_submission_id,
+                            setIsAlertModalOpen
+                        )
+                    }
+                    isLoading={isResetLoading}
+                />
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div className="col-span-full lg:col-span-1 space-y-5">
@@ -175,7 +210,9 @@ export default function StudentQuizDetails({
                                 Tab Switches
                                 <span
                                     onClick={() =>
-                                        setTabSwitchEvidenceOpen(!tabSwitchEvidenceOpen)
+                                        setTabSwitchEvidenceOpen(
+                                            !tabSwitchEvidenceOpen
+                                        )
                                     }
                                     className="ml-2 text-ascend-black text-size1 cursor-pointer hover:text-ascend-blue transition-all duration-300 text-nowrap hover:underline"
                                 >
@@ -270,7 +307,6 @@ export default function StudentQuizDetails({
                     studentData={studentData}
                 />
             )}
-            
         </div>
     );
 }
