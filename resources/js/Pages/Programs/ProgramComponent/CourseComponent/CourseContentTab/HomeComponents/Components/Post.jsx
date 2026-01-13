@@ -161,12 +161,12 @@ export default function Post({ postContent }) {
                         <span className="text-size1">
                             {postContent.deleted_at
                                 ? `Archived on ${formatFullDate(
-                                      postContent.created_at
+                                      postContent.deleted_at
                                   )}`
                                 : postContent.updated_at !==
                                   postContent.created_at
                                 ? `Updated on ${formatFullDate(
-                                      postContent.created_at
+                                      postContent.updated_at
                                   )}`
                                 : `Posted on ${formatFullDate(
                                       postContent.created_at

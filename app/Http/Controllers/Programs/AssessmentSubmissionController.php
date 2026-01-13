@@ -268,4 +268,17 @@ class AssessmentSubmissionController extends Controller
             $assessment
         );
     }
+
+    // Handles reset for student assessment submission
+    public function resetStudentSubmission(Request $request, Course $course, Assessment $assessment, Quiz $quiz, AssessmentSubmission $assessmentSubmission)
+    {
+        // Soft delete current student assessment submission
+        $assessmentSubmission->delete();
+
+        return to_route('assessment.responses.view', [
+            'program'    => $course->program,
+            'course'     => $course,
+            'assessment' => $assessment,
+        ])->with('success', 'Student response reset successfully.');
+    }
 }
