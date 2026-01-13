@@ -121,7 +121,9 @@ export default function AssessmentItem({
         <>
             <div
                 onClick={handleCardClick}
-                className="flex flex-col justify-between border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 cursor-pointer card-hover mt-5"
+                className={`flex flex-col justify-between border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 card-hover mt-5 ${
+                    assessmentDetails.deleted_at ? "" : "cursor-pointer"
+                }`}
             >
                 <div className="flex items-start sm:items-center gap-2 md:gap-2">
                     <div className="flex-1 min-w-0 flex flex-wrap gap-5">
@@ -148,14 +150,6 @@ export default function AssessmentItem({
                                         {"Archived"}
                                     </span>
                                 </div>
-                                <span className="font-bold">
-                                    {`Permanently deleted in
-                                   ${getRemainingDays(
-                                       assessmentDetails.deleted_at,
-                                       30
-                                   )}
-                                    days`}
-                                </span>
                             </div>
                         ) : (
                             auth.user.role_name !== "student" && (
@@ -308,12 +302,16 @@ export default function AssessmentItem({
 
                 <div className="flex flex-wrap-reverse justify-between items-baseline font-nunito-sans gap-2">
                     <span className="text-size1">
-                        {assessmentDetails.created_at !==
-                        assessmentDetails.updated_at
-                            ? ` Updated on ${formatDueDateTime(
+                        {assessmentDetails.deleted_at
+                            ? `Archived on ${formatFullDate(
+                                  assessmentDetails.deleted_at
+                              )}`
+                            : assessmentDetails.updated_at !==
+                              assessmentDetails.created_at
+                            ? `Updated on ${formatFullDate(
                                   assessmentDetails.updated_at
                               )}`
-                            : ` Posted on ${formatFullDate(
+                            : `Created on ${formatFullDate(
                                   assessmentDetails.created_at
                               )}`}
                     </span>

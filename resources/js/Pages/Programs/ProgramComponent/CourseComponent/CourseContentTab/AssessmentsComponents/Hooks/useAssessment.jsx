@@ -192,7 +192,7 @@ export default function useAssessment({ programId, courseId }) {
         }
     };
 
-    const handleArchiveAsessment = async (assessmentId, sectionId) => {
+    const handleArchiveAsessment = async (assessmentId) => {
         closeDropDown();
 
         try {
@@ -208,11 +208,7 @@ export default function useAssessment({ programId, courseId }) {
 
             // Check if sectionId has value
             // If true tthis mean material is a part of section
-            if (sectionId) {
-                setSectionItems(courseId, sectionId, response.data.data.items);
-            } else {
-                updateAssessmentInList(response.data.data, courseId);
-            }
+            updateAssessmentInList(response.data.data, courseId);
 
             displayToast(
                 <DefaultCustomToast message={response.data.success} />,

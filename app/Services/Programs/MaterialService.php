@@ -90,7 +90,6 @@ class MaterialService
                     ->whereNull('deleted_at');
             })
             ->whereDoesntHave('sectionItem') // Only gets materials not created in section
-            ->whereNull('permanently_deleted_at')
             ->orderBy('created_at', 'desc')
             ->orderBy('material_id', 'desc')
             ->paginate(5);
@@ -144,13 +143,8 @@ class MaterialService
     {
 
         $material->delete(); // Soft delete the material 
-        if (!is_null($material->sectionItem)) {
-            $material->sectionItem->delete();
-            $this->sectionItemService->decrementSectionItems($material->sectionItem);
-            return $this->sectionService->getSectionCompleteDetails($material->sectionItem->section);
-        } else {
-            return  $this->getmaterialCompleteDetails($material);
-        }
+
+        return  $this->getmaterialCompleteDetails($material);
     }
 
     public function restoreMaterial(string $materialId)

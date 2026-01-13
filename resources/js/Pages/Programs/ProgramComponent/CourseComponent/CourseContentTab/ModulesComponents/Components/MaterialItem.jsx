@@ -41,7 +41,9 @@ function MaterialItem({ materialDetails, setIsMaterialFormOpen }) {
         <>
             <div
                 onClick={() => handleViewMaterial(materialDetails)}
-                className="flex flex-col justify-between border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 cursor-pointer card-hover mt-5"
+                className={`flex flex-col justify-between border border-ascend-gray1 shadow-shadow1 p-5 space-y-5 card-hover mt-5 ${
+                    materialDetails.deleted_at ? "" : "cursor-pointer"
+                }`}
             >
                 <div className="flex items-center gap-2 md:gap-20">
                     <div className="flex-1 min-w-0 flex flex-wrap gap-5">
@@ -60,14 +62,6 @@ function MaterialItem({ materialDetails, setIsMaterialFormOpen }) {
                                         {"Archived"}
                                     </span>
                                 </div>
-                                <span className="font-bold">
-                                    {`Permanently deleted in
-                                                           ${getRemainingDays(
-                                                               materialDetails.deleted_at,
-                                                               30
-                                                           )}
-                                                            days`}
-                                </span>
                             </div>
                         ) : (
                             auth.user.role_name !== "student" && (
@@ -191,7 +185,18 @@ function MaterialItem({ materialDetails, setIsMaterialFormOpen }) {
 
                 <div className="flex flex-wrap-reverse justify-between items-baseline font-nunito-sans gap-2">
                     <span className="text-size1">
-                        Posted on {formatFullDate(materialDetails.updated_at)}
+                        {materialDetails.deleted_at
+                            ? `Archived on ${formatFullDate(
+                                  materialDetails.deleted_at
+                              )}`
+                            : materialDetails.updated_at !==
+                              materialDetails.created_at
+                            ? `Updated on ${formatFullDate(
+                                  materialDetails.updated_at
+                              )}`
+                            : `Created on ${formatFullDate(
+                                  materialDetails.created_at
+                              )}`}
                     </span>
                     <span className="font-bold">
                         {materialDetails.author.first_name}{" "}

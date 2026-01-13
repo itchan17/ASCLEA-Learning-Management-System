@@ -12,9 +12,6 @@ import MaterialForm from "./MaterialForm";
 import AssessmentForm from "../../AssessmentsComponents/AssessmentForm";
 import { AiFillLock } from "react-icons/ai";
 import { AiFillCheckCircle } from "react-icons/ai";
-import useMaterial from "../Hooks/useMaterial";
-import useAssessment from "../../AssessmentsComponents/Hooks/useAssessment";
-import AlertModal from "../../../../../../../Components/AlertModal";
 
 export default function SectionContent({
     disabled,
@@ -27,20 +24,6 @@ export default function SectionContent({
     const { program, course } = usePage().props;
 
     const [openEditForm, setOpenEditForm] = useState(false);
-
-    // State for alert modal
-    const [openAlerModal, setOpenAlertModal] = useState(false);
-
-    // Custom hooks
-    const { handleArchiveMaterial, isArchiveMaterialLoading } = useMaterial({
-        programId: program.program_id,
-        courseId: course.course_id,
-    });
-    const { handleArchiveAsessment, isArchiveAssessmentLoading } =
-        useAssessment({
-            programId: program.program_id,
-            courseId: course.course_id,
-        });
 
     const {
         attributes,
@@ -90,21 +73,6 @@ export default function SectionContent({
                 );
             }
         }
-    };
-
-    const handleDeleteItem = () => {
-        if (itemDetails.item_type === "App\\Models\\Programs\\Material") {
-            handleArchiveMaterial(
-                itemDetails.item.material_id,
-                itemDetails.section_id
-            );
-        } else {
-            handleArchiveAsessment(
-                itemDetails.item.assessment_id,
-                itemDetails.section_id
-            );
-        }
-        closeDropDown();
     };
 
     const stopPropagation = (e) => {
@@ -189,16 +157,6 @@ export default function SectionContent({
                                                 Edit
                                             </a>
                                         </li>
-                                        <li
-                                            onClick={() => {
-                                                setOpenAlertModal(true);
-                                                closeDropDown();
-                                            }}
-                                        >
-                                            <a className="w-full text-left hover:bg-ascend-lightblue hover:text-ascend-blue transition duration-300">
-                                                Delete
-                                            </a>
-                                        </li>
                                     </ul>
                                 </div>
                             </RoleGuard>
@@ -206,24 +164,6 @@ export default function SectionContent({
                     </div>
                 </div>
             </div>
-
-            {/* Display alert modal */}
-            {openAlerModal && (
-                <AlertModal
-                    title={"Delete Confirmation"}
-                    description={
-                        "This action is permanent and cannot be undone. Are you sure you want to delete this item?"
-                    }
-                    closeModal={() => setOpenAlertModal(false)}
-                    onConfirm={handleDeleteItem}
-                    isLoading={
-                        itemDetails.item_type ===
-                        "App\\Models\\Programs\\Material"
-                            ? isArchiveMaterialLoading
-                            : isArchiveAssessmentLoading
-                    }
-                />
-            )}
 
             {openEditForm && (
                 <ModalContainer>

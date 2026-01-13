@@ -31,6 +31,9 @@ Route::prefix('courses/{course}/assessments/{assessment}/')
         // Route for showing the quiz result 
         Route::post('quizzes/{quiz}/assessment-submissions/{assessmentSubmission}/result/ai/feedback', [AssessmentSubmissionController::class, 'quizResultFeedback'])->can('generateQuizResultFeedback', 'assessmentSubmission')->name('generate.quiz.result.feedback');
 
+        // Reset student assessment submission
+        Route::delete('quizzes/{quiz}/assessment-submissions/{assessmentSubmission}', [AssessmentSubmissionController::class, 'resetStudentSubmission'])->can('resetStudentAssessmentSubmission', [AssessmentSubmission::class, 'assessment'])->name('reset.student.assessment.submission');
+
         // Route for uploading activity files
         Route::put('activity/files', [AssessmentSubmissionController::class, 'uploadActivityFiles'])->can('uploadActivityFile', [AssessmentSubmission::class, 'course'])->name('upload.activity.files');
 
