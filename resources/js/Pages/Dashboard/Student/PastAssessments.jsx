@@ -32,7 +32,7 @@ export default function PastAssessments() {
                                 Score
                             </th>
                             <th className="text-ascend-black font-black">
-                                Status
+                                Submitted At
                             </th>
                         </tr>
                     </thead>
@@ -55,7 +55,9 @@ export default function PastAssessments() {
                                                 "No Due Date"}
                                         </td>
                                         <td>{assessment.score}</td>
-                                        <td>{assessment.status}</td>
+                                        <td className="text-ascend-gray4">
+                                            {assessment.submitted_at}
+                                        </td>
                                     </tr>
                                 )
                             )
