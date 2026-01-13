@@ -304,12 +304,12 @@ export default function AssessmentItem({
                     <span className="text-size1">
                         {assessmentDetails.deleted_at
                             ? `Archived on ${formatFullDate(
-                                  assessmentDetails.created_at
+                                  assessmentDetails.deleted_at
                               )}`
                             : assessmentDetails.updated_at !==
                               assessmentDetails.created_at
                             ? `Updated on ${formatFullDate(
-                                  assessmentDetails.created_at
+                                  assessmentDetails.updated_at
                               )}`
                             : `Created on ${formatFullDate(
                                   assessmentDetails.created_at

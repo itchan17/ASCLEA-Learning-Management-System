@@ -187,12 +187,12 @@ function MaterialItem({ materialDetails, setIsMaterialFormOpen }) {
                     <span className="text-size1">
                         {materialDetails.deleted_at
                             ? `Archived on ${formatFullDate(
-                                  materialDetails.created_at
+                                  materialDetails.deleted_at
                               )}`
                             : materialDetails.updated_at !==
                               materialDetails.created_at
                             ? `Updated on ${formatFullDate(
-                                  materialDetails.created_at
+                                  materialDetails.updated_at
                               )}`
                             : `Created on ${formatFullDate(
                                   materialDetails.created_at
