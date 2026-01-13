@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import PrimaryButton from "../../Components/Button/PrimaryButton";
-import TermsConditionModal from "./Components/TermsConditionModal";
+import AlertModal from "../../Components/AlertModal";
 import { router, usePage } from "@inertiajs/react";
 import { useRoute } from "ziggy-js";
 import useRegistrationStore from "../../Stores/Registration/registrationStore";
@@ -455,11 +455,14 @@ const RegistrationFields = () => {
                     type="checkbox"
                     className="accent-ascend-blue w-4 h-4 cursor-pointer"
                     checked={approvedTerms}
-                    onChange={() => {
-                    if (!approvedTerms) {
-                        setIsTermsConditionOpen(true); // open modal only once
-                    }
+                    onChange={(e) => {
+                        if (!approvedTerms) {
+                            setIsTermsConditionOpen(true);
+                        } else {
+                            setApprovedTerms(false);
+                        }
                     }}
+
                 />
                 <span>Terms and Conditions</span>
                 </div>
@@ -497,10 +500,50 @@ const RegistrationFields = () => {
             </div>
 
             {isTermsConditionOpen && (
-                <TermsConditionModal closeTermsConditionModal={closeTermsConditionModal} approveTerms={approveTerms}>
-                    Testasdasd
-                </TermsConditionModal>
+                <AlertModal
+                    title={
+                        "Terms and Conditions"
+                    }
+                    customBody={
+                        <div className="text-size2 text-justify my-4 p-4 border border-ascend-gray1 max-h-64 overflow-y-auto">
+                            <ol className="list-decimal pl-5 space-y-2 marker:font-semibold">
+                                <li>
+                                By using this Learning Management System (LMS), you agree to provide personal information
+                                such as your name, email address, and other details required for registration and course
+                                participation. This information is collected to ensure a smooth and personalized learning
+                                experience.
+                                </li>
+
+                                <li>
+                                During online quizzes or assessments, the LMS may monitor user activity and capture
+                                screenshots to detect any suspicious behavior that may indicate academic dishonesty.
+                                This process helps maintain fairness and integrity in the learning environment.
+                                </li>
+
+                                <li>
+                                All personal data and quiz monitoring information collected by the LMS will be securely
+                                stored and handled in compliance with applicable data protection laws. The data will be
+                                used solely for educational purposes and system functionality.
+                                </li>
+
+                                <li>
+                                By participating in quizzes and using the LMS, you explicitly consent to the collection
+                                and monitoring of data as described in these terms.
+                                </li>
+
+                                <li>
+                                Personal data will be retained only for as long as necessary to fulfill the purposes
+                                outlined in this agreement. Users have the right to request information regarding their
+                                data and its usage at any time.
+                                </li>
+                            </ol>
+                        </div>
+                    }
+                    onConfirm={approveTerms}
+                    closeModal={closeTermsConditionModal}
+                />
             )}
+
         </>
     );
 };
