@@ -20,7 +20,7 @@ export default function StudentQuizDetails({
     quiz,
     warningsCount,
 }) {
-    const { assessment, courseId } = usePage().props;
+    const { assessment, courseId, auth } = usePage().props;
 
     const [isEvidenceOpen, setIsEvidenceOpen] = useState(false);
     const [tabSwitchEvidenceOpen, setTabSwitchEvidenceOpen] = useState(false);
@@ -105,11 +105,14 @@ export default function StudentQuizDetails({
         <div className="bg-ascend-white p-5 space-y-5 border border-ascend-gray1 shadow-shadow1">
             <div className="flex items-center justify-between">
                 <h1 className="text-size6 font-bold">Student Quiz Result</h1>
-                <PrimaryButton
-                    text={"Reset"}
-                    btnColor={"bg-ascend-yellow"}
-                    doSomething={() => setIsAlertModalOpen(true)}
-                />
+                {(auth.user.role_name === "admin" ||
+                    assessment.created_by === auth.user.user_id) && (
+                    <PrimaryButton
+                        text={"Reset"}
+                        btnColor={"bg-ascend-yellow"}
+                        doSomething={() => setIsAlertModalOpen(true)}
+                    />
+                )}
             </div>
 
             {isAlertModalOpen && (
