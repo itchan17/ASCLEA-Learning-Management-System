@@ -123,60 +123,78 @@ export default function ViewMember() {
                     <tbody>
                         {assignedCourses &&
                             assignedCourses.length > 0 &&
-                            assignedCourses.map((assignedCourse) => (
-                                <tr
-                                    key={assignedCourse.course.course_id}
-                                    className="hover:bg-ascend-lightblue transition-all duration-300"
-                                >
-                                    <td>
-                                        {assignedCourse.course.course_code
-                                            ? assignedCourse.course.course_code
-                                            : ""}
-                                    </td>
-                                    <td>{assignedCourse.course.course_name}</td>
-                                    <td>
-                                        {assignedCourse.course.course_day
-                                            ? `${
-                                                  capitalize(
-                                                      assignedCourse.course
-                                                          .course_day
-                                                  ) +
-                                                  `${
-                                                      assignedCourse.course
-                                                          .start_time
-                                                          ? " - "
-                                                          : ""
-                                                  }`
-                                              }  ${
-                                                  assignedCourse.course
-                                                      .start_time
-                                                      ? `${formatTime(
-                                                            assignedCourse
-                                                                .course.end_time
-                                                        )} to ${formatTime(
-                                                            assignedCourse
-                                                                .course.end_time
-                                                        )}`
-                                                      : ""
-                                              }`
-                                            : "No schedule"}
-                                    </td>
-                                    <RoleGuard allowedRoles={["admin"]}>
-                                        <td>
-                                            <span
-                                                onClick={() =>
-                                                    handleRemoveAssignedCourse(
-                                                        assignedCourse.assigned_course_id
-                                                    )
+                            assignedCourses.map((assignedCourse) => {
+                                if (assignedCourse.course) {
+                                    return (
+                                        <tr
+                                            key={
+                                                assignedCourse.course.course_id
+                                            }
+                                            className="hover:bg-ascend-lightblue transition-all duration-300"
+                                        >
+                                            <td>
+                                                {assignedCourse.course
+                                                    .course_code
+                                                    ? assignedCourse.course
+                                                          .course_code
+                                                    : ""}
+                                            </td>
+                                            <td>
+                                                {
+                                                    assignedCourse.course
+                                                        .course_name
                                                 }
-                                                className="text-ascend-red transition-all duration-300 hover:bg-ascend-red hover:text-ascend-white font-bold py-1 px-2 cursor-pointer"
-                                            >
-                                                Remove
-                                            </span>
-                                        </td>
-                                    </RoleGuard>
-                                </tr>
-                            ))}
+                                            </td>
+                                            <td>
+                                                {assignedCourse.course
+                                                    .course_day
+                                                    ? `${
+                                                          capitalize(
+                                                              assignedCourse
+                                                                  .course
+                                                                  .course_day
+                                                          ) +
+                                                          `${
+                                                              assignedCourse
+                                                                  .course
+                                                                  .start_time
+                                                                  ? " - "
+                                                                  : ""
+                                                          }`
+                                                      }  ${
+                                                          assignedCourse.course
+                                                              .start_time
+                                                              ? `${formatTime(
+                                                                    assignedCourse
+                                                                        .course
+                                                                        .end_time
+                                                                )} to ${formatTime(
+                                                                    assignedCourse
+                                                                        .course
+                                                                        .end_time
+                                                                )}`
+                                                              : ""
+                                                      }`
+                                                    : "No schedule"}
+                                            </td>
+                                            <RoleGuard allowedRoles={["admin"]}>
+                                                <td>
+                                                    <span
+                                                        onClick={() =>
+                                                            handleRemoveAssignedCourse(
+                                                                assignedCourse.assigned_course_id
+                                                            )
+                                                        }
+                                                        className="text-ascend-red transition-all duration-300 hover:bg-ascend-red hover:text-ascend-white font-bold py-1 px-2 cursor-pointer"
+                                                    >
+                                                        Remove
+                                                    </span>
+                                                </td>
+                                            </RoleGuard>
+                                        </tr>
+                                    );
+                                }
+                            })}
                     </tbody>
                 </table>
                 {assignedCourses.length === 0 && (
